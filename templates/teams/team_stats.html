@@ -1,0 +1,223 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}{{ team.name }} - Statistics - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-6">
+        <div class="flex items-center gap-3 mb-2">
+            <a href="{% url 'teams:detail' slug=team.slug %}" class="text-gray-400 hover:text-white transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <h1 class="text-white text-2xl md:text-3xl font-bold">Team Statistics</h1>
+        </div>
+        <p class="text-gray-400 text-sm md:text-base">Performance metrics and analytics for {{ team.name }}</p>
+    </div>
+
+    <!-- Overview Cards (Requirements 8.1, 8.2) -->
+    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+        <!-- Tournaments Played -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-xs md:text-sm">Tournaments</span>
+                <span class="material-symbols-outlined text-blue-400 text-lg md:text-xl">emoji_events</span>
+            </div>
+            <p class="text-white text-2xl md:text-3xl font-bold">{{ statistics.tournaments_played }}</p>
+        </div>
+
+        <!-- Tournaments Won -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-xs md:text-sm">Won</span>
+                <span class="material-symbols-outlined text-yellow-400 text-lg md:text-xl">trophy</span>
+            </div>
+            <p class="text-white text-2xl md:text-3xl font-bold">{{ statistics.tournaments_won }}</p>
+        </div>
+
+        <!-- Win Rate -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-xs md:text-sm">Win Rate</span>
+                <span class="material-symbols-outlined text-green-400 text-lg md:text-xl">trending_up</span>
+            </div>
+            <p class="text-white text-2xl md:text-3xl font-bold">{{ statistics.win_rate }}%</p>
+            <p class="text-gray-400 text-xs mt-1">{{ statistics.total_wins }}W - {{ statistics.total_losses }}L</p>
+        </div>
+
+        <!-- Current Streak -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-400 text-xs md:text-sm">Streak</span>
+                {% if statistics.current_streak.type == 'win' %}
+                <span class="material-symbols-outlined text-green-400 text-lg md:text-xl">local_fire_department</span>
+                {% elif statistics.current_streak.type == 'loss' %}
+                <span class="material-symbols-outlined text-red-400 text-lg md:text-xl">trending_down</span>
+                {% else %}
+                <span class="material-symbols-outlined text-gray-400 text-lg md:text-xl">remove</span>
+                {% endif %}
+            </div>
+            {% if statistics.current_streak.type == 'win' %}
+            <p class="text-green-400 text-2xl md:text-3xl font-bold">{{ statistics.current_streak.count }}W</p>
+            <p class="text-gray-400 text-xs mt-1">Win Streak</p>
+            {% elif statistics.current_streak.type == 'loss' %}
+            <p class="text-red-400 text-2xl md:text-3xl font-bold">{{ statistics.current_streak.count }}L</p>
+            <p class="text-gray-400 text-xs mt-1">Loss Streak</p>
+            {% else %}
+            <p class="text-gray-400 text-2xl md:text-3xl font-bold">-</p>
+            <p class="text-gray-400 text-xs mt-1">No matches</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- Left Column: Performance Trends and Recent Matches -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Performance Chart (Requirement 8.4, 8.5) -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">show_chart</span>
+                    Performance Trend
+                </h2>
+                
+                {% if performance_trends %}
+                <div class="space-y-3">
+                    {% for month_data in performance_trends %}
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-gray-400 text-sm">{{ month_data.month }}</span>
+                            <span class="text-gray-400 text-sm">{{ month_data.total }} matches</span>
+                        </div>
+                        <div class="flex gap-1 h-8">
+                            {% if month_data.total > 0 %}
+                            <div class="bg-green-500 rounded flex items-center justify-center text-white text-xs font-medium" 
+                                 style="width: {{ month_data.wins|floatformat:0|add:0 }}%; min-width: {% if month_data.wins > 0 %}30px{% else %}0{% endif %};">
+                                {% if month_data.wins > 0 %}{{ month_data.wins }}W{% endif %}
+                            </div>
+                            <div class="bg-red-500 rounded flex items-center justify-center text-white text-xs font-medium" 
+                                 style="width: {{ month_data.losses|floatformat:0|add:0 }}%; min-width: {% if month_data.losses > 0 %}30px{% else %}0{% endif %};">
+                                {% if month_data.losses > 0 %}{{ month_data.losses }}L{% endif %}
+                            </div>
+                            {% else %}
+                            <div class="bg-gray-700 rounded w-full flex items-center justify-center text-gray-400 text-xs">
+                                No matches
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <span class="material-symbols-outlined text-gray-600 text-5xl mb-2">bar_chart</span>
+                    <p class="text-gray-400">No performance data available yet</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Matches (Requirement 8.4) -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">history</span>
+                    Recent Matches
+                </h2>
+                
+                {% if recent_matches %}
+                <div class="space-y-3">
+                    {% for match in recent_matches %}
+                    <div class="bg-input-dark border border-card-border-dark rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3">
+                                {% if match.result == 'win' %}
+                                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded font-medium">WIN</span>
+                                {% else %}
+                                <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded font-medium">LOSS</span>
+                                {% endif %}
+                                <span class="text-white font-medium">vs {{ match.opponent }}</span>
+                            </div>
+                            <span class="text-white font-bold">{{ match.team_score }} - {{ match.opponent_score }}</span>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-400 text-sm">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">emoji_events</span>
+                                {{ match.tournament.name }}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">calendar_today</span>
+                                {{ match.date|date:"M d, Y" }}
+                            </span>
+                            <span>Round {{ match.round }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <span class="material-symbols-outlined text-gray-600 text-5xl mb-2">sports_esports</span>
+                    <p class="text-gray-400">No match history available yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Member Statistics -->
+        <div class="lg:col-span-1">
+            <!-- Member Statistics Table (Requirement 8.3) -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">group</span>
+                    Member Statistics
+                </h2>
+                
+                {% if member_statistics %}
+                <div class="space-y-3">
+                    {% for member in member_statistics %}
+                    <div class="bg-input-dark border border-card-border-dark rounded-lg p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            {% if member.user.profile_picture %}
+                            <img src="{{ member.user.profile_picture.url }}" alt="{{ member.user.get_display_name }}" 
+                                 class="w-10 h-10 rounded-full object-cover">
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-sm">person</span>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium truncate">{{ member.user.get_display_name }}</p>
+                                <p class="text-gray-400 text-xs">{{ member.role }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <p class="text-gray-400 text-xs">Matches</p>
+                                <p class="text-white font-medium">{{ member.matches_played }}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-xs">Wins</p>
+                                <p class="text-white font-medium">{{ member.matches_won }}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-gray-400 text-xs mb-1">Win Rate</p>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 bg-gray-700 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ member.win_rate }}%"></div>
+                                    </div>
+                                    <span class="text-white text-xs font-medium">{{ member.win_rate }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8">
+                    <span class="material-symbols-outlined text-gray-600 text-5xl mb-2">person_off</span>
+                    <p class="text-gray-400">No member statistics available</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

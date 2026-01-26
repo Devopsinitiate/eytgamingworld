@@ -1,0 +1,237 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Report Match Score - {{ match.tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center gap-2 text-gray-400 text-sm mb-4">
+            <a href="{% url 'tournaments:list' %}" class="hover:text-primary">Tournaments</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <a href="{% url 'tournaments:detail' match.tournament.slug %}" class="hover:text-primary">{{ match.tournament.name }}</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <a href="{% url 'tournaments:bracket' match.tournament.slug %}" class="hover:text-primary">Bracket</a>
+            <span class="material-symbols-outlined text-xs">chevron_right</span>
+            <span class="text-white">Report Score</span>
+        </div>
+        <h1 class="text-white text-3xl font-bold mb-2">Report Match Score</h1>
+        <p class="text-gray-400">Round {{ match.round_number }}, Match {{ match.match_number }}</p>
+    </div>
+
+    <!-- Match Information Card -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
+        <h2 class="text-white text-xl font-bold mb-4">Match Information</h2>
+        
+        <div class="space-y-4">
+            <!-- Tournament -->
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Tournament:</span>
+                <span class="text-white font-medium">{{ match.tournament.name }}</span>
+            </div>
+            
+            <!-- Round & Match -->
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Round:</span>
+                <span class="text-white font-medium">Round {{ match.round_number }}, Match {{ match.match_number }}</span>
+            </div>
+            
+            <!-- Format -->
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Format:</span>
+                <span class="text-white font-medium">Best of {{ match.tournament.best_of }}</span>
+            </div>
+            
+            {% if match.scheduled_time %}
+            <!-- Scheduled Time -->
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Scheduled:</span>
+                <span class="text-white font-medium">{{ match.scheduled_time|date:"M d, Y g:i A" }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Participants Card -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
+        <h2 class="text-white text-xl font-bold mb-4">Participants</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Participant 1 -->
+            <div class="bg-background-dark rounded-lg p-4 border border-card-border-dark">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-2xl">person</span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">{{ match.participant1.display_name }}</h3>
+                        <p class="text-gray-400 text-sm">Participant 1</p>
+                    </div>
+                </div>
+                {% if match.participant1.seed %}
+                <div class="text-sm text-gray-400">
+                    <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
+                    Seed: {{ match.participant1.seed }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- VS Divider -->
+            <div class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-card-dark border-2 border-card-border-dark rounded-full items-center justify-center">
+                <span class="text-gray-400 font-bold">VS</span>
+            </div>
+            
+            <!-- Participant 2 -->
+            <div class="bg-background-dark rounded-lg p-4 border border-card-border-dark">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-2xl">person</span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">{{ match.participant2.display_name }}</h3>
+                        <p class="text-gray-400 text-sm">Participant 2</p>
+                    </div>
+                </div>
+                {% if match.participant2.seed %}
+                <div class="text-sm text-gray-400">
+                    <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
+                    Seed: {{ match.participant2.seed }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Report Form -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
+        <h2 class="text-white text-xl font-bold mb-4">Report Score</h2>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Display Form Errors -->
+            {% if form.non_field_errors %}
+            <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-red-500">error</span>
+                    <div class="flex-1">
+                        <h3 class="text-red-500 font-bold mb-1">Error</h3>
+                        {% for error in form.non_field_errors %}
+                        <p class="text-red-400 text-sm">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Score Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Participant 1 Score -->
+                <div>
+                    <label for="{{ form.score_p1.id_for_label }}" class="block text-white font-medium mb-2">
+                        {{ match.participant1.display_name }} Score
+                    </label>
+                    <input type="number" 
+                           name="{{ form.score_p1.name }}" 
+                           id="{{ form.score_p1.id_for_label }}"
+                           min="0"
+                           value="{{ form.score_p1.value|default:'' }}"
+                           class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
+                           placeholder="0"
+                           required>
+                    {% if form.score_p1.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.score_p1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Participant 2 Score -->
+                <div>
+                    <label for="{{ form.score_p2.id_for_label }}" class="block text-white font-medium mb-2">
+                        {{ match.participant2.display_name }} Score
+                    </label>
+                    <input type="number" 
+                           name="{{ form.score_p2.name }}" 
+                           id="{{ form.score_p2.id_for_label }}"
+                           min="0"
+                           value="{{ form.score_p2.value|default:'' }}"
+                           class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
+                           placeholder="0"
+                           required>
+                    {% if form.score_p2.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.score_p2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Notes (Optional) -->
+            {% if form.notes %}
+            <div>
+                <label for="{{ form.notes.id_for_label }}" class="block text-white font-medium mb-2">
+                    Notes (Optional)
+                </label>
+                <textarea name="{{ form.notes.name }}" 
+                          id="{{ form.notes.id_for_label }}"
+                          rows="3"
+                          class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          placeholder="Add any notes about the match...">{{ form.notes.value|default:'' }}</textarea>
+                {% if form.notes.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.notes.help_text }}</p>
+                {% endif %}
+                {% if form.notes.errors %}
+                <p class="text-red-400 text-sm mt-1">{{ form.notes.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Important Notice -->
+            <div class="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-yellow-500">info</span>
+                    <div class="flex-1">
+                        <h3 class="text-yellow-500 font-bold mb-1">Important</h3>
+                        <ul class="text-yellow-400 text-sm space-y-1">
+                            <li>• Scores cannot be tied - there must be a winner</li>
+                            <li>• Once submitted, the winner will advance to the next round</li>
+                            <li>• If there's a dispute, you can file one after submission</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-4">
+                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    Submit Score
+                </button>
+                <a href="{% url 'tournaments:bracket' match.tournament.slug %}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Match Status -->
+    {% if match.status == 'completed' %}
+    <div class="bg-green-500/10 border border-green-500/50 rounded-lg p-4">
+        <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-green-500">check_circle</span>
+            <div class="flex-1">
+                <h3 class="text-green-500 font-bold mb-1">Match Completed</h3>
+                <p class="text-green-400 text-sm">
+                    This match has already been completed. 
+                    Winner: <span class="font-bold">{{ match.winner.display_name }}</span> 
+                    ({{ match.score_p1 }} - {{ match.score_p2 }})
+                </p>
+                {% if user == match.tournament.organizer or user.role == 'admin' %}
+                <p class="text-green-400 text-sm mt-2">
+                    As an organizer, you can still update the score if needed.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

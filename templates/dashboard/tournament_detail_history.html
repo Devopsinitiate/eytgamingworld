@@ -1,0 +1,186 @@
+{% extends 'layouts/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}{{ tournament.name }} - Match History{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% url 'dashboard:tournament_history' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Tournament History
+        </a>
+    </div>
+
+    <!-- Tournament Header -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex items-start justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ tournament.name }}</h1>
+                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ tournament.game.name }}
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {{ tournament.start_datetime|date:"M d, Y" }}
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ tournament.format|title }}
+                    </span>
+                </div>
+            </div>
+            <div class="text-right">
+                {% if participation.final_placement %}
+                    <div class="text-sm text-gray-600 mb-1">Final Placement</div>
+                    <div class="text-3xl font-bold 
+                        {% if participation.final_placement == 1 %}text-yellow-600
+                        {% elif participation.final_placement <= 3 %}text-green-600
+                        {% else %}text-gray-600{% endif %}">
+                        {% if participation.final_placement == 1 %}🥇 1st
+                        {% elif participation.final_placement == 2 %}🥈 2nd
+                        {% elif participation.final_placement == 3 %}🥉 3rd
+                        {% else %}#{{ participation.final_placement }}{% endif %}
+                    </div>
+                {% endif %}
+                {% if participation.prize_won > 0 %}
+                    <div class="text-sm text-gray-600 mt-2">Prize Won</div>
+                    <div class="text-xl font-semibold text-green-600">${{ participation.prize_won }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Total Matches</div>
+            <div class="text-3xl font-bold text-blue-600">{{ total_matches }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Matches Won</div>
+            <div class="text-3xl font-bold text-green-600">{{ matches_won }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-sm text-gray-600 mb-1">Matches Lost</div>
+            <div class="text-3xl font-bold text-red-600">{{ matches_lost }}</div>
+        </div>
+    </div>
+
+    <!-- Match History -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Match History</h2>
+        </div>
+
+        {% if match_details %}
+            <div class="divide-y divide-gray-200">
+                {% for detail in match_details %}
+                    <div class="p-6 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <!-- Match Info -->
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-4 mb-2">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                        Round {{ detail.round }}
+                                    </span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        {% if detail.result == 'won' %}bg-green-100 text-green-800
+                                        {% elif detail.result == 'lost' %}bg-red-100 text-red-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {% if detail.result == 'won' %}✓ Won
+                                        {% elif detail.result == 'lost' %}✗ Lost
+                                        {% else %}⏳ Pending{% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- Opponent -->
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-gray-600">vs</span>
+                                    <span class="text-lg font-semibold text-gray-900">
+                                        {{ detail.opponent_name }}
+                                    </span>
+                                </div>
+
+                                <!-- Timestamps -->
+                                {% if detail.completed_at %}
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Completed: {{ detail.completed_at|date:"M d, Y g:i A" }}
+                                        </span>
+                                    </div>
+                                {% elif detail.started_at %}
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Started: {{ detail.started_at|date:"M d, Y g:i A" }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Score -->
+                            <div class="text-right ml-6">
+                                <div class="text-3xl font-bold text-gray-900">
+                                    <span class="{% if detail.result == 'won' %}text-green-600{% elif detail.result == 'lost' %}text-red-600{% endif %}">
+                                        {{ detail.user_score }}
+                                    </span>
+                                    <span class="text-gray-400 mx-2">-</span>
+                                    <span class="{% if detail.result == 'lost' %}text-green-600{% elif detail.result == 'won' %}text-red-600{% endif %}">
+                                        {{ detail.opponent_score }}
+                                    </span>
+                                </div>
+                                {% if detail.match.bracket %}
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        {{ detail.match.bracket.name }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No matches found</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    No match data is available for this tournament yet.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex justify-between">
+        <a href="{% url 'tournaments:detail' tournament.slug %}" 
+           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            View Tournament Page
+        </a>
+        <a href="{% url 'dashboard:tournament_history' %}" 
+           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+            Back to History
+        </a>
+    </div>
+</div>
+{% endblock %}
+

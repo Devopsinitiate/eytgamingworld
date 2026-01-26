@@ -1,0 +1,306 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}{{ action }} Game Profile - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Form styling improvements */
+    .form-input {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #4b5563;
+        background-color: #1f2937;
+        color: #ffffff !important;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input::placeholder {
+        color: #9ca3af;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #b91c1c;
+        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.5);
+    }
+    
+    .form-input:hover {
+        border-color: #6b7280;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #d1d5db;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-checkbox {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid #4b5563;
+        background-color: #1f2937;
+        color: #b91c1c;
+    }
+    
+    .form-checkbox:checked {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
+    }
+    
+    .form-checkbox:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Page Header -->
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{% url 'dashboard:game_profile_list' %}" 
+               class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">{{ action }} Game Profile</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Add your gaming information to showcase your skills</p>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="space-y-3 mb-8">
+                {% for message in messages %}
+                    <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined">
+                                {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                            </span>
+                            <p>{{ message }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Form -->
+        <div class="bg-white dark:bg-[#111318] p-8 rounded-xl border border-gray-200 dark:border-gray-800">
+            <form method="post" class="space-y-8" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-900/20 border border-red-500/30 text-red-300 p-4 rounded-xl" role="alert">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined">error</span>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Game Selection -->
+                    <div class="md:col-span-2">
+                        <label class="form-label" for="{{ form.game.id_for_label }}">
+                            Game <span class="text-red-400">*</span>
+                        </label>
+                        {{ form.game }}
+                        {% if form.game.errors %}
+                            <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ form.game.errors.0 }}
+                            </p>
+                        {% endif %}
+                        {% if form.game.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.game.help_text }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Select the game you want to add to your profile</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- In-Game Name -->
+                    <div class="md:col-span-2">
+                        <label class="form-label" for="{{ form.in_game_name.id_for_label }}">
+                            In-Game Name <span class="text-red-400">*</span>
+                        </label>
+                        {{ form.in_game_name }}
+                        {% if form.in_game_name.errors %}
+                            <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ form.in_game_name.errors.0 }}
+                            </p>
+                        {% endif %}
+                        {% if form.in_game_name.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.in_game_name.help_text }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Your username or gamertag in this game</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Skill Rating -->
+                    <div>
+                        <label class="form-label" for="{{ form.skill_rating.id_for_label }}">
+                            Skill Rating
+                        </label>
+                        {{ form.skill_rating }}
+                        {% if form.skill_rating.errors %}
+                            <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ form.skill_rating.errors.0 }}
+                            </p>
+                        {% endif %}
+                        {% if form.skill_rating.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.skill_rating.help_text }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Enter a value between 0 and 5000</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Rank -->
+                    <div>
+                        <label class="form-label" for="{{ form.rank.id_for_label }}">
+                            Rank
+                        </label>
+                        {{ form.rank }}
+                        {% if form.rank.errors %}
+                            <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ form.rank.errors.0 }}
+                            </p>
+                        {% endif %}
+                        {% if form.rank.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.rank.help_text }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">e.g., Gold, Diamond, Platinum</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Preferred Role -->
+                    <div class="md:col-span-2">
+                        <label class="form-label" for="{{ form.preferred_role.id_for_label }}">
+                            Preferred Role
+                        </label>
+                        {{ form.preferred_role }}
+                        {% if form.preferred_role.errors %}
+                            <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ form.preferred_role.errors.0 }}
+                            </p>
+                        {% endif %}
+                        {% if form.preferred_role.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.preferred_role.help_text }}</p>
+                        {% else %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">e.g., Support, Tank, DPS, Mid, Jungle</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Main Game Checkbox -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-8">
+                    <div class="flex items-start gap-4">
+                        <div class="flex items-center h-6">
+                            {{ form.is_main_game }}
+                        </div>
+                        <div>
+                            <label for="{{ form.is_main_game.id_for_label }}" class="form-label mb-1">
+                                Set as Main Game
+                            </label>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Your main game will be displayed prominently on your profile and used for matchmaking</p>
+                            {% if form.is_main_game.errors %}
+                                <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">error</span>
+                                    {{ form.is_main_game.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-8 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{% url 'dashboard:game_profile_list' %}" 
+                       class="flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium transition-colors">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        {% if action == 'Edit' %}
+                            <span class="material-symbols-outlined text-base">save</span>
+                            Update Profile
+                        {% else %}
+                            <span class="material-symbols-outlined text-base">add</span>
+                            Create Profile
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-8 bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-outlined text-primary text-2xl">help</span>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Tips for Creating Your Game Profile</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-400">
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">In-Game Name</h4>
+                    <p>Use your exact username or gamertag as it appears in the game. This helps other players find and recognize you.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Skill Rating</h4>
+                    <p>Enter your current competitive rating or MMR. This helps with matchmaking and finding players of similar skill level.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Rank</h4>
+                    <p>Your current competitive rank (e.g., Gold III, Diamond, Master). This gives a quick overview of your skill level.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Main Game</h4>
+                    <p>Your main game will be featured prominently on your profile and used for team recommendations and tournaments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Style form fields
+    function styleFormFields() {
+        // Style all text inputs
+        const textInputs = document.querySelectorAll('input[type="text"], input[type="number"], select');
+        textInputs.forEach(input => {
+            input.className = 'form-input';
+        });
+
+        // Style checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.className = 'form-checkbox';
+        });
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        styleFormFields();
+    });
+</script>
+{% endblock %}

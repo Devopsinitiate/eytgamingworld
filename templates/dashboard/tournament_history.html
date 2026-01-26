@@ -1,0 +1,299 @@
+{% extends 'layouts/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Game Stats - {{ request.user.get_display_name }}{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{% url 'dashboard:profile_view' username=request.user.username %}" 
+               class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Game Stats</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">View your complete tournament participation history and performance</p>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-2xl">tournament</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Total Tournaments</h3>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_tournaments }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Competitions entered</p>
+            </div>
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-green-600 text-2xl">emoji_events</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Tournament Wins</h3>
+                </div>
+                <div class="text-3xl font-bold text-green-600">{{ tournament_wins }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">First place finishes</p>
+            </div>
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-yellow-600 text-2xl">military_tech</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Top 3 Finishes</h3>
+                </div>
+                <div class="text-3xl font-bold text-yellow-600">{{ top_3_finishes }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Podium placements</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="material-symbols-outlined text-primary text-2xl">filter_list</span>
+                <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Filter Tournaments</h2>
+            </div>
+            <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Game Filter -->
+                <div>
+                    <label for="game" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Game</label>
+                    <select name="game" id="game" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        <option value="">All Games</option>
+                        {% for game in user_games %}
+                            <option value="{{ game.id }}" {% if selected_game == game.id|stringformat:"s" %}selected{% endif %}>
+                                {{ game.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Date Range Filter -->
+                <div>
+                    <label for="date_range" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                    <select name="date_range" id="date_range" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        <option value="all" {% if selected_date_range == 'all' %}selected{% endif %}>All Time</option>
+                        <option value="7d" {% if selected_date_range == '7d' %}selected{% endif %}>Last 7 Days</option>
+                        <option value="30d" {% if selected_date_range == '30d' %}selected{% endif %}>Last 30 Days</option>
+                        <option value="90d" {% if selected_date_range == '90d' %}selected{% endif %}>Last 90 Days</option>
+                        <option value="1y" {% if selected_date_range == '1y' %}selected{% endif %}>Last Year</option>
+                    </select>
+                </div>
+
+                <!-- Placement Filter -->
+                <div>
+                    <label for="placement" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Placement</label>
+                    <select name="placement" id="placement" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        <option value="">All Placements</option>
+                        <option value="winner" {% if selected_placement == 'winner' %}selected{% endif %}>1st Place</option>
+                        <option value="top3" {% if selected_placement == 'top3' %}selected{% endif %}>Top 3</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-end">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        <span class="material-symbols-outlined text-base">search</span>
+                        Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tournament List -->
+        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            {% if participations %}
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-2xl">history</span>
+                        <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Tournament History</h2>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800/50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Tournament
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Game
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Placement
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Prize
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-[#111318] divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for participation in participations %}
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ participation.tournament.name }}
+                                                </div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ participation.tournament.format|title }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900 dark:text-white">{{ participation.tournament.game.name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900 dark:text-white">
+                                            {{ participation.tournament.start_datetime|date:"M d, Y" }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ participation.tournament.start_datetime|date:"g:i A" }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if participation.final_placement %}
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                {% if participation.final_placement == 1 %}bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300
+                                                {% elif participation.final_placement <= 3 %}bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300
+                                                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300{% endif %}">
+                                                {% if participation.final_placement == 1 %}🥇 1st
+                                                {% elif participation.final_placement == 2 %}🥈 2nd
+                                                {% elif participation.final_placement == 3 %}🥉 3rd
+                                                {% else %}#{{ participation.final_placement }}{% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
+                                                N/A
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                        {% if participation.prize_won > 0 %}
+                                            <span class="font-medium text-green-600">${{ participation.prize_won }}</span>
+                                        {% else %}
+                                            <span class="text-gray-500 dark:text-gray-400">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex items-center gap-2">
+                                            <a href="{% url 'dashboard:tournament_detail_history' participation.tournament.id %}" 
+                                               class="flex items-center gap-1 px-3 py-1 text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-sm">visibility</span>
+                                                Details
+                                            </a>
+                                            <a href="{% url 'tournaments:detail' participation.tournament.slug %}" 
+                                               class="flex items-center gap-1 px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                                                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                                Tournament
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                    <div class="bg-white dark:bg-[#111318] px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
+                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <span class="material-symbols-outlined text-sm mr-1">chevron_left</span>
+                                    Previous
+                                </a>
+                            {% endif %}
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
+                                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    Next
+                                    <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                    Showing page <span class="font-medium">{{ page_obj.number }}</span> of 
+                                    <span class="font-medium">{{ page_obj.paginator.num_pages }}</span>
+                                    ({{ page_obj.paginator.count }} total tournaments)
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-lg shadow-sm -space-x-px" aria-label="Pagination">
+                                    {% if page_obj.has_previous %}
+                                        <a href="?page={{ page_obj.previous_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
+                                           class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                            <span class="material-symbols-outlined text-sm">chevron_left</span>
+                                            Previous
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-primary bg-primary/10 text-sm font-medium text-primary">
+                                                {{ num }}
+                                            </span>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <a href="?page={{ num }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
+                                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                                {{ num }}
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if page_obj.has_next %}
+                                        <a href="?page={{ page_obj.next_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
+                                           class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                            Next
+                                            <span class="material-symbols-outlined text-sm">chevron_right</span>
+                                        </a>
+                                    {% endif %}
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-16">
+                    <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gray-400 text-4xl">tournament</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No tournaments found</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                        {% if selected_game or selected_date_range != 'all' or selected_placement %}
+                            Try adjusting your filters or <a href="{% url 'dashboard:tournament_history' %}" class="text-primary hover:underline">clear all filters</a>.
+                        {% else %}
+                            You haven't participated in any tournaments yet. Start competing to build your tournament history!
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'tournaments:list' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        <span class="material-symbols-outlined text-base">search</span>
+                        Browse Tournaments
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}
+

@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}EYTGaming - Dominate the Competition{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Animated background styles */
+    .animated-bg {
+        background-image: url("{% static 'images/Land.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        animation: backgroundPulse 8s ease-in-out infinite;
+    }
+    
+    @keyframes backgroundPulse {
+        0%, 100% {
+            transform: scale(1);
+            filter: brightness(0.8) contrast(1.1);
+        }
+        50% {
+            transform: scale(1.05);
+            filter: brightness(0.9) contrast(1.2);
+        }
+    }
+    
+    .hero-overlay {
+        background: linear-gradient(135deg, rgba(185, 28, 28, 0.85) 0%, rgba(17, 24, 39, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+        animation: overlayShift 12s ease-in-out infinite;
+    }
+    
+    @keyframes overlayShift {
+        0%, 100% {
+            background: linear-gradient(135deg, rgba(185, 28, 28, 0.85) 0%, rgba(17, 24, 39, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+        }
+        33% {
+            background: linear-gradient(225deg, rgba(185, 28, 28, 0.8) 0%, rgba(17, 24, 39, 0.85) 50%, rgba(0, 0, 0, 0.9) 100%);
+        }
+        66% {
+            background: linear-gradient(315deg, rgba(185, 28, 28, 0.9) 0%, rgba(17, 24, 39, 0.95) 50%, rgba(0, 0, 0, 0.85) 100%);
+        }
+    }
+    
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    
+    .floating-elements::before,
+    .floating-elements::after {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(185, 28, 28, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 15s ease-in-out infinite;
+    }
+    
+    .floating-elements::before {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-elements::after {
+        bottom: 20%;
+        right: 10%;
+        animation-delay: 7s;
+        width: 150px;
+        height: 150px;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) translateX(0px) scale(1);
+            opacity: 0.6;
+        }
+        33% {
+            transform: translateY(-20px) translateX(10px) scale(1.1);
+            opacity: 0.8;
+        }
+        66% {
+            transform: translateY(10px) translateX(-10px) scale(0.9);
+            opacity: 0.4;
+        }
+    }
+    
+    .text-glow {
+        text-shadow: 0 0 20px rgba(185, 28, 28, 0.6), 0 0 40px rgba(185, 28, 28, 0.4);
+    }
+    
+    .hero-content {
+        animation: fadeInUp 1.5s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-background-dark">
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-background-dark/80 px-4 py-3 backdrop-blur-sm sm:px-8 md:px-10">
+        <div class="flex items-center gap-4 text-gray-200">
+            <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-8 w-8 rounded-lg object-cover"/>
+            <h2 class="text-gray-200 text-lg font-bold leading-tight tracking-[-0.015em]">EYTGaming</h2>
+        </div>
+        <nav class="hidden md:flex flex-1 justify-center gap-8">
+            <a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#features">Features</a>
+            <a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#coaching">Coaching</a>
+            <a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#tournaments">Tournaments</a>
+        </nav>
+        <div class="flex gap-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard:home' %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+                    <span class="truncate">Dashboard</span>
+                </a>
+            {% else %}
+                <a href="{% url 'account_login' %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-white/10 hover:bg-white/20 text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+                    <span class="truncate">Log In</span>
+                </a>
+                <a href="{% url 'account_signup' %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+                    <span class="truncate">Sign Up</span>
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="flex flex-col items-center">
+        <div class="layout-content-container flex w-full max-w-5xl flex-col px-4">
+            <!-- Hero Section with Animated Land.png Background -->
+            <section class="py-16 md:py-24 relative">
+                <div class="relative flex min-h-[600px] md:min-h-[700px] flex-col gap-6 rounded-xl items-center justify-center p-8 text-center overflow-hidden animated-bg">
+                    <!-- Animated overlay -->
+                    <div class="absolute inset-0 hero-overlay"></div>
+                    
+                    <!-- Floating elements -->
+                    <div class="floating-elements"></div>
+                    
+                    <!-- Hero content -->
+                    <div class="relative z-10 hero-content">
+                        <div class="flex flex-col gap-4">
+                            <h1 class="text-gray-100 text-4xl font-black leading-tight tracking-[-0.033em] md:text-6xl lg:text-7xl text-glow">
+                                Your Path to <span class="text-primary">Pro</span>
+                            </h1>
+                            <h2 class="text-gray-200 text-base font-normal leading-normal md:text-xl max-w-3xl mx-auto">
+                                The ultimate platform for tournaments, coaching, and performance tracking. Dominate the competition with EYTGaming.
+                            </h2>
+                        </div>
+                        <div class="flex-wrap gap-4 flex justify-center mt-8">
+                            <a href="{% url 'tournaments:list' %}" class="flex min-w-[120px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 md:h-14 md:px-8 bg-primary hover:bg-primary/90 text-white text-sm font-bold leading-normal tracking-[0.015em] md:text-base transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                <span class="truncate">Join a Tournament</span>
+                            </a>
+                            <a href="{% url 'account_signup' %}" class="flex min-w-[120px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 md:h-14 md:px-8 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] md:text-base transition-all transform hover:scale-105 border border-white/20 hover:border-white/40">
+                                <span class="truncate">Sign Up Now</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature Section -->
+            <section id="features" class="flex flex-col gap-10 py-16">
+                <div class="flex flex-col gap-4 text-center">
+                    <h1 class="text-gray-100 tracking-tight text-[32px] font-bold leading-tight md:text-4xl md:font-black max-w-[720px] mx-auto">
+                        Key Features
+                    </h1>
+                    <p class="text-gray-300 text-base font-normal leading-normal max-w-[720px] mx-auto">Everything you need to climb the ranks and achieve gaming excellence.</p>
+                </div>
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 p-0">
+                    <div class="flex flex-1 gap-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 flex-col transition-all duration-300 hover:border-primary/30 hover:bg-white/10 hover:transform hover:scale-105">
+                        <div class="text-primary">
+                            <span class="material-symbols-outlined !text-4xl">emoji_events</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <h2 class="text-gray-100 text-lg font-bold leading-tight">Tournament Brackets</h2>
+                            <p class="text-gray-400 text-sm font-normal leading-normal">Easily join tournaments, track your progress, and compete for glory with our advanced bracket system.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 gap-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 flex-col transition-all duration-300 hover:border-primary/30 hover:bg-white/10 hover:transform hover:scale-105">
+                        <div class="text-primary">
+                            <span class="material-symbols-outlined !text-4xl">school</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <h2 class="text-gray-100 text-lg font-bold leading-tight">Pro Coaching</h2>
+                            <p class="text-gray-400 text-sm font-normal leading-normal">Get personalized improvement plans and one-on-one sessions with elite coaches to elevate your game.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 gap-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 flex-col transition-all duration-300 hover:border-primary/30 hover:bg-white/10 hover:transform hover:scale-105">
+                        <div class="text-primary">
+                            <span class="material-symbols-outlined !text-4xl">query_stats</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <h2 class="text-gray-100 text-lg font-bold leading-tight">Personalized Dashboards</h2>
+                            <p class="text-gray-400 text-sm font-normal leading-normal">Leverage data-driven insights and comprehensive stats tracking to monitor your personal growth.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Showcase Section -->
+            <section id="tournaments" class="flex flex-col gap-6 py-16">
+                <div class="flex flex-col gap-4 text-center">
+                    <h2 class="text-gray-100 tracking-tight text-3xl font-bold leading-tight">See the Platform in Action</h2>
+                    <p class="text-gray-300 text-base font-normal leading-normal max-w-[720px] mx-auto">Explore the sleek UI for tournament brackets, coaching calendars, and data-rich dashboards.</p>
+                </div>
+                <div class="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4">
+                    <div class="flex items-stretch p-2 gap-6">
+                        <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-80">
+                            <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col border border-white/10 bg-gradient-to-br from-primary/30 to-primary/5 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:transform hover:scale-105"></div>
+                            <div>
+                                <p class="text-gray-100 text-base font-medium leading-normal">Live Tournament Brackets</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Follow the action as it happens with real-time updates.</p>
+                            </div>
+                        </div>
+                        <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-80">
+                            <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col border border-white/10 bg-gradient-to-br from-blue-500/30 to-blue-500/5 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/40 hover:transform hover:scale-105"></div>
+                            <div>
+                                <p class="text-gray-100 text-base font-medium leading-normal">Book Pro Coaching</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Schedule sessions with top-tier talent and improve your skills.</p>
+                            </div>
+                        </div>
+                        <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-80">
+                            <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col border border-white/10 bg-gradient-to-br from-green-500/30 to-green-500/5 backdrop-blur-sm transition-all duration-300 hover:border-green-500/40 hover:transform hover:scale-105"></div>
+                            <div>
+                                <p class="text-gray-100 text-base font-medium leading-normal">Track Your Stats</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Analyze your performance with detailed insights and analytics.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section id="coaching" class="flex flex-col gap-8 py-16">
+                <div class="flex flex-col gap-4 text-center">
+                    <h2 class="text-gray-100 tracking-tight text-3xl font-bold leading-tight">What Our Players Say</h2>
+                    <p class="text-gray-300 text-base font-normal leading-normal max-w-[720px] mx-auto">Hear from members of the EYTGaming community who have elevated their game.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 transition-all duration-300 hover:border-primary/30 hover:bg-white/10 hover:transform hover:scale-105">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-primary/20 rounded-full size-12 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-2xl">person</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-100 text-base font-medium leading-normal">GamerPro_92</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Joined August 2023</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-0.5 text-primary">
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                        <p class="text-gray-300 text-base font-normal leading-normal">"EYTGaming completely changed how I approach competitive play. The dashboard insights are a game-changer and the animated interface keeps me engaged!"</p>
+                    </div>
+                    <div class="flex flex-col gap-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 transition-all duration-300 hover:border-primary/30 hover:bg-white/10 hover:transform hover:scale-105">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-primary/20 rounded-full size-12 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary text-2xl">person</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-100 text-base font-medium leading-normal">CoachShadow</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Joined July 2023</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-0.5 text-primary">
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                        <p class="text-gray-300 text-base font-normal leading-normal">"As a coach, the platform makes it incredibly easy to connect with and guide aspiring pros. The visual design is stunning and highly recommended."</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Final CTA Section -->
+            <section class="py-20 md:py-28">
+                <div class="relative flex flex-col items-center justify-center gap-6 rounded-xl bg-gradient-to-r from-primary to-red-700 p-10 text-center overflow-hidden">
+                    <!-- Animated background elements -->
+                    <div class="absolute inset-0 opacity-20">
+                        <div class="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+                        <div class="absolute bottom-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl animate-pulse" style="animation-delay: 2s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <h2 class="text-white text-3xl font-black leading-tight tracking-[-0.033em] md:text-5xl mb-4">Ready to Level Up?</h2>
+                        <p class="text-white/90 text-lg font-normal leading-normal max-w-2xl mx-auto mb-8">Join thousands of players who are taking their game to the next level. Sign up now and start your journey to pro with our animated, immersive platform.</p>
+                        <a href="{% url 'account_signup' %}" class="inline-flex min-w-[200px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-background-dark hover:bg-black text-white text-lg font-bold leading-normal tracking-[0.015em] transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl">
+                            <span class="truncate">Join EYTGaming Today</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-white/10 bg-background-dark mt-16">
+        <div class="max-w-5xl mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4 text-gray-200">
+                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-5 w-5 rounded object-cover"/>
+                    <p class="text-sm text-gray-400">© 2024 EYTGaming. All rights reserved.</p>
+                </div>
+                <div class="flex gap-6 text-sm text-gray-400">
+                    <a class="hover:text-gray-200 transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-gray-200 transition-colors" href="#">Privacy Policy</a>
+                    <a class="hover:text-gray-200 transition-colors" href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}

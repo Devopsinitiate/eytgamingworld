@@ -1,0 +1,78 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}Report User - {{ reported_user.get_display_name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Report User</h1>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        You are about to report <strong>{{ reported_user.get_display_name }}</strong>. 
+                        Please only submit reports for genuine violations of our community guidelines. 
+                        False reports may result in action against your account.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="{{ report_form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ report_form.category.label }}
+                    </label>
+                    {{ report_form.category }}
+                    {% if report_form.category.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ report_form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="{{ report_form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ report_form.description.label }}
+                    </label>
+                    {{ report_form.description }}
+                    {% if report_form.description.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ report_form.description.help_text }}</p>
+                    {% endif %}
+                    {% if report_form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ report_form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{% url 'dashboard:profile_view' username=reported_user.username %}" 
+                       class="text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="mt-6 text-sm text-gray-600">
+            <p>
+                <strong>What happens next?</strong><br>
+                Our moderation team will review your report within 24-48 hours. 
+                If we find a violation of our community guidelines, appropriate action will be taken. 
+                You will not be notified of the outcome for privacy reasons.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

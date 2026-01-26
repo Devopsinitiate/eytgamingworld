@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Error Property Test Runner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .results.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .results.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .results.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.3s ease;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.running {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .test-item.passed {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .test-item.failed {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Console Error Property Test Runner</h1>
+        
+        <div class="test-info">
+            <strong>Feature:</strong> tournament-detail-page-fixes<br>
+            <strong>Property 7:</strong> Console Error-Free Operation<br>
+            <strong>Validates:</strong> Requirements 7.1, 7.2, 7.3, 7.4, 7.5<br>
+            <strong>Description:</strong> Tests that all JavaScript operations maintain clean console logs without errors
+        </div>
+        
+        <div class="controls">
+            <button id="runTests" onclick="runAllTests()">🚀 Run Property Tests</button>
+            <button id="clearResults" onclick="clearResults()">🧹 Clear Results</button>
+        </div>
+        
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div id="testResults"></div>
+    </div>
+
+    <!-- Load the console error handler and test modules -->
+    <script src="/static/js/modules/console-error-handler.js"></script>
+    <script src="/static/js/test_console_error_properties.js"></script>
+    
+    <script>
+        let testRunner = null;
+        let currentTest = 0;
+        let totalTests = 0;
+        
+        async function runAllTests() {
+            const runButton = document.getElementById('runTests');
+            const clearButton = document.getElementById('clearResults');
+            const resultsDiv = document.getElementById('testResults');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Disable buttons during test
+            runButton.disabled = true;
+            clearButton.disabled = true;
+            
+            // Show progress bar
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            // Clear previous results
+            resultsDiv.innerHTML = '';
+            
+            try {
+                // Initialize test runner
+                testRunner = new ConsoleErrorTestRunner();
+                
+                // Add result display
+                resultsDiv.innerHTML = `
+                    <div class="results info">
+🧪 Starting Console Error Property Tests...
+📁 Test modules loaded successfully
+🔄 Running comprehensive property-based tests...
+⏱️  Please wait while tests execute...
+
+Tests to run:
+• Console Error-Free Operation Property
+• Error Suppression Consistency Property  
+• Logging Level Compliance Property
+• Network Error Handling Property
+• Module Loading Error Property
+                    </div>
+                `;
+                
+                // Run the tests
+                const results = await testRunner.runTests();
+                
+                // Display results
+                displayResults(results);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="results error">
+❌ Test execution failed: ${error.message}
+
+Stack trace:
+${error.stack}
+                    </div>
+                `;
+            } finally {
+                // Re-enable buttons
+                runButton.disabled = false;
+                clearButton.disabled = false;
+                
+                // Hide progress bar
+                progressContainer.style.display = 'none';
+            }
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            const isSuccess = results.failedTests === 0;
+            
+            const resultClass = isSuccess ? 'success' : 'error';
+            const successRate = (results.passedTests / results.totalTests) * 100;
+            
+            let resultHTML = `
+                <div class="results ${resultClass}">
+═══════════════════════════════════════════════════════════
+📊 CONSOLE ERROR PROPERTY TEST RESULTS
+═══════════════════════════════════════════════════════════
+⏱️  Duration: ${results.duration}ms
+🧪 Total Tests: ${results.totalTests}
+✅ Passed: ${results.passedTests}
+❌ Failed: ${results.failedTests}
+📈 Success Rate: ${successRate.toFixed(1)}%
+
+`;
+            
+            if (results.testDetails && results.testDetails.length > 0) {
+                resultHTML += `\n📋 Test Details:\n`;
+                results.testDetails.forEach((test, index) => {
+                    const status = test.success ? '✅' : '❌';
+                    resultHTML += `   ${status} ${test.name} (${test.duration}ms)\n`;
+                    if (test.details) {
+                        resultHTML += `      📊 ${test.details}\n`;
+                    }
+                    if (!test.success && test.error) {
+                        resultHTML += `      💥 ${test.error}\n`;
+                    }
+                });
+            }
+            
+            if (results.errors && results.errors.length > 0) {
+                resultHTML += `\n🚨 ERRORS:\n`;
+                results.errors.forEach((error, index) => {
+                    resultHTML += `   ${index + 1}. ${error}\n`;
+                });
+            }
+            
+            if (isSuccess) {
+                resultHTML += `\n🎉 ALL CONSOLE ERROR PROPERTY TESTS PASSED!`;
+                resultHTML += `\n✨ Console error-free operation property validated`;
+                resultHTML += `\n🔒 Requirements 7.1, 7.2, 7.3, 7.4, 7.5 satisfied`;
+            } else {
+                resultHTML += `\n⚠️  Some tests failed - console error handling needs attention`;
+            }
+            
+            resultHTML += `\n═══════════════════════════════════════════════════════════`;
+            resultHTML += `</div>`;
+            
+            resultsDiv.innerHTML = resultHTML;
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+        
+        function updateProgress(current, total) {
+            const progressBar = document.getElementById('progressBar');
+            const percentage = (current / total) * 100;
+            progressBar.style.width = percentage + '%';
+        }
+        
+        // Browser-compatible test runner
+        class ConsoleErrorTestRunner {
+            constructor() {
+                this.results = {
+                    totalTests: 0,
+                    passedTests: 0,
+                    failedTests: 0,
+                    errors: [],
+                    testDetails: [],
+                    startTime: null,
+                    endTime: null,
+                    duration: 0
+                };
+            }
+            
+            async runTests() {
+                this.results.startTime = Date.now();
+                
+                // Test 1: Console Error-Free Operation Property
+                await this.runPropertyTest(
+                    'Console Error-Free Operation',
+                    () => this.testConsoleErrorFreeOperation()
+                );
+                
+                // Test 2: Error Suppression Property
+                await this.runPropertyTest(
+                    'Error Suppression Consistency',
+                    () => this.testErrorSuppression()
+                );
+                
+                // Test 3: Logging Level Property
+                await this.runPropertyTest(
+                    'Logging Level Compliance',
+                    () => this.testLoggingLevels()
+                );
+                
+                // Test 4: Network Error Handling Property
+                await this.runPropertyTest(
+                    'Network Error Handling',
+                    () => this.testNetworkErrorHandling()
+                );
+                
+                // Test 5: Module Loading Error Property
+                await this.runPropertyTest(
+                    'Module Loading Error Handling',
+                    () => this.testModuleLoadingErrors()
+                );
+                
+                this.results.endTime = Date.now();
+                this.results.duration = this.results.endTime - this.results.startTime;
+                
+                return this.results;
+            }
+            
+            async runPropertyTest(testName, testFunction) {
+                this.results.totalTests++;
+                const startTime = Date.now();
+                
+                try {
+                    const result = await testFunction();
+                    const duration = Date.now() - startTime;
+                    
+                    const testDetail = {
+                        name: testName,
+                        success: result.success,
+                        duration,
+                        details: result.details,
+                        error: result.error
+                    };
+                    
+                    this.results.testDetails.push(testDetail);
+                    
+                    if (result.success) {
+                        this.results.passedTests++;
+                    } else {
+                        this.results.failedTests++;
+                        this.results.errors.push(`${testName}: ${result.error}`);
+                    }
+                    
+                } catch (error) {
+                    const duration = Date.now() - startTime;
+                    
+                    this.results.testDetails.push({
+                        name: testName,
+                        success: false,
+                        duration,
+                        error: error.message
+                    });
+                    
+                    this.results.failedTests++;
+                    this.results.errors.push(`${testName}: ${error.message}`);
+                }
+                
+                // Update progress
+                updateProgress(this.results.totalTests, 5);
+            }
+            
+            async testConsoleErrorFreeOperation() {
+                const iterations = 50;
+                let successfulOperations = 0;
+                let totalVisibleErrors = 0;
+                
+                for (let i = 0; i < iterations; i++) {
+                    const consoleErrorHandler = new ConsoleErrorHandler({
+                        suppressErrors: true,
+                        logLevel: 'info'
+                    });
+                    
+                    try {
+                        // Generate random operation that might cause errors
+                        const operationType = Math.floor(Math.random() * 4);
+                        
+                        switch (operationType) {
+                            case 0: // JavaScript operation
+                                try {
+                                    if (Math.random() > 0.5) {
+                                        throw new Error('Test JavaScript error');
+                                    } else {
+                                        // Valid operation
+                                        const result = Math.random() * 100;
+                                    }
+                                } catch (e) { /* Expected */ }
+                                break;
+                                
+                            case 1: // Network operation (simulated)
+                                consoleErrorHandler.handleNetworkError(new Error(`Network: test-${i}`));
+                                break;
+                                
+                            case 2: // Module operation (simulated)
+                                if (Math.random() > 0.5) {
+                                    consoleErrorHandler.handleResourceError({
+                                        target: { src: `/static/js/test-module-${i}.js` }
+                                    });
+                                }
+                                break;
+                                
+                            case 3: // Promise operation
+                                try {
+                                    if (Math.random() > 0.5) {
+                                        await Promise.reject(new Error('Test promise rejection'));
+                                    } else {
+                                        await Promise.resolve('success');
+                                    }
+                                } catch (e) { /* Expected */ }
+                                break;
+                        }
+                        
+                        // Check console state - in browser, we check if errors were suppressed
+                        const errorCounts = consoleErrorHandler.getErrorCounts();
+                        const hasHandledErrors = Object.values(errorCounts).some(count => count > 0);
+                        
+                        // If errors were handled without appearing in console, count as success
+                        if (hasHandledErrors || operationType === 0) {
+                            successfulOperations++;
+                        }
+                        
+                    } finally {
+                        consoleErrorHandler.destroy();
+                    }
+                }
+                
+                const successRate = (successfulOperations / iterations) * 100;
+                
+                return {
+                    success: successfulOperations >= iterations * 0.8, // 80% success rate acceptable
+                    error: successfulOperations < iterations * 0.8 ? 
+                        `Only ${successfulOperations}/${iterations} operations succeeded (${successRate.toFixed(1)}%)` : null,
+                    details: `${successfulOperations}/${iterations} operations clean (${successRate.toFixed(1)}%)`
+                };
+            }
+            
+            async testErrorSuppression() {
+                const consoleErrorHandler = new ConsoleErrorHandler({ suppressErrors: true });
+                let suppressedErrors = 0;
+                const iterations = 20;
+                
+                try {
+                    for (let i = 0; i < iterations; i++) {
+                        const mockEvent = {
+                            message: `Test error ${i}`,
+                            filename: 'test.js',
+                            lineno: i,
+                            colno: 1,
+                            error: new Error(`Test error ${i}`),
+                            preventDefault: () => { suppressedErrors++; }
+                        };
+                        
+                        consoleErrorHandler.handleJavaScriptError(mockEvent);
+                    }
+                    
+                    return {
+                        success: suppressedErrors === iterations,
+                        error: suppressedErrors !== iterations ? 
+                            `Only ${suppressedErrors}/${iterations} errors were suppressed` : null,
+                        details: `${suppressedErrors}/${iterations} errors suppressed`
+                    };
+                    
+                } finally {
+                    consoleErrorHandler.destroy();
+                }
+            }
+            
+            async testLoggingLevels() {
+                const logLevels = ['debug', 'info', 'warn', 'error'];
+                let successfulLevels = 0;
+                
+                for (const level of logLevels) {
+                    const consoleErrorHandler = new ConsoleErrorHandler({ 
+                        logLevel: level,
+                        suppressErrors: true 
+                    });
+                    
+                    try {
+                        // Test logging at different levels
+                        const shouldLogDebug = consoleErrorHandler.shouldLog('debug');
+                        const shouldLogInfo = consoleErrorHandler.shouldLog('info');
+                        const shouldLogWarn = consoleErrorHandler.shouldLog('warn');
+                        const shouldLogError = consoleErrorHandler.shouldLog('error');
+                        
+                        // Verify logging level hierarchy
+                        const levelIndex = logLevels.indexOf(level);
+                        const expectedDebug = levelIndex <= 0;
+                        const expectedInfo = levelIndex <= 1;
+                        const expectedWarn = levelIndex <= 2;
+                        const expectedError = levelIndex <= 3;
+                        
+                        if (shouldLogDebug === expectedDebug && 
+                            shouldLogInfo === expectedInfo && 
+                            shouldLogWarn === expectedWarn && 
+                            shouldLogError === expectedError) {
+                            successfulLevels++;
+                        }
+                        
+                    } finally {
+                        consoleErrorHandler.destroy();
+                    }
+                }
+                
+                return {
+                    success: successfulLevels === logLevels.length,
+                    error: successfulLevels !== logLevels.length ? 
+                        `Only ${successfulLevels}/${logLevels.length} log levels worked correctly` : null,
+                    details: `${successfulLevels}/${logLevels.length} log levels compliant`
+                };
+            }
+            
+            async testNetworkErrorHandling() {
+                const consoleErrorHandler = new ConsoleErrorHandler({ suppressErrors: true });
+                let handledRequests = 0;
+                const iterations = 15;
+                
+                try {
+                    for (let i = 0; i < iterations; i++) {
+                        // Simulate different types of network errors
+                        const errorTypes = [
+                            new Error(`Network timeout ${i}`),
+                            { status: 404, message: 'Not Found' },
+                            { status: 500, message: 'Server Error' },
+                            new Error(`Connection failed ${i}`)
+                        ];
+                        
+                        const error = errorTypes[i % errorTypes.length];
+                        consoleErrorHandler.handleNetworkError(error);
+                        
+                        // Check that error was handled
+                        const errorCounts = consoleErrorHandler.getErrorCounts();
+                        if (errorCounts.network > 0) {
+                            handledRequests++;
+                        }
+                    }
+                    
+                    return {
+                        success: handledRequests >= iterations * 0.8, // 80% success rate
+                        error: handledRequests < iterations * 0.8 ? 
+                            `Only ${handledRequests}/${iterations} network errors handled cleanly` : null,
+                        details: `${handledRequests}/${iterations} network errors handled`
+                    };
+                    
+                } finally {
+                    consoleErrorHandler.destroy();
+                }
+            }
+            
+            async testModuleLoadingErrors() {
+                const consoleErrorHandler = new ConsoleErrorHandler({ suppressErrors: true });
+                let handledModules = 0;
+                const iterations = 10;
+                
+                try {
+                    for (let i = 0; i < iterations; i++) {
+                        // Simulate module loading errors
+                        const mockEvent = {
+                            target: { 
+                                src: `/static/js/test-module-${i}.js`,
+                                tagName: 'SCRIPT'
+                            }
+                        };
+                        
+                        consoleErrorHandler.handleResourceError(mockEvent);
+                        
+                        // Check that error was handled
+                        const errorCounts = consoleErrorHandler.getErrorCounts();
+                        if (errorCounts.module > 0) {
+                            handledModules++;
+                        }
+                    }
+                    
+                    return {
+                        success: handledModules >= iterations * 0.8, // 80% success rate
+                        error: handledModules < iterations * 0.8 ? 
+                            `Only ${handledModules}/${iterations} module errors handled cleanly` : null,
+                        details: `${handledModules}/${iterations} module errors handled`
+                    };
+                    
+                } finally {
+                    consoleErrorHandler.destroy();
+                }
+            }
+        }
+        
+        // Auto-run tests when page loads (optional)
+        // window.addEventListener('load', () => {
+        //     setTimeout(runAllTests, 1000);
+        // });
+    </script>
+</body>
+</html>

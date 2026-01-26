@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{% block title %}EYTGaming - Elevate Your Tournament Experience{% endblock %}</title>
+    
+    {% block extra_meta %}{% endblock %}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="icon" type="image/jpeg" href="{% static 'images/EYTLOGO.jpg' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'images/EYTLOGO.jpg' %}">
+    
+    <!-- Essential Polyfills for Legacy Browser Support (Requirement 4.4) -->
+    <script src="{% static 'js/polyfills.js' %}"></script>
+    
+    <!-- Performance Optimization: Resource hints for external domains (Requirement 3.1) -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    
+    <!-- Performance Optimization: Preload critical resources (Requirement 3.1, 3.4) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+    
+    <!-- Preload critical CSS and fonts for immediate availability -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="{% static 'css/accessibility.css' %}" as="style">
+    <link rel="preload" href="{% static 'css/status-indicators.css' %}" as="style">
+    
+    <!-- Fallback for browsers that don't support preload -->
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    </noscript>
+    
+    <!-- Font-display: swap implementation for better performance (Requirement 3.2) -->
+    <style>
+        /* Use system fonts as fallback and let Google Fonts load properly */
+        @font-face {
+            font-family: 'Spline Sans Fallback';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: swap;
+            src: local('Segoe UI'), local('system-ui'), local('-apple-system');
+        }
+        
+        /* Let Google Fonts handle the actual Spline Sans loading */
+        .font-display {
+            font-family: 'Spline Sans', 'Spline Sans Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        }
+    </style>
+    
+    <!-- Tailwind CSS - Load before configuration with performance optimization -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+    
+    <!-- Critical CSS inline to prevent layout shift (Requirement 3.3) -->
+    <style>
+        /* Cross-browser compatibility: CSS feature detection and fallbacks (Requirement 4.1) */
+        
+        /* Critical CSS for immediate rendering - prevents layout shift */
+        html {
+            font-family: 'Spline Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+        }
+        
+        /* Cross-browser font rendering optimization */
+        @supports (font-feature-settings: normal) {
+            html {
+                font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+            }
+        }
+        
+        /* Fallback for older browsers without font-feature-settings */
+        @supports not (font-feature-settings: normal) {
+            html {
+                text-rendering: optimizeLegibility;
+                -webkit-font-kerning: normal;
+                font-kerning: normal;
+            }
+        }
+        
+        body {
+            margin: 0;
+            font-family: inherit;
+            line-height: inherit;
+            background-color: #f6f6f8;
+            color: #111827;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Cross-browser scrollbar styling with fallbacks */
+        @supports (scrollbar-width: thin) {
+            /* Firefox */
+            html {
+                scrollbar-width: thin;
+                scrollbar-color: #404040 #1a1a1a;
+            }
+        }
+        
+        /* Webkit browsers (Chrome, Safari, Edge) */
+        @supports selector(::-webkit-scrollbar) {
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+            
+            ::-webkit-scrollbar-track {
+                background: #1a1a1a;
+            }
+            
+            ::-webkit-scrollbar-thumb {
+                background: #404040;
+                border-radius: 5px;
+            }
+            
+            ::-webkit-scrollbar-thumb:hover {
+                background: #525252;
+            }
+        }
+        
+        /* Fallback for browsers without custom scrollbar support */
+        @supports not (scrollbar-width: thin) and not selector(::-webkit-scrollbar) {
+            html {
+                overflow-y: scroll; /* Always show scrollbar to prevent layout shift */
+            }
+        }
+        
+        /* Dark mode critical styles */
+        html.dark body {
+            background-color: #121212;
+            color: #f9fafb;
+        }
+        
+        /* Cross-browser dark mode support with fallbacks */
+        @supports (color-scheme: dark) {
+            html.dark {
+                color-scheme: dark;
+            }
+        }
+        
+        /* Fallback for browsers without color-scheme support */
+        @supports not (color-scheme: dark) {
+            html.dark {
+                background: #121212;
+            }
+            
+            html.dark input,
+            html.dark textarea,
+            html.dark select {
+                background-color: #1f2937;
+                color: #f9fafb;
+                border-color: #374151;
+            }
+        }
+        
+        /* Critical layout styles to prevent shift */
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        /* Cross-browser CSS Grid support with flexbox fallback */
+        @supports (display: grid) {
+            .grid-layout {
+                display: grid;
+                gap: 1rem;
+            }
+            
+            .grid-cols-1 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+            
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            
+            .grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        
+        /* Flexbox fallback for browsers without CSS Grid */
+        @supports not (display: grid) {
+            .grid-layout {
+                display: flex;
+                flex-wrap: wrap;
+                margin: -0.5rem;
+            }
+            
+            .grid-layout > * {
+                margin: 0.5rem;
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .grid-cols-1 > * {
+                flex-basis: calc(100% - 1rem);
+            }
+            
+            .grid-cols-2 > * {
+                flex-basis: calc(50% - 1rem);
+            }
+            
+            .grid-cols-3 > * {
+                flex-basis: calc(33.333% - 1rem);
+            }
+        }
+        
+        /* Cross-browser flexbox support with table fallback */
+        @supports (display: flex) {
+            .flex-layout {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+        
+        /* Table fallback for very old browsers */
+        @supports not (display: flex) {
+            .flex-layout {
+                display: table;
+                width: 100%;
+                table-layout: fixed;
+            }
+            
+            .flex-layout > * {
+                display: table-cell;
+                vertical-align: middle;
+            }
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                max-width: 640px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1024px;
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .container {
+                max-width: 1280px;
+            }
+        }
+        
+        /* Critical button styles */
+        .btn-primary {
+            background-color: #b91c1c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        .btn-primary:hover {
+            background-color: #991b1b;
+        }
+        
+        /* Cross-browser button styling with fallbacks */
+        @supports (appearance: none) {
+            .btn-primary {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+            }
+        }
+        
+        /* Fallback for browsers without appearance support */
+        @supports not (appearance: none) {
+            .btn-primary {
+                border: 1px solid #b91c1c;
+                outline: none;
+            }
+            
+            .btn-primary:focus {
+                border-color: #7f1d1d;
+                box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
+            }
+        }
+        
+        /* Cross-browser focus styles */
+        @supports selector(:focus-visible) {
+            .btn-primary:focus-visible {
+                outline: 2px solid #b91c1c;
+                outline-offset: 2px;
+            }
+            
+            .btn-primary:focus:not(:focus-visible) {
+                outline: none;
+            }
+        }
+        
+        /* Fallback for browsers without :focus-visible */
+        @supports not selector(:focus-visible) {
+            .btn-primary:focus {
+                outline: 2px solid #b91c1c;
+                outline-offset: 2px;
+            }
+        }
+        
+        /* Critical accessibility styles */
+        .skip-to-main {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #b91c1c;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+        
+        .skip-to-main:focus {
+            top: 6px;
+        }
+        
+        /* Loading state to prevent flash of unstyled content */
+        .loading-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        html.dark .loading-placeholder {
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+            background-size: 200% 100%;
+        }
+        
+        /* Cross-browser animation support with fallbacks */
+        @supports (animation: loading 1.5s infinite) {
+            @keyframes loading {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+        }
+        
+        /* Fallback for browsers without animation support */
+        @supports not (animation: loading 1.5s infinite) {
+            .loading-placeholder {
+                background: #e0e0e0;
+                opacity: 0.7;
+            }
+            
+            html.dark .loading-placeholder {
+                background: #3a3a3a;
+                opacity: 0.7;
+            }
+        }
+        
+        /* Cross-browser transform support */
+        @supports (transform: translateY(0)) {
+            .transform-gpu {
+                transform: translateZ(0);
+                will-change: transform;
+            }
+        }
+        
+        /* Fallback for browsers without transform support */
+        @supports not (transform: translateY(0)) {
+            .transform-gpu {
+                position: relative;
+            }
+        }
+    </style>
+    
+    <!-- Comprehensive Tailwind CSS Error Handler - Load before configuration -->
+    <script src="{% static 'js/tailwind-error-handler.js' %}" defer></script>
+    
+    <!-- Tailwind Config with EYTGaming Brand Colors - Enhanced with error handling -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for error handler to be available
+            function waitForErrorHandler(callback, attempts = 0) {
+                if (window.TailwindErrorHandler) {
+                    callback();
+                } else if (attempts < 50) { // Wait up to 5 seconds
+                    setTimeout(() => waitForErrorHandler(callback, attempts + 1), 100);
+                } else {
+                    console.warn('[TailwindConfig] Error handler not available, falling back to basic configuration');
+                    fallbackConfiguration();
+                }
+            }
+            
+            // Enhanced configuration with error handling
+            function configureWithErrorHandling() {
+                const errorHandler = window.TailwindErrorHandler;
+                
+                // Suppress production warning for development/demo purposes
+                if (console && console.warn) {
+                    const originalWarn = console.warn;
+                    console.warn = function(...args) {
+                        if (args[0] && args[0].includes && args[0].includes('should not be used in production')) {
+                            return; // Suppress Tailwind CDN production warning
+                        }
+                        originalWarn.apply(console, args);
+                    };
+                }
+                
+                // EYTGaming brand configuration
+                const eytGamingConfig = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                // EYTGaming Brand Red as Primary Color (Requirement 2.1)
+                                "primary": {
+                                    DEFAULT: "#b91c1c",  // EYTGaming Brand Red
+                                    50: "#fef2f2",
+                                    100: "#fee2e2", 
+                                    200: "#fecaca",
+                                    300: "#fca5a5",
+                                    400: "#f87171",
+                                    500: "#ef4444",
+                                    600: "#dc2626",
+                                    700: "#b91c1c",  // Main brand color
+                                    800: "#991b1b",
+                                    900: "#7f1d1d",
+                                    950: "#450a0a"
+                                },
+                                // Dark Mode Color Configuration (Requirement 2.2)
+                                "background": {
+                                    light: "#f6f6f8",
+                                    dark: "#121212"
+                                },
+                                "card": {
+                                    light: "#ffffff",
+                                    dark: "#151c2c"
+                                },
+                                "border": {
+                                    light: "#e5e7eb",
+                                    dark: "#282e39"
+                                },
+                                "text": {
+                                    light: "#111827",
+                                    dark: "#f9fafb"
+                                },
+                                "muted": {
+                                    light: "#6b7280",
+                                    dark: "#9ca3af"
+                                }
+                            },
+                            // Spline Sans as Display Font Family (Requirement 2.3)
+                            fontFamily: {
+                                "display": ["Spline Sans", "sans-serif"],
+                                "sans": ["Spline Sans", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "sans-serif"]
+                            },
+                            borderRadius: {
+                                "DEFAULT": "0.25rem",
+                                "lg": "0.5rem",
+                                "xl": "0.75rem",
+                                "2xl": "1rem",
+                                "full": "9999px"
+                            },
+                            // Enhanced spacing for better design consistency
+                            spacing: {
+                                '18': '4.5rem',
+                                '88': '22rem',
+                                '128': '32rem'
+                            },
+                            // Animation enhancements
+                            animation: {
+                                'fade-in': 'fadeIn 0.3s ease-in-out',
+                                'fade-out': 'fadeOut 0.3s ease-in-out',
+                                'slide-up': 'slideUp 0.3s ease-out',
+                                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                            },
+                            keyframes: {
+                                fadeIn: {
+                                    '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                                    '100%': { opacity: '1', transform: 'translateY(0)' }
+                                },
+                                fadeOut: {
+                                    '0%': { opacity: '1', transform: 'translateY(0)' },
+                                    '100%': { opacity: '0', transform: 'translateY(-10px)' }
+                                },
+                                slideUp: {
+                                    '0%': { transform: 'translateY(100%)' },
+                                    '100%': { transform: 'translateY(0)' }
+                                }
+                            }
+                        },
+                    },
+                };
+                
+                // Use error handler to apply configuration safely
+                const success = errorHandler.applyConfiguration(eytGamingConfig);
+                
+                if (success) {
+                    console.log('[TailwindConfig] EYTGaming configuration applied successfully with error handling');
+                } else {
+                    console.warn('[TailwindConfig] Failed to apply configuration, error handler will manage fallbacks');
+                }
+                
+                // Listen for configuration events
+                document.addEventListener('tailwindConfigured', function(event) {
+                    console.log('[TailwindConfig] Configuration event received:', event.detail);
+                });
+            }
+            
+            // Fallback configuration without error handler
+            function fallbackConfiguration() {
+                if (typeof tailwind !== 'undefined') {
+                    try {
+                        tailwind.config = {
+                            darkMode: "class",
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        "primary": {
+                                            DEFAULT: "#b91c1c",
+                                            700: "#b91c1c"
+                                        }
+                                    },
+                                    fontFamily: {
+                                        "display": ["Spline Sans", "sans-serif"],
+                                        "sans": ["system-ui", "sans-serif"]
+                                    }
+                                }
+                            }
+                        };
+                        console.log('[TailwindConfig] Basic fallback configuration applied');
+                    } catch (error) {
+                        console.error('[TailwindConfig] Even fallback configuration failed:', error);
+                    }
+                } else {
+                    console.error('[TailwindConfig] Tailwind CSS not available for any configuration');
+                }
+            }
+            
+            // Start configuration process
+            waitForErrorHandler(configureWithErrorHandling);
+        });
+    </script>
+    
+    <!-- Accessibility CSS - Load asynchronously to minimize render blocking (Requirement 3.1) -->
+    <link rel="stylesheet" href="{% static 'css/accessibility.css' %}" media="print" onload="this.media='all'; this.onload=null;">
+    <link rel="stylesheet" href="{% static 'css/tailwind-accessibility-compliance.css' %}" media="print" onload="this.media='all'; this.onload=null;">
+    <link rel="stylesheet" href="{% static 'css/status-indicators.css' %}" media="print" onload="this.media='all'; this.onload=null;">
+    <link rel="stylesheet" href="{% static 'css/graceful-fallbacks.css' %}" media="print" onload="this.media='all'; this.onload=null;">
+    
+    <!-- Fallback for browsers that don't support async CSS loading -->
+    <noscript>
+        <link rel="stylesheet" href="{% static 'css/accessibility.css' %}">
+        <link rel="stylesheet" href="{% static 'css/tailwind-accessibility-compliance.css' %}">
+        <link rel="stylesheet" href="{% static 'css/status-indicators.css' %}">
+        <link rel="stylesheet" href="{% static 'css/graceful-fallbacks.css' %}">
+        <link rel="stylesheet" href="{% static 'css/tailwind-fallback.css' %}">
+        
+        <!-- No-JavaScript fallback notification -->
+        <div class="tailwind-fallback-notice" style="background: #fbbf24; color: #92400e; padding: 0.5rem; text-align: center; font-size: 0.875rem; font-weight: 500;">
+            ⚠ JavaScript is disabled. Some features may be limited. <a href="?no_js=1" style="color: #92400e; text-decoration: underline;">Enable basic mode</a>
+        </div>
+    </noscript>
+    
+    <style>
+        /* Material Icons Styling Consistency (Requirement 2.4) */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 1.5rem;
+            line-height: 1;
+            vertical-align: middle;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Cross-browser font-variation-settings support with fallbacks */
+        @supports not (font-variation-settings: 'FILL' 0) {
+            .material-symbols-outlined {
+                font-weight: 400;
+                font-style: normal;
+            }
+            
+            .material-symbols-outlined.filled {
+                font-weight: 700;
+            }
+        }
+        
+        /* Cross-browser user-select support */
+        @supports (user-select: none) {
+            .material-symbols-outlined {
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+            }
+        }
+        
+        /* Fallback for browsers without user-select */
+        @supports not (user-select: none) {
+            .material-symbols-outlined {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        }
+        
+        /* Material Icons size variants */
+        .material-symbols-outlined.size-sm {
+            font-size: 1rem;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+        
+        .material-symbols-outlined.size-lg {
+            font-size: 2rem;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        
+        .material-symbols-outlined.size-xl {
+            font-size: 3rem;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        
+        /* Material Icons filled variant */
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Material Icons in buttons and interactive elements */
+        button .material-symbols-outlined,
+        a .material-symbols-outlined {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* Ensure proper color inheritance in dark mode */
+        .dark .material-symbols-outlined {
+            color: inherit;
+        }
+        
+        /* EYTGaming Brand Color Utilities */
+        .text-primary {
+            color: #b91c1c;
+        }
+        
+        .bg-primary {
+            background-color: #b91c1c;
+        }
+        
+        .border-primary {
+            border-color: #b91c1c;
+        }
+        
+        /* Focus indicators with proper contrast (Accessibility) */
+        /* Cross-browser focus-visible support */
+        @supports selector(:focus-visible) {
+            .focus-visible:focus-visible {
+                outline: 2px solid #b91c1c;
+                outline-offset: 2px;
+            }
+            
+            .focus-visible:focus:not(:focus-visible) {
+                outline: none;
+            }
+        }
+        
+        /* Fallback for browsers without :focus-visible */
+        @supports not selector(:focus-visible) {
+            .focus-visible:focus {
+                outline: 2px solid #b91c1c;
+                outline-offset: 2px;
+            }
+        }
+        
+        /* Dark mode focus indicators with cross-browser support */
+        @supports selector(:focus-visible) {
+            .dark .focus-visible:focus-visible {
+                outline-color: #dc2626;
+            }
+        }
+        
+        @supports not selector(:focus-visible) {
+            .dark .focus-visible:focus {
+                outline-color: #dc2626;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="font-sans bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark antialiased">
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+    
+    <!-- No-JavaScript Fallback Content -->
+    {% include 'noscript-fallback.html' %}
+    
+    {% block body %}{% endblock %}
+    
+    <!-- Global JavaScript -->
+    <script>
+        // Cross-browser compatibility detection and fallbacks (Requirement 4.1)
+        (function() {
+            'use strict';
+            
+            // Browser detection for specific fallbacks
+            const browserInfo = {
+                isIE: /MSIE|Trident/.test(navigator.userAgent),
+                isEdge: /Edge/.test(navigator.userAgent),
+                isFirefox: /Firefox/.test(navigator.userAgent),
+                isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent),
+                isChrome: /Chrome/.test(navigator.userAgent) && !/Edge/.test(navigator.userAgent),
+                isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            };
+            
+            // Add browser classes to html element for CSS targeting
+            const htmlElement = document.documentElement;
+            Object.keys(browserInfo).forEach(function(key) {
+                if (browserInfo[key]) {
+                    htmlElement.classList.add(key.toLowerCase().replace('is', 'browser-'));
+                }
+            });
+            
+            // CSS feature detection and polyfills
+            const features = {
+                grid: CSS.supports('display', 'grid'),
+                flexbox: CSS.supports('display', 'flex'),
+                customProperties: CSS.supports('color', 'var(--test)'),
+                focusVisible: CSS.supports('selector(:focus-visible)'),
+                colorScheme: CSS.supports('color-scheme', 'dark'),
+                fontVariationSettings: CSS.supports('font-variation-settings', '"wght" 400')
+            };
+            
+            // Add feature classes to html element
+            Object.keys(features).forEach(function(feature) {
+                htmlElement.classList.add(features[feature] ? 'supports-' + feature : 'no-' + feature);
+            });
+            
+            // Polyfill for CSS.supports in older browsers
+            if (!window.CSS || !window.CSS.supports) {
+                window.CSS = window.CSS || {};
+                window.CSS.supports = function() {
+                    return false; // Conservative fallback
+                };
+                
+                // Add fallback classes
+                htmlElement.classList.add('no-css-supports');
+                htmlElement.classList.add('no-grid');
+                htmlElement.classList.add('no-flexbox');
+                htmlElement.classList.add('no-custom-properties');
+                htmlElement.classList.add('no-focus-visible');
+                htmlElement.classList.add('no-color-scheme');
+                htmlElement.classList.add('no-font-variation-settings');
+            }
+            
+            // Internet Explorer specific fixes
+            if (browserInfo.isIE) {
+                // Add IE-specific classes and fixes
+                htmlElement.classList.add('ie-browser');
+                
+                // Polyfill for classList in IE9
+                if (!('classList' in document.createElement('_'))) {
+                    (function(view) {
+                        if (!('Element' in view)) return;
+                        var classListProp = "classList",
+                            protoProp = "prototype",
+                            elemCtrProto = view.Element[protoProp],
+                            objCtr = Object,
+                            strTrim = String[protoProp].trim || function() {
+                                return this.replace(/^\s+|\s+$/g, "");
+                            };
+                        // Implementation would go here - simplified for brevity
+                    }(window));
+                }
+                
+                // Fix for console.log in IE
+                if (!window.console) {
+                    window.console = {
+                        log: function() {},
+                        warn: function() {},
+                        error: function() {}
+                    };
+                }
+            }
+            
+            // Safari-specific fixes
+            if (browserInfo.isSafari) {
+                // Fix for Safari's handling of focus-visible
+                if (!features.focusVisible) {
+                    // Add keyboard navigation detection
+                    let hadKeyboardEvent = true;
+                    const keyboardThrottleTimeout = 100;
+                    
+                    function onPointerDown() {
+                        hadKeyboardEvent = false;
+                    }
+                    
+                    function onKeyDown(e) {
+                        if (e.metaKey || e.altKey || e.ctrlKey) {
+                            return;
+                        }
+                        hadKeyboardEvent = true;
+                    }
+                    
+                    function onFocus(e) {
+                        if (hadKeyboardEvent) {
+                            e.target.classList.add('focus-visible-polyfill');
+                        }
+                    }
+                    
+                    function onBlur(e) {
+                        e.target.classList.remove('focus-visible-polyfill');
+                    }
+                    
+                    document.addEventListener('keydown', onKeyDown, true);
+                    document.addEventListener('mousedown', onPointerDown, true);
+                    document.addEventListener('pointerdown', onPointerDown, true);
+                    document.addEventListener('touchstart', onPointerDown, true);
+                    document.addEventListener('focus', onFocus, true);
+                    document.addEventListener('blur', onBlur, true);
+                }
+            }
+            
+            // Firefox-specific fixes
+            if (browserInfo.isFirefox) {
+                // Fix for Firefox's scrollbar styling
+                if (!CSS.supports('scrollbar-width', 'thin')) {
+                    // Add custom scrollbar styles for Firefox
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        html {
+                            scrollbar-width: thin;
+                            scrollbar-color: #404040 #1a1a1a;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            // Mobile-specific optimizations
+            if (browserInfo.isMobile) {
+                htmlElement.classList.add('mobile-device');
+                
+                // Prevent zoom on input focus for iOS
+                if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                    const viewport = document.querySelector('meta[name="viewport"]');
+                    if (viewport) {
+                        let content = viewport.getAttribute('content');
+                        if (content.indexOf('user-scalable=no') === -1) {
+                            viewport.setAttribute('content', content + ', user-scalable=no');
+                        }
+                    }
+                }
+                
+                // Add touch-friendly classes
+                htmlElement.classList.add('touch-device');
+                
+                // Optimize touch interactions
+                document.addEventListener('touchstart', function() {}, { passive: true });
+            }
+            
+            // Feature detection for modern CSS features
+            function detectCSSFeatures() {
+                const testElement = document.createElement('div');
+                const features = {
+                    'backdrop-filter': 'backdrop-filter: blur(10px)',
+                    'clip-path': 'clip-path: circle(50%)',
+                    'object-fit': 'object-fit: cover',
+                    'position-sticky': 'position: sticky',
+                    'mix-blend-mode': 'mix-blend-mode: multiply'
+                };
+                
+                Object.keys(features).forEach(function(feature) {
+                    try {
+                        testElement.style.cssText = features[feature];
+                        if (testElement.style.length > 0) {
+                            htmlElement.classList.add('supports-' + feature);
+                        } else {
+                            htmlElement.classList.add('no-' + feature);
+                        }
+                    } catch (e) {
+                        htmlElement.classList.add('no-' + feature);
+                    }
+                });
+            }
+            
+            // Run feature detection when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', detectCSSFeatures);
+            } else {
+                detectCSSFeatures();
+            }
+            
+        })();
+        
+        // CSRF Token for AJAX requests
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        const csrftoken = getCookie('csrftoken');
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const colors = {
+                'success': 'bg-green-600',
+                'error': 'bg-red-600',
+                'warning': 'bg-yellow-600',
+                'info': 'bg-blue-600'
+            };
+            
+            toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in`;
+            toast.textContent = message;
+            toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            // Error messages use assertive, others use polite
+            toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+            toast.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('animate-fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    
+    <!-- Accessibility JavaScript - Already optimized with defer -->
+    <script src="{% static 'js/accessibility.js' %}" defer></script>
+    
+    <!-- Tailwind CSS Accessibility Compliance - Load after accessibility.js -->
+    <script src="{% static 'js/tailwind-accessibility-compliance.js' %}" defer></script>
+    
+    <!-- Tailwind CSS Fallback Handler - Load early to detect failures (Requirement 4.2, 4.3, 4.4) -->
+    <script src="{% static 'js/tailwind-fallback.js' %}" defer></script>
+    
+    <!-- Cross-browser compatibility test script (Development) -->
+    <script src="{% static 'js/cross_browser_compatibility_test.js' %}" defer></script>
+    
+    <!-- Performance monitoring and optimization script (Requirement 3.1, 3.4) -->
+    <script>
+        // Performance optimization: Monitor critical resource loading
+        if ('performance' in window && 'mark' in performance) {
+            performance.mark('critical-css-start');
+            
+            // Monitor font loading performance
+            if ('fonts' in document) {
+                document.fonts.ready.then(function() {
+                    performance.mark('fonts-loaded');
+                    console.log('Fonts loaded successfully');
+                });
+            }
+            
+            // Monitor Tailwind CSS loading
+            document.addEventListener('DOMContentLoaded', function() {
+                performance.mark('dom-ready');
+                
+                // Check if critical resources are loaded
+                const criticalResourcesLoaded = typeof tailwind !== 'undefined';
+                if (criticalResourcesLoaded) {
+                    performance.mark('critical-resources-loaded');
+                    console.log('Critical resources loaded successfully');
+                } else {
+                    console.warn('Critical resources failed to load');
+                }
+            });
+            
+            // Measure performance metrics
+            window.addEventListener('load', function() {
+                performance.mark('page-loaded');
+                
+                // Log performance metrics for monitoring
+                const navigation = performance.getEntriesByType('navigation')[0];
+                if (navigation) {
+                    console.log('Performance Metrics:', {
+                        domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+                        loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
+                        totalTime: navigation.loadEventEnd - navigation.fetchStart
+                    });
+                }
+            });
+        }
+        
+        // Optimize image loading with lazy loading fallback
+        if ('loading' in HTMLImageElement.prototype) {
+            // Native lazy loading supported
+            document.addEventListener('DOMContentLoaded', function() {
+                const images = document.querySelectorAll('img[data-src]');
+                images.forEach(img => {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                });
+            });
+        } else {
+            // Fallback for browsers without native lazy loading
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js';
+            script.async = true;
+            document.head.appendChild(script);
+        }
+        
+        // Service Worker registration for advanced caching (Performance Enhancement)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('{% static "sw.js" %}').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }).catch(function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

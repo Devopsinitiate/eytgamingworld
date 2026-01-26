@@ -1,0 +1,120 @@
+{% load static %}
+
+<div class="info-card bg-gray-800 border border-gray-700 rounded-lg p-4">
+    <h4 class="info-card-title flex items-center text-white font-medium mb-4">
+        <span class="material-symbols-outlined text-red-600 mr-2">emoji_events</span>
+        Tournament Details
+    </h4>
+    
+    <div class="info-list space-y-3">
+        <!-- Tournament Name -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-red-600">emoji_events</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Tournament</span>
+                <span class="info-value text-white">{{ tournament_name|default:"Tournament" }}</span>
+            </div>
+        </div>
+        
+        <!-- Game Name -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-gray-400">sports_esports</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Game</span>
+                <span class="info-value text-white">{{ game_name|default:"Game" }}</span>
+            </div>
+        </div>
+        
+        <!-- Start Date -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-gray-400">calendar_today</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Start Date</span>
+                <span class="info-value text-white">{{ start_date|default:"TBD" }}</span>
+            </div>
+        </div>
+        
+        <!-- Tournament Format -->
+        {% if tournament.format %}
+            <div class="info-item flex items-start">
+                <div class="info-icon mr-3 mt-0.5">
+                    <span class="material-symbols-outlined text-gray-400">category</span>
+                </div>
+                <div class="info-content flex-1">
+                    <span class="info-label block text-gray-400 text-sm">Format</span>
+                    <span class="info-value text-white">{{ tournament.get_format_display|default:"Format TBD" }}</span>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Participants -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-gray-400">group</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Participants</span>
+                <span class="info-value text-white">
+                    {{ registered_count|default:0 }}/{% if max_participants > 0 %}{{ max_participants }}{% else %}∞{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <!-- Prize Pool -->
+        {% if prize_pool > 0 %}
+            <div class="info-item flex items-start">
+                <div class="info-icon mr-3 mt-0.5">
+                    <span class="material-symbols-outlined text-yellow-400">monetization_on</span>
+                </div>
+                <div class="info-content flex-1">
+                    <span class="info-label block text-gray-400 text-sm">Prize Pool</span>
+                    <span class="info-value text-yellow-400">${{ prize_pool|default:0 }}</span>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Entry Fee -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-gray-400">payment</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Entry Fee</span>
+                <span class="info-value text-white">
+                    {% if registration_fee > 0 %}
+                        ${{ registration_fee }}
+                    {% else %}
+                        Free
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <!-- Registration End -->
+        <div class="info-item flex items-start">
+            <div class="info-icon mr-3 mt-0.5">
+                <span class="material-symbols-outlined text-gray-400">schedule</span>
+            </div>
+            <div class="info-content flex-1">
+                <span class="info-label block text-gray-400 text-sm">Registration Closes</span>
+                <span class="info-value text-white">{{ registration_end|default:"TBD" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    {% if show_registration_button and tournament %}
+        <div class="mt-4 pt-4 border-t border-gray-700">
+            <a href="{% url 'tournaments:register' tournament.id %}" 
+               class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+                <span class="material-symbols-outlined mr-2">person_add</span>
+                Register Now
+            </a>
+        </div>
+    {% endif %}
+</div>

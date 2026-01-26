@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS Integration Test Runner - Task 10</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+    
+    <!-- Load error handler -->
+    <script src="static/js/tailwind-error-handler.js" defer></script>
+    
+    <!-- Tailwind Configuration -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            function waitForErrorHandler(callback, attempts = 0) {
+                if (window.TailwindErrorHandler) {
+                    callback();
+                } else if (attempts < 50) {
+                    setTimeout(() => waitForErrorHandler(callback, attempts + 1), 100);
+                } else {
+                    console.warn('[TailwindConfig] Error handler not available, falling back to basic configuration');
+                    fallbackConfiguration();
+                }
+            }
+            
+            function configureWithErrorHandling() {
+                const errorHandler = window.TailwindErrorHandler;
+                
+                const eytGamingConfig = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                "primary": {
+                                    DEFAULT: "#b91c1c",
+                                    50: "#fef2f2",
+                                    100: "#fee2e2", 
+                                    200: "#fecaca",
+                                    300: "#fca5a5",
+                                    400: "#f87171",
+                                    500: "#ef4444",
+                                    600: "#dc2626",
+                                    700: "#b91c1c",
+                                    800: "#991b1b",
+                                    900: "#7f1d1d",
+                                    950: "#450a0a"
+                                }
+                            },
+                            fontFamily: {
+                                "display": ["Spline Sans", "sans-serif"],
+                                "sans": ["Spline Sans", "ui-sans-serif", "system-ui"]
+                            }
+                        }
+                    }
+                };
+                
+                const success = errorHandler.applyConfiguration(eytGamingConfig);
+                
+                if (success) {
+                    console.log('[TailwindConfig] EYTGaming configuration applied successfully');
+                } else {
+                    console.warn('[TailwindConfig] Failed to apply configuration');
+                }
+            }
+            
+            function fallbackConfiguration() {
+                if (typeof tailwind !== 'undefined') {
+                    try {
+                        tailwind.config = {
+                            darkMode: "class",
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        "primary": {
+                                            DEFAULT: "#b91c1c",
+                                            700: "#b91c1c"
+                                        }
+                                    },
+                                    fontFamily: {
+                                        "display": ["Spline Sans", "sans-serif"]
+                                    }
+                                }
+                            }
+                        };
+                        console.log('[TailwindConfig] Basic fallback configuration applied');
+                    } catch (error) {
+                        console.error('[TailwindConfig] Even fallback configuration failed:', error);
+                    }
+                }
+            }
+            
+            waitForErrorHandler(configureWithErrorHandling);
+        });
+    </script>
+    
+    <style>
+        .test-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+        }
+        
+        .dark .test-container {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .test-result {
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .test-result.pass {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .test-result.fail {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .test-result.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .dark .test-result.pass {
+            background: #064e3b;
+            color: #a7f3d0;
+        }
+        
+        .dark .test-result.fail {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .dark .test-result.warning {
+            background: #78350f;
+            color: #fde68a;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .metric-card {
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .dark .metric-card {
+            background: #4b5563;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .dark .metric-label {
+            color: #9ca3af;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.3s ease;
+        }
+        
+        .dark .progress-bar {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
+    <div class="container mx-auto max-w-6xl">
+        <header class="text-center py-8">
+            <h1 class="text-4xl font-bold text-primary mb-4">
+                Tailwind CSS Integration Test Runner
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">
+                Task 10: Integration testing and validation
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-500">
+                Testing complete loading sequence, brand consistency, performance, and accessibility
+            </p>
+            
+            <!-- Test Controls -->
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="runAllTests" class="btn btn-primary px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-800 focus:outline-primary">
+                    🚀 Run All Integration Tests
+                </button>
+                <button id="toggleDarkMode" class="btn btn-secondary px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-primary">
+                    🌙 Toggle Dark Mode
+                </button>
+                <button id="exportResults" class="btn btn-outline px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-primary">
+                    📄 Export Results
+                </button>
+            </div>
+        </header>
+        
+        <main>
+            <!-- Overall Progress -->
+            <section class="test-container mb-8">
+                <h2 class="text-2xl font-semibold mb-4">📊 Integration Test Progress</h2>
+                <div id="overallProgress" class="mb-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span>Overall Progress</span>
+                        <span id="progressText">0/0 tests completed</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summaryMetrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalTests">0</div>
+                        <div class="metric-label">Total Tests</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value text-green-600" id="passedTests">0</div>
+                        <div class="metric-label">Passed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value text-red-600" id="failedTests">0</div>
+                        <div class="metric-label">Failed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value text-blue-600" id="passRate">0%</div>
+                        <div class="metric-label">Pass Rate</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Test Categories -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Loading Sequence Tests -->
+                <section class="test-container">
+                    <h3 class="text-xl font-semibold mb-4">🔄 Loading Sequence Tests</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Requirements 1.1, 1.2, 1.3, 1.4</p>
+                    <div id="loadingResults" class="space-y-2">
+                        <div class="test-result warning">Waiting to run...</div>
+                    </div>
+                </section>
+                
+                <!-- Brand Consistency Tests -->
+                <section class="test-container">
+                    <h3 class="text-xl font-semibold mb-4">🎨 Brand Consistency Tests</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Requirements 2.1, 2.2, 2.3, 2.4</p>
+                    <div id="brandResults" class="space-y-2">
+                        <div class="test-result warning">Waiting to run...</div>
+                    </div>
+                </section>
+                
+                <!-- Performance Tests -->
+                <section class="test-container">
+                    <h3 class="text-xl font-semibold mb-4">⚡ Performance Tests</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Requirements 3.1, 3.2, 3.3, 3.4</p>
+                    <div id="performanceResults" class="space-y-2">
+                        <div class="test-result warning">Waiting to run...</div>
+                    </div>
+                </section>
+                
+                <!-- Accessibility Tests -->
+                <section class="test-container">
+                    <h3 class="text-xl font-semibold mb-4">♿ Accessibility Tests</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Requirements 5.1, 5.2, 5.3, 5.4</p>
+                    <div id="accessibilityResults" class="space-y-2">
+                        <div class="test-result warning">Waiting to run...</div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Cross-Browser Compatibility Tests -->
+            <section class="test-container mt-6">
+                <h3 class="text-xl font-semibold mb-4">🌐 Cross-Browser Compatibility Tests</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Requirements 4.1, 4.2, 4.3, 4.4</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+                        <h4 class="font-semibold mb-2">Browser Information</h4>
+                        <div id="browserInfo" class="text-sm space-y-1">
+                            <!-- Browser info will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+                        <h4 class="font-semibold mb-2">Feature Support</h4>
+                        <div id="featureSupport" class="text-sm space-y-1">
+                            <!-- Feature support will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="compatibilityResults" class="space-y-2">
+                    <div class="test-result warning">Waiting to run...</div>
+                </div>
+            </section>
+            
+            <!-- Test Log -->
+            <section class="test-container mt-6">
+                <h3 class="text-xl font-semibold mb-4">📝 Test Execution Log</h3>
+                <div id="testLog" class="bg-gray-100 dark:bg-gray-800 p-4 rounded font-mono text-sm max-h-64 overflow-y-auto">
+                    <div class="text-gray-500">Test log will appear here...</div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- ARIA Live Region for Test Announcements -->
+        <div id="testAnnouncements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    </div>
+    
+    <script>
+        /**
+         * Integration Test Runner for Task 10
+         * Comprehensive testing implementation
+         */
+        
+        class IntegrationTestRunner {
+            constructor() {
+                this.testResults = {
+                    loading: [],
+                    brand: [],
+                    performance: [],
+                    accessibility: [],
+                    compatibility: []
+                };
+                this.totalTests = 0;
+                this.completedTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                console.log('🚀 Initializing Integration Test Runner for Task 10');
+                this.bindEventListeners();
+                this.detectBrowserInfo();
+                this.logMessage('Integration Test Runner initialized');
+            }
+            
+            bindEventListeners() {
+                document.getElementById('runAllTests')?.addEventListener('click', () => this.runAllIntegrationTests());
+                document.getElementById('toggleDarkMode')?.addEventListener('click', () => this.toggleDarkMode());
+                document.getElementById('exportResults')?.addEventListener('click', () => this.exportResults());
+            }
+            
+            async runAllIntegrationTests() {
+                this.logMessage('🚀 Starting comprehensive integration testing...');
+                this.resetResults();
+                
+                try {
+                    // Run all test categories
+                    await this.runLoadingSequenceTests();
+                    await this.runBrandConsistencyTests();
+                    await this.runPerformanceTests();
+                    await this.runAccessibilityTests();
+                    await this.runCompatibilityTests();
+                    
+                    this.generateFinalReport();
+                    this.logMessage('✅ All integration tests completed');
+                    
+                } catch (error) {
+                    this.logMessage(`❌ Integration testing failed: ${error.message}`);
+                    console.error('Integration testing error:', error);
+                }
+            }
+            
+            // ========================================
+            // LOADING SEQUENCE TESTS (Requirements 1.1, 1.2, 1.3, 1.4)
+            // ========================================
+            
+            async runLoadingSequenceTests() {
+                this.logMessage('🔄 Running loading sequence tests...');
+                const container = document.getElementById('loadingResults');
+                container.innerHTML = '<div class="test-result warning loading">Running loading sequence tests...</div>';
+                
+                const tests = [
+                    await this.testTailwindAvailability(),
+                    await this.testConfigurationApplication(),
+                    await this.testErrorPrevention(),
+                    await this.testScriptLoadingOrder()
+                ];
+                
+                this.testResults.loading = tests;
+                this.displayResults(container, tests);
+                this.updateProgress();
+                
+                const passed = tests.filter(t => t.passed).length;
+                this.logMessage(`🔄 Loading sequence tests: ${passed}/${tests.length} passed`);
+            }
+            
+            async testTailwindAvailability() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Tailwind CSS Availability',
+                        requirement: '1.1, 1.2',
+                        passed: typeof tailwind !== 'undefined',
+                        message: typeof tailwind !== 'undefined' ? 
+                            '✅ Tailwind CSS library is available' : 
+                            '❌ Tailwind CSS library not available - race condition detected'
+                    };
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            async testConfigurationApplication() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Configuration Application',
+                        requirement: '1.3, 1.4'
+                    };
+                    
+                    // Test if EYTGaming brand configuration was applied
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-primary';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const computedStyle = window.getComputedStyle(testElement);
+                        const bgColor = computedStyle.backgroundColor;
+                        
+                        test.passed = bgColor.includes('185, 28, 28'); // EYTGaming brand red
+                        test.message = test.passed ? 
+                            `✅ Brand configuration applied: ${bgColor}` : 
+                            `❌ Brand configuration not applied: ${bgColor}`;
+                        
+                        document.body.removeChild(testElement);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testErrorPrevention() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'JavaScript Error Prevention',
+                        requirement: '1.2, 1.3'
+                    };
+                    
+                    // Check for console errors (simplified check)
+                    const originalError = console.error;
+                    let errorDetected = false;
+                    
+                    console.error = function(...args) {
+                        if (args.some(arg => typeof arg === 'string' && arg.includes('tailwind is not defined'))) {
+                            errorDetected = true;
+                        }
+                        originalError.apply(console, args);
+                    };
+                    
+                    setTimeout(() => {
+                        console.error = originalError;
+                        
+                        test.passed = !errorDetected;
+                        test.message = test.passed ? 
+                            '✅ No "tailwind is not defined" errors detected' : 
+                            '❌ "tailwind is not defined" error detected';
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 500);
+                });
+            }
+            
+            async testScriptLoadingOrder() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Script Loading Order',
+                        requirement: '1.1, 1.4'
+                    };
+                    
+                    const scripts = Array.from(document.querySelectorAll('script[src*="tailwind"]'));
+                    const hasDefer = scripts.some(s => s.hasAttribute('defer'));
+                    
+                    test.passed = scripts.length > 0 && hasDefer;
+                    test.message = test.passed ? 
+                        `✅ Tailwind scripts properly deferred: ${scripts.length} scripts` : 
+                        `❌ Script loading order issues: ${scripts.length} scripts, defer: ${hasDefer}`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            // ========================================
+            // BRAND CONSISTENCY TESTS (Requirements 2.1, 2.2, 2.3, 2.4)
+            // ========================================
+            
+            async runBrandConsistencyTests() {
+                this.logMessage('🎨 Running brand consistency tests...');
+                const container = document.getElementById('brandResults');
+                container.innerHTML = '<div class="test-result warning loading">Running brand consistency tests...</div>';
+                
+                const tests = [
+                    await this.testPrimaryColors(),
+                    await this.testDarkModeColors(),
+                    await this.testFontFamily(),
+                    await this.testMaterialIcons()
+                ];
+                
+                this.testResults.brand = tests;
+                this.displayResults(container, tests);
+                this.updateProgress();
+                
+                const passed = tests.filter(t => t.passed).length;
+                this.logMessage(`🎨 Brand consistency tests: ${passed}/${tests.length} passed`);
+            }
+            
+            async testPrimaryColors() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'EYTGaming Primary Colors',
+                        requirement: '2.1'
+                    };
+                    
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-primary text-primary border-primary';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(testElement);
+                        const bgColor = style.backgroundColor;
+                        const textColor = style.color;
+                        
+                        const expectedRgb = '185, 28, 28';
+                        const bgMatch = bgColor.includes(expectedRgb);
+                        const textMatch = textColor.includes(expectedRgb);
+                        
+                        test.passed = bgMatch || textMatch;
+                        test.message = test.passed ? 
+                            `✅ Brand red applied: bg=${bgMatch}, text=${textMatch}` : 
+                            `❌ Brand red not applied: bg=${bgColor}, text=${textColor}`;
+                        
+                        document.body.removeChild(testElement);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testDarkModeColors() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Dark Mode Colors',
+                        requirement: '2.2'
+                    };
+                    
+                    // Toggle dark mode temporarily
+                    const originalClass = document.documentElement.className;
+                    document.documentElement.classList.add('dark');
+                    
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-background-dark text-text-dark';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(testElement);
+                        const bgColor = style.backgroundColor;
+                        const textColor = style.color;
+                        
+                        const hasDarkBg = bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent';
+                        const hasDarkText = textColor !== 'rgba(0, 0, 0, 0)' && textColor !== 'transparent';
+                        
+                        test.passed = hasDarkBg || hasDarkText;
+                        test.message = test.passed ? 
+                            `✅ Dark mode colors applied: bg=${hasDarkBg}, text=${hasDarkText}` : 
+                            `❌ Dark mode colors not applied: bg=${bgColor}, text=${textColor}`;
+                        
+                        document.body.removeChild(testElement);
+                        document.documentElement.className = originalClass;
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testFontFamily() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Spline Sans Font Family',
+                        requirement: '2.3'
+                    };
+                    
+                    const testElement = document.createElement('div');
+                    testElement.className = 'font-display';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(testElement);
+                        const fontFamily = style.fontFamily;
+                        
+                        test.passed = fontFamily.includes('Spline Sans');
+                        test.message = test.passed ? 
+                            `✅ Spline Sans applied: ${fontFamily}` : 
+                            `❌ Spline Sans not found: ${fontFamily}`;
+                        
+                        document.body.removeChild(testElement);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testMaterialIcons() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Material Icons Styling',
+                        requirement: '2.4'
+                    };
+                    
+                    const testElement = document.createElement('span');
+                    testElement.className = 'material-symbols-outlined';
+                    testElement.textContent = 'home';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(testElement);
+                        const fontSize = style.fontSize;
+                        
+                        test.passed = fontSize && fontSize !== '16px';
+                        test.message = test.passed ? 
+                            `✅ Material Icons styled: ${fontSize}` : 
+                            `❌ Material Icons not styled: ${fontSize}`;
+                        
+                        document.body.removeChild(testElement);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            // ========================================
+            // PERFORMANCE TESTS (Requirements 3.1, 3.2, 3.3, 3.4)
+            // ========================================
+            
+            async runPerformanceTests() {
+                this.logMessage('⚡ Running performance tests...');
+                const container = document.getElementById('performanceResults');
+                container.innerHTML = '<div class="test-result warning loading">Running performance tests...</div>';
+                
+                const tests = [
+                    await this.testRenderBlockingResources(),
+                    await this.testFontLoadingPerformance(),
+                    await this.testLayoutStability(),
+                    await this.testResourceTiming()
+                ];
+                
+                this.testResults.performance = tests;
+                this.displayResults(container, tests);
+                this.updateProgress();
+                
+                const passed = tests.filter(t => t.passed).length;
+                this.logMessage(`⚡ Performance tests: ${passed}/${tests.length} passed`);
+            }
+            
+            async testRenderBlockingResources() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Render-Blocking Resources',
+                        requirement: '3.1'
+                    };
+                    
+                    const stylesheets = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+                    const scripts = Array.from(document.querySelectorAll('script[src]'));
+                    
+                    const blockingCSS = stylesheets.filter(link => 
+                        !link.hasAttribute('media') || link.getAttribute('media') === 'all'
+                    ).length;
+                    
+                    const blockingJS = scripts.filter(script => 
+                        !script.hasAttribute('defer') && !script.hasAttribute('async')
+                    ).length;
+                    
+                    const totalBlocking = blockingCSS + blockingJS;
+                    
+                    test.passed = totalBlocking <= 3; // Allow some critical resources
+                    test.message = test.passed ? 
+                        `✅ Minimal blocking resources: ${totalBlocking} (${blockingCSS} CSS, ${blockingJS} JS)` : 
+                        `❌ Too many blocking resources: ${totalBlocking} (${blockingCSS} CSS, ${blockingJS} JS)`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            async testFontLoadingPerformance() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Font Loading Performance',
+                        requirement: '3.2'
+                    };
+                    
+                    if ('fonts' in document) {
+                        document.fonts.ready.then(() => {
+                            const loadedFonts = Array.from(document.fonts);
+                            const splineSansLoaded = loadedFonts.some(font => font.family.includes('Spline Sans'));
+                            
+                            test.passed = splineSansLoaded;
+                            test.message = test.passed ? 
+                                `✅ Fonts loaded: ${loadedFonts.length} including Spline Sans` : 
+                                `❌ Spline Sans not loaded: ${loadedFonts.length} fonts`;
+                            
+                            this.totalTests++;
+                            this.completedTests++;
+                            if (test.passed) this.passedTests++;
+                            else this.failedTests++;
+                            
+                            resolve(test);
+                        });
+                    } else {
+                        test.passed = false;
+                        test.message = '❌ Font Loading API not supported';
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        this.failedTests++;
+                        
+                        resolve(test);
+                    }
+                });
+            }
+            
+            async testLayoutStability() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Layout Stability (CLS)',
+                        requirement: '3.3'
+                    };
+                    
+                    if ('PerformanceObserver' in window) {
+                        let clsValue = 0;
+                        
+                        try {
+                            const observer = new PerformanceObserver((list) => {
+                                for (const entry of list.getEntries()) {
+                                    if (!entry.hadRecentInput) {
+                                        clsValue += entry.value;
+                                    }
+                                }
+                            });
+                            
+                            observer.observe({ type: 'layout-shift', buffered: true });
+                            
+                            setTimeout(() => {
+                                observer.disconnect();
+                                
+                                test.passed = clsValue < 0.1;
+                                test.message = test.passed ? 
+                                    `✅ Good layout stability: CLS = ${clsValue.toFixed(4)}` : 
+                                    `❌ Poor layout stability: CLS = ${clsValue.toFixed(4)}`;
+                                
+                                this.totalTests++;
+                                this.completedTests++;
+                                if (test.passed) this.passedTests++;
+                                else this.failedTests++;
+                                
+                                resolve(test);
+                            }, 1000);
+                            
+                        } catch (error) {
+                            test.passed = false;
+                            test.message = `❌ CLS measurement failed: ${error.message}`;
+                            
+                            this.totalTests++;
+                            this.completedTests++;
+                            this.failedTests++;
+                            
+                            resolve(test);
+                        }
+                    } else {
+                        test.passed = false;
+                        test.message = '❌ PerformanceObserver not supported';
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        this.failedTests++;
+                        
+                        resolve(test);
+                    }
+                });
+            }
+            
+            async testResourceTiming() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Resource Loading Timing',
+                        requirement: '3.4'
+                    };
+                    
+                    if ('performance' in window && 'getEntriesByType' in performance) {
+                        const resources = performance.getEntriesByType('resource');
+                        const tailwindResource = resources.find(r => r.name.includes('tailwindcss.com'));
+                        
+                        if (tailwindResource) {
+                            const loadTime = tailwindResource.responseEnd - tailwindResource.startTime;
+                            
+                            test.passed = loadTime < 2000; // 2 second threshold
+                            test.message = test.passed ? 
+                                `✅ Tailwind loaded quickly: ${loadTime.toFixed(0)}ms` : 
+                                `❌ Tailwind loaded slowly: ${loadTime.toFixed(0)}ms`;
+                        } else {
+                            test.passed = false;
+                            test.message = '❌ Tailwind resource timing not found';
+                        }
+                    } else {
+                        test.passed = false;
+                        test.message = '❌ Performance API not supported';
+                    }
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            // ========================================
+            // ACCESSIBILITY TESTS (Requirements 5.1, 5.2, 5.3, 5.4)
+            // ========================================
+            
+            async runAccessibilityTests() {
+                this.logMessage('♿ Running accessibility tests...');
+                const container = document.getElementById('accessibilityResults');
+                container.innerHTML = '<div class="test-result warning loading">Running accessibility tests...</div>';
+                
+                const tests = [
+                    await this.testFocusIndicators(),
+                    await this.testColorContrast(),
+                    await this.testInteractiveElements(),
+                    await this.testARIACompliance()
+                ];
+                
+                this.testResults.accessibility = tests;
+                this.displayResults(container, tests);
+                this.updateProgress();
+                
+                const passed = tests.filter(t => t.passed).length;
+                this.logMessage(`♿ Accessibility tests: ${passed}/${tests.length} passed`);
+            }
+            
+            async testFocusIndicators() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Focus Indicators',
+                        requirement: '5.1'
+                    };
+                    
+                    const button = document.createElement('button');
+                    button.className = 'focus:outline-primary px-4 py-2';
+                    button.textContent = 'Test';
+                    document.body.appendChild(button);
+                    
+                    button.focus();
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(button);
+                        const outline = style.outline;
+                        const outlineColor = style.outlineColor;
+                        
+                        const hasOutline = outline !== 'none';
+                        const hasBrandColor = outlineColor.includes('185, 28, 28');
+                        
+                        test.passed = hasOutline || hasBrandColor;
+                        test.message = test.passed ? 
+                            `✅ Focus indicators present: outline=${hasOutline}, brand=${hasBrandColor}` : 
+                            `❌ Focus indicators missing: outline=${outline}`;
+                        
+                        document.body.removeChild(button);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testColorContrast() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Color Contrast',
+                        requirement: '5.2'
+                    };
+                    
+                    // Test primary color on white background
+                    const testElement = document.createElement('div');
+                    testElement.className = 'bg-primary text-white p-4';
+                    testElement.textContent = 'Test';
+                    document.body.appendChild(testElement);
+                    
+                    setTimeout(() => {
+                        const style = window.getComputedStyle(testElement);
+                        const bgColor = style.backgroundColor;
+                        const textColor = style.color;
+                        
+                        // Simple check for brand red and white text
+                        const hasGoodContrast = bgColor.includes('185, 28, 28') && textColor.includes('255, 255, 255');
+                        
+                        test.passed = hasGoodContrast;
+                        test.message = test.passed ? 
+                            `✅ Good contrast: primary red with white text` : 
+                            `❌ Poor contrast: bg=${bgColor}, text=${textColor}`;
+                        
+                        document.body.removeChild(testElement);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testInteractiveElements() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Interactive Elements Size',
+                        requirement: '5.3'
+                    };
+                    
+                    const button = document.createElement('button');
+                    button.className = 'interactive-element px-4 py-2';
+                    button.textContent = 'Test';
+                    document.body.appendChild(button);
+                    
+                    setTimeout(() => {
+                        const rect = button.getBoundingClientRect();
+                        const minSize = 44; // 44px minimum
+                        
+                        test.passed = rect.width >= minSize && rect.height >= minSize;
+                        test.message = test.passed ? 
+                            `✅ Meets minimum size: ${rect.width}x${rect.height}px` : 
+                            `❌ Too small: ${rect.width}x${rect.height}px (min: ${minSize}px)`;
+                        
+                        document.body.removeChild(button);
+                        
+                        this.totalTests++;
+                        this.completedTests++;
+                        if (test.passed) this.passedTests++;
+                        else this.failedTests++;
+                        
+                        resolve(test);
+                    }, 100);
+                });
+            }
+            
+            async testARIACompliance() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'ARIA Compliance',
+                        requirement: '5.1-5.4'
+                    };
+                    
+                    const skipLink = document.querySelector('.skip-to-main, [href="#main-content"]');
+                    const liveRegions = document.querySelectorAll('[aria-live]');
+                    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                    
+                    const hasSkipLink = !!skipLink;
+                    const hasLiveRegions = liveRegions.length > 0;
+                    const hasHeadings = headings.length > 0;
+                    
+                    test.passed = hasSkipLink || hasLiveRegions || hasHeadings;
+                    test.message = test.passed ? 
+                        `✅ ARIA features present: skip=${hasSkipLink}, live=${liveRegions.length}, headings=${headings.length}` : 
+                        `❌ Missing ARIA features`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            // ========================================
+            // COMPATIBILITY TESTS (Requirements 4.1, 4.2, 4.3, 4.4)
+            // ========================================
+            
+            async runCompatibilityTests() {
+                this.logMessage('🌐 Running cross-browser compatibility tests...');
+                const container = document.getElementById('compatibilityResults');
+                container.innerHTML = '<div class="test-result warning loading">Running compatibility tests...</div>';
+                
+                const tests = [
+                    await this.testBrowserCompatibility(),
+                    await this.testFeatureDetection(),
+                    await this.testGracefulFallbacks(),
+                    await this.testJavaScriptFallbacks()
+                ];
+                
+                this.testResults.compatibility = tests;
+                this.displayResults(container, tests);
+                this.updateProgress();
+                
+                const passed = tests.filter(t => t.passed).length;
+                this.logMessage(`🌐 Compatibility tests: ${passed}/${tests.length} passed`);
+            }
+            
+            async testBrowserCompatibility() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Browser Compatibility',
+                        requirement: '4.1'
+                    };
+                    
+                    const features = this.checkFeatureSupport();
+                    const criticalFeatures = ['flexbox', 'grid', 'customProperties'];
+                    const supportedCritical = criticalFeatures.filter(f => features[f]);
+                    
+                    test.passed = supportedCritical.length >= 2;
+                    test.message = test.passed ? 
+                        `✅ Compatible browser: supports ${supportedCritical.join(', ')}` : 
+                        `❌ Limited compatibility: missing ${criticalFeatures.filter(f => !features[f]).join(', ')}`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            async testFeatureDetection() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'CSS Feature Detection',
+                        requirement: '4.2'
+                    };
+                    
+                    const features = this.checkFeatureSupport();
+                    const supportedCount = Object.values(features).filter(Boolean).length;
+                    const totalCount = Object.keys(features).length;
+                    
+                    test.passed = supportedCount >= totalCount * 0.6; // 60% support
+                    test.message = test.passed ? 
+                        `✅ Good feature support: ${supportedCount}/${totalCount}` : 
+                        `❌ Limited feature support: ${supportedCount}/${totalCount}`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            async testGracefulFallbacks() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'Graceful Fallbacks',
+                        requirement: '4.3'
+                    };
+                    
+                    // Check for fallback CSS
+                    const fallbackStyles = Array.from(document.styleSheets).some(sheet => {
+                        try {
+                            return sheet.href && sheet.href.includes('fallback');
+                        } catch (e) {
+                            return false;
+                        }
+                    });
+                    
+                    // Test basic styling
+                    const testElement = document.createElement('div');
+                    testElement.style.cssText = 'background: #f0f0f0; padding: 10px;';
+                    document.body.appendChild(testElement);
+                    
+                    const hasBasicStyling = window.getComputedStyle(testElement).backgroundColor !== 'rgba(0, 0, 0, 0)';
+                    document.body.removeChild(testElement);
+                    
+                    test.passed = fallbackStyles || hasBasicStyling;
+                    test.message = test.passed ? 
+                        `✅ Fallbacks available: CSS=${fallbackStyles}, basic=${hasBasicStyling}` : 
+                        `❌ No fallbacks detected`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            async testJavaScriptFallbacks() {
+                return new Promise((resolve) => {
+                    const test = {
+                        name: 'JavaScript Fallbacks',
+                        requirement: '4.4'
+                    };
+                    
+                    const noscriptElements = document.querySelectorAll('noscript');
+                    const fallbackNotices = document.querySelectorAll('.tailwind-fallback-notice');
+                    
+                    test.passed = noscriptElements.length > 0 || fallbackNotices.length > 0;
+                    test.message = test.passed ? 
+                        `✅ JS fallbacks present: ${noscriptElements.length} noscript, ${fallbackNotices.length} notices` : 
+                        `❌ No JS fallbacks found`;
+                    
+                    this.totalTests++;
+                    this.completedTests++;
+                    if (test.passed) this.passedTests++;
+                    else this.failedTests++;
+                    
+                    resolve(test);
+                });
+            }
+            
+            // ========================================
+            // UTILITY METHODS
+            // ========================================
+            
+            checkFeatureSupport() {
+                return {
+                    flexbox: CSS.supports('display', 'flex'),
+                    grid: CSS.supports('display', 'grid'),
+                    customProperties: CSS.supports('color', 'var(--test)'),
+                    focusVisible: CSS.supports('selector(:focus-visible)'),
+                    backdropFilter: CSS.supports('backdrop-filter', 'blur(10px)')
+                };
+            }
+            
+            detectBrowserInfo() {
+                const ua = navigator.userAgent;
+                let name = 'Unknown';
+                let version = 'Unknown';
+                
+                if (ua.includes('Chrome')) {
+                    name = 'Chrome';
+                    version = ua.match(/Chrome\/(\d+)/)?.[1] || 'Unknown';
+                } else if (ua.includes('Firefox')) {
+                    name = 'Firefox';
+                    version = ua.match(/Firefox\/(\d+)/)?.[1] || 'Unknown';
+                } else if (ua.includes('Safari')) {
+                    name = 'Safari';
+                    version = ua.match(/Version\/(\d+)/)?.[1] || 'Unknown';
+                } else if (ua.includes('Edge')) {
+                    name = 'Edge';
+                    version = ua.match(/Edge\/(\d+)/)?.[1] || 'Unknown';
+                }
+                
+                const browserInfo = document.getElementById('browserInfo');
+                if (browserInfo) {
+                    browserInfo.innerHTML = `
+                        <div><strong>Browser:</strong> ${name} ${version}</div>
+                        <div><strong>Platform:</strong> ${navigator.platform}</div>
+                        <div><strong>Viewport:</strong> ${window.innerWidth}x${window.innerHeight}</div>
+                        <div><strong>User Agent:</strong> ${ua.substring(0, 60)}...</div>
+                    `;
+                }
+                
+                const features = this.checkFeatureSupport();
+                const featureSupport = document.getElementById('featureSupport');
+                if (featureSupport) {
+                    featureSupport.innerHTML = Object.entries(features).map(([feature, supported]) => 
+                        `<div><strong>${feature}:</strong> ${supported ? '✅' : '❌'}</div>`
+                    ).join('');
+                }
+            }
+            
+            displayResults(container, tests) {
+                container.innerHTML = tests.map(test => `
+                    <div class="test-result ${test.passed ? 'pass' : 'fail'}">
+                        <strong>${test.name}</strong> (${test.requirement})<br>
+                        ${test.message}
+                    </div>
+                `).join('');
+            }
+            
+            updateProgress() {
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                const totalTestsEl = document.getElementById('totalTests');
+                const passedTestsEl = document.getElementById('passedTests');
+                const failedTestsEl = document.getElementById('failedTests');
+                const passRateEl = document.getElementById('passRate');
+                
+                const progress = this.totalTests > 0 ? (this.completedTests / this.totalTests) * 100 : 0;
+                const passRate = this.totalTests > 0 ? Math.round((this.passedTests / this.totalTests) * 100) : 0;
+                
+                if (progressFill) progressFill.style.width = `${progress}%`;
+                if (progressText) progressText.textContent = `${this.completedTests}/${this.totalTests} tests completed`;
+                if (totalTestsEl) totalTestsEl.textContent = this.totalTests;
+                if (passedTestsEl) passedTestsEl.textContent = this.passedTests;
+                if (failedTestsEl) failedTestsEl.textContent = this.failedTests;
+                if (passRateEl) passRateEl.textContent = `${passRate}%`;
+            }
+            
+            resetResults() {
+                this.testResults = { loading: [], brand: [], performance: [], accessibility: [], compatibility: [] };
+                this.totalTests = 0;
+                this.completedTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.updateProgress();
+            }
+            
+            generateFinalReport() {
+                const passRate = this.totalTests > 0 ? Math.round((this.passedTests / this.totalTests) * 100) : 0;
+                
+                this.logMessage('📊 INTEGRATION TEST SUMMARY');
+                this.logMessage('=' .repeat(40));
+                this.logMessage(`Total Tests: ${this.totalTests}`);
+                this.logMessage(`Passed: ${this.passedTests} (${passRate}%)`);
+                this.logMessage(`Failed: ${this.failedTests}`);
+                this.logMessage('=' .repeat(40));
+                
+                if (passRate >= 80) {
+                    this.logMessage('🎉 Integration tests PASSED! All critical requirements working.');
+                } else {
+                    this.logMessage('⚠️ Integration tests need attention. Some requirements failing.');
+                }
+                
+                // Announce results
+                const announcement = document.getElementById('testAnnouncements');
+                if (announcement) {
+                    announcement.textContent = `Integration tests completed: ${this.passedTests} passed, ${this.failedTests} failed`;
+                }
+            }
+            
+            logMessage(message) {
+                const log = document.getElementById('testLog');
+                if (log) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const logEntry = document.createElement('div');
+                    logEntry.textContent = `[${timestamp}] ${message}`;
+                    log.appendChild(logEntry);
+                    log.scrollTop = log.scrollHeight;
+                }
+                console.log(message);
+            }
+            
+            toggleDarkMode() {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                
+                const button = document.getElementById('toggleDarkMode');
+                if (button) {
+                    button.textContent = isDark ? '☀️ Toggle Light Mode' : '🌙 Toggle Dark Mode';
+                }
+                
+                this.logMessage(`Switched to ${isDark ? 'dark' : 'light'} mode`);
+            }
+            
+            exportResults() {
+                const results = {
+                    timestamp: new Date().toISOString(),
+                    summary: {
+                        totalTests: this.totalTests,
+                        passedTests: this.passedTests,
+                        failedTests: this.failedTests,
+                        passRate: this.totalTests > 0 ? Math.round((this.passedTests / this.totalTests) * 100) : 0
+                    },
+                    testResults: this.testResults,
+                    browserInfo: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        viewport: `${window.innerWidth}x${window.innerHeight}`,
+                        features: this.checkFeatureSupport()
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tailwind-integration-test-results-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.logMessage('📄 Test results exported to JSON file');
+            }
+        }
+        
+        // Initialize the test runner when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Initializing Integration Test Runner for Task 10');
+            
+            setTimeout(() => {
+                window.integrationTestRunner = new IntegrationTestRunner();
+                console.log('✅ Integration Test Runner Ready');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

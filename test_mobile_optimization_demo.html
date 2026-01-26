@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Optimization Demo - Tournament Detail Page</title>
+    
+    <!-- Mobile optimization CSS -->
+    <link rel="stylesheet" href="/static/css/mobile-optimizations.css">
+    
+    <style>
+        /* Base styles for demo */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111827;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .tournament-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tournament-hero {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            min-height: 500px;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .tournament-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .tournament-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .hero-quick-stats {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .quick-stat {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            min-width: 80px;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 0 2rem;
+        }
+        
+        .tab-button {
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            color: #9ca3af;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .tab-button.active {
+            background: #b91c1c;
+            color: white;
+            border-color: #dc2626;
+        }
+        
+        .participant-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .participant-card {
+            background: #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .participant-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .participant-avatar {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #b91c1c, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .participant-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .seed-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .enhanced-registration-card {
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+        
+        .card-header h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .registration-info {
+            margin-bottom: 2rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+        
+        .btn {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: #991b1b;
+        }
+        
+        .stats-dashboard {
+            margin: 2rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: #374151;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        
+        .copy-button {
+            background: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+        
+        /* Demo SVG */
+        .demo-svg {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .demo-svg svg {
+            max-width: 300px;
+            height: auto;
+        }
+        
+        /* Demo controls */
+        .demo-controls {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            z-index: 100;
+        }
+        
+        .demo-controls button {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        
+        .demo-controls button.active {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <h4>Demo Controls</h4>
+        <button onclick="simulateMobile()" id="mobileBtn">Mobile View</button>
+        <button onclick="simulateTablet()" id="tabletBtn">Tablet View</button>
+        <button onclick="simulateDesktop()" id="desktopBtn" class="active">Desktop View</button>
+        <br>
+        <button onclick="toggleTouch()" id="touchBtn">Toggle Touch</button>
+        <button onclick="showStatus()" id="statusBtn">Show Status</button>
+    </div>
+
+    <div class="tournament-grid">
+        <main>
+            <!-- Hero Section -->
+            <div class="tournament-hero">
+                <div class="hero-content">
+                    <h1 class="tournament-title">Championship Tournament 2024</h1>
+                    <div class="tournament-meta">
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span>Dec 25, 2024</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>🎮</span>
+                            <span>Valorant</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>💰</span>
+                            <span>$10,000 Prize Pool</span>
+                        </div>
+                    </div>
+                    <div class="hero-quick-stats">
+                        <div class="quick-stat">
+                            <div class="stat-number">64</div>
+                            <div class="stat-label">Players</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-number">16</div>
+                            <div class="stat-label">Teams</div>
+                        </div>
+                        <div class="quick-stat">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Days</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <button class="tab-button active">Details</button>
+                <button class="tab-button">Participants</button>
+                <button class="tab-button">Bracket</button>
+                <button class="tab-button">Rules</button>
+                <button class="tab-button">Statistics</button>
+                <button class="tab-button">Live Updates</button>
+                <button class="tab-button">Chat</button>
+            </div>
+
+            <!-- Participant Grid -->
+            <div class="participant-grid">
+                <div class="participant-card">
+                    <div class="participant-avatar">P1</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player One</div>
+                        <div class="seed-badge">Seed #1</div>
+                    </div>
+                </div>
+                <div class="participant-card">
+                    <div class="participant-avatar">P2</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player Two</div>
+                        <div class="seed-badge">Seed #2</div>
+                    </div>
+                </div>
+                <div class="participant-card">
+                    <div class="participant-avatar">P3</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player Three</div>
+                        <div class="seed-badge">Seed #3</div>
+                    </div>
+                </div>
+                <div class="participant-card">
+                    <div class="participant-avatar">P4</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player Four</div>
+                        <div class="seed-badge">Seed #4</div>
+                    </div>
+                </div>
+                <div class="participant-card">
+                    <div class="participant-avatar">P5</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player Five</div>
+                        <div class="seed-badge">Seed #5</div>
+                    </div>
+                </div>
+                <div class="participant-card">
+                    <div class="participant-avatar">P6</div>
+                    <div class="participant-info">
+                        <div class="participant-name">Player Six</div>
+                        <div class="seed-badge">Seed #6</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Dashboard -->
+            <div class="stats-dashboard">
+                <h2>Tournament Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">64</div>
+                        <div class="stat-label">Total Players</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">16</div>
+                        <div class="stat-label">Teams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">32</div>
+                        <div class="stat-label">Matches</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">Check-in Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo SVG -->
+            <div class="demo-svg">
+                <h3>SVG Scaling Demo</h3>
+                <svg width="300" height="150" viewBox="0 0 300 150">
+                    <rect width="300" height="150" fill="#374151" rx="10"/>
+                    <text x="150" y="75" text-anchor="middle" fill="white" font-size="16">Tournament Bracket</text>
+                    <circle cx="50" cy="50" r="20" fill="#b91c1c"/>
+                    <circle cx="250" cy="50" r="20" fill="#059669"/>
+                    <line x1="70" y1="50" x2="230" y2="50" stroke="white" stroke-width="2"/>
+                </svg>
+            </div>
+
+            <!-- Copy Button Demo -->
+            <button class="copy-button">Copy Tournament Link</button>
+        </main>
+
+        <!-- Registration Card -->
+        <aside class="enhanced-registration-card">
+            <div class="card-header">
+                <h3>Tournament Registration</h3>
+            </div>
+            <div class="card-content">
+                <div class="registration-info">
+                    <div class="info-item">
+                        <span>Entry Fee:</span>
+                        <span>$25</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Spots Left:</span>
+                        <span>12/64</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Registration Ends:</span>
+                        <span>Dec 24</span>
+                    </div>
+                </div>
+                <button class="btn">Register Now</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Load mobile optimization scripts -->
+    <script src="/static/js/modules/mobile-optimizer.js"></script>
+
+    <script>
+        // Demo controls
+        function simulateMobile() {
+            document.body.style.width = '375px';
+            document.body.style.margin = '0 auto';
+            document.body.classList.add('mobile-device', 'touch-device');
+            updateActiveButton('mobileBtn');
+            
+            // Trigger resize event
+            window.dispatchEvent(new Event('resize'));
+        }
+        
+        function simulateTablet() {
+            document.body.style.width = '768px';
+            document.body.style.margin = '0 auto';
+            document.body.classList.remove('mobile-device');
+            document.body.classList.add('touch-device');
+            updateActiveButton('tabletBtn');
+            
+            window.dispatchEvent(new Event('resize'));
+        }
+        
+        function simulateDesktop() {
+            document.body.style.width = '';
+            document.body.style.margin = '';
+            document.body.classList.remove('mobile-device', 'touch-device');
+            updateActiveButton('desktopBtn');
+            
+            window.dispatchEvent(new Event('resize'));
+        }
+        
+        function toggleTouch() {
+            document.body.classList.toggle('touch-device');
+            const btn = document.getElementById('touchBtn');
+            btn.textContent = document.body.classList.contains('touch-device') ? 'Disable Touch' : 'Enable Touch';
+        }
+        
+        function showStatus() {
+            if (window.MobileOptimizer) {
+                const status = window.MobileOptimizer.getStatus();
+                alert(JSON.stringify(status, null, 2));
+            } else {
+                alert('Mobile Optimizer not loaded');
+            }
+        }
+        
+        function updateActiveButton(activeId) {
+            document.querySelectorAll('.demo-controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+        
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Mobile Optimization Demo loaded');
+            
+            // Add some demo interactions
+            document.querySelectorAll('.participant-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.background = this.style.background === 'rgb(59, 130, 246)' ? '#374151' : '#3b82f6';
+                });
+            });
+            
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Demo copy functionality
+            document.querySelector('.copy-button').addEventListener('click', function() {
+                this.textContent = 'Copied!';
+                setTimeout(() => {
+                    this.textContent = 'Copy Tournament Link';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

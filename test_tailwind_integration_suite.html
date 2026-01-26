@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS Integration Test Suite</title>
+    
+    <!-- Load the actual base template structure for testing -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+    
+    <!-- Load error handler first -->
+    <script src="static/js/tailwind-error-handler.js" defer></script>
+    
+    <!-- Tailwind Configuration -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            function waitForErrorHandler(callback, attempts = 0) {
+                if (window.TailwindErrorHandler) {
+                    callback();
+                } else if (attempts < 50) {
+                    setTimeout(() => waitForErrorHandler(callback, attempts + 1), 100);
+                } else {
+                    console.warn('[TailwindConfig] Error handler not available, falling back to basic configuration');
+                    fallbackConfiguration();
+                }
+            }
+            
+            function configureWithErrorHandling() {
+                const errorHandler = window.TailwindErrorHandler;
+                
+                const eytGamingConfig = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                "primary": {
+                                    DEFAULT: "#b91c1c",
+                                    50: "#fef2f2",
+                                    100: "#fee2e2", 
+                                    200: "#fecaca",
+                                    300: "#fca5a5",
+                                    400: "#f87171",
+                                    500: "#ef4444",
+                                    600: "#dc2626",
+                                    700: "#b91c1c",
+                                    800: "#991b1b",
+                                    900: "#7f1d1d",
+                                    950: "#450a0a"
+                                }
+                            },
+                            fontFamily: {
+                                "display": ["Spline Sans", "sans-serif"],
+                                "sans": ["Spline Sans", "ui-sans-serif", "system-ui"]
+                            }
+                        }
+                    }
+                };
+                
+                const success = errorHandler.applyConfiguration(eytGamingConfig);
+                
+                if (success) {
+                    console.log('[TailwindConfig] EYTGaming configuration applied successfully');
+                } else {
+                    console.warn('[TailwindConfig] Failed to apply configuration');
+                }
+            }
+            
+            function fallbackConfiguration() {
+                if (typeof tailwind !== 'undefined') {
+                    try {
+                        tailwind.config = {
+                            darkMode: "class",
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        "primary": {
+                                            DEFAULT: "#b91c1c",
+                                            700: "#b91c1c"
+                                        }
+                                    },
+                                    fontFamily: {
+                                        "display": ["Spline Sans", "sans-serif"]
+                                    }
+                                }
+                            }
+                        };
+                        console.log('[TailwindConfig] Basic fallback configuration applied');
+                    } catch (error) {
+                        console.error('[TailwindConfig] Even fallback configuration failed:', error);
+                    }
+                }
+            }
+            
+            waitForErrorHandler(configureWithErrorHandling);
+        });
+    </script>
+    
+    <!-- Load other scripts -->
+    <script src="static/js/tailwind-accessibility-compliance.js" defer></script>
+    <script src="static/js/tailwind-fallback.js" defer></script>
+    <script src="static/js/cross_browser_compatibility_test.js" defer></script>
+    
+    <!-- Load CSS files -->
+    <link rel="stylesheet" href="static/css/tailwind-accessibility-compliance.css" media="print" onload="this.media='all'; this.onload=null;">
+    <link rel="stylesheet" href="static/css/tailwind-fallback.css" media="print" onload="this.media='all'; this.onload=null;">
+    
+    <style>
+        /* Test-specific styles */
+        .test-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+        }
+        
+        .dark .test-container {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .test-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #b91c1c;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .test-card {
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
+        
+        .dark .test-card {
+            background: #374151;
+            border-color: #4b5563;
+        }
+        
+        .test-result {
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .test-result.pass {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .test-result.fail {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .test-result.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .dark .test-result.pass {
+            background: #064e3b;
+            color: #a7f3d0;
+        }
+        
+        .dark .test-result.fail {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+        
+        .dark .test-result.warning {
+            background: #78350f;
+            color: #fde68a;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .metric-card {
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .dark .metric-card {
+            background: #4b5563;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .dark .metric-label {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
+    <div class="container mx-auto max-w-6xl">
+        <header class="text-center py-8">
+            <h1 class="text-4xl font-bold text-primary mb-4">
+                Tailwind CSS Integration Test Suite
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">
+                Comprehensive testing for loading sequence, brand consistency, performance, and accessibility
+            </p>
+            
+            <!-- Test Controls -->
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="runAllTests" class="btn btn-primary px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-800 focus:outline-primary">
+                    🚀 Run All Tests
+                </button>
+                <button id="toggleDarkMode" class="btn btn-secondary px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-primary">
+                    🌙 Toggle Dark Mode
+                </button>
+                <button id="clearResults" class="btn btn-outline px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-primary">
+                    🗑️ Clear Results
+                </button>
+            </div>
+        </header>
+        
+        <main>
+            <!-- Test Status Overview -->
+            <section class="test-container">
+                <h2 class="test-header">📊 Test Status Overview</h2>
+                <div id="testOverview" class="test-grid">
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Loading Sequence</h3>
+                        <div id="loadingStatus" class="test-result">Not started</div>
+                    </div>
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Brand Consistency</h3>
+                        <div id="brandStatus" class="test-result">Not started</div>
+                    </div>
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Performance</h3>
+                        <div id="performanceStatus" class="test-result">Not started</div>
+                    </div>
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Accessibility</h3>
+                        <div id="accessibilityStatus" class="test-result">Not started</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Loading Sequence Tests -->
+            <section class="test-container">
+                <h2 class="test-header">🔄 Loading Sequence Tests (Requirements 1.1, 1.2, 1.3, 1.4)</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Testing proper script loading order, error prevention, and configuration application
+                </p>
+                
+                <div id="loadingResults" class="space-y-4">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+                
+                <button id="runLoadingTests" class="btn btn-primary mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-800">
+                    Run Loading Tests
+                </button>
+            </section>
+            
+            <!-- Brand Consistency Tests -->
+            <section class="test-container">
+                <h2 class="test-header">🎨 Brand Consistency Tests (Requirements 2.1, 2.2, 2.3, 2.4)</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Testing EYTGaming brand colors, fonts, and styling consistency
+                </p>
+                
+                <!-- Brand Color Samples -->
+                <div class="test-grid mb-4">
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Primary Colors</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-primary rounded"></div>
+                                <span class="text-sm font-mono">#b91c1c</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-primary-600 rounded"></div>
+                                <span class="text-sm font-mono">#dc2626</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-primary-800 rounded"></div>
+                                <span class="text-sm font-mono">#991b1b</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Typography</h3>
+                        <div class="space-y-2">
+                            <p class="font-display text-lg">Spline Sans Display</p>
+                            <p class="font-sans">Spline Sans Regular</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Secondary Text</p>
+                        </div>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Material Icons</h3>
+                        <div class="flex gap-2 text-2xl">
+                            <span class="material-symbols-outlined">home</span>
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="material-symbols-outlined">person</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="brandResults" class="space-y-4">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+                
+                <button id="runBrandTests" class="btn btn-primary mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-800">
+                    Run Brand Tests
+                </button>
+            </section>
+            
+            <!-- Performance Tests -->
+            <section class="test-container">
+                <h2 class="test-header">⚡ Performance Tests (Requirements 3.1, 3.2, 3.3, 3.4)</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Testing loading performance, render-blocking optimization, and layout stability
+                </p>
+                
+                <div class="performance-metrics" id="performanceMetrics">
+                    <!-- Metrics will be populated by JavaScript -->
+                </div>
+                
+                <div id="performanceResults" class="space-y-4">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+                
+                <button id="runPerformanceTests" class="btn btn-primary mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-800">
+                    Run Performance Tests
+                </button>
+            </section>
+            
+            <!-- Accessibility Tests -->
+            <section class="test-container">
+                <h2 class="test-header">♿ Accessibility Tests (Requirements 5.1, 5.2, 5.3, 5.4)</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Testing WCAG AA compliance, focus indicators, and color contrast
+                </p>
+                
+                <!-- Interactive Elements for Testing -->
+                <div class="test-grid mb-4">
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Interactive Elements</h3>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary px-4 py-2 bg-primary text-white rounded focus:outline-primary">Primary Button</button>
+                            <input type="text" placeholder="Test Input" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-primary">
+                            <a href="#" class="text-primary underline focus:outline-primary">Test Link</a>
+                        </div>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h3 class="font-semibold mb-2">Color Contrast</h3>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-primary text-white rounded">White on Primary</div>
+                            <div class="p-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded">Text on Background</div>
+                            <div class="p-2 text-primary">Primary Text Color</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="accessibilityResults" class="space-y-4">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+                
+                <button id="runAccessibilityTests" class="btn btn-primary mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-800">
+                    Run Accessibility Tests
+                </button>
+            </section>
+            
+            <!-- Cross-Browser Compatibility Tests -->
+            <section class="test-container">
+                <h2 class="test-header">🌐 Cross-Browser Compatibility Tests (Requirements 4.1, 4.2, 4.3, 4.4)</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    Testing browser compatibility, graceful fallbacks, and feature detection
+                </p>
+                
+                <div id="browserInfo" class="test-card mb-4">
+                    <h3 class="font-semibold mb-2">Current Browser</h3>
+                    <div id="browserDetails" class="text-sm space-y-1">
+                        <!-- Browser info will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div id="compatibilityResults" class="space-y-4">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+                
+                <button id="runCompatibilityTests" class="btn btn-primary mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-800">
+                    Run Compatibility Tests
+                </button>
+            </section>
+            
+            <!-- Test Summary -->
+            <section class="test-container">
+                <h2 class="test-header">📋 Test Summary</h2>
+                <div id="testSummary" class="space-y-4">
+                    <p class="text-gray-600 dark:text-gray-400">Run tests to see summary results</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- ARIA Live Region for Test Announcements -->
+        <div id="testAnnouncements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    </div>
+    
+    <!-- Integration Test JavaScript -->
+    <script src="test_tailwind_integration_suite.js"></script>
+</body>
+</html>

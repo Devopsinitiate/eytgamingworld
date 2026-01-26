@@ -1,0 +1,32 @@
+{% load static %}
+
+<!-- Responsive Banner Component -->
+<!-- Requirements: 14.5 - Responsive image serving -->
+
+<div class="banner-container w-full overflow-hidden">
+    {% if has_banner %}
+        <picture>
+            <!-- WebP format for modern browsers -->
+            <source 
+                type="image/webp"
+                srcset="{{ user.banner.url }} 1920w"
+                sizes="(max-width: 768px) 640px, (max-width: 1024px) 1280px, 1920px"
+            />
+            
+            <!-- Fallback to original format -->
+            <img 
+                src="{{ user.banner.url }}"
+                srcset="{{ user.banner.url }} 1920w"
+                sizes="(max-width: 768px) 640px, (max-width: 1024px) 1280px, 1920px"
+                alt="Profile banner for {{ user.get_display_name }}"
+                class="responsive-image banner-image w-full"
+                loading="lazy"
+                decoding="async"
+            />
+        </picture>
+    {% else %}
+        <!-- Default gradient banner -->
+        <div class="banner-image w-full bg-gradient-to-r from-blue-500 to-purple-600" role="img" aria-label="Default profile banner"></div>
+    {% endif %}
+</div>
+

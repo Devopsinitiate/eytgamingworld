@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Compliance Property Tests</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #111827;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(185, 28, 28, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #374151;
+            color: #f3f4f6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-output {
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .test-status {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .status-item {
+            background: #374151;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-passed { color: #10b981; }
+        .status-failed { color: #ef4444; }
+        .status-rate { color: #3b82f6; }
+        
+        .demo-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .demo-card {
+            background: #374151;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .demo-card h3 {
+            margin-top: 0;
+            color: #f3f4f6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Accessibility demo styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+        
+        .status-registration {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-in-progress {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .status-completed {
+            background: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+        
+        .participant-card {
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .participant-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .timeline-item {
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .timeline-item.active {
+            border-color: #b91c1c;
+            background: rgba(185, 28, 28, 0.1);
+        }
+        
+        .progress-bar {
+            background: #374151;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #b91c1c, #ef4444);
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #374151;
+            border-top: 2px solid #b91c1c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Focus indicators */
+        *:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Accessibility Compliance Property Tests</h1>
+            <p>Testing universal accessibility properties for tournament detail page components</p>
+            <p><strong>Feature:</strong> tournament-detail-page-fixes | <strong>Property 12:</strong> Accessibility Compliance and Support</p>
+        </div>
+        
+        <div class="test-controls">
+            <button id="runTests" class="btn btn-primary">
+                🧪 Run Property Tests
+            </button>
+            <button id="clearOutput" class="btn btn-secondary">
+                🗑️ Clear Output
+            </button>
+            <button id="generateDemo" class="btn btn-secondary">
+                🎯 Generate Demo Elements
+            </button>
+        </div>
+        
+        <div class="test-status">
+            <div class="status-item">
+                <div id="passedCount" class="status-value status-passed">0</div>
+                <div>Passed</div>
+            </div>
+            <div class="status-item">
+                <div id="failedCount" class="status-value status-failed">0</div>
+                <div>Failed</div>
+            </div>
+            <div class="status-item">
+                <div id="successRate" class="status-value status-rate">0%</div>
+                <div>Success Rate</div>
+            </div>
+        </div>
+        
+        <div id="testOutput" class="test-output">
+            <div style="color: #9ca3af;">Test output will appear here...</div>
+        </div>
+        
+        <div class="demo-elements">
+            <div class="demo-card">
+                <h3>🎯 Interactive Elements</h3>
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary Button</button>
+                <input type="text" placeholder="Text input" style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; background: #1f2937; border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;">
+                <select style="width: 100%; margin: 0.5rem 0; padding: 0.5rem; background: #1f2937; border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;">
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                </select>
+            </div>
+            
+            <div class="demo-card">
+                <h3>📊 Status Indicators</h3>
+                <div class="status-badge status-registration">📝 Registration Open</div>
+                <div class="status-badge status-in-progress">🔴 In Progress</div>
+                <div class="status-badge status-completed">✅ Completed</div>
+            </div>
+            
+            <div class="demo-card">
+                <h3>👥 Participant Cards</h3>
+                <div class="participant-card" tabindex="0" role="button" aria-label="Participant: Player1, Team: Alpha Squad">
+                    <div style="font-weight: 600;">Player1</div>
+                    <div style="color: #9ca3af; font-size: 0.875rem;">Alpha Squad</div>
+                </div>
+                <div class="participant-card" tabindex="0" role="button" aria-label="Participant: Player2, Team: Beta Team">
+                    <div style="font-weight: 600;">Player2</div>
+                    <div style="color: #9ca3af; font-size: 0.875rem;">Beta Team</div>
+                </div>
+            </div>
+            
+            <div class="demo-card">
+                <h3>⏱️ Timeline Items</h3>
+                <div class="timeline-item timeline-item-interactive" tabindex="0" role="button" aria-label="Registration phase, completed">
+                    <h4 style="margin: 0 0 0.5rem 0;">Registration</h4>
+                    <p style="margin: 0; color: #9ca3af;">Tournament registration period</p>
+                </div>
+                <div class="timeline-item timeline-item-interactive active" tabindex="0" role="button" aria-label="Tournament phase, currently active">
+                    <h4 style="margin: 0 0 0.5rem 0;">Tournament</h4>
+                    <p style="margin: 0; color: #9ca3af;">Main tournament matches</p>
+                </div>
+            </div>
+            
+            <div class="demo-card">
+                <h3>📈 Progress Indicators</h3>
+                <div>Tournament Progress</div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Tournament progress: 75% complete" style="--progress: 75%"></div>
+                <div style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">75% Complete</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load required modules -->
+    <script src="/static/js/modules/accessibility-compliance.js"></script>
+    <script src="/static/js/test_accessibility_compliance_properties.js"></script>
+    
+    <script>
+        // Test runner interface
+        let currentTests = null;
+        
+        // DOM elements
+        const runTestsBtn = document.getElementById('runTests');
+        const clearOutputBtn = document.getElementById('clearOutput');
+        const generateDemoBtn = document.getElementById('generateDemo');
+        const testOutput = document.getElementById('testOutput');
+        const passedCount = document.getElementById('passedCount');
+        const failedCount = document.getElementById('failedCount');
+        const successRate = document.getElementById('successRate');
+        
+        // Event listeners
+        runTestsBtn.addEventListener('click', runTests);
+        clearOutputBtn.addEventListener('click', clearOutput);
+        generateDemoBtn.addEventListener('click', generateDemoElements);
+        
+        // Capture console output
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        function captureConsoleOutput() {
+            console.log = (...args) => {
+                originalConsoleLog(...args);
+                appendToOutput(args.join(' '), 'log');
+            };
+            
+            console.error = (...args) => {
+                originalConsoleError(...args);
+                appendToOutput(args.join(' '), 'error');
+            };
+        }
+        
+        function restoreConsoleOutput() {
+            console.log = originalConsoleLog;
+            console.error = originalConsoleError;
+        }
+        
+        function appendToOutput(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ef4444' : 
+                         type === 'success' ? '#10b981' : '#f3f4f6';
+            
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.style.marginBottom = '0.25rem';
+            line.innerHTML = `<span style="color: #9ca3af;">[${timestamp}]</span> ${message}`;
+            
+            testOutput.appendChild(line);
+            testOutput.scrollTop = testOutput.scrollHeight;
+        }
+        
+        async function runTests() {
+            if (currentTests) {
+                appendToOutput('Tests are already running...', 'error');
+                return;
+            }
+            
+            runTestsBtn.disabled = true;
+            runTestsBtn.textContent = '🔄 Running Tests...';
+            runTestsBtn.classList.add('loading');
+            
+            // Reset counters
+            passedCount.textContent = '0';
+            failedCount.textContent = '0';
+            successRate.textContent = '0%';
+            
+            try {
+                captureConsoleOutput();
+                appendToOutput('Starting accessibility compliance property tests...', 'log');
+                
+                // Run the property tests
+                currentTests = runAccessibilityPropertyTests();
+                const results = await currentTests;
+                
+                // Update counters
+                passedCount.textContent = results.passed;
+                failedCount.textContent = results.failed;
+                const rate = results.passed + results.failed > 0 ? 
+                    ((results.passed / (results.passed + results.failed)) * 100).toFixed(1) : 0;
+                successRate.textContent = `${rate}%`;
+                
+                if (results.failed === 0) {
+                    appendToOutput('🎉 All accessibility property tests passed!', 'success');
+                } else {
+                    appendToOutput(`⚠️ ${results.failed} test(s) failed. Check output for details.`, 'error');
+                }
+                
+            } catch (error) {
+                appendToOutput(`❌ Test execution failed: ${error.message}`, 'error');
+                console.error('Test execution error:', error);
+            } finally {
+                restoreConsoleOutput();
+                currentTests = null;
+                runTestsBtn.disabled = false;
+                runTestsBtn.textContent = '🧪 Run Property Tests';
+                runTestsBtn.classList.remove('loading');
+            }
+        }
+        
+        function clearOutput() {
+            testOutput.innerHTML = '<div style="color: #9ca3af;">Test output cleared...</div>';
+            passedCount.textContent = '0';
+            failedCount.textContent = '0';
+            successRate.textContent = '0%';
+        }
+        
+        function generateDemoElements() {
+            appendToOutput('Generating random demo elements for testing...', 'log');
+            
+            // This would generate random elements for testing
+            // For now, we'll just log that it's been triggered
+            appendToOutput('Demo elements generated. Use "Run Property Tests" to test them.', 'success');
+        }
+        
+        // Initialize progress bars
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+            const progress = bar.getAttribute('aria-valuenow') || 0;
+            bar.style.setProperty('--progress', `${progress}%`);
+            bar.style.background = `linear-gradient(90deg, #b91c1c ${progress}%, #374151 ${progress}%)`;
+        });
+        
+        // Add keyboard navigation for demo elements
+        document.addEventListener('keydown', (e) => {
+            if (e.target.classList.contains('participant-card') || 
+                e.target.classList.contains('timeline-item-interactive')) {
+                
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.target.click();
+                    appendToOutput(`Activated: ${e.target.getAttribute('aria-label')}`, 'log');
+                }
+            }
+        });
+        
+        // Initialize accessibility compliance
+        document.addEventListener('DOMContentLoaded', () => {
+            appendToOutput('Page loaded. Accessibility compliance initialized.', 'log');
+            appendToOutput('Click "Run Property Tests" to start testing accessibility properties.', 'log');
+        });
+    </script>
+</body>
+</html>

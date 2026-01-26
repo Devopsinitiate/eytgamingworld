@@ -1,0 +1,324 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}{{ coach.user.get_display_name }} - Coach Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .availability-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+    }
+    .time-slot {
+        transition: all 0.2s ease;
+    }
+    .time-slot:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+    }
+    .rating-stars {
+        color: #fbbf24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Coach Header -->
+    <div class="relative mb-8">
+        <!-- Banner -->
+        <div class="h-64 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl overflow-hidden">
+            {% if coach.banner %}
+            <img src="{{ coach.banner.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
+            {% else %}
+            <div class="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-8xl">school</span>
+            </div>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        </div>
+        
+        <!-- Coach Info Overlay -->
+        <div class="absolute bottom-6 left-6 right-6">
+            <div class="flex items-end gap-6">
+                <!-- Avatar -->
+                <div class="w-24 h-24 rounded-full border-4 border-white/20 overflow-hidden bg-card-dark">
+                    {% if coach.user.avatar %}
+                    <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full bg-primary flex items-center justify-center text-white font-bold text-2xl">
+                        {{ coach.user.get_display_name|first|upper }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Info -->
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-white text-3xl font-bold">{{ coach.user.get_display_name }}</h1>
+                        {% if coach.is_verified %}
+                        <span class="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">verified</span>
+                            Verified Coach
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Rating and Stats -->
+                    <div class="flex items-center gap-6 text-white/90">
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center rating-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= coach.average_rating %}
+                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-sm">star</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-sm">{{ coach.average_rating|floatformat:1 }} ({{ coach.total_reviews }} reviews)</span>
+                        </div>
+                        <div class="text-sm">
+                            <span class="material-symbols-outlined text-xs align-middle">school</span>
+                            {{ coach.total_sessions }} sessions taught
+                        </div>
+                        <div class="text-sm">
+                            <span class="material-symbols-outlined text-xs align-middle">people</span>
+                            {{ coach.total_students }} students
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Price and Book Button -->
+                <div class="text-right">
+                    <div class="text-white text-2xl font-bold mb-2">${{ coach.hourly_rate }}/hour</div>
+                    {% if coach.is_available %}
+                    <a href="{% url 'coaching:book_session' coach_pk=coach.pk %}" 
+                       class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined">calendar_add_on</span>
+                        Book Session
+                    </a>
+                    {% else %}
+                    <button disabled class="px-6 py-3 bg-gray-600 text-gray-400 font-medium rounded-lg cursor-not-allowed">
+                        Currently Unavailable
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- About -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4">About</h2>
+                <p class="text-gray-300 leading-relaxed">{{ coach.bio|default:"This coach hasn't added a bio yet." }}</p>
+                
+                {% if coach.achievements %}
+                <div class="mt-6">
+                    <h3 class="text-white font-semibold mb-3">Achievements</h3>
+                    <p class="text-gray-300">{{ coach.achievements }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Games & Expertise -->
+            {% if games %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4">Games & Expertise</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for expertise in games %}
+                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            {% if expertise.game.icon %}
+                            <img src="{{ expertise.game.icon.url }}" alt="{{ expertise.game.name }}" class="w-10 h-10 rounded">
+                            {% else %}
+                            <div class="w-10 h-10 bg-primary/20 rounded flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">sports_esports</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="text-white font-semibold">{{ expertise.game.name }}</h3>
+                                <p class="text-gray-400 text-sm">{{ expertise.get_skill_level_display }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if expertise.specializations %}
+                        <div class="mb-3">
+                            <p class="text-gray-400 text-sm mb-2">Specializations:</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for spec in expertise.specializations_list %}
+                                <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">{{ spec }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if expertise.custom_rate %}
+                        <div class="text-primary font-semibold">${{ expertise.custom_rate }}/hour for this game</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Packages -->
+            {% if packages %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4">Coaching Packages</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for package in packages %}
+                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-white font-semibold">{{ package.name }}</h3>
+                            <span class="text-primary font-bold">${{ package.total_price }}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-3">{{ package.description }}</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">{{ package.number_of_sessions }} sessions</span>
+                            <span class="text-gray-400">Valid {{ package.valid_for_days }} days</span>
+                        </div>
+                        <div class="mt-4">
+                            <a href="{% url 'coaching:purchase_package' pk=package.pk %}" 
+                               class="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors text-center block">
+                                Purchase Package
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reviews -->
+            {% if reviews %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4">Student Reviews</h2>
+                <div class="space-y-4">
+                    {% for review in reviews %}
+                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                                    <span class="text-primary text-sm font-bold">{{ review.student.get_display_name|first|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">{{ review.student.get_display_name }}</p>
+                                    <p class="text-gray-400 text-sm">{{ review.created_at|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center rating-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-sm">star</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-gray-300">{{ review.comment }}</p>
+                        {% if review.session.game %}
+                        <p class="text-gray-400 text-sm mt-2">Game: {{ review.session.game.name }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Quick Stats -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h3 class="text-white font-semibold mb-4">Coach Stats</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Experience Level</span>
+                        <span class="text-white">{{ coach.get_experience_level_display }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Response Time</span>
+                        <span class="text-white">{{ coach.response_time_hours }}h avg</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Languages</span>
+                        <span class="text-white">{{ coach.languages|default:"English" }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">Timezone</span>
+                        <span class="text-white">{{ coach.timezone|default:"UTC" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability -->
+            {% if availability %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h3 class="text-white font-semibold mb-4">Weekly Availability</h3>
+                <div class="space-y-3">
+                    {% for avail in availability %}
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">{{ avail.get_weekday_display }}</span>
+                        <span class="text-white text-sm">{{ avail.start_time|time:"g:i A" }} - {{ avail.end_time|time:"g:i A" }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-gray-500 text-xs mt-4">Times shown in coach's timezone</p>
+            </div>
+            {% endif %}
+
+            <!-- Contact Info -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h3 class="text-white font-semibold mb-4">Platform</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">videocam</span>
+                        <span class="text-white">{{ coach.get_platform_display }}</span>
+                    </div>
+                    {% if coach.platform_username %}
+                    <p class="text-gray-400 text-sm">Username: {{ coach.platform_username }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Report Coach -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <button class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">flag</span>
+                    Report Coach
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy profile link functionality
+    const shareButton = document.querySelector('[data-action="share"]');
+    if (shareButton) {
+        shareButton.addEventListener('click', function() {
+            navigator.clipboard.writeText(window.location.href).then(function() {
+                // Show success message
+                const message = document.createElement('div');
+                message.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg z-50';
+                message.textContent = 'Profile link copied!';
+                document.body.appendChild(message);
+                
+                setTimeout(() => {
+                    message.remove();
+                }, 3000);
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

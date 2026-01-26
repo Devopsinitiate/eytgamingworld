@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register for {{ tournament.name }} - EYTGaming{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-background-dark">
+    <main class="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 py-10">
+        <div class="max-w-2xl mx-auto">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap gap-2 py-6">
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium" href="{% url 'home' %}">Home</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium" href="{% url 'tournaments:list' %}">Tournaments</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium" href="{% url 'tournaments:detail' tournament.slug %}">{{ tournament.name }}</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <span class="text-white text-sm font-medium">Register</span>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="bg-gray-800 p-8 rounded-lg border border-white/10">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-white mb-2">Confirm Registration</h1>
+                    <p class="text-gray-400">{{ tournament.name }}</p>
+                </div>
+
+                <!-- Tournament Details -->
+                <div class="bg-gray-900 p-6 rounded-lg mb-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Tournament Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-400">Start Date</p>
+                            <p class="text-white font-medium">{{ tournament.start_datetime|date:"M d, Y g:i A" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Format</p>
+                            <p class="text-white font-medium">{{ tournament.get_format_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Entry Fee</p>
+                            <p class="text-white font-medium">${{ tournament.registration_fee }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Prize Pool</p>
+                            <p class="text-red-500 font-medium">${{ tournament.prize_pool }}</p>
+                        </div>
+                        {% if is_team_based %}
+                        <div class="md:col-span-2">
+                            <p class="text-gray-400">Registering Team</p>
+                            <p class="text-white font-medium">{{ user_team.name }} [{{ user_team.tag }}]</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Registration Fee Notice -->
+                {% if registration_fee > 0 %}
+                <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <p class="text-yellow-400 font-medium">Payment Required</p>
+                    </div>
+                    <p class="text-yellow-300 text-sm mt-1">
+                        After confirming registration, you will be redirected to complete payment of ${{ registration_fee }}.
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Terms and Conditions -->
+                <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                    <h3 class="text-white font-bold mb-2">Terms and Conditions</h3>
+                    <div class="text-gray-300 text-sm space-y-2">
+                        <p>• By registering, you agree to follow all tournament rules and regulations.</p>
+                        <p>• You must check in during the designated check-in period.</p>
+                        <p>• Failure to check in may result in disqualification.</p>
+                        {% if registration_fee > 0 %}
+                        <p>• Registration fees are non-refundable except in case of tournament cancellation.</p>
+                        {% endif %}
+                        <p>• Unsportsmanlike conduct may result in disqualification and potential ban.</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'tournaments:detail' tournament.slug %}" 
+                       class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg text-center transition">
+                        Cancel
+                    </a>
+                    <form method="post" class="flex-1">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition">
+                            {% if registration_fee > 0 %}
+                                Confirm & Pay ${{ registration_fee }}
+                            {% else %}
+                                Confirm Registration
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

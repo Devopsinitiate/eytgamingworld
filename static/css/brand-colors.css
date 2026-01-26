@@ -1,0 +1,139 @@
+/* EYTGaming Global Brand Colors and Utilities */
+/* This file defines the brand colors and utility classes used across the entire site */
+
+/* EYTGaming Global Brand Colors and Utilities */
+/* This file defines the brand colors and utility classes used across the entire site */
+
+:root {
+    /* Official EYTGaming Brand Colors - Updated to match company branding */
+    --eyt-primary: #b91c1c;           /* Official EYT Red from logo */
+    --eyt-red: #b91c1c;              /* Main brand red */
+    --eyt-red-dark: #991b1b;         /* Darker variant */
+    --eyt-red-light: #dc2626;        /* Lighter variant for hover states */
+
+    /* Primary color with alpha channels */
+    --eyt-primary-alpha-5: rgba(185, 28, 28, 0.05);
+    --eyt-primary-alpha-10: rgba(185, 28, 28, 0.1);
+    --eyt-primary-alpha-20: rgba(185, 28, 28, 0.2);
+    --eyt-primary-alpha-30: rgba(185, 28, 28, 0.3);
+    --eyt-primary-alpha-40: rgba(185, 28, 28, 0.4);
+    --eyt-primary-alpha-50: rgba(185, 28, 28, 0.5);
+    --eyt-primary-alpha-90: rgba(185, 28, 28, 0.9);
+
+    /* Background colors - Deep dark from design */
+    --background-dark: #0a0e1a;
+    --card-dark: #151c2c;
+    --card-border-dark: #282e39;
+}
+
+/* Utility Classes for Brand Colors */
+
+/* Text color utilities */
+.text-primary {
+    color: var(--eyt-primary) !important;
+}
+
+/* Background color utilities */
+.bg-primary {
+    background-color: var(--eyt-primary) !important;
+}
+
+.bg-primary\/5 {
+    background-color: var(--eyt-primary-alpha-5) !important;
+}
+
+.bg-primary\/10 {
+    background-color: var(--eyt-primary-alpha-10) !important;
+}
+
+.bg-primary\/20 {
+    background-color: var(--eyt-primary-alpha-20) !important;
+}
+
+.bg-primary\/30 {
+    background-color: var(--eyt-primary-alpha-30) !important;
+}
+
+.bg-primary\/40 {
+    background-color: var(--eyt-primary-alpha-40) !important;
+}
+
+.bg-primary\/50 {
+    background-color: var(--eyt-primary-alpha-50) !important;
+}
+
+.bg-primary\/90 {
+    background-color: var(--eyt-primary-alpha-90) !important;
+}
+
+/* Border color utilities */
+.border-primary {
+    border-color: var(--eyt-primary) !important;
+}
+
+.border-primary\/20 {
+    border-color: var(--eyt-primary-alpha-20) !important;
+}
+
+.border-primary\/30 {
+    border-color: var(--eyt-primary-alpha-30) !important;
+}
+
+.border-primary\/40 {
+    border-color: var(--eyt-primary-alpha-40) !important;
+}
+
+.border-primary\/50 {
+    border-color: var(--eyt-primary-alpha-50) !important;
+}
+
+/* Hover states */
+.hover\:bg-primary:hover {
+    background-color: var(--eyt-primary) !important;
+}
+
+.hover\:bg-primary\/80:hover {
+    background-color: rgba(185, 28, 28, 0.8) !important;
+}
+
+.hover\:bg-primary\/90:hover {
+    background-color: var(--eyt-primary-alpha-90) !important;
+}
+
+.hover\:text-primary:hover {
+    color: var(--eyt-primary) !important;
+}
+
+.hover\:text-primary\/80:hover {
+    color: rgba(185, 28, 28, 0.8) !important;
+}
+
+.hover\:border-primary:hover {
+    border-color: var(--eyt-primary) !important;
+}
+
+.hover\:border-primary\/50:hover {
+    border-color: var(--eyt-primary-alpha-50) !important;
+}
+
+/* Focus states */
+.focus\:ring-primary:focus {
+    --tw-ring-color: var(--eyt-primary) !important;
+}
+
+.focus\:border-primary:focus {
+    border-color: var(--eyt-primary) !important;
+}
+
+/* Background dark colors */
+.bg-background-dark {
+    background-color: var(--background-dark);
+}
+
+.bg-card-dark {
+    background-color: var(--card-dark);
+}
+
+.border-card-border-dark {
+    border-color: var(--card-border-dark);
+}

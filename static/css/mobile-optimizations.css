@@ -1,0 +1,598 @@
+/**
+ * Mobile Optimization CSS
+ * Comprehensive mobile-first styles for tournament detail page
+ * Addresses Requirements 8.1, 8.2, 8.3, 8.4, 8.5
+ */
+
+/* Mobile-first breakpoints */
+:root {
+  --mobile-breakpoint: 768px;
+  --tablet-breakpoint: 1024px;
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --mobile-spacing-xs: 0.5rem;
+  --mobile-spacing-sm: 0.75rem;
+  --mobile-spacing-md: 1rem;
+  --mobile-spacing-lg: 1.5rem;
+  --mobile-spacing-xl: 2rem;
+}
+
+/* Viewport height handling for mobile browsers */
+:root {
+  --vh: 1vh;
+}
+
+@media (max-width: 767px) {
+  .full-height {
+    height: calc(var(--vh, 1vh) * 100);
+  }
+}
+
+/* Base mobile device optimizations */
+.mobile-device {
+  /* Prevent overscroll */
+  overscroll-behavior: none;
+}
+
+.mobile-device body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch device optimizations */
+.touch-device {
+  /* Remove hover effects on touch devices */
+}
+
+@media (hover: none) {
+  .touch-device .participant-card:hover,
+  .touch-device .match-card:hover,
+  .touch-device .stat-card:hover,
+  .touch-device .tab-button:hover,
+  .touch-device .share-button:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Touch feedback for interactive elements */
+.touch-device button:active,
+.touch-device .btn:active,
+.touch-device .participant-card:active,
+.touch-device .match-card:active,
+.touch-device .tab-button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Enhanced touch targets */
+@media (max-width: 767px) {
+  button,
+  .btn,
+  a[href],
+  .tab-button,
+  .participant-card,
+  .match-card,
+  .copy-button,
+  .share-button,
+  [role="button"],
+  [tabindex="0"] {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+    padding: max(12px, 0.75rem);
+    box-sizing: border-box;
+  }
+  
+  /* Comfortable touch targets for primary actions */
+  .enhanced-button,
+  .primary-button,
+  .registration-button {
+    min-height: var(--touch-target-comfortable);
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* Mobile-optimized tournament grid */
+@media (max-width: 767px) {
+  .tournament-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--mobile-spacing-md) !important;
+    padding: var(--mobile-spacing-md) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Mobile-optimized hero section */
+@media (max-width: 767px) {
+  .tournament-hero {
+    min-height: 350px !important;
+    padding: var(--mobile-spacing-md) !important;
+    box-sizing: border-box !important;
+  }
+  
+  .tournament-hero .hero-content {
+    padding: var(--mobile-spacing-md) !important;
+    box-sizing: border-box !important;
+  }
+  
+  .tournament-hero .tournament-title,
+  .tournament-hero h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem) !important;
+    line-height: 1.1 !important;
+    margin-bottom: var(--mobile-spacing-md) !important;
+  }
+  
+  .tournament-hero .tournament-meta {
+    flex-direction: column !important;
+    gap: var(--mobile-spacing-sm) !important;
+  }
+  
+  .tournament-hero .meta-item {
+    font-size: 0.8rem !important;
+    padding: var(--mobile-spacing-sm) !important;
+    min-height: var(--touch-target-min) !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+  
+  .tournament-hero .hero-quick-stats {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: var(--mobile-spacing-sm) !important;
+  }
+  
+  .tournament-hero .quick-stat {
+    flex: 1 !important;
+    min-width: 70px !important;
+    max-width: 90px !important;
+    text-align: center !important;
+  }
+}
+
+/* Mobile-optimized participant display */
+@media (max-width: 767px) {
+  .participant-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--mobile-spacing-md) !important;
+    padding: 0 var(--mobile-spacing-md) !important;
+  }
+  
+  .participant-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--mobile-spacing-md) !important;
+    padding: var(--mobile-spacing-md) !important;
+    min-height: var(--touch-target-min) !important;
+    border-radius: 0.5rem !important;
+    transition: transform 0.2s ease !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+  }
+  
+  .participant-card .participant-avatar,
+  .participant-card .avatar {
+    flex-shrink: 0 !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border-radius: 50% !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .participant-card .participant-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  .participant-card .participant-name,
+  .participant-card .name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .participant-card .seed-badge {
+    flex-shrink: 0 !important;
+    margin-top: 0 !important;
+    margin-left: auto !important;
+  }
+}
+
+/* Mobile-optimized registration card */
+@media (max-width: 767px) {
+  .enhanced-registration-card,
+  .registration-card {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    z-index: 50 !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    margin: 0 !important;
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+    padding-bottom: calc(var(--mobile-spacing-md) + env(safe-area-inset-bottom, 0)) !important;
+    box-sizing: border-box !important;
+    transform: translateY(0) !important;
+    transition: transform 0.3s ease !important;
+  }
+  
+  .enhanced-registration-card.scroll-hidden {
+    transform: translateY(100%) !important;
+  }
+  
+  .enhanced-registration-card.minimized {
+    transform: translateY(calc(100% - 60px)) !important;
+    opacity: 0.9 !important;
+  }
+  
+  .enhanced-registration-card::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    z-index: 10;
+  }
+  
+  .enhanced-registration-card .card-header {
+    padding: var(--mobile-spacing-md) !important;
+  }
+  
+  .enhanced-registration-card .card-content {
+    padding: 0 var(--mobile-spacing-md) var(--mobile-spacing-md) !important;
+  }
+  
+  .enhanced-registration-card button,
+  .enhanced-registration-card .btn {
+    min-height: var(--touch-target-comfortable) !important;
+    padding: 1rem 1.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 0.75rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Mobile-optimized tab navigation */
+@media (max-width: 767px) {
+  .tab-container {
+    display: flex !important;
+    gap: var(--mobile-spacing-sm) !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding: 0 var(--mobile-spacing-md) !important;
+    box-sizing: border-box !important;
+    overscroll-behavior-x: contain !important;
+  }
+  
+  .tab-container::-webkit-scrollbar {
+    display: none !important;
+  }
+  
+  .tab-button {
+    min-height: var(--touch-target-min) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Tab scroll indicators */
+  .tab-scroll-indicators {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 15 !important;
+    pointer-events: none !important;
+  }
+  
+  .scroll-indicator {
+    position: absolute !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    background: linear-gradient(135deg, #1f2937, #374151) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 50% !important;
+    color: #9ca3af !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    min-height: var(--touch-target-min) !important;
+    min-width: var(--touch-target-min) !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .scroll-indicator.left {
+    left: -0.5rem !important;
+  }
+  
+  .scroll-indicator.right {
+    right: -0.5rem !important;
+  }
+  
+  .scroll-indicator:hover {
+    color: white !important;
+    background: linear-gradient(135deg, #374151, #1f2937) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.1) !important;
+  }
+  
+  .scroll-indicator:active {
+    transform: scale(0.95) !important;
+  }
+  
+  .scroll-indicator:disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+  }
+}
+
+/* Mobile-optimized statistics dashboard */
+@media (max-width: 767px) {
+  #stats-dashboard .grid,
+  .stats-dashboard .grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--mobile-spacing-md) !important;
+    padding: 0 var(--mobile-spacing-md) !important;
+  }
+  
+  .stat-card {
+    padding: var(--mobile-spacing-md) !important;
+    border-radius: 0.75rem !important;
+    min-height: var(--touch-target-min) !important;
+    box-sizing: border-box !important;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.125rem !important;
+  }
+  
+  .stat-card .stat-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .engagement-card,
+  .progress-card {
+    padding: var(--mobile-spacing-sm) !important;
+  }
+  
+  .engagement-card .text-lg,
+  .progress-card .text-lg,
+  .engagement-card .text-2xl,
+  .progress-card .text-2xl {
+    font-size: 1rem !important;
+  }
+}
+
+/* Mobile-optimized SVG scaling */
+@media (max-width: 767px) {
+  svg {
+    max-width: 80vw !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+  
+  /* Icon SVGs should remain small */
+  .icon svg,
+  .btn svg,
+  .tab-button svg,
+  .meta-item svg {
+    max-width: 1.5rem !important;
+    max-height: 1.5rem !important;
+    margin: 0 !important;
+  }
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 767px) {
+  /* Reduce animation complexity */
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
+  /* Keep essential animations but make them faster */
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin {
+    animation-duration: 1s !important;
+  }
+  
+  /* Optimize scroll performance */
+  .tab-container,
+  [data-scrollable] {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scroll-indicator,
+  .tab-button,
+  .participant-card,
+  .enhanced-registration-card {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tab-button,
+  .enhanced-button,
+  .participant-card,
+  .enhanced-registration-card,
+  .stat-card {
+    border-width: 2px !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+  }
+}
+
+/* Safe area insets for devices with notches */
+@supports (padding: max(0px)) {
+  @media (max-width: 767px) {
+    .enhanced-registration-card {
+      padding-bottom: max(var(--mobile-spacing-md), env(safe-area-inset-bottom)) !important;
+    }
+    
+    .tournament-hero {
+      padding-left: max(var(--mobile-spacing-md), env(safe-area-inset-left)) !important;
+      padding-right: max(var(--mobile-spacing-md), env(safe-area-inset-right)) !important;
+    }
+    
+    .tab-container {
+      padding-left: max(var(--mobile-spacing-md), env(safe-area-inset-left)) !important;
+      padding-right: max(var(--mobile-spacing-md), env(safe-area-inset-right)) !important;
+    }
+  }
+}
+
+/* Long press feedback */
+.long-pressed {
+  animation: longPressEffect 0.2s ease-out !important;
+}
+
+@keyframes longPressEffect {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Mobile-specific utility classes */
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block !important;
+  }
+  
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+.touch-only {
+  display: none !important;
+}
+
+@media (hover: none) {
+  .touch-only {
+    display: block !important;
+  }
+  
+  .hover-only {
+    display: none !important;
+  }
+}
+
+/* Mobile-optimized spacing utilities */
+@media (max-width: 767px) {
+  .mobile-p-xs { padding: var(--mobile-spacing-xs) !important; }
+  .mobile-p-sm { padding: var(--mobile-spacing-sm) !important; }
+  .mobile-p-md { padding: var(--mobile-spacing-md) !important; }
+  .mobile-p-lg { padding: var(--mobile-spacing-lg) !important; }
+  
+  .mobile-m-xs { margin: var(--mobile-spacing-xs) !important; }
+  .mobile-m-sm { margin: var(--mobile-spacing-sm) !important; }
+  .mobile-m-md { margin: var(--mobile-spacing-md) !important; }
+  .mobile-m-lg { margin: var(--mobile-spacing-lg) !important; }
+  
+  .mobile-gap-xs { gap: var(--mobile-spacing-xs) !important; }
+  .mobile-gap-sm { gap: var(--mobile-spacing-sm) !important; }
+  .mobile-gap-md { gap: var(--mobile-spacing-md) !important; }
+  .mobile-gap-lg { gap: var(--mobile-spacing-lg) !important; }
+}
+
+/* Mobile-optimized text sizes */
+@media (max-width: 767px) {
+  .mobile-text-xs { font-size: 0.7rem !important; }
+  .mobile-text-sm { font-size: 0.8rem !important; }
+  .mobile-text-base { font-size: 0.875rem !important; }
+  .mobile-text-lg { font-size: 1rem !important; }
+  .mobile-text-xl { font-size: 1.125rem !important; }
+  .mobile-text-2xl { font-size: 1.25rem !important; }
+}
+
+/* Mobile-optimized layout utilities */
+@media (max-width: 767px) {
+  .mobile-flex-col {
+    flex-direction: column !important;
+  }
+  
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .mobile-w-full {
+    width: 100% !important;
+  }
+  
+  .mobile-h-auto {
+    height: auto !important;
+  }
+  
+  .mobile-text-center {
+    text-align: center !important;
+  }
+}
+
+/* Print styles for mobile */
+@media print {
+  .enhanced-registration-card,
+  .tab-scroll-indicators,
+  .scroll-indicator,
+  .mobile-swipe-handle {
+    display: none !important;
+  }
+  
+  .tournament-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .participant-card {
+    break-inside: avoid !important;
+  }
+}

@@ -1,0 +1,311 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Profile Settings - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Settings Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
+                <nav class="space-y-2">
+                    <a href="{% url 'dashboard:settings_profile' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white"
+                       aria-current="page">
+                        <span class="material-symbols-outlined text-base">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">privacy_tip</span>
+                        Privacy
+                    </a>
+                    <a href="{% url 'dashboard:settings_security' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">security</span>
+                        Security
+                    </a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">notifications</span>
+                        Notifications
+                    </a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">link</span>
+                        Connected Accounts
+                    </a>
+                    <a href="{% url 'dashboard:account_delete' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                        Delete Account
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Profile Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Manage your personal information and gaming accounts</p>
+            </div>
+            
+            <!-- Messages -->
+            {% if messages %}
+                <div class="space-y-3">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">
+                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Profile Settings Form -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">person</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Profile Information</h2>
+                </div>
+                
+                <form id="profile-form" method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Avatar Upload -->
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">account_circle</span>
+                            Profile Picture
+                        </h3>
+                        <div class="flex items-center gap-6">
+                            <div class="relative">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="Profile Picture" 
+                                         class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600">
+                                {% else %}
+                                    <div class="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center border-4 border-gray-200 dark:border-gray-600">
+                                        <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-3xl">person</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-1">
+                                <label for="{{ form.avatar.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Upload New Avatar
+                                </label>
+                                {{ form.avatar }}
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">JPG, PNG or GIF. Max size 2MB.</p>
+                                {% if form.avatar.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.avatar.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">badge</span>
+                            Personal Information
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    First Name
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.first_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Last Name
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.last_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label for="{{ form.display_name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Display Name
+                                </label>
+                                {{ form.display_name }}
+                                {% if form.display_name.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.display_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label for="{{ form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Bio
+                                </label>
+                                {{ form.bio }}
+                                {% if form.bio.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.bio.help_text }}</p>
+                                {% endif %}
+                                {% if form.bio.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.bio.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Location & Contact -->
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">location_on</span>
+                            Location & Contact
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Date of Birth
+                                </label>
+                                {{ form.date_of_birth }}
+                                {% if form.date_of_birth.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.date_of_birth.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.timezone.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Timezone
+                                </label>
+                                {{ form.timezone }}
+                                {% if form.timezone.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.timezone.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Country
+                                </label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.country.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    City
+                                </label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.city.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Phone Number
+                                </label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.phone_number.help_text }}</p>
+                                {% endif %}
+                                {% if form.phone_number.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.phone_number.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gaming Accounts -->
+                    <div class="space-y-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">videogame_asset</span>
+                            Gaming Accounts
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.discord_username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-indigo-600">forum</span>
+                                        Discord Username
+                                    </span>
+                                </label>
+                                {{ form.discord_username }}
+                                {% if form.discord_username.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.discord_username.help_text }}</p>
+                                {% endif %}
+                                {% if form.discord_username.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.discord_username.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.steam_id.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-gray-800">videogame_asset</span>
+                                        Steam ID
+                                    </span>
+                                </label>
+                                {{ form.steam_id }}
+                                {% if form.steam_id.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.steam_id.help_text }}</p>
+                                {% endif %}
+                                {% if form.steam_id.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.steam_id.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.twitch_username.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-purple-600">live_tv</span>
+                                        Twitch Username
+                                    </span>
+                                </label>
+                                {{ form.twitch_username }}
+                                {% if form.twitch_username.help_text %}
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.twitch_username.help_text }}</p>
+                                {% endif %}
+                                {% if form.twitch_username.errors %}
+                                    <p class="mt-1 text-sm text-red-400">{{ form.twitch_username.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-between">
+                <a href="{% url 'dashboard:home' %}" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+                    Cancel
+                </a>
+                <button type="submit" form="profile-form" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <span class="material-symbols-outlined text-base">save</span>
+                    Save Profile Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+

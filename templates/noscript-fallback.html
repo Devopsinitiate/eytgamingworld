@@ -1,0 +1,403 @@
+<!-- 
+No-JavaScript Fallback Content
+This template provides essential functionality when JavaScript is disabled
+Addresses Requirement 4.3 - Ensure basic styling works without JavaScript
+-->
+
+<noscript>
+    <!-- Critical CSS for no-JavaScript scenarios -->
+    <style>
+        /* Essential styles when JavaScript is disabled */
+        .no-js-notice {
+            background: #fbbf24;
+            color: #92400e;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+            border-bottom: 1px solid #f59e0b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .no-js-notice a {
+            color: #92400e;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        
+        /* Hide JavaScript-dependent elements */
+        .js-only,
+        [data-requires-js],
+        .dynamic-content:not(.static-fallback),
+        .interactive-element:not(.static-alternative) {
+            display: none !important;
+        }
+        
+        /* Show no-JS alternatives */
+        .no-js-only,
+        .static-fallback,
+        .static-alternative {
+            display: block !important;
+        }
+        
+        /* Basic form styling for no-JS */
+        .no-js-form {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        html.dark .no-js-form {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .no-js-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        html.dark .no-js-form label {
+            color: #d1d5db;
+        }
+        
+        .no-js-form input,
+        .no-js-form select,
+        .no-js-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        html.dark .no-js-form input,
+        html.dark .no-js-form select,
+        html.dark .no-js-form textarea {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+        
+        .no-js-form button {
+            background: #b91c1c;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .no-js-form button:hover {
+            background: #991b1b;
+        }
+        
+        /* Basic navigation for no-JS */
+        .no-js-nav {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        html.dark .no-js-nav {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        .no-js-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .no-js-nav a {
+            color: #374151;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid #d1d5db;
+            background: white;
+        }
+        
+        html.dark .no-js-nav a {
+            color: #d1d5db;
+            background: #374151;
+            border-color: #4b5563;
+        }
+        
+        .no-js-nav a:hover {
+            background: #f9fafb;
+            border-color: #b91c1c;
+        }
+        
+        html.dark .no-js-nav a:hover {
+            background: #4b5563;
+            border-color: #dc2626;
+        }
+        
+        /* Basic card styling for no-JS */
+        .no-js-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        html.dark .no-js-card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        
+        /* Basic button styling for no-JS */
+        .no-js-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #b91c1c;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .no-js-btn:hover {
+            background: #991b1b;
+        }
+        
+        .no-js-btn-secondary {
+            background: #6b7280;
+        }
+        
+        .no-js-btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        /* Basic grid for no-JS */
+        .no-js-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+        
+        @media (min-width: 768px) {
+            .no-js-grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .no-js-grid-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Fallback for browsers without CSS Grid */
+        @supports not (display: grid) {
+            .no-js-grid {
+                display: block;
+            }
+            
+            .no-js-grid > * {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Basic responsive utilities for no-JS */
+        @media (max-width: 767px) {
+            .no-js-hide-mobile {
+                display: none !important;
+            }
+            
+            .no-js-nav ul {
+                flex-direction: column;
+            }
+            
+            .no-js-form {
+                padding: 1rem;
+            }
+        }
+        
+        /* Print styles for no-JS */
+        @media print {
+            .no-js-notice,
+            .no-js-nav {
+                display: none !important;
+            }
+            
+            .no-js-card {
+                border: 1px solid #000 !important;
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+    
+    <!-- No-JavaScript notification -->
+    <div class="no-js-notice">
+        ⚠ JavaScript is disabled. Some features may be limited. 
+        <a href="?enable_js=1">Learn how to enable JavaScript</a> or 
+        <a href="?basic_mode=1">continue in basic mode</a>
+    </div>
+    
+    <!-- Basic navigation for no-JS scenarios -->
+    <nav class="no-js-nav no-js-only">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/tournaments/">Tournaments</a></li>
+            <li><a href="/teams/">Teams</a></li>
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="/accounts/login/">Login</a></li>
+            <li><a href="/accounts/signup/">Sign Up</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Static content alternatives -->
+    <div class="no-js-only">
+        <!-- Tournament registration fallback -->
+        <div class="no-js-card" id="tournament-registration-fallback" style="display: none;">
+            <h3>Tournament Registration</h3>
+            <p>To register for tournaments without JavaScript, please use the basic registration form below:</p>
+            <form class="no-js-form" method="POST" action="">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <input type="hidden" name="no_js_mode" value="true">
+                
+                <label for="display_name">Display Name:</label>
+                <input type="text" id="display_name" name="display_name" required>
+                
+                <label for="team_selection">Team (if applicable):</label>
+                <select id="team_selection" name="team_id">
+                    <option value="">Individual Registration</option>
+                    <!-- Teams will be populated server-side -->
+                </select>
+                
+                <button type="submit" class="no-js-btn">Register for Tournament</button>
+            </form>
+        </div>
+        
+        <!-- Search fallback -->
+        <div class="no-js-card" id="search-fallback" style="display: none;">
+            <h3>Search</h3>
+            <form class="no-js-form" method="GET" action="/search/">
+                <label for="search_query">Search tournaments, teams, or players:</label>
+                <input type="text" id="search_query" name="q" placeholder="Enter search terms...">
+                
+                <label for="search_type">Search in:</label>
+                <select id="search_type" name="type">
+                    <option value="all">All</option>
+                    <option value="tournaments">Tournaments</option>
+                    <option value="teams">Teams</option>
+                    <option value="players">Players</option>
+                </select>
+                
+                <button type="submit" class="no-js-btn">Search</button>
+            </form>
+        </div>
+        
+        <!-- Contact form fallback -->
+        <div class="no-js-card" id="contact-fallback" style="display: none;">
+            <h3>Contact Support</h3>
+            <p>If you're experiencing issues, please contact us using the form below:</p>
+            <form class="no-js-form" method="POST" action="/contact/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                
+                <label for="contact_name">Name:</label>
+                <input type="text" id="contact_name" name="name" required>
+                
+                <label for="contact_email">Email:</label>
+                <input type="email" id="contact_email" name="email" required>
+                
+                <label for="contact_subject">Subject:</label>
+                <input type="text" id="contact_subject" name="subject" required>
+                
+                <label for="contact_message">Message:</label>
+                <textarea id="contact_message" name="message" rows="5" required></textarea>
+                
+                <button type="submit" class="no-js-btn">Send Message</button>
+            </form>
+        </div>
+        
+        <!-- Social sharing fallback -->
+        <div class="no-js-card" id="sharing-fallback" style="display: none;">
+            <h3>Share This Page</h3>
+            <p>Copy the link below to share this page:</p>
+            <div class="no-js-form">
+                <label for="share_url">Page URL:</label>
+                <input type="text" id="share_url" value="" readonly onclick="this.select()">
+                
+                <p>Or use these direct links:</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="#" class="no-js-btn" id="twitter-share" target="_blank" rel="noopener">Share on Twitter</a>
+                    <a href="#" class="no-js-btn no-js-btn-secondary" id="facebook-share" target="_blank" rel="noopener">Share on Facebook</a>
+                    <a href="#" class="no-js-btn no-js-btn-secondary" id="linkedin-share" target="_blank" rel="noopener">Share on LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Initialize no-JS fallbacks -->
+    <script>
+        // This script only runs if JavaScript is actually enabled
+        // Hide the no-JS content since JS is working
+        document.addEventListener('DOMContentLoaded', function() {
+            var noJsElements = document.querySelectorAll('.no-js-only');
+            noJsElements.forEach(function(element) {
+                element.style.display = 'none';
+            });
+            
+            var noJsNotice = document.querySelector('.no-js-notice');
+            if (noJsNotice) {
+                noJsNotice.style.display = 'none';
+            }
+        });
+    </script>
+</noscript>
+
+<!-- Show fallback content when specific elements are missing -->
+<script>
+    // This script shows fallback content for specific missing elements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for missing tournament registration form
+        if (!document.querySelector('.tournament-registration-form') && 
+            document.querySelector('#tournament-registration-fallback')) {
+            document.querySelector('#tournament-registration-fallback').style.display = 'block';
+        }
+        
+        // Check for missing search functionality
+        if (!document.querySelector('.search-form') && 
+            document.querySelector('#search-fallback')) {
+            document.querySelector('#search-fallback').style.display = 'block';
+        }
+        
+        // Check for missing contact form
+        if (!document.querySelector('.contact-form') && 
+            document.querySelector('#contact-fallback')) {
+            document.querySelector('#contact-fallback').style.display = 'block';
+        }
+        
+        // Set up sharing fallback
+        var shareUrl = document.querySelector('#share_url');
+        var twitterShare = document.querySelector('#twitter-share');
+        var facebookShare = document.querySelector('#facebook-share');
+        var linkedinShare = document.querySelector('#linkedin-share');
+        
+        if (shareUrl && twitterShare && facebookShare && linkedinShare) {
+            var currentUrl = encodeURIComponent(window.location.href);
+            var pageTitle = encodeURIComponent(document.title);
+            
+            shareUrl.value = window.location.href;
+            twitterShare.href = 'https://twitter.com/intent/tweet?url=' + currentUrl + '&text=' + pageTitle;
+            facebookShare.href = 'https://www.facebook.com/sharer/sharer.php?u=' + currentUrl;
+            linkedinShare.href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + currentUrl;
+        }
+    });
+</script>

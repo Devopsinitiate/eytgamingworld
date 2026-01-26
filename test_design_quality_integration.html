@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Quality Integration Test</title>
+    
+    <!-- Include design quality enhancements -->
+    <link rel="stylesheet" href="static/css/design-quality-enhancements.css">
+    
+    <style>
+        /* Base tournament detail styles for testing */
+        :root {
+            --eyt-red: #b91c1c;
+            --eyt-red-dark: #991b1b;
+            --eyt-red-light: #dc2626;
+            --bg-dark: #111827;
+            --bg-gray-800: #1f2937;
+            --bg-gray-700: #374151;
+            --text-white: #ffffff;
+            --text-gray-300: #d1d5db;
+            --text-gray-400: #9ca3af;
+            --text-gray-500: #6b7280;
+            --border-white-10: rgba(255, 255, 255, 0.1);
+            --border-white-20: rgba(255, 255, 255, 0.2);
+            --status-green: #10b981;
+            --status-blue: #3b82f6;
+            --status-yellow: #f59e0b;
+            --status-red: #ef4444;
+            --animation-normal: 0.3s;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+        
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--bg-gray-800);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-white-10);
+        }
+        
+        .test-results {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: var(--bg-gray-800);
+            border: 1px solid var(--border-white-10);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .test-pass {
+            color: var(--status-green);
+        }
+        
+        .test-fail {
+            color: var(--status-red);
+        }
+        
+        .test-item {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Design Quality Integration Test</h1>
+        <p>Testing design consistency, spacing, typography, colors, and interactive feedback.</p>
+        
+        <!-- Test Results Panel -->
+        <div class="test-results">
+            <h3>Test Results</h3>
+            <div id="test-output">Running tests...</div>
+        </div>
+        
+        <!-- Typography Test Section -->
+        <div class="test-section">
+            <h2>Typography Hierarchy Test</h2>
+            <h1>Heading 1 - Main Title</h1>
+            <h2>Heading 2 - Section Title</h2>
+            <h3>Heading 3 - Subsection</h3>
+            <h4>Heading 4 - Minor Heading</h4>
+            <h5>Heading 5 - Small Heading</h5>
+            <h6>Heading 6 - Smallest Heading</h6>
+            <p>This is a paragraph with normal text. It should have proper line height and color contrast.</p>
+            <p class="text-small">This is small text for secondary information.</p>
+            <p class="text-large">This is large text for emphasis.</p>
+            <a href="#" class="test-link">This is a test link</a>
+        </div>
+        
+        <!-- Interactive Elements Test Section -->
+        <div class="test-section">
+            <h2>Interactive Elements Test</h2>
+            <div class="flex gap-md mb-lg">
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary Button</button>
+                <button class="btn" disabled>Disabled Button</button>
+            </div>
+            
+            <div class="flex gap-md mb-lg">
+                <input type="text" placeholder="Test input field" class="test-input">
+                <select class="test-select">
+                    <option>Test Option 1</option>
+                    <option>Test Option 2</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-md">
+                <div class="card card-interactive" tabindex="0">
+                    <h4>Interactive Card 1</h4>
+                    <p>This card should have hover and focus effects.</p>
+                </div>
+                <div class="card card-interactive" tabindex="0">
+                    <h4>Interactive Card 2</h4>
+                    <p>Test card with consistent spacing and typography.</p>
+                </div>
+                <div class="card card-interactive" tabindex="0">
+                    <h4>Interactive Card 3</h4>
+                    <p>Another test card for consistency validation.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Badges Test Section -->
+        <div class="test-section">
+            <h2>Status Badges Test</h2>
+            <div class="flex gap-md flex-wrap">
+                <span class="status-badge status-registration">Registration Open</span>
+                <span class="status-badge status-in-progress">In Progress</span>
+                <span class="status-badge status-completed">Completed</span>
+                <span class="status-badge status-cancelled">Cancelled</span>
+            </div>
+        </div>
+        
+        <!-- Layout and Spacing Test Section -->
+        <div class="test-section">
+            <h2>Layout and Spacing Test</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
+                <div class="card">
+                    <h4>Card 1</h4>
+                    <p>Testing consistent spacing and alignment.</p>
+                </div>
+                <div class="card">
+                    <h4>Card 2</h4>
+                    <p>All cards should have identical spacing.</p>
+                </div>
+                <div class="card">
+                    <h4>Card 3</h4>
+                    <p>Consistent padding and margins throughout.</p>
+                </div>
+                <div class="card">
+                    <h4>Card 4</h4>
+                    <p>Proper alignment and visual hierarchy.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dynamic Content Test Section -->
+        <div class="test-section">
+            <h2>Dynamic Content Test</h2>
+            <button id="add-content-btn" class="btn btn-primary mb-md">Add Dynamic Content</button>
+            <div id="dynamic-content-container" class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <!-- Dynamic content will be added here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load design quality manager -->
+    <script src="static/js/modules/design-quality-manager.js"></script>
+    
+    <!-- Test Script -->
+    <script>
+        class DesignQualityTester {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+            
+            addTest(name, testFn) {
+                this.tests.push({ name, testFn });
+            }
+            
+            async runTests() {
+                const output = document.getElementById('test-output');
+                output.innerHTML = '<p>Running tests...</p>';
+                
+                for (const test of this.tests) {
+                    try {
+                        const result = await test.testFn();
+                        this.results.push({ name: test.name, passed: result.passed, message: result.message });
+                    } catch (error) {
+                        this.results.push({ name: test.name, passed: false, message: error.message });
+                    }
+                }
+                
+                this.displayResults();
+            }
+            
+            displayResults() {
+                const output = document.getElementById('test-output');
+                const passed = this.results.filter(r => r.passed).length;
+                const total = this.results.length;
+                
+                let html = `<h4>Results: ${passed}/${total} passed</h4>`;
+                
+                this.results.forEach(result => {
+                    const className = result.passed ? 'test-pass' : 'test-fail';
+                    const icon = result.passed ? '✅' : '❌';
+                    html += `
+                        <div class="test-item ${className}">
+                            ${icon} ${result.name}
+                            <br><small>${result.message}</small>
+                        </div>
+                    `;
+                });
+                
+                output.innerHTML = html;
+            }
+            
+            // Test helper methods
+            getComputedStyleValue(element, property) {
+                return getComputedStyle(element).getPropertyValue(property).trim();
+            }
+            
+            isColorConsistent(element, expectedColorPattern) {
+                const color = this.getComputedStyleValue(element, 'color');
+                const backgroundColor = this.getComputedStyleValue(element, 'background-color');
+                
+                // Simple color validation - check if colors are not default browser colors
+                return color !== 'rgb(0, 0, 0)' && backgroundColor !== 'rgba(0, 0, 0, 0)';
+            }
+            
+            hasTransition(element) {
+                const transition = this.getComputedStyleValue(element, 'transition');
+                return transition !== 'all 0s ease 0s' && transition !== 'none';
+            }
+        }
+        
+        // Initialize tester
+        const tester = new DesignQualityTester();
+        
+        // Typography Tests
+        tester.addTest('Typography Hierarchy', () => {
+            const h1 = document.querySelector('h1');
+            const h2 = document.querySelector('h2');
+            const h3 = document.querySelector('h3');
+            
+            const h1Size = parseFloat(tester.getComputedStyleValue(h1, 'font-size'));
+            const h2Size = parseFloat(tester.getComputedStyleValue(h2, 'font-size'));
+            const h3Size = parseFloat(tester.getComputedStyleValue(h3, 'font-size'));
+            
+            const hierarchyCorrect = h1Size > h2Size && h2Size > h3Size;
+            
+            return {
+                passed: hierarchyCorrect,
+                message: hierarchyCorrect ? 
+                    'Font sizes decrease properly with heading levels' : 
+                    `Font sizes not hierarchical: H1(${h1Size}px) H2(${h2Size}px) H3(${h3Size}px)`
+            };
+        });
+        
+        // Interactive Feedback Tests
+        tester.addTest('Button Transitions', () => {
+            const buttons = document.querySelectorAll('.btn');
+            let allHaveTransitions = true;
+            let buttonCount = 0;
+            
+            buttons.forEach(btn => {
+                if (!btn.disabled) {
+                    buttonCount++;
+                    if (!tester.hasTransition(btn)) {
+                        allHaveTransitions = false;
+                    }
+                }
+            });
+            
+            return {
+                passed: allHaveTransitions && buttonCount > 0,
+                message: allHaveTransitions ? 
+                    `All ${buttonCount} buttons have transitions` : 
+                    'Some buttons missing transitions'
+            };
+        });
+        
+        // Color Consistency Tests
+        tester.addTest('Status Badge Colors', () => {
+            const badges = document.querySelectorAll('.status-badge');
+            let allHaveColors = true;
+            
+            badges.forEach(badge => {
+                if (!tester.isColorConsistent(badge)) {
+                    allHaveColors = false;
+                }
+            });
+            
+            return {
+                passed: allHaveColors && badges.length > 0,
+                message: allHaveColors ? 
+                    `All ${badges.length} status badges have proper colors` : 
+                    'Some status badges missing proper colors'
+            };
+        });
+        
+        // Spacing Consistency Tests
+        tester.addTest('Card Spacing Consistency', () => {
+            const cards = document.querySelectorAll('.card');
+            const paddings = [];
+            
+            cards.forEach(card => {
+                const padding = tester.getComputedStyleValue(card, 'padding');
+                paddings.push(padding);
+            });
+            
+            // Check if all cards have the same padding
+            const consistentPadding = paddings.every(p => p === paddings[0]);
+            
+            return {
+                passed: consistentPadding && cards.length > 0,
+                message: consistentPadding ? 
+                    `All ${cards.length} cards have consistent padding` : 
+                    'Cards have inconsistent padding'
+            };
+        });
+        
+        // Visual Hierarchy Tests
+        tester.addTest('Visual Hierarchy', () => {
+            const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            let properWeights = true;
+            
+            headings.forEach(heading => {
+                const weight = tester.getComputedStyleValue(heading, 'font-weight');
+                const level = parseInt(heading.tagName.charAt(1));
+                
+                // Check if higher level headings have higher or equal font weights
+                if (level <= 2 && parseInt(weight) < 700) {
+                    properWeights = false;
+                }
+            });
+            
+            return {
+                passed: properWeights && headings.length > 0,
+                message: properWeights ? 
+                    `All ${headings.length} headings have proper font weights` : 
+                    'Some headings have improper font weights'
+            };
+        });
+        
+        // Element Alignment Tests
+        tester.addTest('Flex Container Alignment', () => {
+            const flexContainers = document.querySelectorAll('.flex');
+            let allAligned = true;
+            
+            flexContainers.forEach(container => {
+                const alignItems = tester.getComputedStyleValue(container, 'align-items');
+                if (alignItems === 'normal' || alignItems === 'stretch') {
+                    // Check if it has explicit alignment class
+                    if (!container.classList.contains('items-start') && 
+                        !container.classList.contains('items-end')) {
+                        allAligned = false;
+                    }
+                }
+            });
+            
+            return {
+                passed: allAligned && flexContainers.length > 0,
+                message: allAligned ? 
+                    `All ${flexContainers.length} flex containers properly aligned` : 
+                    'Some flex containers missing proper alignment'
+            };
+        });
+        
+        // Dynamic Content Test
+        tester.addTest('Dynamic Content Enhancement', () => {
+            // Add dynamic content and test if it gets enhanced
+            const container = document.getElementById('dynamic-content-container');
+            const dynamicCard = document.createElement('div');
+            dynamicCard.className = 'card card-interactive';
+            dynamicCard.innerHTML = '<h4>Dynamic Card</h4><p>This was added dynamically.</p>';
+            dynamicCard.tabIndex = 0;
+            
+            container.appendChild(dynamicCard);
+            
+            // Wait a bit for the observer to process
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const hasTransition = tester.hasTransition(dynamicCard);
+                    const hasProperPadding = tester.getComputedStyleValue(dynamicCard, 'padding') !== '0px';
+                    
+                    resolve({
+                        passed: hasTransition && hasProperPadding,
+                        message: hasTransition && hasProperPadding ? 
+                            'Dynamic content properly enhanced' : 
+                            'Dynamic content not properly enhanced'
+                    });
+                }, 100);
+            });
+        });
+        
+        // Setup dynamic content button
+        document.getElementById('add-content-btn').addEventListener('click', () => {
+            const container = document.getElementById('dynamic-content-container');
+            const newCard = document.createElement('div');
+            newCard.className = 'card card-interactive';
+            newCard.innerHTML = `
+                <h4>Dynamic Card ${container.children.length + 1}</h4>
+                <p>This card was added dynamically and should be enhanced automatically.</p>
+            `;
+            newCard.tabIndex = 0;
+            container.appendChild(newCard);
+        });
+        
+        // Wait for design quality manager to initialize, then run tests
+        setTimeout(() => {
+            tester.runTests();
+        }, 500);
+    </script>
+</body>
+</html>

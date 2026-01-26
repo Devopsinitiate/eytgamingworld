@@ -1,0 +1,29 @@
+{% load static %}
+
+<!-- Responsive Avatar Component -->
+<!-- Requirements: 14.5 - Responsive image serving -->
+
+<div class="avatar-container relative inline-block">
+    {% if has_avatar %}
+        <img 
+            src="{{ user.avatar.url }}"
+            srcset="{{ user.avatar.url }} 1x, {{ user.avatar.url }} 2x"
+            alt="{{ user.get_display_name }}"
+            class="responsive-image {{ size_class }}"
+            loading="lazy"
+            decoding="async"
+        />
+    {% else %}
+        <div class="{{ size_class }} bg-primary flex items-center justify-center text-white font-bold rounded-full">
+            {{ user.get_display_name|first|upper }}
+        </div>
+    {% endif %}
+    
+    {% if show_online and user.is_online %}
+        <span 
+            class="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 ring-2 ring-white"
+            aria-label="Online"
+        ></span>
+    {% endif %}
+</div>
+

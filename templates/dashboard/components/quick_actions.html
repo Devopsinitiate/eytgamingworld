@@ -1,0 +1,72 @@
+{% load static %}
+
+<!-- Quick Actions Component -->
+<!-- Displays 4 prominent action buttons for frequently used features -->
+<!-- Requirements: 1.5 -->
+
+<div class="bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30 rounded-lg p-6" role="region" aria-labelledby="quick-actions-heading">
+    <h2 class="text-white text-xl font-bold mb-4" id="quick-actions-heading">Quick Actions</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="navigation" aria-label="Quick action buttons">
+        <!-- Register for Tournament -->
+        <a 
+            href="{% url 'tournaments:list' %}" 
+            class="flex items-center gap-3 p-4 bg-background-dark/50 hover:bg-background-dark/70 rounded-lg border border-card-border-dark transition-all hover:border-primary/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark"
+            style="min-height: 44px; min-width: 44px;"
+            aria-label="Register for tournament"
+        >
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0" aria-hidden="true">emoji_events</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-white font-medium text-sm">Register for Tournament</p>
+                <p class="text-gray-400 text-xs truncate">Browse & Join</p>
+            </div>
+        </a>
+        
+        <!-- Join Team -->
+        <a 
+            href="{% url 'teams:list' %}" 
+            class="flex items-center gap-3 p-4 bg-background-dark/50 hover:bg-background-dark/70 rounded-lg border border-card-border-dark transition-all hover:border-blue-500/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background-dark"
+            style="min-height: 44px; min-width: 44px;"
+            aria-label="Join team"
+        >
+            <span class="material-symbols-outlined text-blue-500 text-2xl flex-shrink-0" aria-hidden="true">groups</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-white font-medium text-sm">Join Team</p>
+                <p class="text-gray-400 text-xs truncate">Find or Create</p>
+            </div>
+        </a>
+        
+        <!-- View Notifications -->
+        <a 
+            href="{% url 'notifications:list' %}" 
+            class="flex items-center gap-3 p-4 bg-background-dark/50 hover:bg-background-dark/70 rounded-lg border border-card-border-dark transition-all hover:border-yellow-500/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-background-dark relative"
+            style="min-height: 44px; min-width: 44px;"
+            aria-label="View notifications{% if stats.unread_notifications %}, {{ stats.unread_notifications }} unread{% endif %}"
+        >
+            <span class="material-symbols-outlined text-yellow-500 text-2xl flex-shrink-0" aria-hidden="true">notifications</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-white font-medium text-sm">View Notifications</p>
+                <p class="text-gray-400 text-xs truncate">Stay Updated</p>
+            </div>
+            {% if stats.unread_notifications %}
+                <span class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold" aria-label="{{ stats.unread_notifications }} unread">
+                    {{ stats.unread_notifications }}
+                </span>
+            {% endif %}
+        </a>
+        
+        <!-- Manage Payment Methods -->
+        <a 
+            href="{% url 'payments:payment_methods' %}" 
+            class="flex items-center gap-3 p-4 bg-background-dark/50 hover:bg-background-dark/70 rounded-lg border border-card-border-dark transition-all hover:border-green-500/50 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background-dark"
+            style="min-height: 44px; min-width: 44px;"
+            aria-label="Manage payment methods"
+        >
+            <span class="material-symbols-outlined text-green-500 text-2xl flex-shrink-0" aria-hidden="true">payment</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-white font-medium text-sm">Manage Payment Methods</p>
+                <p class="text-gray-400 text-xs truncate">Cards & Billing</p>
+            </div>
+        </a>
+    </div>
+</div>
+

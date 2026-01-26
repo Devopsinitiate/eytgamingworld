@@ -1,0 +1,86 @@
+{% load static %}
+
+<!-- Mobile Bottom Navigation Component -->
+<!-- Fixed bottom navigation bar for mobile devices (< 768px) -->
+<!-- Requirements: 14.3 -->
+
+<nav 
+    class="md:hidden fixed bottom-0 left-0 right-0 bg-background-dark border-t border-card-border-dark z-40 safe-area-inset-bottom"
+    role="navigation"
+    aria-label="Mobile navigation"
+>
+    <div class="grid grid-cols-4 h-16">
+        <!-- Dashboard -->
+        <a 
+            href="{% url 'dashboard:home' %}" 
+            class="flex flex-col items-center justify-center gap-1 {% if request.resolver_match.url_name == 'home' %}text-primary{% else %}text-gray-400{% endif %} hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
+            aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}"
+            {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}
+        >
+            <span class="material-symbols-outlined text-2xl" aria-hidden="true">dashboard</span>
+            <span class="text-xs font-medium">Dashboard</span>
+        </a>
+        
+        <!-- Profile -->
+        <a 
+            href="{% url 'dashboard:profile_view' user.username %}" 
+            class="flex flex-col items-center justify-center gap-1 {% if 'profile' in request.path %}text-primary{% else %}text-gray-400{% endif %} hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
+            aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}"
+            {% if 'profile' in request.path %}aria-current="page"{% endif %}
+        >
+            <span class="material-symbols-outlined text-2xl" aria-hidden="true">person</span>
+            <span class="text-xs font-medium">Profile</span>
+        </a>
+        
+        <!-- Notifications -->
+        <a 
+            href="{% url 'notifications:list' %}" 
+            class="flex flex-col items-center justify-center gap-1 {% if 'notifications' in request.path %}text-primary{% else %}text-gray-400{% endif %} hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset relative"
+            aria-label="Notifications{% if stats.unread_notifications %}, {{ stats.unread_notifications }} unread{% endif %}{% if 'notifications' in request.path %}, current page{% endif %}"
+            {% if 'notifications' in request.path %}aria-current="page"{% endif %}
+        >
+            <span class="material-symbols-outlined text-2xl" aria-hidden="true">notifications</span>
+            <span class="text-xs font-medium">Notifications</span>
+            {% if stats.unread_notifications %}
+                <span 
+                    class="absolute top-1 right-1/4 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold"
+                    aria-label="{{ stats.unread_notifications }} unread"
+                >
+                    {{ stats.unread_notifications|slice:":9" }}{% if stats.unread_notifications > 9 %}+{% endif %}
+                </span>
+            {% endif %}
+        </a>
+        
+        <!-- Menu -->
+        <button 
+            onclick="toggleMobileMenu()" 
+            class="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+        >
+            <span class="material-symbols-outlined text-2xl" aria-hidden="true">menu</span>
+            <span class="text-xs font-medium">Menu</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Add padding to bottom of page content to prevent overlap with fixed nav -->
+<div class="md:hidden h-16" aria-hidden="true"></div>
+
+<style>
+    /* Ensure touch targets are at least 44x44 pixels for accessibility */
+    @media (max-width: 768px) {
+        nav[aria-label="Mobile navigation"] a,
+        nav[aria-label="Mobile navigation"] button {
+            min-height: 44px;
+            min-width: 44px;
+        }
+    }
+    
+    /* Safe area insets for devices with notches */
+    .safe-area-inset-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+</style>
+

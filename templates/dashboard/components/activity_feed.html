@@ -1,0 +1,86 @@
+{% load static %}
+
+<!-- Activity Feed Component -->
+<!-- Displays recent user activities with timestamps and icons -->
+<!-- Requirements: 1.3, 8.1 -->
+
+<div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-white text-xl font-bold" id="activity-feed-heading">Recent Activity</h2>
+        <a href="{% url 'dashboard:activity' %}" class="text-primary hover:text-primary/80 text-sm font-medium transition-colors" aria-label="View all activities">
+            View All →
+        </a>
+    </div>
+    
+    {% if recent_activities %}
+        <div class="space-y-3" role="list" aria-label="Recent activities" aria-live="polite" aria-atomic="false" aria-labelledby="activity-feed-heading">
+            {% for activity in recent_activities %}
+                <div class="p-4 bg-neutral-900/50 hover:bg-neutral-800/50 rounded-lg border border-card-border-dark transition-colors" role="listitem">
+                    <div class="flex items-start gap-3">
+                        <!-- Activity Icon -->
+                        <div class="flex-shrink-0 bg-primary/20 p-2 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">
+                                {% if activity.activity_type == 'tournament_registered' %}emoji_events
+                                {% elif activity.activity_type == 'tournament_completed' %}emoji_events
+                                {% elif activity.activity_type == 'team_joined' %}groups
+                                {% elif activity.activity_type == 'team_left' %}groups
+                                {% elif activity.activity_type == 'achievement_earned' %}military_tech
+                                {% elif activity.activity_type == 'payment_completed' %}payment
+                                {% elif activity.activity_type == 'profile_updated' %}person
+                                {% elif activity.activity_type == 'game_profile_added' %}sports_esports
+                                {% else %}circle{% endif %}
+                            </span>
+                        </div>
+                        
+                        <!-- Activity Content -->
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white font-medium text-sm">
+                                {% if activity.activity_type == 'tournament_registered' %}
+                                    Registered for tournament
+                                {% elif activity.activity_type == 'tournament_completed' %}
+                                    Completed tournament
+                                {% elif activity.activity_type == 'team_joined' %}
+                                    Joined a team
+                                {% elif activity.activity_type == 'team_left' %}
+                                    Left a team
+                                {% elif activity.activity_type == 'achievement_earned' %}
+                                    Earned an achievement
+                                {% elif activity.activity_type == 'payment_completed' %}
+                                    Payment completed
+                                {% elif activity.activity_type == 'profile_updated' %}
+                                    Updated profile
+                                {% elif activity.activity_type == 'game_profile_added' %}
+                                    Added game profile
+                                {% else %}
+                                    Activity recorded
+                                {% endif %}
+                            </p>
+                            
+                            {% if activity.data %}
+                                <p class="text-gray-400 text-xs mt-1">
+                                    {% if activity.data.game %}{{ activity.data.game }}{% endif %}
+                                    {% if activity.data.tournament %}{{ activity.data.tournament }}{% endif %}
+                                    {% if activity.data.team %}{{ activity.data.team }}{% endif %}
+                                    {% if activity.data.achievement %}{{ activity.data.achievement }}{% endif %}
+                                </p>
+                            {% endif %}
+                            
+                            <p class="text-gray-500 text-xs mt-1">
+                                <time datetime="{{ activity.created_at|date:'c' }}">
+                                    {{ activity.created_at|timesince }} ago
+                                </time>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-8">
+            <span class="material-symbols-outlined text-gray-600 text-5xl" aria-hidden="true">history</span>
+            <p class="text-gray-400 mt-2">No recent activity</p>
+            <p class="text-gray-500 text-sm mt-1">Your activities will appear here</p>
+        </div>
+    {% endif %}
+</div>
+

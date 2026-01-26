@@ -1,0 +1,309 @@
+{% comment %}
+Report User Modal Component
+
+Displays a modal dialog for reporting users for inappropriate behavior.
+Can be used as a standalone modal or embedded in a page.
+
+Context variables:
+- form: UserReportForm instance
+- reported_user: User instance being reported
+- show_as_modal: Boolean to show as modal (default: True)
+{% endcomment %}
+
+{% if show_as_modal %}
+<!-- Modal Overlay -->
+<div id="reportUserModal" 
+     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden" 
+     role="dialog" 
+     aria-labelledby="reportModalTitle" 
+     aria-modal="true"
+     onclick="if(event.target === this) closeReportModal()">
+    
+    <!-- Modal Content -->
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white" 
+         onclick="event.stopPropagation()">
+{% endif %}
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+            <h3 id="reportModalTitle" class="text-xl font-bold text-gray-900">
+                <svg class="w-6 h-6 inline-block mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                Report User
+            </h3>
+            {% if show_as_modal %}
+            <button type="button" 
+                    onclick="closeReportModal()" 
+                    class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
+                    aria-label="Close modal">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="py-4">
+            <!-- Warning Message -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4" role="alert">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            <strong>Important:</strong> False reports may result in action against your account. 
+                            Please only report genuine violations of our community guidelines.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if reported_user %}
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm text-gray-600">You are reporting:</p>
+                <div class="flex items-center mt-2">
+                    {% if reported_user.avatar %}
+                        <img src="{{ reported_user.avatar.url }}" 
+                             alt="{{ reported_user.get_display_name }}" 
+                             class="w-10 h-10 rounded-full mr-3 object-cover">
+                    {% else %}
+                        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3 text-gray-600 font-bold">
+                            {{ reported_user.get_display_name|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ reported_user.get_display_name }}</p>
+                        <p class="text-sm text-gray-500">@{{ reported_user.username }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Report Form -->
+            <form method="post" id="reportUserForm" class="space-y-4" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4" role="alert">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    {{ form.non_field_errors }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Category Field -->
+                <div class="form-group">
+                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Report Category <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <p class="mt-1 text-sm text-red-600" role="alert">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            {{ form.category.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+                
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600" role="alert">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            {{ form.description.errors.0 }}
+                        </p>
+                    {% endif %}
+                    {% if form.description.help_text %}
+                        <p class="mt-1 text-sm text-gray-500">{{ form.description.help_text }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-sm text-gray-500" id="descriptionCounter">
+                        <span id="charCount">0</span> / 1000 characters
+                    </p>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+                    {% if show_as_modal %}
+                    <button type="button" 
+                            onclick="closeReportModal()" 
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        Cancel
+                    </button>
+                    {% else %}
+                    <a href="{% url 'dashboard:profile_view' username=reported_user.username %}" 
+                       class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded transition-colors">
+                        Cancel
+                    </a>
+                    {% endif %}
+                    <button type="submit" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                        <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+
+{% if show_as_modal %}
+    </div>
+</div>
+{% endif %}
+
+<style>
+    /* Form styling */
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #374151;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        color: #374151;
+        background-color: #fff;
+        border-color: #ef4444;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Modal animation */
+    #reportUserModal.show {
+        display: block;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+    // Character counter for description field
+    document.addEventListener('DOMContentLoaded', function() {
+        const descriptionField = document.querySelector('textarea[name="description"]');
+        const charCount = document.getElementById('charCount');
+        
+        if (descriptionField && charCount) {
+            // Update counter on input
+            descriptionField.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = count;
+                
+                // Change color based on character count
+                const counter = document.getElementById('descriptionCounter');
+                if (count > 1000) {
+                    counter.classList.add('text-red-600');
+                    counter.classList.remove('text-gray-500');
+                } else if (count > 900) {
+                    counter.classList.add('text-yellow-600');
+                    counter.classList.remove('text-gray-500', 'text-red-600');
+                } else {
+                    counter.classList.add('text-gray-500');
+                    counter.classList.remove('text-yellow-600', 'text-red-600');
+                }
+            });
+            
+            // Initialize counter
+            charCount.textContent = descriptionField.value.length;
+        }
+    });
+    
+    {% if show_as_modal %}
+    // Modal functions
+    function openReportModal() {
+        const modal = document.getElementById('reportUserModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('show');
+            // Focus on first form field
+            const firstField = modal.querySelector('select, textarea, input');
+            if (firstField) {
+                setTimeout(() => firstField.focus(), 100);
+            }
+            // Trap focus in modal
+            trapFocus(modal);
+        }
+    }
+    
+    function closeReportModal() {
+        const modal = document.getElementById('reportUserModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('show');
+        }
+    }
+    
+    // Trap focus within modal for accessibility
+    function trapFocus(element) {
+        const focusableElements = element.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+        
+        element.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeReportModal();
+            }
+            
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        lastFocusable.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        firstFocusable.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeReportModal();
+        }
+    });
+    {% endif %}
+</script>
+

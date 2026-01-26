@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Test - Tailwind Error Handler</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- Load our error handler -->
+    <script src="static/js/tailwind-error-handler.js" defer></script>
+    
+    <!-- Test configuration script (similar to base template) -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            function waitForErrorHandler(callback, attempts = 0) {
+                if (window.TailwindErrorHandler) {
+                    callback();
+                } else if (attempts < 50) {
+                    setTimeout(() => waitForErrorHandler(callback, attempts + 1), 100);
+                } else {
+                    console.warn('Error handler not available, falling back to basic configuration');
+                    fallbackConfiguration();
+                }
+            }
+            
+            function configureWithErrorHandling() {
+                const errorHandler = window.TailwindErrorHandler;
+                
+                const eytGamingConfig = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                "primary": {
+                                    DEFAULT: "#b91c1c",
+                                    700: "#b91c1c"
+                                }
+                            },
+                            fontFamily: {
+                                "display": ["Spline Sans", "sans-serif"]
+                            }
+                        }
+                    }
+                };
+                
+                const success = errorHandler.applyConfiguration(eytGamingConfig);
+                
+                if (success) {
+                    console.log('✓ Configuration applied successfully with error handling');
+                    document.getElementById('status').textContent = 'Configuration Applied Successfully';
+                    document.getElementById('status').className = 'status success';
+                } else {
+                    console.warn('✗ Configuration failed, error handler managing fallbacks');
+                    document.getElementById('status').textContent = 'Configuration Failed - Fallback Active';
+                    document.getElementById('status').className = 'status warning';
+                }
+                
+                // Update debug info
+                updateDebugInfo();
+            }
+            
+            function fallbackConfiguration() {
+                if (typeof tailwind !== 'undefined') {
+                    try {
+                        tailwind.config = {
+                            darkMode: "class",
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        "primary": { DEFAULT: "#b91c1c" }
+                                    }
+                                }
+                            }
+                        };
+                        console.log('Basic fallback configuration applied');
+                        document.getElementById('status').textContent = 'Basic Fallback Configuration Applied';
+                        document.getElementById('status').className = 'status warning';
+                    } catch (error) {
+                        console.error('Even fallback configuration failed:', error);
+                        document.getElementById('status').textContent = 'All Configuration Failed';
+                        document.getElementById('status').className = 'status error';
+                    }
+                } else {
+                    console.error('Tailwind CSS not available');
+                    document.getElementById('status').textContent = 'Tailwind CSS Not Available';
+                    document.getElementById('status').className = 'status error';
+                }
+            }
+            
+            function updateDebugInfo() {
+                if (window.TailwindErrorHandler) {
+                    const handler = window.TailwindErrorHandler;
+                    const debugInfo = document.getElementById('debug-info');
+                    
+                    debugInfo.innerHTML = `
+                        <h3>Debug Information</h3>
+                        <p><strong>Tailwind Available:</strong> ${handler.isAvailable()}</p>
+                        <p><strong>Configuration Applied:</strong> ${handler.isConfigured()}</p>
+                        <p><strong>Fallback Active:</strong> ${handler.isFallbackActive()}</p>
+                        <p><strong>Last Error:</strong> ${handler.getLastError() || 'None'}</p>
+                        <p><strong>Error History:</strong> ${handler.debug.getErrorHistory().length} errors</p>
+                    `;
+                }
+            }
+            
+            waitForErrorHandler(configureWithErrorHandling);
+        });
+    </script>
+    
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        #debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .tailwind-test {
+            /* These classes should work if Tailwind is loaded */
+            background-color: #b91c1c;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tailwind CSS Error Handler Integration Test</h1>
+    
+    <div id="status" class="status">Loading...</div>
+    
+    <div class="test-section">
+        <h2>Tailwind CSS Test</h2>
+        <p>The box below should have a red background if Tailwind CSS is working:</p>
+        <div class="tailwind-test bg-primary text-white p-4 rounded-lg">
+            This box should be red with white text if Tailwind CSS is working properly.
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Handler Controls</h2>
+        <button onclick="window.TailwindErrorHandler && window.TailwindErrorHandler.debug.enableDebugMode()">Enable Debug Mode</button>
+        <button onclick="window.TailwindErrorHandler && window.TailwindErrorHandler.debug.disableDebugMode()">Disable Debug Mode</button>
+        <button onclick="window.TailwindErrorHandler && console.log(window.TailwindErrorHandler.debug.getState())">Log State</button>
+        <button onclick="window.TailwindErrorHandler && console.log(window.TailwindErrorHandler.debug.getErrorHistory())">Log Error History</button>
+        <button onclick="window.TailwindErrorHandler && window.TailwindErrorHandler.debug.clearErrorHistory()">Clear Error History</button>
+    </div>
+    
+    <div id="debug-info">
+        <h3>Debug Information</h3>
+        <p>Loading debug information...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Tests</h2>
+        <button onclick="testValidConfig()">Test Valid Config</button>
+        <button onclick="testInvalidConfig()">Test Invalid Config</button>
+        <button onclick="testFallbackConfig()">Test Fallback Config</button>
+        <div id="manual-test-results"></div>
+    </div>
+    
+    <script>
+        function testValidConfig() {
+            if (!window.TailwindErrorHandler) {
+                alert('Error handler not available');
+                return;
+            }
+            
+            const config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            test: '#ff0000'
+                        }
+                    }
+                }
+            };
+            
+            const validation = window.TailwindErrorHandler.validateConfiguration(config);
+            const result = `Valid Config Test: ${validation.isValid ? 'PASSED' : 'FAILED'} (${validation.errors.length} errors, ${validation.warnings.length} warnings)`;
+            
+            document.getElementById('manual-test-results').innerHTML += `<p>${result}</p>`;
+            console.log('Valid config test:', validation);
+        }
+        
+        function testInvalidConfig() {
+            if (!window.TailwindErrorHandler) {
+                alert('Error handler not available');
+                return;
+            }
+            
+            const config = {
+                darkMode: 'invalid',
+                theme: {
+                    extend: {
+                        colors: 'not-an-object'
+                    }
+                }
+            };
+            
+            const validation = window.TailwindErrorHandler.validateConfiguration(config);
+            const result = `Invalid Config Test: ${!validation.isValid || validation.warnings.length > 0 ? 'PASSED' : 'FAILED'} (${validation.errors.length} errors, ${validation.warnings.length} warnings)`;
+            
+            document.getElementById('manual-test-results').innerHTML += `<p>${result}</p>`;
+            console.log('Invalid config test:', validation);
+        }
+        
+        function testFallbackConfig() {
+            if (!window.TailwindErrorHandler) {
+                alert('Error handler not available');
+                return;
+            }
+            
+            const fallbackConfig = window.TailwindErrorHandler.createFallbackConfiguration();
+            const validation = window.TailwindErrorHandler.validateConfiguration(fallbackConfig);
+            const result = `Fallback Config Test: ${validation.isValid ? 'PASSED' : 'FAILED'}`;
+            
+            document.getElementById('manual-test-results').innerHTML += `<p>${result}</p>`;
+            console.log('Fallback config test:', fallbackConfig, validation);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{
+  "timestamp": "2025-12-22T22:51:54.605Z",
+  "totalTime": 17,
+  "results": {
+    "performance": {
+      "criticalContentLoading": true,
+      "moduleLoadingEfficiency": true,
+      "animationPerformance": true,
+      "imageOptimization": false,
+      "overallScore": 50
+    },
+    "accessibility": {
+      "keyboardNavigation": true,
+      "screenReaderSupport": false,
+      "colorContrast": true,
+      "motionPreferences": true,
+      "wcagCompliance": false,
+      "overallScore": 50
+    },
+    "crossBrowser": {
+      "browsers": {
+        "Chrome": {
+          "javascriptFeatures": true,
+          "cssAnimations": true,
+          "clipboardAPI": false,
+          "overallCompatibility": false
+        },
+        "Firefox": {
+          "javascriptFeatures": true,
+          "cssAnimations": true,
+          "clipboardAPI": true,
+          "overallCompatibility": true
+        },
+        "Safari": {
+          "javascriptFeatures": true,
+          "cssAnimations": true,
+          "clipboardAPI": true,
+          "overallCompatibility": true
+        },
+        "Edge": {
+          "javascriptFeatures": false,
+          "cssAnimations": true,
+          "clipboardAPI": true,
+          "overallCompatibility": false
+        }
+      },
+      "overallScore": 50,
+      "compatibleBrowsers": 2
+    },
+    "endToEnd": {
+      "pageLoading": true,
+      "moduleInitialization": false,
+      "interactiveTimeline": false,
+      "copyLinkFunctionality": false,
+      "mobileResponsiveness": true,
+      "overallWorkflow": false
+    },
+    "overall": false
+  },
+  "overallPass": false,
+  "summary": {
+    "performance": {
+      "score": 50,
+      "pass": false
+    },
+    "accessibility": {
+      "score": 50,
+      "pass": false
+    },
+    "crossBrowser": {
+      "score": 50,
+      "pass": false
+    },
+    "endToEnd": {
+      "pass": false
+    }
+  }
+}

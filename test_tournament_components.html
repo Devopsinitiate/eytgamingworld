@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Detail Components Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #b91c1c, #dc2626);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .test-suite {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        
+        .test-suite h3 {
+            margin: 0 0 15px 0;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            background: #334155;
+        }
+        
+        .test-result.pass {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+        }
+        
+        .test-result.fail {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+        }
+        
+        .status {
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status.pass {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .status.fail {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .summary {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid #334155;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: #334155;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .run-tests-btn {
+            background: linear-gradient(135deg, #b91c1c, #dc2626);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .run-tests-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .error-details {
+            font-size: 12px;
+            color: #f87171;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            border-top-color: #b91c1c;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Tournament Detail Components Test Suite</h1>
+        <p>Comprehensive testing for JavaScript components including tab navigation, social sharing, real-time updates, and mobile responsive behavior</p>
+    </div>
+    
+    <button class="run-tests-btn" onclick="runTests()">
+        🧪 Run All Tests
+    </button>
+    
+    <div id="test-results">
+        <div class="loading">
+            <div class="spinner"></div>
+            Click "Run All Tests" to start the test suite
+        </div>
+    </div>
+    
+    <div id="test-summary" style="display: none;">
+        <div class="summary">
+            <h3>📊 Test Summary</h3>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="passed-tests" style="color: #22c55e;">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failed-tests" style="color: #ef4444;">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/test_tournament_detail_components.js"></script>
+    <script>
+        function runTests() {
+            const resultsContainer = document.getElementById('test-results');
+            const summaryContainer = document.getElementById('test-summary');
+            
+            // Show loading state
+            resultsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Running tests...
+                </div>
+            `;
+            
+            // Run tests after a short delay to show loading state
+            setTimeout(() => {
+                try {
+                    const testRunner = new TestRunner();
+                    const results = testRunner.runAllTests();
+                    
+                    displayResults(results);
+                    displaySummary(results);
+                    
+                } catch (error) {
+                    resultsContainer.innerHTML = `
+                        <div class="test-suite">
+                            <h3>❌ Test Execution Error</h3>
+                            <div class="test-result fail">
+                                <span>Failed to run tests</span>
+                                <span class="status fail">ERROR</span>
+                            </div>
+                            <div class="error-details">${error.message}</div>
+                        </div>
+                    `;
+                }
+            }, 500);
+        }
+        
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('test-results');
+            
+            // Group results by test suite
+            const suites = {
+                'TournamentDetailPage': results.filter(r => r.test.includes('TournamentDetailPage') || r.test.includes('initialization') || r.test.includes('Component') || r.test.includes('cleanup')),
+                'Tab Navigation': results.filter(r => r.test.includes('Tab') || r.test.includes('navigation') || r.test.includes('keyboard') || r.test.includes('Active')),
+                'Social Sharing': results.filter(r => r.test.includes('Share') || r.test.includes('share') || r.test.includes('Clipboard') || r.test.includes('Platform')),
+                'Real-Time Updates': results.filter(r => r.test.includes('update') || r.test.includes('Update') || r.test.includes('Connection') || r.test.includes('sync')),
+                'Mobile Responsive': results.filter(r => r.test.includes('Mobile') || r.test.includes('mobile') || r.test.includes('Touch') || r.test.includes('Viewport'))
+            };
+            
+            let html = '';
+            
+            Object.entries(suites).forEach(([suiteName, suiteResults]) => {
+                if (suiteResults.length === 0) return;
+                
+                const passed = suiteResults.filter(r => r.status === 'PASS').length;
+                const total = suiteResults.length;
+                const icon = passed === total ? '✅' : '⚠️';
+                
+                html += `
+                    <div class="test-suite">
+                        <h3>${icon} ${suiteName} (${passed}/${total})</h3>
+                `;
+                
+                suiteResults.forEach(result => {
+                    html += `
+                        <div class="test-result ${result.status.toLowerCase()}">
+                            <span>${result.test}</span>
+                            <span class="status ${result.status.toLowerCase()}">${result.status}</span>
+                        </div>
+                    `;
+                    
+                    if (result.error) {
+                        html += `<div class="error-details">Error: ${result.error}</div>`;
+                    }
+                });
+                
+                html += '</div>';
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+        
+        function displaySummary(results) {
+            const summaryContainer = document.getElementById('test-summary');
+            const totalTests = results.length;
+            const passedTests = results.filter(r => r.status === 'PASS').length;
+            const failedTests = results.filter(r => r.status === 'FAIL').length;
+            const successRate = totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0;
+            
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            
+            summaryContainer.style.display = 'block';
+        }
+        
+        // Auto-run tests on page load for demonstration
+        document.addEventListener('DOMContentLoaded', () => {
+            // Uncomment the line below to auto-run tests
+            // runTests();
+        });
+    </script>
+</body>
+</html>

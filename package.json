@@ -1,0 +1,39 @@
+{
+  "name": "eytgaming-frontend",
+  "version": "1.0.0",
+  "description": "Frontend JavaScript components for EYTGaming tournament platform",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/static/js/test_*.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/static/js/test-setup.js"
+    ],
+    "collectCoverageFrom": [
+      "static/js/**/*.js",
+      "!static/js/test_*.js",
+      "!static/js/test-setup.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/venv/",
+      "<rootDir>/node_modules/"
+    ],
+    "testPathIgnorePatterns": [
+      "/venv/",
+      "/node_modules/"
+    ]
+  },
+  "dependencies": {
+    "puppeteer": "^24.34.0"
+  }
+}

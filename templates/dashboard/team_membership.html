@@ -1,0 +1,256 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Match History - Dashboard{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{% url 'dashboard:profile_view' username=request.user.username %}" 
+               class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Match History</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Manage your team memberships and view your competitive history</p>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary text-2xl">group</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Active Teams</h3>
+                </div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_active_teams }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Current memberships</p>
+            </div>
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-yellow-600 text-2xl">mail</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Pending Invites</h3>
+                </div>
+                <div class="text-3xl font-bold text-yellow-600">{{ total_pending_invites }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Awaiting response</p>
+            </div>
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-green-600 text-2xl">tournament</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Team Tournaments</h3>
+                </div>
+                <div class="text-3xl font-bold text-green-600">{{ total_team_tournaments }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Competitions entered</p>
+            </div>
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-purple-600 text-2xl">emoji_events</span>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Tournament Wins</h3>
+                </div>
+                <div class="text-3xl font-bold text-purple-600">{{ total_team_wins }}</div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Team victories</p>
+            </div>
+        </div>
+
+        <!-- Pending Invitations -->
+        {% if pending_invitations %}
+        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-yellow-600 text-2xl">mail</span>
+                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Pending Invitations</h2>
+                </div>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for invitation in pending_invitations %}
+                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            {% if invitation.team.logo %}
+                            <img src="{{ invitation.team.logo.url }}" alt="{{ invitation.team.name }}" class="w-16 h-16 rounded-lg object-cover">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <span class="text-gray-500 dark:text-gray-400 font-bold text-lg">{{ invitation.team.tag }}</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-bold text-xl text-gray-900 dark:text-white">{{ invitation.team.name }}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Invited by {{ invitation.invited_by.get_display_name }} • {{ invitation.team.game.name }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    Expires {{ invitation.expires_at|date:"M d, Y" }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3">
+                            <a href="{% url 'teams:detail' invitation.team.slug %}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                                <span class="material-symbols-outlined text-base">visibility</span>
+                                View Team
+                            </a>
+                        </div>
+                    </div>
+                    {% if invitation.message %}
+                    <div class="mt-4 ml-20 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-primary">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 italic">
+                            "{{ invitation.message }}"
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Active Teams -->
+        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-2xl">group</span>
+                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Active Teams</h2>
+                </div>
+            </div>
+            {% if team_stats %}
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for stat in team_stats %}
+                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start space-x-4 flex-1">
+                            {% if stat.membership.team.logo %}
+                            <img src="{{ stat.membership.team.logo.url }}" alt="{{ stat.membership.team.name }}" class="w-20 h-20 rounded-lg object-cover">
+                            {% else %}
+                            <div class="w-20 h-20 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <span class="text-gray-500 dark:text-gray-400 font-bold text-xl">{{ stat.membership.team.tag }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h3 class="font-bold text-xl text-gray-900 dark:text-white">{{ stat.membership.team.name }}</h3>
+                                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full font-medium">{{ stat.membership.team.tag }}</span>
+                                    {% if stat.membership.role == 'captain' %}
+                                    <span class="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">Captain</span>
+                                    {% elif stat.membership.role == 'co_captain' %}
+                                    <span class="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">Co-Captain</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">sports_esports</span>
+                                    {{ stat.membership.team.game.name }} • Joined {{ stat.membership.joined_at|date:"M d, Y" }}
+                                </p>
+                                
+                                <!-- Team Statistics -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mt-4">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.total_tournaments }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Tournaments</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600">{{ stat.tournaments_won }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Wins</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-blue-600">{{ stat.top_3_finishes }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Top 3</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.total_matches }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Matches</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-purple-600">{{ stat.win_rate }}%</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Win Rate</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ml-6">
+                            <a href="{% url 'teams:detail' stat.membership.team.slug %}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                                <span class="material-symbols-outlined text-base">visibility</span>
+                                View Team
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="px-6 py-16 text-center">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gray-400 text-4xl">group</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No active teams</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">Get started by joining or creating a team to compete in tournaments together.</p>
+                <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <span class="material-symbols-outlined text-base">search</span>
+                    Browse Teams
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Team History -->
+        {% if team_history %}
+        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-2xl">history</span>
+                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Team History</h2>
+                </div>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for membership in team_history %}
+                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            {% if membership.team.logo %}
+                            <img src="{{ membership.team.logo.url }}" alt="{{ membership.team.name }}" class="w-16 h-16 rounded-lg object-cover opacity-75">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center opacity-75">
+                                <span class="text-gray-500 dark:text-gray-400 font-bold text-lg">{{ membership.team.tag }}</span>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-700 dark:text-gray-300">{{ membership.team.name }}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">sports_esports</span>
+                                    {{ membership.team.game.name }}
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    Joined {{ membership.joined_at|date:"M d, Y" }} • Left {{ membership.left_at|date:"M d, Y" }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">timer</span>
+                                    Duration: {% widthratio membership.left_at|timeuntil:membership.joined_at 86400 1 %} days
+                                </p>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm rounded-full font-medium">
+                                {{ membership.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+

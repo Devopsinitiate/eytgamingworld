@@ -1,0 +1,315 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Payment Details - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6 fade-in">
+        <a href="{% url 'payments:history' %}" 
+           aria-label="Back to payment history"
+           class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+            <span>Back to Payment History</span>
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8 fade-in">
+        <div class="flex items-start justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-white text-3xl font-bold mb-2">Payment Details</h1>
+                <p class="text-gray-400">Transaction ID: {{ payment.id }}</p>
+            </div>
+            <span class="status-{{ payment.status }} px-4 py-2 rounded-full text-sm font-medium" aria-label="Payment status: {{ payment.get_status_display }}">
+                {{ payment.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <!-- Main Payment Information -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Payment Information Card -->
+            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
+                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">receipt</span>
+                    Payment Information
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Amount -->
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Amount</p>
+                        <p class="text-white text-2xl font-bold">${{ payment.amount }}</p>
+                        {% if payment.refund_amount > 0 %}
+                        <p class="text-purple-400 text-sm mt-1">
+                            Refunded: ${{ payment.refund_amount }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Currency -->
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Currency</p>
+                        <p class="text-white font-medium">{{ payment.currency|upper }}</p>
+                    </div>
+
+                    <!-- Date -->
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Date & Time</p>
+                        <p class="text-white font-medium">{{ payment.created_at|date:"F d, Y" }}</p>
+                        <p class="text-gray-400 text-sm">{{ payment.created_at|date:"g:i A" }}</p>
+                    </div>
+
+                    <!-- Payment Type -->
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Payment Type</p>
+                        <p class="text-white font-medium">{{ payment.get_payment_type_display }}</p>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="md:col-span-2">
+                        <p class="text-gray-400 text-sm mb-1">Description</p>
+                        <p class="text-white font-medium">{{ payment.description|default:"No description provided" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Details Card -->
+            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
+                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">info</span>
+                    Transaction Details
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Payment ID -->
+                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
+                        <span class="text-gray-400 text-sm">Payment ID</span>
+                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.id }}</span>
+                    </div>
+
+                    <!-- Stripe Payment Intent ID -->
+                    {% if payment.stripe_payment_intent_id %}
+                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
+                        <span class="text-gray-400 text-sm">Stripe Payment Intent</span>
+                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.stripe_payment_intent_id }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Stripe Charge ID -->
+                    {% if payment.stripe_charge_id %}
+                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
+                        <span class="text-gray-400 text-sm">Stripe Charge ID</span>
+                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.stripe_charge_id }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Completed At -->
+                    {% if payment.completed_at %}
+                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
+                        <span class="text-gray-400 text-sm">Completed At</span>
+                        <span class="text-white text-sm">{{ payment.completed_at|date:"F d, Y g:i A" }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Updated At -->
+                    <div class="flex items-start justify-between py-3">
+                        <span class="text-gray-400 text-sm">Last Updated</span>
+                        <span class="text-white text-sm">{{ payment.updated_at|date:"F d, Y g:i A" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refund Section (if refunded) -->
+            {% if payment.status == 'refunded' %}
+            <div class="bg-purple-900/20 border border-purple-800 rounded-xl p-6 fade-in">
+                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">undo</span>
+                    Refund Information
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Refund Amount -->
+                    <div class="flex items-start justify-between py-3 border-b border-purple-800/50">
+                        <span class="text-purple-200 text-sm">Refund Amount</span>
+                        <span class="text-white font-bold text-lg">${{ payment.refund_amount }}</span>
+                    </div>
+
+                    <!-- Refund Date -->
+                    {% if payment.refunded_at %}
+                    <div class="flex items-start justify-between py-3 border-b border-purple-800/50">
+                        <span class="text-purple-200 text-sm">Refunded At</span>
+                        <span class="text-white text-sm">{{ payment.refunded_at|date:"F d, Y g:i A" }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Refund Reason -->
+                    {% if payment.refund_reason %}
+                    <div class="py-3">
+                        <p class="text-purple-200 text-sm mb-2">Reason</p>
+                        <p class="text-white text-sm">{{ payment.refund_reason }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Actions Card -->
+            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in sticky top-6">
+                <h2 class="text-white text-lg font-semibold mb-4">Actions</h2>
+
+                <div class="space-y-3">
+                    <!-- Request Refund Button -->
+                    {% if payment.is_refundable %}
+                    <button id="request-refund-btn"
+                            data-payment-id="{{ payment.id }}"
+                            aria-label="Request refund for this payment"
+                            class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
+                        <span class="material-symbols-outlined" aria-hidden="true">undo</span>
+                        <span>Request Refund</span>
+                    </button>
+                    {% elif payment.status == 'refunded' %}
+                    <div class="w-full flex items-center justify-center gap-2 bg-purple-900/20 border border-purple-800 text-purple-200 font-semibold py-3 px-4 rounded-lg">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Refunded</span>
+                    </div>
+                    {% else %}
+                    <div class="w-full flex items-center justify-center gap-2 bg-gray-700/50 text-gray-400 font-semibold py-3 px-4 rounded-lg cursor-not-allowed">
+                        <span class="material-symbols-outlined">block</span>
+                        <span>Not Refundable</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- View History Button -->
+                    <a href="{% url 'payments:history' %}"
+                       class="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined">history</span>
+                        <span>View All Payments</span>
+                    </a>
+                </div>
+
+                <!-- Related Object Link -->
+                {% if payment.related_model and payment.related_object_id %}
+                <div class="mt-6 pt-6 border-t border-card-border-dark">
+                    <p class="text-gray-400 text-sm mb-2">Related To</p>
+                    <a href="#" class="text-primary hover:text-primary-dark font-medium text-sm transition-colors flex items-center gap-1">
+                        <span>{{ payment.related_model }}</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Security Info Card -->
+            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
+                <h2 class="text-white text-lg font-semibold mb-4">Security</h2>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">verified_user</span>
+                        <span>PCI DSS Compliant</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">https</span>
+                        <span>256-bit SSL Encryption</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">lock</span>
+                        <span>Secure Payment Processing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Refund Modal -->
+<div id="refund-modal" class="modal" role="dialog" aria-labelledby="refund-modal-title" aria-describedby="refund-modal-description" aria-modal="true">
+    <div class="modal-content">
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <h3 id="refund-modal-title" class="text-white text-xl font-bold mb-1">Request Refund</h3>
+                <p id="refund-modal-description" class="text-gray-400 text-sm">Please provide a reason for the refund request</p>
+            </div>
+            <button id="close-modal" aria-label="Close refund dialog" class="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+        </div>
+
+        <form id="refund-form" method="POST" action="{% url 'payments:request_refund' payment.id %}">
+            {% csrf_token %}
+            
+            <!-- Refund Amount Display -->
+            <div class="mb-6 p-4 bg-background-dark rounded-lg">
+                <p class="text-gray-400 text-sm mb-1">Refund Amount</p>
+                <p class="text-white text-2xl font-bold">${{ payment.amount }}</p>
+            </div>
+
+            <!-- Reason Input -->
+            <div class="mb-6">
+                <label for="refund-reason" class="block text-white font-medium mb-2">
+                    Reason for Refund <span class="text-red-400">*</span>
+                </label>
+                <textarea 
+                    id="refund-reason" 
+                    name="reason"
+                    rows="4"
+                    required
+                    placeholder="Please explain why you're requesting a refund..."
+                    class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
+                <p class="text-gray-400 text-xs mt-2">Minimum 10 characters required</p>
+            </div>
+
+            <!-- Warning Message -->
+            <div class="mb-6 p-4 bg-yellow-900/20 border border-yellow-800 rounded-lg">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-yellow-500 flex-shrink-0">warning</span>
+                    <div>
+                        <p class="text-yellow-200 text-sm font-medium mb-1">Important</p>
+                        <p class="text-yellow-200/80 text-xs">
+                            Refunds typically take 5-10 business days to appear in your account. 
+                            This action cannot be undone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button 
+                    type="submit" 
+                    id="confirm-refund-btn"
+                    class="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <!-- Loading Spinner -->
+                    <svg id="refund-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="refund-btn-text">Confirm Refund</span>
+                </button>
+                
+                <button 
+                    type="button" 
+                    id="cancel-refund-btn"
+                    class="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/payment_detail.js' %}"></script>
+{% endblock %}

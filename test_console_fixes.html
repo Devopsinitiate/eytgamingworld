@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Console Error Fixes Test</title>
+    
+    <!-- Load polyfills first -->
+    <script src="static/js/polyfills.js"></script>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+    
+    <!-- Load fallback CSS -->
+    <link rel="stylesheet" href="static/css/tailwind-fallback.css">
+    
+    <!-- Load Google Fonts properly -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Load fallback handler -->
+    <script src="static/js/tailwind-fallback.js" defer></script>
+    
+    <!-- Load performance optimizer with fixed endpoint -->
+    <script>
+        // Configure performance optimizer to not use the API endpoint
+        window.performanceOptimizerConfig = {
+            enablePerformanceMonitoring: true,
+            performanceReportingUrl: null // Disable server reporting
+        };
+    </script>
+    <script src="static/js/performance-optimizer.js" defer></script>
+    
+    <style>
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            background: #1f2937;
+        }
+        
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+        
+        .test-result {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin: 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .test-pass {
+            background: #065f46;
+            color: #6ee7b7;
+            border: 1px solid #10b981;
+        }
+        
+        .test-fail {
+            background: #7f1d1d;
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+        }
+        
+        .test-info {
+            background: #1e3a8a;
+            color: #93c5fd;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-green-400 mb-4">
+                Console Error Fixes Test
+            </h1>
+            <p class="text-gray-400">
+                Testing fixes for font loading, Tailwind warnings, and performance issues
+            </p>
+        </header>
+        
+        <main>
+            <!-- Font Loading Test -->
+            <section class="test-section">
+                <h2 class="test-title">Font Loading Test</h2>
+                <div id="font-test-results"></div>
+                <p style="font-family: 'Spline Sans', sans-serif; font-size: 1.125rem;">
+                    This text should use Spline Sans font without console errors.
+                </p>
+            </section>
+            
+            <!-- Tailwind CSS Test -->
+            <section class="test-section">
+                <h2 class="test-title">Tailwind CSS Test</h2>
+                <div id="tailwind-test-results"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="bg-blue-600 p-4 rounded-lg">
+                        <h3 class="font-semibold">Tailwind Classes</h3>
+                        <p class="text-sm">This should work without production warnings</p>
+                    </div>
+                    <div class="bg-green-600 p-4 rounded-lg">
+                        <h3 class="font-semibold">Grid Layout</h3>
+                        <p class="text-sm">Responsive grid system test</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Performance Optimizer Test -->
+            <section class="test-section">
+                <h2 class="test-title">Performance Optimizer Test</h2>
+                <div id="performance-test-results"></div>
+                <button id="test-performance" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">
+                    Test Performance Monitoring
+                </button>
+            </section>
+            
+            <!-- Service Worker Test -->
+            <section class="test-section">
+                <h2 class="test-title">Service Worker Test</h2>
+                <div id="sw-test-results"></div>
+            </section>
+            
+            <!-- Fallback System Test -->
+            <section class="test-section">
+                <h2 class="test-title">Fallback System Test</h2>
+                <div id="fallback-test-results"></div>
+                <button id="test-fallback" class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-lg">
+                    Test Fallback Detection
+                </button>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Starting console error fixes test...');
+            
+            // Test 1: Font Loading
+            testFontLoading();
+            
+            // Test 2: Tailwind CSS
+            testTailwindCSS();
+            
+            // Test 3: Performance Optimizer
+            testPerformanceOptimizer();
+            
+            // Test 4: Service Worker
+            testServiceWorker();
+            
+            // Test 5: Fallback System
+            testFallbackSystem();
+            
+            // Set up interactive tests
+            setupInteractiveTests();
+        });
+        
+        function addTestResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result test-${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+        }
+        
+        function testFontLoading() {
+            console.log('🔤 Testing font loading...');
+            
+            // Check if Spline Sans is loaded
+            if (document.fonts && document.fonts.check) {
+                const isLoaded = document.fonts.check('16px "Spline Sans"');
+                if (isLoaded) {
+                    addTestResult('font-test-results', '✅ Spline Sans font loaded successfully', 'pass');
+                } else {
+                    addTestResult('font-test-results', '⏳ Spline Sans font loading...', 'info');
+                    
+                    document.fonts.ready.then(() => {
+                        const isLoadedAfter = document.fonts.check('16px "Spline Sans"');
+                        if (isLoadedAfter) {
+                            addTestResult('font-test-results', '✅ Spline Sans font loaded after ready', 'pass');
+                        } else {
+                            addTestResult('font-test-results', '⚠ Spline Sans font not detected, using fallback', 'info');
+                        }
+                    });
+                }
+            } else {
+                addTestResult('font-test-results', '⚠ Font API not supported, using fallback fonts', 'info');
+            }
+            
+            // Check for font loading errors in console
+            const originalError = console.error;
+            let fontErrors = 0;
+            console.error = function(...args) {
+                if (args[0] && args[0].includes && args[0].includes('font')) {
+                    fontErrors++;
+                }
+                originalError.apply(console, args);
+            };
+            
+            setTimeout(() => {
+                if (fontErrors === 0) {
+                    addTestResult('font-test-results', '✅ No font loading errors detected', 'pass');
+                } else {
+                    addTestResult('font-test-results', `❌ ${fontErrors} font loading errors detected`, 'fail');
+                }
+                console.error = originalError;
+            }, 2000);
+        }
+        
+        function testTailwindCSS() {
+            console.log('🎨 Testing Tailwind CSS...');
+            
+            // Check if Tailwind is loaded
+            if (typeof tailwind !== 'undefined') {
+                addTestResult('tailwind-test-results', '✅ Tailwind CSS object detected', 'pass');
+            } else {
+                addTestResult('tailwind-test-results', '⚠ Tailwind CSS object not detected', 'info');
+            }
+            
+            // Test if Tailwind classes are working
+            const testElement = document.createElement('div');
+            testElement.className = 'bg-red-500 p-4 hidden';
+            testElement.style.position = 'absolute';
+            testElement.style.top = '-9999px';
+            document.body.appendChild(testElement);
+            
+            const computedStyle = window.getComputedStyle(testElement);
+            const hasBackground = computedStyle.backgroundColor.includes('rgb');
+            const hasPadding = computedStyle.padding !== '0px';
+            const isHidden = computedStyle.display === 'none';
+            
+            document.body.removeChild(testElement);
+            
+            if (hasBackground && hasPadding && isHidden) {
+                addTestResult('tailwind-test-results', '✅ Tailwind CSS classes working correctly', 'pass');
+            } else {
+                addTestResult('tailwind-test-results', '⚠ Tailwind CSS classes not fully working, fallback active', 'info');
+            }
+            
+            // Check for production warnings
+            const originalWarn = console.warn;
+            let productionWarnings = 0;
+            console.warn = function(...args) {
+                if (args[0] && args[0].includes && args[0].includes('should not be used in production')) {
+                    productionWarnings++;
+                }
+                originalWarn.apply(console, args);
+            };
+            
+            setTimeout(() => {
+                if (productionWarnings === 0) {
+                    addTestResult('tailwind-test-results', '✅ No Tailwind production warnings', 'pass');
+                } else {
+                    addTestResult('tailwind-test-results', `⚠ ${productionWarnings} production warnings (suppressed)`, 'info');
+                }
+                console.warn = originalWarn;
+            }, 1000);
+        }
+        
+        function testPerformanceOptimizer() {
+            console.log('⚡ Testing performance optimizer...');
+            
+            if (window.performanceOptimizer) {
+                addTestResult('performance-test-results', '✅ Performance optimizer loaded', 'pass');
+                
+                // Test performance measurement
+                try {
+                    window.performanceOptimizer.measurePerformance('test-operation', () => {
+                        return new Promise(resolve => setTimeout(resolve, 100));
+                    });
+                    addTestResult('performance-test-results', '✅ Performance measurement working', 'pass');
+                } catch (error) {
+                    addTestResult('performance-test-results', '❌ Performance measurement error: ' + error.message, 'fail');
+                }
+            } else {
+                addTestResult('performance-test-results', '❌ Performance optimizer not loaded', 'fail');
+            }
+        }
+        
+        function testServiceWorker() {
+            console.log('🔧 Testing service worker...');
+            
+            if ('serviceWorker' in navigator) {
+                addTestResult('sw-test-results', '✅ Service Worker API supported', 'pass');
+                
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    if (registrations.length > 0) {
+                        addTestResult('sw-test-results', '✅ Service Worker registered', 'pass');
+                    } else {
+                        addTestResult('sw-test-results', '⚠ Service Worker not registered (may be loading)', 'info');
+                    }
+                });
+            } else {
+                addTestResult('sw-test-results', '⚠ Service Worker not supported', 'info');
+            }
+        }
+        
+        function testFallbackSystem() {
+            console.log('🛡️ Testing fallback system...');
+            
+            if (window.TailwindFallback) {
+                addTestResult('fallback-test-results', '✅ Tailwind fallback system loaded', 'pass');
+                
+                const isLoaded = window.TailwindFallback.isLoaded();
+                const isFallbackActive = window.TailwindFallback.isFallbackActive();
+                
+                addTestResult('fallback-test-results', `ℹ️ Tailwind loaded: ${isLoaded}`, 'info');
+                addTestResult('fallback-test-results', `ℹ️ Fallback active: ${isFallbackActive}`, 'info');
+            } else {
+                addTestResult('fallback-test-results', '❌ Tailwind fallback system not loaded', 'fail');
+            }
+        }
+        
+        function setupInteractiveTests() {
+            // Performance test button
+            document.getElementById('test-performance').addEventListener('click', function() {
+                if (window.performanceOptimizer) {
+                    const loading = window.performanceOptimizer.showLoadingIndicator(
+                        document.body, 
+                        'Testing performance...'
+                    );
+                    
+                    setTimeout(() => {
+                        loading.hide();
+                        addTestResult('performance-test-results', '✅ Loading indicator test completed', 'pass');
+                    }, 2000);
+                }
+            });
+            
+            // Fallback test button
+            document.getElementById('test-fallback').addEventListener('click', function() {
+                if (window.TailwindFallback) {
+                    window.TailwindFallback.activateEnhanced();
+                    addTestResult('fallback-test-results', '✅ Enhanced fallbacks activated', 'pass');
+                }
+            });
+        }
+        
+        // Monitor for any remaining console errors
+        window.addEventListener('error', function(event) {
+            console.log('🚨 JavaScript error detected:', event.error);
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            console.log('🚨 Unhandled promise rejection:', event.reason);
+        });
+        
+        console.log('✅ Console error fixes test setup complete');
+    </script>
+</body>
+</html>

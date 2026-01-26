@@ -1,0 +1,360 @@
+/* Mobile Responsive Enhancements for Tournament System */
+
+/* Base mobile-first approach */
+@media screen and (max-width: 768px) {
+    /* Tournament Detail Page Mobile Optimizations */
+    .tournament-detail-container {
+        padding: 0.5rem;
+        margin: 0;
+    }
+    
+    .tournament-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .tournament-title {
+        font-size: 1.5rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tournament-meta {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .tournament-status-badge {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+    }
+    
+    /* Tournament Info Cards Mobile Layout */
+    .tournament-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .info-card {
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .info-card-header {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .info-card-content {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+    
+    /* Tournament Registration Mobile Optimizations */
+    .registration-container {
+        padding: 0.5rem;
+        max-width: 100%;
+    }
+    
+    .registration-steps {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .step-indicator {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        text-align: center;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .step-indicator.active {
+        background-color: var(--primary-color, #b91c1c);
+        color: white;
+        transform: scale(1.02);
+    }
+    
+    .step-indicator.completed {
+        background-color: var(--success-color, #28a745);
+        color: white;
+    }
+    
+    /* Form Mobile Optimizations */
+    .registration-form {
+        padding: 1rem;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        transition: border-color 0.3s ease;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color, #b91c1c);
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+    }
+    
+    /* Touch-friendly buttons */
+    .btn {
+        min-height: 44px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color, #b91c1c);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-hover, #0056b3);
+    }
+    
+    .btn-secondary {
+        background-color: var(--secondary-color, #6c757d);
+        color: white;
+    }
+    
+    .btn-block {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    /* Navigation Mobile Optimizations */
+    .mobile-nav-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        height: 100vh;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease;
+        z-index: 1000;
+        padding: 2rem 1rem;
+    }
+    
+    .nav-menu.active {
+        left: 0;
+    }
+    
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Error Messages Mobile */
+    .error-message {
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border-radius: 6px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        font-size: 0.875rem;
+    }
+    
+    .success-message {
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border-radius: 6px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        font-size: 0.875rem;
+    }
+    
+    /* Loading States Mobile */
+    .loading-spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid var(--primary-color, #b91c1c);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 1rem auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Tournament List Mobile */
+    .tournament-card {
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .tournament-card-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary-color, #b91c1c), var(--primary-hover, #991b1b));
+        color: white;
+    }
+    
+    .tournament-card-body {
+        padding: 1rem;
+    }
+    
+    .tournament-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tournament-card-meta {
+        font-size: 0.875rem;
+        opacity: 0.9;
+    }
+}
+
+/* Tablet optimizations */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .tournament-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .registration-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .mobile-nav-toggle {
+        display: none;
+    }
+}
+
+/* Desktop optimizations */
+@media screen and (min-width: 1025px) {
+    .mobile-nav-toggle {
+        display: none;
+    }
+    
+    .nav-menu {
+        position: static;
+        width: auto;
+        height: auto;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .tournament-info-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+}
+
+/* iOS specific optimizations */
+@supports (-webkit-touch-callout: none) {
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .btn {
+        -webkit-appearance: none;
+        -webkit-border-radius: 6px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .form-control {
+        border-width: 3px;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .tournament-detail-container,
+    .registration-form {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .form-control {
+        background-color: #2d2d2d;
+        border-color: #404040;
+        color: #ffffff;
+    }
+    
+    .info-card {
+        background-color: #2d2d2d;
+        border-color: #404040;
+    }
+}

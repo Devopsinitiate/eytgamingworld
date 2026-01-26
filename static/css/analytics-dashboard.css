@@ -1,0 +1,396 @@
+/**
+ * Analytics Dashboard Styles
+ * Styling for the performance monitoring and analytics dashboard
+ */
+
+.analytics-dashboard {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h2 {
+    margin: 0;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.dashboard-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.dashboard-controls .form-select {
+    min-width: 150px;
+}
+
+.dashboard-loading {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+}
+
+.dashboard-error {
+    margin: 20px 0;
+}
+
+/* Metric Cards */
+.metric-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    font-size: 24px;
+}
+
+.metric-content {
+    flex: 1;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.chart-card h3 {
+    margin: 0 0 20px 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.chart-card canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Performance Card */
+.performance-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.performance-card h3 {
+    margin: 0 0 20px 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.performance-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.performance-metric:last-child {
+    border-bottom: none;
+}
+
+.performance-metric .metric-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.performance-metric .metric-value {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1.1rem;
+}
+
+/* Engagement Card */
+.engagement-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.engagement-card h3 {
+    margin: 0 0 20px 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.engagement-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.engagement-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.engagement-metric:last-child {
+    border-bottom: none;
+}
+
+.engagement-metric .metric-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.engagement-metric .metric-value {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1.1rem;
+}
+
+/* Errors Card */
+.errors-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.errors-card h3 {
+    margin: 0 0 20px 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.errors-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.error-item {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fef2f2;
+}
+
+.error-item:last-child {
+    margin-bottom: 0;
+}
+
+.error-severity {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.error-severity.low {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.error-severity.medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.error-severity.high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.error-severity.critical {
+    background: #fecaca;
+    color: #991b1b;
+}
+
+.error-message {
+    margin: 8px 0 4px 0;
+    font-weight: 500;
+    color: #374151;
+}
+
+.error-timestamp {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .analytics-dashboard {
+        padding: 10px;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .dashboard-controls {
+        justify-content: center;
+    }
+    
+    .metric-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .performance-metric,
+    .engagement-metric {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .dashboard-controls .form-select,
+    .dashboard-controls .btn {
+        width: 100%;
+    }
+}
+
+/* Loading States */
+.metric-card.loading .metric-value,
+.performance-metric.loading .metric-value,
+.engagement-metric.loading .metric-value {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    height: 20px;
+    width: 60px;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .analytics-dashboard {
+        background-color: #111827;
+    }
+    
+    .metric-card,
+    .chart-card,
+    .performance-card,
+    .engagement-card,
+    .errors-card,
+    .dashboard-header {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .metric-value,
+    .performance-card h3,
+    .engagement-card h3,
+    .errors-card h3,
+    .chart-card h3,
+    .dashboard-header h2 {
+        color: #f9fafb;
+    }
+    
+    .metric-label,
+    .performance-metric .metric-name,
+    .engagement-metric .metric-name,
+    .error-timestamp {
+        color: #d1d5db;
+    }
+    
+    .performance-metric,
+    .engagement-metric {
+        border-bottom-color: #374151;
+    }
+    
+    .error-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+}

@@ -1,0 +1,1054 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS Integration Test Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .test-passed { @apply bg-green-100 border-green-500 text-green-800; }
+        .test-failed { @apply bg-red-100 border-red-500 text-red-800; }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Tailwind CSS Integration Test Report</h1>
+            <p class="text-gray-600">Generated: 2026-01-01T23:14:36.129Z</p>
+            
+            <div class="grid grid-cols-4 gap-4 mt-6">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-blue-600">72</div>
+                    <div class="text-sm text-gray-600">Total Tests</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-green-600">42</div>
+                    <div class="text-sm text-gray-600">Passed</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-red-600">30</div>
+                    <div class="text-sm text-gray-600">Failed</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-2xl font-bold text-purple-600">58%</div>
+                    <div class="text-sm text-gray-600">Pass Rate</div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="space-y-8">
+            
+            <section class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Loading Sequence Tests</h2>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-600">
+                        10/16 tests passed
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 62.5%"></div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Tailwind Availability</h3>
+                                    <p class="text-sm mt-1">Tailwind CSS is available</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 1.1, 1.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Configuration Application</h3>
+                                    <p class="text-sm mt-1">Brand configuration not applied</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 1.3, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Script Loading Order</h3>
+                                    <p class="text-sm mt-1">Tailwind scripts: 5, Defer: true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 1.1, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Loading Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 2909ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Tailwind Availability</h3>
+                                    <p class="text-sm mt-1">Tailwind CSS is available</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 1.1, 1.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Configuration Application</h3>
+                                    <p class="text-sm mt-1">Brand configuration not applied</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 1.3, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Script Loading Order</h3>
+                                    <p class="text-sm mt-1">Tailwind scripts: 2, Defer: true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 1.1, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Loading Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 1874ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Tailwind Availability</h3>
+                                    <p class="text-sm mt-1">Tailwind CSS not available</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 1.1, 1.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Configuration Application</h3>
+                                    <p class="text-sm mt-1">Brand configuration not applied</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 1.3, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Script Loading Order</h3>
+                                    <p class="text-sm mt-1">Tailwind scripts: 0, Defer: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 1.1, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Loading Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 1123ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Tailwind Availability</h3>
+                                    <p class="text-sm mt-1">Tailwind CSS not available</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 1.1, 1.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Configuration Application</h3>
+                                    <p class="text-sm mt-1">Brand configuration applied</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 1.3, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Script Loading Order</h3>
+                                    <p class="text-sm mt-1">Tailwind scripts: 1, Defer: true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 1.1, 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Loading Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 1173ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 1.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </section>
+        
+            
+            <section class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Brand Consistency Tests</h2>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-600">
+                        7/16 tests passed
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 43.75%"></div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Primary Color Consistency</h3>
+                                    <p class="text-sm mt-1">Brand red applied: bg=false, text=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 2.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Dark Mode Colors</h3>
+                                    <p class="text-sm mt-1">Dark mode colors: bg=false, text=true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 2.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Family Consistency</h3>
+                                    <p class="text-sm mt-1">Spline Sans applied: false (ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 2.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Material Icons Styling</h3>
+                                    <p class="text-sm mt-1">Icons styled: size=true, variation=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 2.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Primary Color Consistency</h3>
+                                    <p class="text-sm mt-1">Brand red applied: bg=false, text=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 2.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Dark Mode Colors</h3>
+                                    <p class="text-sm mt-1">Dark mode colors: bg=false, text=true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 2.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Family Consistency</h3>
+                                    <p class="text-sm mt-1">Spline Sans applied: false (ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 2.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Material Icons Styling</h3>
+                                    <p class="text-sm mt-1">Icons styled: size=false, variation=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 2.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Primary Color Consistency</h3>
+                                    <p class="text-sm mt-1">Brand red applied: bg=false, text=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 2.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Dark Mode Colors</h3>
+                                    <p class="text-sm mt-1">Dark mode colors: bg=false, text=true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 2.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Family Consistency</h3>
+                                    <p class="text-sm mt-1">Spline Sans applied: false (Arial, sans-serif)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 2.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Material Icons Styling</h3>
+                                    <p class="text-sm mt-1">Icons styled: size=false, variation=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 2.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Primary Color Consistency</h3>
+                                    <p class="text-sm mt-1">Brand red applied: bg=true, text=true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 2.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Dark Mode Colors</h3>
+                                    <p class="text-sm mt-1">Dark mode colors: bg=false, text=true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 2.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Family Consistency</h3>
+                                    <p class="text-sm mt-1">Spline Sans applied: true ("Spline Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji")</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 2.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Material Icons Styling</h3>
+                                    <p class="text-sm mt-1">Icons styled: size=false, variation=false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 2.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </section>
+        
+            
+            <section class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Performance Tests</h2>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-600">
+                        13/20 tests passed
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 65%"></div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Render-Blocking Resources</h3>
+                                    <p class="text-sm mt-1">5 blocking resources (4 CSS, 1 JS)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 3.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Loading Performance</h3>
+                                    <p class="text-sm mt-1">11 fonts loaded, Spline Sans: true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 3.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Layout Stability (CLS)</h3>
+                                    <p class="text-sm mt-1">CLS: 0.3138</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 3.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Critical Resource Timing</h3>
+                                    <p class="text-sm mt-1">Tailwind loaded in 432ms (0 bytes)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Overall Load Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 1689ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 3.1-3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Render-Blocking Resources</h3>
+                                    <p class="text-sm mt-1">2 blocking resources (1 CSS, 1 JS)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 3.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Loading Performance</h3>
+                                    <p class="text-sm mt-1">0 fonts loaded, Spline Sans: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 3.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Layout Stability (CLS)</h3>
+                                    <p class="text-sm mt-1">CLS: 0.0751</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 3.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Critical Resource Timing</h3>
+                                    <p class="text-sm mt-1">Tailwind loaded in 441ms (0 bytes)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Overall Load Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 2776ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 3.1-3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Render-Blocking Resources</h3>
+                                    <p class="text-sm mt-1">0 blocking resources (0 CSS, 0 JS)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 3.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Loading Performance</h3>
+                                    <p class="text-sm mt-1">0 fonts loaded, Spline Sans: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 3.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Layout Stability (CLS)</h3>
+                                    <p class="text-sm mt-1">CLS: 0.0000</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 3.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Critical Resource Timing</h3>
+                                    <p class="text-sm mt-1">Tailwind resource timing not found</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Overall Load Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 1026ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 3.1-3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Render-Blocking Resources</h3>
+                                    <p class="text-sm mt-1">3 blocking resources (2 CSS, 1 JS)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 3.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Font Loading Performance</h3>
+                                    <p class="text-sm mt-1">0 fonts loaded, Spline Sans: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 3.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Layout Stability (CLS)</h3>
+                                    <p class="text-sm mt-1">CLS: 0.0000</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 3.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Critical Resource Timing</h3>
+                                    <p class="text-sm mt-1">Tailwind resource timing not found</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Overall Load Performance</h3>
+                                    <p class="text-sm mt-1">Page loaded in 976ms</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 3.1-3.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </section>
+        
+            
+            <section class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Accessibility Tests</h2>
+                <div class="mb-4">
+                    <div class="text-sm text-gray-600">
+                        12/20 tests passed
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Focus Indicators</h3>
+                                    <p class="text-sm mt-1">Focus outline: true, Brand color: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 5.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">WCAG AA Color Contrast</h3>
+                                    <p class="text-sm mt-1">Primary/white contrast: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 5.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Interactive Elements Size</h3>
+                                    <p class="text-sm mt-1">Button size: 59.400001525878906x44px (min: 44px)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 5.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Custom Color Accessibility</h3>
+                                    <p class="text-sm mt-1">0/3 color applications working</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">ARIA and Semantic Markup</h3>
+                                    <p class="text-sm mt-1">Skip link: true, Live regions: 1, Headings: 18</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_tailwind_integration_suite.html | Requirement: 5.1-5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Focus Indicators</h3>
+                                    <p class="text-sm mt-1">Focus outline: true, Brand color: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 5.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">WCAG AA Color Contrast</h3>
+                                    <p class="text-sm mt-1">Primary/white contrast: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 5.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Interactive Elements Size</h3>
+                                    <p class="text-sm mt-1">Button size: 59.400001525878906x44px (min: 44px)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 5.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Custom Color Accessibility</h3>
+                                    <p class="text-sm mt-1">0/3 color applications working</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">ARIA and Semantic Markup</h3>
+                                    <p class="text-sm mt-1">Skip link: true, Live regions: 1, Headings: 12</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_accessibility_compliance_tailwind.html | Requirement: 5.1-5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Focus Indicators</h3>
+                                    <p class="text-sm mt-1">Focus outline: true, Brand color: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 5.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">WCAG AA Color Contrast</h3>
+                                    <p class="text-sm mt-1">Primary/white contrast: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 5.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Interactive Elements Size</h3>
+                                    <p class="text-sm mt-1">Button size: 39.650001525878906x21.200000762939453px (min: 44px)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 5.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Custom Color Accessibility</h3>
+                                    <p class="text-sm mt-1">0/3 color applications working</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">ARIA and Semantic Markup</h3>
+                                    <p class="text-sm mt-1">Skip link: false, Live regions: 0, Headings: 6</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_cross_browser_compatibility.html | Requirement: 5.1-5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Focus Indicators</h3>
+                                    <p class="text-sm mt-1">Focus outline: true, Brand color: false</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 5.1</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">WCAG AA Color Contrast</h3>
+                                    <p class="text-sm mt-1">Primary/white contrast: true</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 5.2</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-failed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Interactive Elements Size</h3>
+                                    <p class="text-sm mt-1">Button size: 59.650001525878906x35.20000076293945px (min: 44px)</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 5.3</p>
+                                </div>
+                                <div class="text-lg">
+                                    ❌
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">Custom Color Accessibility</h3>
+                                    <p class="text-sm mt-1">3/3 color applications working</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="border-l-4 p-4 test-passed">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-medium">ARIA and Semantic Markup</h3>
+                                    <p class="text-sm mt-1">Skip link: false, Live regions: 0, Headings: 11</p>
+                                    <p class="text-xs mt-1 opacity-75">Page: test_graceful_fallbacks_demo.html | Requirement: 5.1-5.4</p>
+                                </div>
+                                <div class="text-lg">
+                                    ✅
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </section>
+        
+        </main>
+        
+        <footer class="mt-12 pt-8 border-t border-gray-200">
+            <p class="text-center text-gray-600">
+                Integration testing completed for Tailwind CSS Fix (Task 10)
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

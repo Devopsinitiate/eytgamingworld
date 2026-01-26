@@ -1,0 +1,603 @@
+/**
+ * Status Indicators with Non-Color Cues
+ * Requirements: 15.3 - Non-color indicators for accessibility
+ * 
+ * This stylesheet provides status indicators that use both color AND
+ * non-color cues (icons, text, patterns) to convey information.
+ * This ensures accessibility for users with color vision deficiencies.
+ */
+
+/* ============================================
+   STATUS BADGES WITH ICONS
+   ============================================ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+}
+
+/* Success Status - Green with Checkmark */
+.status-success {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.status-success::before {
+    content: "✓";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Error Status - Red with X */
+.status-error {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+.status-error::before {
+    content: "✗";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Warning Status - Yellow with Exclamation */
+.status-warning {
+    background-color: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+    border: 1px solid #eab308;
+}
+
+.status-warning::before {
+    content: "⚠";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Info Status - Blue with Info Icon */
+.status-info {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+}
+
+.status-info::before {
+    content: "ℹ";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Pending Status - Gray with Clock */
+.status-pending {
+    background-color: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+    border: 1px solid #9ca3af;
+}
+
+.status-pending::before {
+    content: "⏱";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Active Status - Green with Dot */
+.status-active {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.status-active::before {
+    content: "●";
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+/* Inactive Status - Gray with Dot */
+.status-inactive {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+    border: 1px solid #6b7280;
+}
+
+.status-inactive::before {
+    content: "○";
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   ALERT BOXES WITH ICONS
+   ============================================ */
+
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid;
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.alert-message {
+    font-size: 0.875rem;
+}
+
+/* Success Alert */
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-left-color: #10b981;
+    color: #10b981;
+}
+
+.alert-success .alert-icon::before {
+    content: "✓";
+}
+
+/* Error Alert */
+.alert-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+    color: #ef4444;
+}
+
+.alert-error .alert-icon::before {
+    content: "✗";
+}
+
+/* Warning Alert */
+.alert-warning {
+    background-color: rgba(234, 179, 8, 0.1);
+    border-left-color: #eab308;
+    color: #eab308;
+}
+
+.alert-warning .alert-icon::before {
+    content: "⚠";
+}
+
+/* Info Alert */
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.alert-info .alert-icon::before {
+    content: "ℹ";
+}
+
+/* ============================================
+   PROGRESS INDICATORS WITH PATTERNS
+   ============================================ */
+
+.progress-bar {
+    width: 100%;
+    height: 1rem;
+    background-color: rgba(107, 114, 128, 0.2);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+/* Success Progress - Solid Green */
+.progress-success .progress-fill {
+    background-color: #10b981;
+}
+
+/* Warning Progress - Striped Yellow */
+.progress-warning .progress-fill {
+    background: repeating-linear-gradient(
+        45deg,
+        #eab308,
+        #eab308 10px,
+        #f59e0b 10px,
+        #f59e0b 20px
+    );
+}
+
+/* Error Progress - Dotted Red */
+.progress-error .progress-fill {
+    background: repeating-linear-gradient(
+        90deg,
+        #ef4444,
+        #ef4444 5px,
+        #dc2626 5px,
+        #dc2626 10px
+    );
+}
+
+/* ============================================
+   FORM VALIDATION WITH ICONS
+   ============================================ */
+
+.form-field {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 3rem;
+    border: 1px solid #282e39;
+    border-radius: 0.375rem;
+    background-color: #151c2c;
+    color: #ffffff;
+}
+
+.form-input:focus {
+    outline: 2px solid #b91c1c;
+    outline-offset: 2px;
+}
+
+/* Valid Input - Green with Checkmark */
+.form-input.is-valid {
+    border-color: #10b981;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+}
+
+/* Invalid Input - Red with X */
+.form-input.is-invalid {
+    border-color: #ef4444;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+}
+
+.form-feedback {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.form-feedback-valid {
+    color: #10b981;
+}
+
+.form-feedback-valid::before {
+    content: "✓";
+    font-weight: bold;
+}
+
+.form-feedback-invalid {
+    color: #ef4444;
+}
+
+.form-feedback-invalid::before {
+    content: "✗";
+    font-weight: bold;
+}
+
+/* ============================================
+   BUTTON STATES WITH ICONS
+   ============================================ */
+
+.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+/* Success Button */
+.btn-success {
+    background-color: #10b981;
+    color: #ffffff;
+    border: 1px solid #10b981;
+}
+
+.btn-success::before {
+    content: "✓";
+    font-weight: bold;
+}
+
+.btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+}
+
+/* Error Button */
+.btn-error {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: 1px solid #ef4444;
+}
+
+.btn-error::before {
+    content: "✗";
+    font-weight: bold;
+}
+
+.btn-error:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* Warning Button */
+.btn-warning {
+    background-color: #eab308;
+    color: #121212;
+    border: 1px solid #eab308;
+}
+
+.btn-warning::before {
+    content: "⚠";
+    font-weight: bold;
+}
+
+.btn-warning:hover {
+    background-color: #ca8a04;
+    border-color: #ca8a04;
+}
+
+/* ============================================
+   NOTIFICATION BADGES WITH SHAPES
+   ============================================ */
+
+.notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.375rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Unread Badge - Red Circle */
+.notification-unread {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+/* Read Badge - Gray Circle */
+.notification-read {
+    background-color: #6b7280;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+/* Important Badge - Red Square */
+.notification-important {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-radius: 0.25rem;
+    border: 2px solid #ffffff;
+}
+
+/* ============================================
+   TOURNAMENT PLACEMENT INDICATORS
+   ============================================ */
+
+.placement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* 1st Place - Gold with Trophy */
+.placement-1st {
+    background-color: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+    border: 2px solid #eab308;
+}
+
+.placement-1st::before {
+    content: "🏆";
+    font-size: 1rem;
+}
+
+/* 2nd Place - Silver with Medal */
+.placement-2nd {
+    background-color: rgba(156, 163, 175, 0.2);
+    color: #9ca3af;
+    border: 2px solid #9ca3af;
+}
+
+.placement-2nd::before {
+    content: "🥈";
+    font-size: 1rem;
+}
+
+/* 3rd Place - Bronze with Medal */
+.placement-3rd {
+    background-color: rgba(217, 119, 6, 0.2);
+    color: #d97706;
+    border: 2px solid #d97706;
+}
+
+.placement-3rd::before {
+    content: "🥉";
+    font-size: 1rem;
+}
+
+/* Other Placements - Gray with Number */
+.placement-other {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+    border: 1px solid #6b7280;
+}
+
+/* ============================================
+   TEAM STATUS INDICATORS
+   ============================================ */
+
+.team-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Recruiting - Green with Plus */
+.team-recruiting {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.team-recruiting::before {
+    content: "+";
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* Full - Red with Minus */
+.team-full {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+.team-full::before {
+    content: "−";
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* Private - Gray with Lock */
+.team-private {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+    border: 1px solid #6b7280;
+}
+
+.team-private::before {
+    content: "🔒";
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   PAYMENT STATUS INDICATORS
+   ============================================ */
+
+.payment-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Paid - Green with Checkmark */
+.payment-paid {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid #10b981;
+}
+
+.payment-paid::before {
+    content: "✓";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Pending - Yellow with Clock */
+.payment-pending {
+    background-color: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+    border: 1px solid #eab308;
+}
+
+.payment-pending::before {
+    content: "⏱";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Failed - Red with X */
+.payment-failed {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+}
+
+.payment-failed::before {
+    content: "✗";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Refunded - Gray with Arrow */
+.payment-refunded {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+    border: 1px solid #6b7280;
+}
+
+.payment-refunded::before {
+    content: "↩";
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* ============================================
+   ACCESSIBILITY NOTES
+   ============================================ */
+
+/**
+ * All status indicators in this stylesheet follow these accessibility principles:
+ * 
+ * 1. Color + Icon: Every status uses both color AND an icon/symbol
+ * 2. Color + Border: Status badges have colored borders in addition to background
+ * 3. Color + Pattern: Progress bars use patterns (stripes, dots) in addition to color
+ * 4. Color + Shape: Different shapes (circle, square, rounded) convey different meanings
+ * 5. Color + Text: All badges include text labels in addition to visual indicators
+ * 
+ * This ensures that information is conveyed through multiple channels:
+ * - Visual (color)
+ * - Symbolic (icons, shapes)
+ * - Textual (labels)
+ * - Structural (borders, patterns)
+ * 
+ * Users with color vision deficiencies can rely on non-color cues to understand status.
+ */

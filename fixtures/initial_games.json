@@ -1,0 +1,161 @@
+[
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Street Fighter 6",
+      "slug": "street-fighter-6",
+      "description": "The latest installment in the legendary fighting game series",
+      "genre": "fighting",
+      "developer": "Capcom",
+      "supports_teams": false,
+      "min_team_size": 1,
+      "max_team_size": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Tekken 8",
+      "slug": "tekken-8",
+      "description": "High-octane 3D fighting game",
+      "genre": "fighting",
+      "developer": "Bandai Namco",
+      "supports_teams": false,
+      "min_team_size": 1,
+      "max_team_size": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Mortal Kombat 1",
+      "slug": "mortal-kombat-1",
+      "description": "Brutal fighting game with fatalities",
+      "genre": "fighting",
+      "developer": "NetherRealm Studios",
+      "supports_teams": false,
+      "min_team_size": 1,
+      "max_team_size": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "League of Legends",
+      "slug": "league-of-legends",
+      "description": "Multiplayer online battle arena",
+      "genre": "moba",
+      "developer": "Riot Games",
+      "supports_teams": true,
+      "min_team_size": 5,
+      "max_team_size": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Valorant",
+      "slug": "valorant",
+      "description": "Tactical 5v5 character-based shooter",
+      "genre": "fps",
+      "developer": "Riot Games",
+      "supports_teams": true,
+      "min_team_size": 5,
+      "max_team_size": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Counter-Strike 2",
+      "slug": "counter-strike-2",
+      "description": "Competitive tactical FPS",
+      "genre": "fps",
+      "developer": "Valve",
+      "supports_teams": true,
+      "min_team_size": 5,
+      "max_team_size": 5,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Rocket League",
+      "slug": "rocket-league",
+      "description": "Vehicular soccer with rocket-powered cars",
+      "genre": "sports",
+      "developer": "Psyonix",
+      "supports_teams": true,
+      "min_team_size": 1,
+      "max_team_size": 3,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Super Smash Bros. Ultimate",
+      "slug": "super-smash-bros-ultimate",
+      "description": "Platform fighting game featuring Nintendo characters",
+      "genre": "fighting",
+      "developer": "Nintendo",
+      "supports_teams": false,
+      "min_team_size": 1,
+      "max_team_size": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "Fortnite",
+      "slug": "fortnite",
+      "description": "Battle royale with building mechanics",
+      "genre": "battle_royale",
+      "developer": "Epic Games",
+      "supports_teams": true,
+      "min_team_size": 1,
+      "max_team_size": 4,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.game",
+    "fields": {
+      "name": "EA Sports FC 24",
+      "slug": "ea-sports-fc-24",
+      "description": "Realistic soccer simulation",
+      "genre": "sports",
+      "developer": "EA Sports",
+      "supports_teams": false,
+      "min_team_size": 1,
+      "max_team_size": 1,
+      "is_active": true
+    }
+  },
+  {
+    "model": "core.sitesettings",
+    "pk": 1,
+    "fields": {
+      "site_name": "EYTGaming",
+      "site_tagline": "Compete. Learn. Dominate.",
+      "contact_email": "contact@eytgaming.com",
+      "support_email": "support@eytgaming.com",
+      "discord_server": "",
+      "twitter_url": "",
+      "twitch_url": "",
+      "youtube_url": "",
+      "registrations_open": true,
+      "tournaments_enabled": true,
+      "coaching_enabled": true,
+      "maintenance_mode": false,
+      "maintenance_message": ""
+    }
+  }
+]

@@ -1,0 +1,156 @@
+{% load static %}
+
+<!-- Analytics Dashboard Template -->
+<div class="analytics-dashboard-container">
+    <!-- Dashboard Toggle Button (for organizers) -->
+    {% if user == tournament.organizer or user.is_staff %}
+    <div class="dashboard-toggle">
+        <button id="toggle-analytics" class="btn btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#analytics-dashboard" aria-expanded="false">
+            <i class="material-symbols-outlined">analytics</i>
+            Analytics Dashboard
+        </button>
+    </div>
+    
+    <!-- Collapsible Analytics Dashboard -->
+    <div class="collapse mt-3" id="analytics-dashboard" data-tournament-slug="{{ tournament.slug }}">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="material-symbols-outlined me-2">bar_chart</i>
+                    Tournament Analytics
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <!-- Dashboard content will be loaded here by JavaScript -->
+                <div id="analytics-dashboard-content">
+                    <div class="text-center p-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading analytics...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading analytics data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Analytics Dashboard Styles -->
+<link rel="stylesheet" href="{% static 'css/analytics-dashboard.css' %}">
+
+<!-- Chart.js for dashboard charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Analytics Dashboard JavaScript -->
+<script src="{% static 'js/modules/analytics-dashboard.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dashboardToggle = document.getElementById('toggle-analytics');
+    const dashboardContainer = document.getElementById('analytics-dashboard');
+    let dashboardInstance = null;
+    
+    if (dashboardToggle && dashboardContainer) {
+        // Initialize dashboard when first opened
+        dashboardContainer.addEventListener('shown.bs.collapse', function() {
+            if (!dashboardInstance) {
+                // Replace the loading content with the actual dashboard
+                const content = document.getElementById('analytics-dashboard-content');
+                content.innerHTML = '<div id="analytics-dashboard-main"></div>';
+                
+                // Initialize the dashboard
+                dashboardInstance = new AnalyticsDashboard('analytics-dashboard-main', {
+                    tournamentSlug: '{{ tournament.slug }}',
+                    refreshInterval: 60000 // 1 minute for tournament-specific data
+                });
+            }
+        });
+        
+        // Clean up when collapsed
+        dashboardContainer.addEventListener('hidden.bs.collapse', function() {
+            if (dashboardInstance) {
+                dashboardInstance.destroy();
+                dashboardInstance = null;
+                
+                // Reset to loading state
+                const content = document.getElementById('analytics-dashboard-content');
+                content.innerHTML = `
+                    <div class="text-center p-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading analytics...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading analytics data...</p>
+                    </div>
+                `;
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.analytics-dashboard-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.dashboard-toggle {
+    text-align: center;
+}
+
+.dashboard-toggle .btn {
+    padding: 12px 24px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.dashboard-toggle .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-toggle .material-symbols-outlined {
+    font-size: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+#analytics-dashboard .card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#analytics-dashboard .card-header {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-bottom: none;
+}
+
+#analytics-dashboard .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+#analytics-dashboard .card-header .material-symbols-outlined {
+    font-size: 20px;
+    vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .analytics-dashboard-container {
+        margin-top: 20px;
+        padding: 15px;
+    }
+    
+    .dashboard-toggle .btn {
+        width: 100%;
+        padding: 15px;
+    }
+}
+</style>

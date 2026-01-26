@@ -1,0 +1,521 @@
+{
+  "loadingSequence": [
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Tailwind Availability",
+      "passed": true,
+      "message": "Tailwind CSS is available",
+      "requirement": "1.1, 1.2"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Configuration Application",
+      "passed": false,
+      "message": "Brand configuration not applied",
+      "requirement": "1.3, 1.4"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Script Loading Order",
+      "passed": true,
+      "message": "Tailwind scripts: 5, Defer: true",
+      "requirement": "1.1, 1.4"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Loading Performance",
+      "passed": true,
+      "message": "Page loaded in 2909ms",
+      "requirement": "1.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Tailwind Availability",
+      "passed": true,
+      "message": "Tailwind CSS is available",
+      "requirement": "1.1, 1.2"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Configuration Application",
+      "passed": false,
+      "message": "Brand configuration not applied",
+      "requirement": "1.3, 1.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Script Loading Order",
+      "passed": true,
+      "message": "Tailwind scripts: 2, Defer: true",
+      "requirement": "1.1, 1.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Loading Performance",
+      "passed": true,
+      "message": "Page loaded in 1874ms",
+      "requirement": "1.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Tailwind Availability",
+      "passed": false,
+      "message": "Tailwind CSS not available",
+      "requirement": "1.1, 1.2"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Configuration Application",
+      "passed": false,
+      "message": "Brand configuration not applied",
+      "requirement": "1.3, 1.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Script Loading Order",
+      "passed": false,
+      "message": "Tailwind scripts: 0, Defer: false",
+      "requirement": "1.1, 1.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Loading Performance",
+      "passed": true,
+      "message": "Page loaded in 1123ms",
+      "requirement": "1.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Tailwind Availability",
+      "passed": false,
+      "message": "Tailwind CSS not available",
+      "requirement": "1.1, 1.2"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Configuration Application",
+      "passed": true,
+      "message": "Brand configuration applied",
+      "requirement": "1.3, 1.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Script Loading Order",
+      "passed": true,
+      "message": "Tailwind scripts: 1, Defer: true",
+      "requirement": "1.1, 1.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Loading Performance",
+      "passed": true,
+      "message": "Page loaded in 1173ms",
+      "requirement": "1.4"
+    }
+  ],
+  "brandConsistency": [
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Primary Color Consistency",
+      "passed": false,
+      "message": "Brand red applied: bg=false, text=false",
+      "requirement": "2.1"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Dark Mode Colors",
+      "passed": true,
+      "message": "Dark mode colors: bg=false, text=true",
+      "requirement": "2.2"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Font Family Consistency",
+      "passed": false,
+      "message": "Spline Sans applied: false (ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\")",
+      "requirement": "2.3"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Material Icons Styling",
+      "passed": true,
+      "message": "Icons styled: size=true, variation=false",
+      "requirement": "2.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Primary Color Consistency",
+      "passed": false,
+      "message": "Brand red applied: bg=false, text=false",
+      "requirement": "2.1"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Dark Mode Colors",
+      "passed": true,
+      "message": "Dark mode colors: bg=false, text=true",
+      "requirement": "2.2"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Font Family Consistency",
+      "passed": false,
+      "message": "Spline Sans applied: false (ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\")",
+      "requirement": "2.3"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Material Icons Styling",
+      "passed": false,
+      "message": "Icons styled: size=false, variation=false",
+      "requirement": "2.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Primary Color Consistency",
+      "passed": false,
+      "message": "Brand red applied: bg=false, text=false",
+      "requirement": "2.1"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Dark Mode Colors",
+      "passed": true,
+      "message": "Dark mode colors: bg=false, text=true",
+      "requirement": "2.2"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Font Family Consistency",
+      "passed": false,
+      "message": "Spline Sans applied: false (Arial, sans-serif)",
+      "requirement": "2.3"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Material Icons Styling",
+      "passed": false,
+      "message": "Icons styled: size=false, variation=false",
+      "requirement": "2.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Primary Color Consistency",
+      "passed": true,
+      "message": "Brand red applied: bg=true, text=true",
+      "requirement": "2.1"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Dark Mode Colors",
+      "passed": true,
+      "message": "Dark mode colors: bg=false, text=true",
+      "requirement": "2.2"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Font Family Consistency",
+      "passed": true,
+      "message": "Spline Sans applied: true (\"Spline Sans\", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, \"Noto Sans\", sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\")",
+      "requirement": "2.3"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Material Icons Styling",
+      "passed": false,
+      "message": "Icons styled: size=false, variation=false",
+      "requirement": "2.4"
+    }
+  ],
+  "performance": [
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Render-Blocking Resources",
+      "passed": false,
+      "message": "5 blocking resources (4 CSS, 1 JS)",
+      "requirement": "3.1"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Font Loading Performance",
+      "passed": true,
+      "message": "11 fonts loaded, Spline Sans: true",
+      "requirement": "3.2"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Layout Stability (CLS)",
+      "passed": false,
+      "message": "CLS: 0.3138",
+      "requirement": "3.3"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Critical Resource Timing",
+      "passed": true,
+      "message": "Tailwind loaded in 432ms (0 bytes)",
+      "requirement": "3.4"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Overall Load Performance",
+      "passed": true,
+      "message": "Page loaded in 1689ms",
+      "requirement": "3.1-3.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Render-Blocking Resources",
+      "passed": true,
+      "message": "2 blocking resources (1 CSS, 1 JS)",
+      "requirement": "3.1"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Font Loading Performance",
+      "passed": false,
+      "message": "0 fonts loaded, Spline Sans: false",
+      "requirement": "3.2"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Layout Stability (CLS)",
+      "passed": true,
+      "message": "CLS: 0.0751",
+      "requirement": "3.3"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Critical Resource Timing",
+      "passed": true,
+      "message": "Tailwind loaded in 441ms (0 bytes)",
+      "requirement": "3.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Overall Load Performance",
+      "passed": true,
+      "message": "Page loaded in 2776ms",
+      "requirement": "3.1-3.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Render-Blocking Resources",
+      "passed": true,
+      "message": "0 blocking resources (0 CSS, 0 JS)",
+      "requirement": "3.1"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Font Loading Performance",
+      "passed": false,
+      "message": "0 fonts loaded, Spline Sans: false",
+      "requirement": "3.2"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Layout Stability (CLS)",
+      "passed": true,
+      "message": "CLS: 0.0000",
+      "requirement": "3.3"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Critical Resource Timing",
+      "passed": false,
+      "message": "Tailwind resource timing not found",
+      "requirement": "3.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Overall Load Performance",
+      "passed": true,
+      "message": "Page loaded in 1026ms",
+      "requirement": "3.1-3.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Render-Blocking Resources",
+      "passed": true,
+      "message": "3 blocking resources (2 CSS, 1 JS)",
+      "requirement": "3.1"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Font Loading Performance",
+      "passed": false,
+      "message": "0 fonts loaded, Spline Sans: false",
+      "requirement": "3.2"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Layout Stability (CLS)",
+      "passed": true,
+      "message": "CLS: 0.0000",
+      "requirement": "3.3"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Critical Resource Timing",
+      "passed": false,
+      "message": "Tailwind resource timing not found",
+      "requirement": "3.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Overall Load Performance",
+      "passed": true,
+      "message": "Page loaded in 976ms",
+      "requirement": "3.1-3.4"
+    }
+  ],
+  "accessibility": [
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Focus Indicators",
+      "passed": true,
+      "message": "Focus outline: true, Brand color: false",
+      "requirement": "5.1"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "WCAG AA Color Contrast",
+      "passed": false,
+      "message": "Primary/white contrast: false",
+      "requirement": "5.2"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Interactive Elements Size",
+      "passed": true,
+      "message": "Button size: 59.400001525878906x44px (min: 44px)",
+      "requirement": "5.3"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "Custom Color Accessibility",
+      "passed": false,
+      "message": "0/3 color applications working",
+      "requirement": "5.4"
+    },
+    {
+      "page": "test_tailwind_integration_suite.html",
+      "test": "ARIA and Semantic Markup",
+      "passed": true,
+      "message": "Skip link: true, Live regions: 1, Headings: 18",
+      "requirement": "5.1-5.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Focus Indicators",
+      "passed": true,
+      "message": "Focus outline: true, Brand color: false",
+      "requirement": "5.1"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "WCAG AA Color Contrast",
+      "passed": false,
+      "message": "Primary/white contrast: false",
+      "requirement": "5.2"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Interactive Elements Size",
+      "passed": true,
+      "message": "Button size: 59.400001525878906x44px (min: 44px)",
+      "requirement": "5.3"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "Custom Color Accessibility",
+      "passed": false,
+      "message": "0/3 color applications working",
+      "requirement": "5.4"
+    },
+    {
+      "page": "test_accessibility_compliance_tailwind.html",
+      "test": "ARIA and Semantic Markup",
+      "passed": true,
+      "message": "Skip link: true, Live regions: 1, Headings: 12",
+      "requirement": "5.1-5.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Focus Indicators",
+      "passed": true,
+      "message": "Focus outline: true, Brand color: false",
+      "requirement": "5.1"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "WCAG AA Color Contrast",
+      "passed": false,
+      "message": "Primary/white contrast: false",
+      "requirement": "5.2"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Interactive Elements Size",
+      "passed": false,
+      "message": "Button size: 39.650001525878906x21.200000762939453px (min: 44px)",
+      "requirement": "5.3"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "Custom Color Accessibility",
+      "passed": false,
+      "message": "0/3 color applications working",
+      "requirement": "5.4"
+    },
+    {
+      "page": "test_cross_browser_compatibility.html",
+      "test": "ARIA and Semantic Markup",
+      "passed": true,
+      "message": "Skip link: false, Live regions: 0, Headings: 6",
+      "requirement": "5.1-5.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Focus Indicators",
+      "passed": true,
+      "message": "Focus outline: true, Brand color: false",
+      "requirement": "5.1"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "WCAG AA Color Contrast",
+      "passed": true,
+      "message": "Primary/white contrast: true",
+      "requirement": "5.2"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Interactive Elements Size",
+      "passed": false,
+      "message": "Button size: 59.650001525878906x35.20000076293945px (min: 44px)",
+      "requirement": "5.3"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "Custom Color Accessibility",
+      "passed": true,
+      "message": "3/3 color applications working",
+      "requirement": "5.4"
+    },
+    {
+      "page": "test_graceful_fallbacks_demo.html",
+      "test": "ARIA and Semantic Markup",
+      "passed": true,
+      "message": "Skip link: false, Live regions: 0, Headings: 11",
+      "requirement": "5.1-5.4"
+    }
+  ],
+  "summary": {
+    "totalTests": 72,
+    "passedTests": 42,
+    "failedTests": 30,
+    "passRate": 58,
+    "timestamp": "2026-01-01T23:14:36.129Z"
+  }
+}

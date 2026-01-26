@@ -1,0 +1,336 @@
+/* EYTGaming Brand Consistency Fix */
+/* This file ensures consistent brand colors across all pages */
+
+:root {
+    /* Official EYTGaming Brand Colors */
+    --eyt-primary: #b91c1c;           /* Main brand red */
+    --eyt-primary-dark: #991b1b;      /* Darker variant */
+    --eyt-primary-light: #dc2626;     /* Lighter variant */
+    --eyt-primary-hover: #7f1d1d;     /* Hover state */
+    
+    /* Alpha variants for transparency effects */
+    --eyt-primary-alpha-5: rgba(185, 28, 28, 0.05);
+    --eyt-primary-alpha-10: rgba(185, 28, 28, 0.1);
+    --eyt-primary-alpha-20: rgba(185, 28, 28, 0.2);
+    --eyt-primary-alpha-30: rgba(185, 28, 28, 0.3);
+    --eyt-primary-alpha-40: rgba(185, 28, 28, 0.4);
+    --eyt-primary-alpha-50: rgba(185, 28, 28, 0.5);
+    --eyt-primary-alpha-80: rgba(185, 28, 28, 0.8);
+    --eyt-primary-alpha-90: rgba(185, 28, 28, 0.9);
+    
+    /* Override any conflicting color definitions */
+    --primary-color: var(--eyt-primary);
+    --primary: var(--eyt-primary);
+    --brand-color: var(--eyt-primary);
+    --accent-color: var(--eyt-primary);
+}
+
+/* Force override any existing primary color definitions */
+* {
+    --tw-ring-color: var(--eyt-primary) !important;
+}
+
+/* Text Colors */
+.text-primary,
+.text-brand,
+.text-accent {
+    color: var(--eyt-primary) !important;
+}
+
+.text-primary\/80 {
+    color: var(--eyt-primary-alpha-80) !important;
+}
+
+.text-primary\/90 {
+    color: var(--eyt-primary-alpha-90) !important;
+}
+
+/* Background Colors */
+.bg-primary,
+.bg-brand,
+.bg-accent {
+    background-color: var(--eyt-primary) !important;
+}
+
+.bg-primary\/5 {
+    background-color: var(--eyt-primary-alpha-5) !important;
+}
+
+.bg-primary\/10 {
+    background-color: var(--eyt-primary-alpha-10) !important;
+}
+
+.bg-primary\/20 {
+    background-color: var(--eyt-primary-alpha-20) !important;
+}
+
+.bg-primary\/30 {
+    background-color: var(--eyt-primary-alpha-30) !important;
+}
+
+.bg-primary\/40 {
+    background-color: var(--eyt-primary-alpha-40) !important;
+}
+
+.bg-primary\/50 {
+    background-color: var(--eyt-primary-alpha-50) !important;
+}
+
+.bg-primary\/80 {
+    background-color: var(--eyt-primary-alpha-80) !important;
+}
+
+.bg-primary\/90 {
+    background-color: var(--eyt-primary-alpha-90) !important;
+}
+
+/* Border Colors */
+.border-primary,
+.border-brand,
+.border-accent {
+    border-color: var(--eyt-primary) !important;
+}
+
+.border-primary\/20 {
+    border-color: var(--eyt-primary-alpha-20) !important;
+}
+
+.border-primary\/30 {
+    border-color: var(--eyt-primary-alpha-30) !important;
+}
+
+.border-primary\/40 {
+    border-color: var(--eyt-primary-alpha-40) !important;
+}
+
+.border-primary\/50 {
+    border-color: var(--eyt-primary-alpha-50) !important;
+}
+
+/* Hover States */
+.hover\:bg-primary:hover,
+.hover\:bg-brand:hover {
+    background-color: var(--eyt-primary) !important;
+}
+
+.hover\:bg-primary\/80:hover {
+    background-color: var(--eyt-primary-alpha-80) !important;
+}
+
+.hover\:bg-primary\/90:hover {
+    background-color: var(--eyt-primary-alpha-90) !important;
+}
+
+.hover\:text-primary:hover,
+.hover\:text-brand:hover {
+    color: var(--eyt-primary) !important;
+}
+
+.hover\:text-primary\/80:hover {
+    color: var(--eyt-primary-alpha-80) !important;
+}
+
+.hover\:border-primary:hover,
+.hover\:border-brand:hover {
+    border-color: var(--eyt-primary) !important;
+}
+
+.hover\:border-primary\/50:hover {
+    border-color: var(--eyt-primary-alpha-50) !important;
+}
+
+/* Focus States */
+.focus\:ring-primary:focus,
+.focus\:ring-brand:focus {
+    --tw-ring-color: var(--eyt-primary) !important;
+}
+
+.focus\:border-primary:focus,
+.focus\:border-brand:focus {
+    border-color: var(--eyt-primary) !important;
+}
+
+.focus\:ring-primary\/50:focus {
+    --tw-ring-color: var(--eyt-primary-alpha-50) !important;
+}
+
+/* Button Styles */
+.btn-primary,
+button[type="submit"],
+.button-primary {
+    background-color: var(--eyt-primary) !important;
+    border-color: var(--eyt-primary) !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover,
+.button-primary:hover {
+    background-color: var(--eyt-primary-hover) !important;
+    border-color: var(--eyt-primary-hover) !important;
+}
+
+.btn-primary:focus,
+button[type="submit"]:focus,
+.button-primary:focus {
+    outline: 2px solid var(--eyt-primary) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 4px var(--eyt-primary-alpha-20) !important;
+}
+
+/* Link Styles */
+a.text-primary,
+a.link-primary,
+.link-brand {
+    color: var(--eyt-primary) !important;
+}
+
+a.text-primary:hover,
+a.link-primary:hover,
+.link-brand:hover {
+    color: var(--eyt-primary-light) !important;
+}
+
+/* Form Elements */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--eyt-primary) !important;
+    --tw-ring-color: var(--eyt-primary-alpha-50) !important;
+}
+
+.form-control:focus {
+    border-color: var(--eyt-primary) !important;
+    box-shadow: 0 0 0 3px var(--eyt-primary-alpha-20) !important;
+}
+
+/* Navigation Elements */
+.nav-link.active,
+.nav-item.active {
+    color: var(--eyt-primary) !important;
+    border-color: var(--eyt-primary) !important;
+}
+
+.nav-link:hover,
+.nav-item:hover {
+    color: var(--eyt-primary) !important;
+}
+
+/* Card Elements */
+.card:hover,
+.dashboard-card:hover {
+    border-color: var(--eyt-primary) !important;
+}
+
+.card:focus-within,
+.dashboard-card:focus-within {
+    border-color: var(--eyt-primary) !important;
+}
+
+/* Progress Indicators */
+.progress-bar,
+.step-indicator.active {
+    background-color: var(--eyt-primary) !important;
+}
+
+/* Loading Spinners */
+.spinner,
+.loading-spinner {
+    border-top-color: var(--eyt-primary) !important;
+}
+
+/* Badges and Tags */
+.badge-primary,
+.tag-primary {
+    background-color: var(--eyt-primary) !important;
+    color: white !important;
+}
+
+/* Tournament and Game Elements */
+.tournament-card-header {
+    background: linear-gradient(135deg, var(--eyt-primary), var(--eyt-primary-dark)) !important;
+}
+
+.game-card:hover,
+.tournament-card:hover {
+    border-color: var(--eyt-primary) !important;
+}
+
+/* Calendar Elements */
+.calendar-day.selected {
+    background-color: var(--eyt-primary) !important;
+    color: white !important;
+}
+
+.time-slot.selected {
+    background-color: var(--eyt-primary) !important;
+    border-color: var(--eyt-primary) !important;
+    color: white !important;
+}
+
+/* Step Indicators */
+.step.active .step-number {
+    background-color: var(--eyt-primary) !important;
+    color: white !important;
+}
+
+/* Accessibility Focus Indicators */
+*:focus-visible {
+    outline: 2px solid var(--eyt-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --eyt-primary: #dc2626 !important;
+        --eyt-primary-dark: #b91c1c !important;
+        --eyt-primary-light: #ef4444 !important;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .hover\:bg-primary:hover,
+    .hover\:text-primary:hover,
+    .hover\:border-primary:hover {
+        transition: none !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .text-primary,
+    .bg-primary {
+        color: #000 !important;
+        background-color: transparent !important;
+        border-color: #000 !important;
+    }
+}
+
+/* Force override for any remaining conflicting styles */
+[class*="primary"],
+[class*="brand"],
+[class*="accent"] {
+    --primary-color: var(--eyt-primary) !important;
+}
+
+/* Specific overrides for common conflicting classes */
+.text-blue-500,
+.text-blue-600,
+.bg-blue-500,
+.bg-blue-600,
+.border-blue-500,
+.border-blue-600 {
+    color: var(--eyt-primary) !important;
+    background-color: var(--eyt-primary) !important;
+    border-color: var(--eyt-primary) !important;
+}
+
+/* Override any hardcoded colors that might conflict */
+[style*="#3b82f6"],
+[style*="#ef4444"] {
+    color: var(--eyt-primary) !important;
+    background-color: var(--eyt-primary) !important;
+    border-color: var(--eyt-primary) !important;
+}

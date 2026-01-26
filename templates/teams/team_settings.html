@@ -1,0 +1,457 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}Team Settings - {{ team.name }} - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 md:mb-8">
+        <div class="flex items-center gap-3 md:gap-4 mb-4">
+            <a href="{% url 'teams:detail' slug=team.slug %}" class="text-gray-400 hover:text-white transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-white text-2xl md:text-3xl font-bold">Team Settings</h1>
+                <p class="text-gray-400 text-sm md:text-base">{{ team.name }} [{{ team.tag }}]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Display form errors -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <div class="flex-1">
+                    <h3 class="text-red-500 font-medium mb-1">Form Errors</h3>
+                    {% for error in form.non_field_errors %}
+                    <p class="text-red-400 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- General Settings Section (Requirement 7.1) -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+            <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">info</span>
+                General Settings
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- Team Name -->
+                <div>
+                    <label for="{{ form.name.id_for_label }}" class="block text-gray-300 font-medium mb-2">
+                        {{ form.name.label }} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.name.help_text }}</p>
+                    {% endif %}
+                    {% if form.name.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Team Tag -->
+                <div>
+                    <label for="{{ form.tag.id_for_label }}" class="block text-gray-300 font-medium mb-2">
+                        {{ form.tag.label }} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.tag }}
+                    {% if form.tag.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.tag.help_text }}</p>
+                    {% endif %}
+                    {% if form.tag.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.tag.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-gray-300 font-medium mb-2">
+                        {{ form.description.label }}
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.description.help_text }}</p>
+                    {% endif %}
+                    {% if form.description.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Images Section (Requirement 7.1) -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+            <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">image</span>
+                Team Images
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Logo Upload -->
+                <div>
+                    <label class="block text-gray-300 font-medium mb-2">
+                        {{ form.logo.label }}
+                    </label>
+                    <div class="relative">
+                        <div id="logo-preview" class="w-full h-48 bg-background-dark border-2 border-dashed border-card-border-dark rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden">
+                            {% if team.logo %}
+                            <img src="{{ team.logo.url }}" alt="{{ team.name }} logo" class="w-full h-full object-contain">
+                            {% else %}
+                            <div class="text-center">
+                                <span class="material-symbols-outlined text-gray-500 text-5xl mb-2">upload</span>
+                                <p class="text-gray-400 text-sm">Click to upload logo</p>
+                                <p class="text-gray-500 text-xs mt-1">Square image recommended</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {{ form.logo }}
+                    </div>
+                    {% if form.logo.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.logo.help_text }}</p>
+                    {% endif %}
+                    {% if form.logo.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.logo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Banner Upload -->
+                <div>
+                    <label class="block text-gray-300 font-medium mb-2">
+                        {{ form.banner.label }}
+                    </label>
+                    <div class="relative">
+                        <div id="banner-preview" class="w-full h-48 bg-background-dark border-2 border-dashed border-card-border-dark rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors overflow-hidden">
+                            {% if team.banner %}
+                            <img src="{{ team.banner.url }}" alt="{{ team.name }} banner" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="text-center">
+                                <span class="material-symbols-outlined text-gray-500 text-5xl mb-2">upload</span>
+                                <p class="text-gray-400 text-sm">Click to upload banner</p>
+                                <p class="text-gray-500 text-xs mt-1">Wide image recommended</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {{ form.banner }}
+                    </div>
+                    {% if form.banner.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.banner.help_text }}</p>
+                    {% endif %}
+                    {% if form.banner.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.banner.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Roster Settings Section (Requirement 7.1) -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+            <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">group</span>
+                Roster Settings
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- Max Members -->
+                <div>
+                    <label for="{{ form.max_members.id_for_label }}" class="block text-gray-300 font-medium mb-2">
+                        {{ form.max_members.label }}
+                    </label>
+                    {{ form.max_members }}
+                    {% if form.max_members.help_text %}
+                    <p class="text-gray-500 text-sm mt-1">{{ form.max_members.help_text }}</p>
+                    {% endif %}
+                    {% if form.max_members.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.max_members.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Toggles -->
+                <div class="space-y-3">
+                    <!-- Requires Approval -->
+                    <div class="flex items-start gap-3">
+                        {{ form.requires_approval }}
+                        <div class="flex-1">
+                            <label for="{{ form.requires_approval.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
+                                {{ form.requires_approval.label }}
+                            </label>
+                            <p class="text-gray-500 text-sm">Applications must be approved by captain or co-captain</p>
+                        </div>
+                    </div>
+
+                    <!-- Is Recruiting -->
+                    <div class="flex items-start gap-3">
+                        {{ form.is_recruiting }}
+                        <div class="flex-1">
+                            <label for="{{ form.is_recruiting.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
+                                {{ form.is_recruiting.label }}
+                            </label>
+                            <p class="text-gray-500 text-sm">Show recruiting badge and allow applications</p>
+                        </div>
+                    </div>
+
+                    <!-- Is Public -->
+                    <div class="flex items-start gap-3">
+                        {{ form.is_public }}
+                        <div class="flex-1">
+                            <label for="{{ form.is_public.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
+                                {{ form.is_public.label }}
+                            </label>
+                            <p class="text-gray-500 text-sm">Team will be visible in public listings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links Section (Requirement 7.1) -->
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+            <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">link</span>
+                Social Links
+            </h2>
+            
+            <div class="space-y-4">
+                <!-- Discord -->
+                <div>
+                    <label for="{{ form.discord_server.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">forum</span>
+                        {{ form.discord_server.label }}
+                    </label>
+                    {{ form.discord_server }}
+                    {% if form.discord_server.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.discord_server.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Twitter -->
+                <div>
+                    <label for="{{ form.twitter_url.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">tag</span>
+                        {{ form.twitter_url.label }}
+                    </label>
+                    {{ form.twitter_url }}
+                    {% if form.twitter_url.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.twitter_url.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Twitch -->
+                <div>
+                    <label for="{{ form.twitch_url.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">videocam</span>
+                        {{ form.twitch_url.label }}
+                    </label>
+                    {{ form.twitch_url }}
+                    {% if form.twitch_url.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.twitch_url.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-3 md:gap-4">
+            <a href="{% url 'teams:detail' slug=team.slug %}" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                Cancel
+            </a>
+            <button type="submit" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">save</span>
+                Save Changes
+            </button>
+        </div>
+    </form>
+
+    <!-- Danger Zone Section (Requirement 7.5) -->
+    <div class="mt-8 bg-red-500/10 border border-red-500/50 rounded-lg p-6">
+        <h2 class="text-red-500 text-xl font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined">warning</span>
+            Danger Zone
+        </h2>
+        
+        <div class="space-y-4">
+            <!-- Transfer Captaincy -->
+            <div class="flex flex-col sm:flex-row items-start justify-between gap-3 md:gap-4 pb-4 border-b border-red-500/30">
+                <div class="flex-1">
+                    <h3 class="text-white font-medium mb-1">Transfer Captaincy</h3>
+                    <p class="text-gray-400 text-sm">Transfer team leadership to another member. You will become a regular member.</p>
+                </div>
+                <button type="button" onclick="showTransferModal()" class="w-full sm:w-auto px-4 py-3 min-h-[48px] bg-red-500/20 hover:bg-red-500/30 text-red-500 font-medium rounded-lg transition-colors whitespace-nowrap">
+                    Transfer
+                </button>
+            </div>
+
+            <!-- Disband Team -->
+            <div class="flex flex-col sm:flex-row items-start justify-between gap-3 md:gap-4">
+                <div class="flex-1">
+                    <h3 class="text-white font-medium mb-1">Disband Team</h3>
+                    <p class="text-gray-400 text-sm">Permanently disband this team. All members will be removed and this action cannot be undone.</p>
+                </div>
+                <button type="button" onclick="showDisbandModal()" class="w-full sm:w-auto px-4 py-3 min-h-[48px] bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors whitespace-nowrap">
+                    Disband
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Captaincy Modal -->
+<div id="transferModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-card-dark border border-card-border-dark rounded-lg max-w-md w-full p-6">
+        <h3 class="text-white text-xl font-bold mb-4">Transfer Captaincy</h3>
+        <p class="text-gray-400 mb-4">Select a member to transfer team captaincy to. You will become a regular member.</p>
+        
+        <form method="post" action="{% url 'teams:transfer_captaincy' slug=team.slug %}">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="new_captain" class="block text-gray-300 font-medium mb-2">New Captain</label>
+                <select name="new_captain" id="new_captain" required class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="">Select a member...</option>
+                    {% for member in active_members %}
+                    <option value="{{ member.id }}">{{ member.user.get_display_name }} ({{ member.get_role_display }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" onclick="hideTransferModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                    Transfer Captaincy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Disband Team Modal -->
+<div id="disbandModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-card-dark border border-card-border-dark rounded-lg max-w-md w-full p-6">
+        <h3 class="text-red-500 text-xl font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined">warning</span>
+            Disband Team
+        </h3>
+        <p class="text-gray-400 mb-4">Are you sure you want to disband <strong class="text-white">{{ team.name }}</strong>? This action cannot be undone.</p>
+        <p class="text-gray-400 mb-6">All team members will be removed and the team will be permanently deleted.</p>
+        
+        <form method="post" action="{% url 'teams:disband' slug=team.slug %}">
+            {% csrf_token %}
+            
+            <div class="flex items-center justify-end gap-3">
+                <button type="button" onclick="hideDisbandModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors">
+                    Yes, Disband Team
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Logo upload preview
+    const logoInput = document.getElementById('{{ form.logo.id_for_label }}');
+    const logoPreview = document.getElementById('logo-preview');
+    
+    if (logoInput && logoPreview) {
+        logoPreview.addEventListener('click', function() {
+            logoInput.click();
+        });
+        
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoPreview.innerHTML = `<img src="${e.target.result}" alt="Logo preview" class="w-full h-full object-contain">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Banner upload preview
+    const bannerInput = document.getElementById('{{ form.banner.id_for_label }}');
+    const bannerPreview = document.getElementById('banner-preview');
+    
+    if (bannerInput && bannerPreview) {
+        bannerPreview.addEventListener('click', function() {
+            bannerInput.click();
+        });
+        
+        bannerInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    bannerPreview.innerHTML = `<img src="${e.target.result}" alt="Banner preview" class="w-full h-full object-cover">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Auto-uppercase team tag
+    const tagInput = document.getElementById('{{ form.tag.id_for_label }}');
+    if (tagInput) {
+        tagInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+    }
+});
+
+// Transfer captaincy modal functions
+function showTransferModal() {
+    document.getElementById('transferModal').classList.remove('hidden');
+}
+
+function hideTransferModal() {
+    document.getElementById('transferModal').classList.add('hidden');
+}
+
+// Disband team modal functions
+function showDisbandModal() {
+    document.getElementById('disbandModal').classList.remove('hidden');
+}
+
+function hideDisbandModal() {
+    document.getElementById('disbandModal').classList.add('hidden');
+}
+
+// Close modals on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideTransferModal();
+        hideDisbandModal();
+    }
+});
+
+// Close modals on background click
+document.getElementById('transferModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideTransferModal();
+    }
+});
+
+document.getElementById('disbandModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDisbandModal();
+    }
+});
+</script>
+{% endblock %}

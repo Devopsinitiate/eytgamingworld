@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS Error Handling Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-warn {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .log-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-pass { background: #28a745; }
+        .status-fail { background: #dc3545; }
+        .status-warn { background: #ffc107; }
+        .status-pending { background: #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>Tailwind CSS Error Handling System Test</h1>
+    <p>This page tests the comprehensive error handling system for Tailwind CSS configuration.</p>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- Load our error handler -->
+    <script src="static/js/tailwind-error-handler.js" defer></script>
+    
+    <div class="test-section">
+        <h2>System Status</h2>
+        <div id="system-status">
+            <div><span class="status-indicator status-pending"></span>Tailwind Availability: <span id="tailwind-status">Checking...</span></div>
+            <div><span class="status-indicator status-pending"></span>Error Handler: <span id="handler-status">Loading...</span></div>
+            <div><span class="status-indicator status-pending"></span>Configuration: <span id="config-status">Pending...</span></div>
+            <div><span class="status-indicator status-pending"></span>Fallback System: <span id="fallback-status">Ready</span></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Availability Detection Tests</h2>
+        <button onclick="testAvailabilityDetection()">Test Tailwind Availability Detection</button>
+        <div id="availability-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Configuration Validation Tests</h2>
+        <button onclick="testValidConfiguration()">Test Valid Configuration</button>
+        <button onclick="testInvalidConfiguration()">Test Invalid Configuration</button>
+        <button onclick="testMalformedConfiguration()">Test Malformed Configuration</button>
+        <div id="validation-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Error Handling Tests</h2>
+        <button onclick="testConfigurationRetry()">Test Configuration Retry</button>
+        <button onclick="testFallbackConfiguration()">Test Fallback Configuration</button>
+        <button onclick="testErrorLogging()">Test Error Logging</button>
+        <div id="error-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Utilities Tests</h2>
+        <button onclick="testDebugUtilities()">Test Debug Functions</button>
+        <button onclick="showErrorHistory()">Show Error History</button>
+        <button onclick="clearErrorHistory()">Clear Error History</button>
+        <div id="debug-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output" class="log-output">Console output will appear here...</div>
+        <button onclick="clearConsoleOutput()">Clear Output</button>
+    </div>
+    
+    <script>
+        // Console output capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error,
+            info: console.info,
+            debug: console.debug
+        };
+        
+        function captureConsole(method, ...args) {
+            originalConsole[method](...args);
+            const timestamp = new Date().toLocaleTimeString();
+            const message = `[${timestamp}] ${method.toUpperCase()}: ${args.join(' ')}\n`;
+            consoleOutput.textContent += message;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = (...args) => captureConsole('log', ...args);
+        console.warn = (...args) => captureConsole('warn', ...args);
+        console.error = (...args) => captureConsole('error', ...args);
+        console.info = (...args) => captureConsole('info', ...args);
+        console.debug = (...args) => captureConsole('debug', ...args);
+        
+        function clearConsoleOutput() {
+            consoleOutput.textContent = '';
+        }
+        
+        // Test utilities
+        function showResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const result = document.createElement('div');
+            result.className = `test-result test-${type}`;
+            result.textContent = message;
+            container.appendChild(result);
+        }
+        
+        function updateStatus(elementId, status, type = 'pass') {
+            const element = document.getElementById(elementId);
+            const indicator = element.previousElementSibling;
+            
+            element.textContent = status;
+            indicator.className = `status-indicator status-${type}`;
+        }
+        
+        // Wait for error handler to be available
+        function waitForErrorHandler(callback, timeout = 5000) {
+            const startTime = Date.now();
+            
+            function check() {
+                if (window.TailwindErrorHandler) {
+                    callback();
+                } else if (Date.now() - startTime < timeout) {
+                    setTimeout(check, 100);
+                } else {
+                    console.error('Error handler failed to load within timeout');
+                    updateStatus('handler-status', 'Failed to load', 'fail');
+                }
+            }
+            
+            check();
+        }
+        
+        // System status monitoring
+        function updateSystemStatus() {
+            // Check Tailwind availability
+            if (typeof window.tailwind !== 'undefined') {
+                updateStatus('tailwind-status', 'Available', 'pass');
+            } else {
+                updateStatus('tailwind-status', 'Not Available', 'fail');
+            }
+            
+            // Check error handler
+            if (window.TailwindErrorHandler) {
+                updateStatus('handler-status', 'Loaded', 'pass');
+                
+                // Check configuration status
+                if (window.TailwindErrorHandler.isConfigured()) {
+                    updateStatus('config-status', 'Applied', 'pass');
+                } else {
+                    updateStatus('config-status', 'Not Applied', 'warn');
+                }
+                
+                // Check fallback status
+                if (window.TailwindErrorHandler.isFallbackActive()) {
+                    updateStatus('fallback-status', 'Active', 'warn');
+                } else {
+                    updateStatus('fallback-status', 'Standby', 'pass');
+                }
+            }
+        }
+        
+        // Test functions
+        function testAvailabilityDetection() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const isAvailable = handler.detectAvailability();
+                
+                showResult('availability-results', 
+                    `Tailwind availability: ${isAvailable ? 'DETECTED' : 'NOT DETECTED'}`, 
+                    isAvailable ? 'pass' : 'fail'
+                );
+                
+                console.log('Availability detection test completed:', isAvailable);
+            });
+        }
+        
+        function testValidConfiguration() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const validConfig = {
+                    darkMode: 'class',
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: '#b91c1c',
+                                secondary: {
+                                    500: '#6b7280'
+                                }
+                            },
+                            fontFamily: {
+                                sans: ['Inter', 'sans-serif']
+                            }
+                        }
+                    }
+                };
+                
+                const validation = handler.validateConfiguration(validConfig);
+                
+                showResult('validation-results', 
+                    `Valid config test: ${validation.isValid ? 'PASSED' : 'FAILED'} (${validation.errors.length} errors, ${validation.warnings.length} warnings)`, 
+                    validation.isValid ? 'pass' : 'fail'
+                );
+                
+                console.log('Valid configuration test:', validation);
+            });
+        }
+        
+        function testInvalidConfiguration() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const invalidConfig = {
+                    darkMode: 'invalid-mode',
+                    theme: {
+                        extend: {
+                            colors: 'not-an-object',
+                            fontFamily: {
+                                sans: 'not-an-array'
+                            }
+                        }
+                    }
+                };
+                
+                const validation = handler.validateConfiguration(invalidConfig);
+                
+                showResult('validation-results', 
+                    `Invalid config test: ${!validation.isValid ? 'PASSED' : 'FAILED'} (detected ${validation.errors.length} errors)`, 
+                    !validation.isValid ? 'pass' : 'fail'
+                );
+                
+                console.log('Invalid configuration test:', validation);
+            });
+        }
+        
+        function testMalformedConfiguration() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const malformedConfigs = [null, undefined, 'string', 123, []];
+                
+                malformedConfigs.forEach((config, index) => {
+                    const validation = handler.validateConfiguration(config);
+                    
+                    showResult('validation-results', 
+                        `Malformed config ${index + 1}: ${!validation.isValid ? 'PASSED' : 'FAILED'}`, 
+                        !validation.isValid ? 'pass' : 'fail'
+                    );
+                });
+                
+                console.log('Malformed configuration tests completed');
+            });
+        }
+        
+        function testConfigurationRetry() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                
+                // Test with a valid configuration
+                const testConfig = {
+                    darkMode: 'class',
+                    theme: {
+                        extend: {
+                            colors: {
+                                test: '#ff0000'
+                            }
+                        }
+                    }
+                };
+                
+                const success = handler.applyConfiguration(testConfig);
+                
+                showResult('error-results', 
+                    `Configuration retry test: ${success ? 'PASSED' : 'FAILED'}`, 
+                    success ? 'pass' : 'fail'
+                );
+                
+                console.log('Configuration retry test:', success);
+            });
+        }
+        
+        function testFallbackConfiguration() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const fallbackConfig = handler.createFallbackConfiguration();
+                
+                const validation = handler.validateConfiguration(fallbackConfig);
+                
+                showResult('error-results', 
+                    `Fallback config test: ${validation.isValid ? 'PASSED' : 'FAILED'}`, 
+                    validation.isValid ? 'pass' : 'fail'
+                );
+                
+                console.log('Fallback configuration test:', fallbackConfig, validation);
+            });
+        }
+        
+        function testErrorLogging() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                
+                // Trigger some errors for testing
+                handler.validateConfiguration(null); // Should create an error
+                handler.validateConfiguration({ theme: { colors: 'invalid' } }); // Should create warnings
+                
+                const errorHistory = handler.debug.getErrorHistory();
+                
+                showResult('error-results', 
+                    `Error logging test: ${errorHistory.length > 0 ? 'PASSED' : 'FAILED'} (${errorHistory.length} errors logged)`, 
+                    errorHistory.length > 0 ? 'pass' : 'fail'
+                );
+                
+                console.log('Error logging test:', errorHistory);
+            });
+        }
+        
+        function testDebugUtilities() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const debug = handler.debug;
+                
+                // Test debug functions
+                const state = debug.getState();
+                const errorHistory = debug.getErrorHistory();
+                
+                debug.enableDebugMode();
+                const debugEnabled = debug.getState().debugMode;
+                
+                debug.disableDebugMode();
+                const debugDisabled = !debug.getState().debugMode;
+                
+                const testsPassed = state && Array.isArray(errorHistory) && debugEnabled && debugDisabled;
+                
+                showResult('debug-results', 
+                    `Debug utilities test: ${testsPassed ? 'PASSED' : 'FAILED'}`, 
+                    testsPassed ? 'pass' : 'fail'
+                );
+                
+                console.log('Debug utilities test:', { state, errorHistory, debugEnabled, debugDisabled });
+            });
+        }
+        
+        function showErrorHistory() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                const errorHistory = handler.debug.getErrorHistory();
+                
+                if (errorHistory.length === 0) {
+                    showResult('debug-results', 'No errors in history', 'info');
+                } else {
+                    errorHistory.forEach((error, index) => {
+                        showResult('debug-results', 
+                            `Error ${index + 1}: ${error.type} - ${error.message} (${error.timestamp})`, 
+                            'warn'
+                        );
+                    });
+                }
+                
+                console.log('Error history:', errorHistory);
+            });
+        }
+        
+        function clearErrorHistory() {
+            waitForErrorHandler(() => {
+                const handler = window.TailwindErrorHandler;
+                handler.debug.clearErrorHistory();
+                
+                showResult('debug-results', 'Error history cleared', 'info');
+                console.log('Error history cleared');
+            });
+        }
+        
+        // Initialize tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Tailwind Error Handling Test Page Loaded');
+            
+            // Update system status periodically
+            setInterval(updateSystemStatus, 1000);
+            
+            // Initial status update
+            setTimeout(updateSystemStatus, 500);
+            
+            // Run automatic tests after a delay
+            setTimeout(() => {
+                console.log('Running automatic tests...');
+                testAvailabilityDetection();
+                setTimeout(testValidConfiguration, 1000);
+                setTimeout(testFallbackConfiguration, 2000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

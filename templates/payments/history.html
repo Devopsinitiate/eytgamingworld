@@ -1,0 +1,355 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Payment History - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-8 fade-in">
+        <h1 class="text-white text-3xl font-bold mb-2">Payment History</h1>
+        <p class="text-gray-400">View and manage all your payment transactions</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 mb-6 fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Status Filter -->
+            <div>
+                <label for="status-filter" class="block text-white font-medium mb-2 text-sm">
+                    Status
+                </label>
+                <select id="status-filter" 
+                        aria-label="Filter payments by status"
+                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="succeeded">Succeeded</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Type Filter -->
+            <div>
+                <label for="type-filter" class="block text-white font-medium mb-2 text-sm">
+                    Payment Type
+                </label>
+                <select id="type-filter" 
+                        aria-label="Filter payments by type"
+                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
+                    <option value="">All Types</option>
+                    <option value="tournament_fee">Tournament Fee</option>
+                    <option value="coaching_session">Coaching Session</option>
+                    <option value="package_purchase">Package Purchase</option>
+                    <option value="venue_booking">Venue Booking</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <!-- Date Range Filter -->
+            <div>
+                <label for="date-filter" class="block text-white font-medium mb-2 text-sm">
+                    Date Range
+                </label>
+                <select id="date-filter" 
+                        aria-label="Filter payments by date range"
+                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
+                    <option value="">All Time</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="365">Last Year</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <div class="mt-4 flex justify-end">
+            <button id="clear-filters" 
+                    aria-label="Clear all payment filters"
+                    class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
+                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">filter_alt_off</span>
+                Clear Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Count -->
+    <div class="mb-4 fade-in">
+        <p class="text-gray-400 text-sm">
+            Showing <span id="payment-count" class="text-white font-medium">{{ payments|length }}</span> payment(s)
+        </p>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="desktop-table bg-card-dark border border-card-border-dark rounded-xl overflow-hidden fade-in">
+        <div class="overflow-x-auto">
+            <table class="w-full" aria-label="Payment history table">
+                <caption class="sr-only">List of all payment transactions</caption>
+                <thead class="bg-background-dark border-b border-card-border-dark">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Type
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Amount
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="payments-table-body" class="divide-y divide-card-border-dark">
+                    {% for payment in payments %}
+                    <tr class="payment-row hover:bg-background-dark/50 transition-colors"
+                        data-status="{{ payment.status }}"
+                        data-type="{{ payment.payment_type }}"
+                        data-date="{{ payment.created_at|date:'Y-m-d' }}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-white text-sm">{{ payment.created_at|date:"M d, Y" }}</div>
+                            <div class="text-gray-400 text-xs">{{ payment.created_at|date:"g:i A" }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-white text-sm font-medium max-w-xs truncate">
+                                {{ payment.description|default:"No description" }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-gray-300 text-sm">
+                                {{ payment.get_payment_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-white font-semibold text-sm">
+                                ${{ payment.amount }}
+                            </div>
+                            {% if payment.refund_amount > 0 %}
+                            <div class="text-purple-400 text-xs">
+                                -${{ payment.refund_amount }} refunded
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="status-{{ payment.status }} px-3 py-1 rounded-full text-xs font-medium" aria-label="Payment status: {{ payment.get_status_display }}">
+                                {{ payment.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'payments:detail' payment.id %}" 
+                               aria-label="View details for payment of ${{ payment.amount }} on {{ payment.created_at|date:'M d, Y' }}"
+                               class="text-primary hover:text-primary-dark font-medium text-sm transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center" role="status" aria-label="No payments found">
+                                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">receipt_long</span>
+                                <p class="text-gray-400 text-lg mb-2">No payments found</p>
+                                <p class="text-gray-500 text-sm">Your payment history will appear here</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="mobile-cards space-y-4 fade-in">
+        {% for payment in payments %}
+        <div class="payment-card bg-card-dark border border-card-border-dark rounded-xl p-4"
+             data-status="{{ payment.status }}"
+             data-type="{{ payment.payment_type }}"
+             data-date="{{ payment.created_at|date:'Y-m-d' }}">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                    <div class="text-white font-semibold text-lg mb-1">
+                        ${{ payment.amount }}
+                    </div>
+                    <div class="text-gray-400 text-sm">
+                        {{ payment.created_at|date:"M d, Y" }} at {{ payment.created_at|date:"g:i A" }}
+                    </div>
+                </div>
+                <span class="status-{{ payment.status }} px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                    {{ payment.get_status_display }}
+                </span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <p class="text-white text-sm">
+                    {{ payment.description|default:"No description" }}
+                </p>
+            </div>
+
+            <!-- Type -->
+            <div class="mb-3">
+                <span class="text-gray-400 text-xs">Type:</span>
+                <span class="text-gray-300 text-sm ml-1">
+                    {{ payment.get_payment_type_display }}
+                </span>
+            </div>
+
+            <!-- Refund Info -->
+            {% if payment.refund_amount > 0 %}
+            <div class="mb-3 p-2 bg-purple-900/20 border border-purple-800 rounded-lg">
+                <span class="text-purple-400 text-xs">
+                    Refunded: ${{ payment.refund_amount }}
+                </span>
+            </div>
+            {% endif %}
+
+            <!-- Action Button -->
+            <div class="pt-3 border-t border-card-border-dark">
+                <a href="{% url 'payments:detail' payment.id %}" 
+                   class="block w-full text-center py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors text-sm">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-card-dark border border-card-border-dark rounded-xl p-12 text-center">
+            <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">receipt_long</span>
+            <p class="text-gray-400 text-lg mb-2">No payments found</p>
+            <p class="text-gray-500 text-sm">Your payment history will appear here</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty State (when filtered) -->
+    <div id="no-results" class="hidden bg-card-dark border border-card-border-dark rounded-xl p-12 text-center fade-in" role="status" aria-live="polite">
+        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">search_off</span>
+        <p class="text-gray-400 text-lg mb-2">No payments match your filters</p>
+        <p class="text-gray-500 text-sm mb-4">Try adjusting your filter criteria</p>
+        <button id="clear-filters-empty" 
+                aria-label="Clear all filters to show all payments"
+                class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
+            Clear Filters
+        </button>
+    </div>
+
+    <!-- ARIA Live Region for Page Change Announcements -->
+    <div id="pagination-status" 
+         aria-live="polite" 
+         aria-atomic="true" 
+         class="sr-only">
+        {% if page_obj %}
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} loaded
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.count > 25 %}
+    <div id="payment-list-top"></div>
+    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 fade-in" role="navigation" aria-label="Payment history pagination">
+        <!-- Page Info -->
+        <div class="text-gray-400 text-sm" aria-live="polite" aria-atomic="true">
+            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} payment(s)
+        </div>
+        
+        <!-- Page Numbers -->
+        <div class="flex items-center gap-2">
+            <!-- Previous Button -->
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
+               aria-label="Go to previous page"
+               class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_left</span>
+                <span class="hidden sm:inline ml-1">Previous</span>
+            </a>
+            {% else %}
+            <button disabled 
+                    aria-label="Previous page (disabled)"
+                    aria-disabled="true"
+                    class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-gray-600 rounded-lg cursor-not-allowed opacity-50">
+                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_left</span>
+                <span class="hidden sm:inline ml-1">Previous</span>
+            </button>
+            {% endif %}
+            
+            <!-- Page Numbers -->
+            <div class="flex gap-1">
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-primary text-white rounded-lg font-medium" aria-current="page" aria-label="Current page, page {{ num }}">
+                        {{ num }}
+                    </span>
+                    {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                    {# Always show first and last pages #}
+                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
+                       aria-label="Go to page {{ num }}"
+                       class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+                        {{ num }}
+                    </a>
+                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    {# Desktop: Show pages within 2 positions of current page #}
+                    {# Mobile: Show pages within 1 position of current page #}
+                    {% if num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %}
+                    {# Always show for mobile (current ± 1) #}
+                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
+                       aria-label="Go to page {{ num }}"
+                       class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+                        {{ num }}
+                    </a>
+                    {% else %}
+                    {# Show only on desktop (current ± 2) #}
+                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
+                       aria-label="Go to page {{ num }}"
+                       class="pagination-btn pagination-page-extended hidden md:inline-flex min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                    {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                    {# Show ellipsis for gaps #}
+                    <span class="hidden md:inline px-4 py-2 text-gray-400" aria-hidden="true">...</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Next Button -->
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
+               aria-label="Go to next page"
+               class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
+                <span class="hidden sm:inline mr-1">Next</span>
+                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_right</span>
+            </a>
+            {% else %}
+            <button disabled 
+                    aria-label="Next page (disabled)"
+                    aria-disabled="true"
+                    class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-gray-600 rounded-lg cursor-not-allowed opacity-50">
+                <span class="hidden sm:inline mr-1">Next</span>
+                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_right</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/payment_history.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,349 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}{{ team.name }} - Roster Management - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-6 md:mb-8">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Roster Management</h1>
+                <p class="text-gray-400 text-sm md:text-base">{{ team.name }} [{{ team.tag }}]</p>
+            </div>
+            <a href="{% url 'teams:detail' slug=team.slug %}"
+                class="w-full sm:w-auto px-4 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                Back to Team
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- Main Content (Left Column - 2/3) -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Active Members Section -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-white text-xl font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined">groups</span>
+                        Active Members ({{ active_members.count }}/{{ team.max_members }})
+                    </h2>
+                </div>
+
+                {% if active_members %}
+                <div class="space-y-3">
+                    {% for member in active_members %}
+                    <div class="bg-background-dark rounded-lg p-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
+                                <!-- User Avatar -->
+                                <div
+                                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                    <span
+                                        class="material-symbols-outlined text-primary text-lg sm:text-xl">person</span>
+                                </div>
+
+                                <!-- User Info -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-medium truncate">{{ member.user.get_display_name }}</p>
+                                    <p class="text-gray-400 text-xs sm:text-sm">Joined {{ member.joined_at|date:"M d, Y"
+                                        }}</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-center gap-2 md:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                                <!-- Role Badge -->
+                                {% if member.role == 'captain' %}
+                                <span
+                                    class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">star</span>
+                                    Captain
+                                </span>
+                                {% elif member.role == 'co_captain' %}
+                                <span
+                                    class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-sm font-medium flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">star_half</span>
+                                    Co-Captain
+                                </span>
+                                {% elif member.role == 'substitute' %}
+                                <span class="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full text-sm font-medium">
+                                    Substitute
+                                </span>
+                                {% else %}
+                                <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium">
+                                    Member
+                                </span>
+                                {% endif %}
+
+                                <!-- Action Dropdown -->
+                                {% if member.user != user %}
+                                {% if member.role != 'captain' %}
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open"
+                                        class="p-2 min-w-[48px] min-h-[48px] hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-gray-400">more_vert</span>
+                                    </button>
+
+                                    <div x-show="open" @click.away="open = false"
+                                        class="absolute right-0 mt-2 w-56 bg-card-dark border border-card-border-dark rounded-lg shadow-lg z-10"
+                                        style="display: none;">
+                                        <!-- Role Change (Captain only) -->
+                                        {% if user_membership.role == 'captain' %}
+                                        <div class="border-b border-card-border-dark">
+                                            <p class="px-4 py-2 text-gray-400 text-xs font-medium uppercase">Change Role
+                                            </p>
+                                            <form method="post"
+                                                action="{% url 'teams:member_role_change' slug=team.slug member_id=member.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="role" value="co_captain">
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 text-white hover:bg-background-dark transition-colors flex items-center gap-2">
+                                                    <span class="material-symbols-outlined text-sm">star_half</span>
+                                                    Promote to Co-Captain
+                                                </button>
+                                            </form>
+                                            <form method="post"
+                                                action="{% url 'teams:member_role_change' slug=team.slug member_id=member.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="role" value="member">
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 text-white hover:bg-background-dark transition-colors flex items-center gap-2">
+                                                    <span class="material-symbols-outlined text-sm">person</span>
+                                                    Set as Member
+                                                </button>
+                                            </form>
+                                            <form method="post"
+                                                action="{% url 'teams:member_role_change' slug=team.slug member_id=member.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="role" value="substitute">
+                                                <button type="submit"
+                                                    class="w-full text-left px-4 py-2 text-white hover:bg-background-dark transition-colors flex items-center gap-2">
+                                                    <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                                                    Set as Substitute
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Remove Member (Captain and Co-Captain) -->
+                                        <form method="post"
+                                            action="{% url 'teams:member_remove' slug=team.slug member_id=member.id %}"
+                                            onsubmit="return confirm('Are you sure you want to remove this member?');">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="w-full text-left px-4 py-2 text-red-400 hover:bg-background-dark transition-colors flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-sm">person_remove</span>
+                                                Remove Member
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-400 text-center py-8">No active members</p>
+                {% endif %}
+            </div>
+
+            <!-- Pending Applications Section -->
+            {% if pending_applications %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">pending</span>
+                    Pending Applications ({{ pending_applications.count }})
+                </h2>
+
+                <div class="space-y-3">
+                    {% for application in pending_applications %}
+                    <div class="bg-background-dark rounded-lg p-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
+                                <!-- User Avatar -->
+                                <div
+                                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                    <span
+                                        class="material-symbols-outlined text-primary text-lg sm:text-xl">person</span>
+                                </div>
+
+                                <!-- User Info -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-medium truncate">{{ application.user.get_display_name }}
+                                    </p>
+                                    <p class="text-gray-400 text-xs sm:text-sm">Applied {{ application.joined_at|date:"M
+                                        d, Y" }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <form method="post"
+                                    action="{% url 'teams:application_approve' slug=team.slug member_id=application.id %}"
+                                    class="flex-1 sm:flex-none">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        class="w-full px-4 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">check</span>
+                                        <span class="hidden sm:inline">Approve</span>
+                                    </button>
+                                </form>
+
+                                <form method="post"
+                                    action="{% url 'teams:application_decline' slug=team.slug member_id=application.id %}"
+                                    onsubmit="return confirm('Are you sure you want to decline this application?');"
+                                    class="flex-1 sm:flex-none">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        class="w-full px-4 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">close</span>
+                                        <span class="hidden sm:inline">Decline</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar (Right Column - 1/3) -->
+        <div class="space-y-8">
+            <!-- Invite Players Section -->
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">person_add</span>
+                    Invite Players
+                </h2>
+
+                {% if team.is_full %}
+                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-4">
+                    <p class="text-yellow-400 text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">info</span>
+                        Team is full. Remove members to invite new players.
+                    </p>
+                </div>
+                {% else %}
+                <!-- User Search -->
+                <div class="mb-4">
+                    <label class="block text-gray-400 text-sm mb-2">Search for users</label>
+                    <input type="text" id="userSearch" placeholder="Type username or email..."
+                        class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+
+                <!-- Search Results -->
+                <div id="searchResults" class="space-y-2 mb-4 hidden">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <!-- Invite Form (hidden until user selected) -->
+                <form method="post" action="{% url 'teams:invite_send' slug=team.slug %}" id="inviteForm"
+                    class="hidden">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" id="selectedUserId">
+
+                    <div class="mb-4">
+                        <label class="block text-gray-400 text-sm mb-2">Message (optional)</label>
+                        <textarea name="message" rows="3" placeholder="Add a personal message to your invitation..."
+                            class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"></textarea>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full px-4 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                        Send Invitation
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Pending Invites Section -->
+            {% if pending_invites %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">mail</span>
+                    Pending Invites ({{ pending_invites.count }})
+                </h2>
+
+                <div class="space-y-3">
+                    {% for invite in pending_invites %}
+                    <div class="bg-background-dark rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-white font-medium text-sm">{{ invite.invited_user.get_display_name }}</p>
+                            <form method="post"
+                                action="{% url 'teams:invite_cancel' slug=team.slug invite_id=invite.id %}"
+                                onsubmit="return confirm('Cancel this invitation?');">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-400 hover:text-red-300 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            </form>
+                        </div>
+                        <p class="text-gray-400 text-xs">Sent by {{ invite.invited_by.get_display_name }}</p>
+                        <p class="text-gray-500 text-xs">Expires {{ invite.expires_at|timeuntil }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // User search functionality
+    const searchInput = document.getElementById('userSearch');
+    const searchResults = document.getElementById('searchResults');
+    const inviteForm = document.getElementById('inviteForm');
+    const selectedUserIdInput = document.getElementById('selectedUserId');
+    let searchTimeout;
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            searchResults.classList.add('hidden');
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/teams/api/user-search/?q=${encodeURIComponent(query)}&team={{ team.slug }}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.users.length > 0) {
+                        searchResults.classList.remove('hidden');
+                        searchResults.innerHTML = data.users.map(user => `
+                        <div class="bg-background-dark rounded-lg p-3 hover:bg-gray-700 cursor-pointer transition-colors" onclick="selectUser('${user.id}', '${user.display_name}')">
+                            <p class="text-white font-medium text-sm">${user.display_name}</p>
+                            <p class="text-gray-400 text-xs">${user.email}</p>
+                        </div>
+                    `).join('');
+                    } else {
+                        searchResults.classList.remove('hidden');
+                        searchResults.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">No users found</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    searchResults.classList.add('hidden');
+                });
+        }, 300);
+    });
+
+    function selectUser(userId, displayName) {
+        selectedUserIdInput.value = userId;
+        searchInput.value = displayName;
+        searchResults.classList.add('hidden');
+        inviteForm.classList.remove('hidden');
+    }
+</script>
+{% endblock %}

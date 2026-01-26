@@ -1,0 +1,171 @@
+{% load static %}
+
+<!-- Recommendations Component -->
+<!-- Displays personalized tournament and team recommendations -->
+<!-- Requirements: 13.1, 13.2 -->
+
+<div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-white text-xl font-bold">Recommended for You</h2>
+        {% if recommendations %}
+            <button 
+                onclick="refreshRecommendations()" 
+                class="text-primary hover:text-primary/80 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark rounded px-2 py-1"
+                aria-label="Refresh recommendations"
+            >
+                <span class="material-symbols-outlined text-sm align-middle" aria-hidden="true">refresh</span>
+                Refresh
+            </button>
+        {% endif %}
+    </div>
+    
+    {% if recommendations %}
+        <div class="space-y-3" role="list" aria-label="Recommendations">
+            {% for rec in recommendations %}
+                <div class="p-4 bg-neutral-900/50 hover:bg-neutral-800/50 rounded-lg border border-card-border-dark transition-colors group" role="listitem">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <!-- Recommendation Icon -->
+                            <div class="flex-shrink-0 bg-primary/20 p-2 rounded-lg">
+                                <span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">
+                                    {% if rec.recommendation_type == 'tournament' %}emoji_events
+                                    {% elif rec.recommendation_type == 'team' %}groups
+                                    {% else %}star{% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Recommendation Content -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium text-sm">
+                                    {% if rec.content_object %}
+                                        {{ rec.content_object.name }}
+                                    {% else %}
+                                        Recommended {{ rec.recommendation_type }}
+                                    {% endif %}
+                                </p>
+                                
+                                <p class="text-gray-400 text-xs mt-1">
+                                    {{ rec.reason }}
+                                </p>
+                                
+                                {% if rec.content_object %}
+                                    <div class="flex items-center gap-2 mt-2">
+                                        {% if rec.recommendation_type == 'tournament' and rec.content_object.game %}
+                                            <span class="text-gray-500 text-xs">
+                                                <span class="material-symbols-outlined text-xs align-middle" aria-hidden="true">sports_esports</span>
+                                                {{ rec.content_object.game.name }}
+                                            </span>
+                                        {% endif %}
+                                        
+                                        {% if rec.recommendation_type == 'tournament' and rec.content_object.start_datetime %}
+                                            <span class="text-gray-500 text-xs">
+                                                <span class="material-symbols-outlined text-xs align-middle" aria-hidden="true">schedule</span>
+                                                <time datetime="{{ rec.content_object.start_datetime|date:'c' }}">
+                                                    {{ rec.content_object.start_datetime|date:"M d, Y" }}
+                                                </time>
+                                            </span>
+                                        {% endif %}
+                                        
+                                        {% if rec.recommendation_type == 'team' and rec.content_object.member_count %}
+                                            <span class="text-gray-500 text-xs">
+                                                <span class="material-symbols-outlined text-xs align-middle" aria-hidden="true">people</span>
+                                                {{ rec.content_object.member_count }} members
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 mt-3">
+                                        {% if rec.recommendation_type == 'tournament' %}
+                                            <a 
+                                                href="{% url 'tournaments:detail' rec.content_object.slug %}" 
+                                                class="text-primary hover:text-primary/80 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-neutral-900 rounded px-2 py-1"
+                                            >
+                                                View Details →
+                                            </a>
+                                        {% elif rec.recommendation_type == 'team' %}
+                                            <a 
+                                                href="{% url 'teams:detail' rec.content_object.slug %}" 
+                                                class="text-primary hover:text-primary/80 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-neutral-900 rounded px-2 py-1"
+                                            >
+                                                View Team →
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Dismiss Button -->
+                        <button 
+                            onclick="dismissRecommendation('{{ rec.id }}')" 
+                            class="flex-shrink-0 text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded p-1"
+                            aria-label="Dismiss recommendation"
+                            title="Dismiss this recommendation"
+                        >
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">close</span>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-8">
+            <span class="material-symbols-outlined text-gray-600 text-5xl" aria-hidden="true">lightbulb</span>
+            <p class="text-gray-400 mt-2">No recommendations yet</p>
+            <p class="text-gray-500 text-sm mt-1">Complete your profile to get personalized recommendations</p>
+            <a 
+                href="{% url 'dashboard:profile_edit' %}" 
+                class="inline-block mt-3 text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+            >
+                Complete Profile →
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Dismiss recommendation
+    async function dismissRecommendation(recId) {
+        try {
+            const response = await fetch(`/dashboard/recommendations/${recId}/dismiss/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (response.ok) {
+                // Remove the recommendation from the UI
+                const recElement = event.target.closest('[role="listitem"]');
+                if (recElement) {
+                    recElement.style.opacity = '0';
+                    recElement.style.transform = 'translateX(20px)';
+                    setTimeout(() => recElement.remove(), 300);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to dismiss recommendation:', error);
+        }
+    }
+    
+    // Refresh recommendations
+    async function refreshRecommendations() {
+        try {
+            const response = await fetch('/dashboard/recommendations/refresh/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            });
+            
+            if (response.ok) {
+                // Reload the page to show new recommendations
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Failed to refresh recommendations:', error);
+        }
+    }
+</script>
+

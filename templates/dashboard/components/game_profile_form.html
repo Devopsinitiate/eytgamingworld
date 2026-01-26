@@ -1,0 +1,262 @@
+{% comment %}
+Game Profile Form Component
+
+Displays a form for creating or editing a game profile.
+Used in game profile create and edit pages.
+
+Context variables:
+- form: GameProfileForm instance
+- is_edit: Boolean indicating if this is an edit form (default: False)
+- profile: UserGameProfile instance (for edit mode)
+{% endcomment %}
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900">
+        {% if is_edit %}
+        Edit Game Profile
+        {% else %}
+        Add Game Profile
+        {% endif %}
+    </h2>
+
+    <form method="post" class="space-y-6" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4" role="alert">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        {{ form.non_field_errors }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Game Selection -->
+        <div class="form-group">
+            <label for="{{ form.game.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Game <span class="text-red-500">*</span>
+            </label>
+            {{ form.game }}
+            {% if form.game.errors %}
+            <p class="mt-1 text-sm text-red-600" role="alert">
+                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                {{ form.game.errors.0 }}
+            </p>
+            {% endif %}
+            {% if form.game.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ form.game.help_text }}</p>
+            {% endif %}
+        </div>
+
+        <!-- In-Game Name -->
+        <div class="form-group">
+            <label for="{{ form.in_game_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                In-Game Name <span class="text-red-500">*</span>
+            </label>
+            {{ form.in_game_name }}
+            {% if form.in_game_name.errors %}
+            <p class="mt-1 text-sm text-red-600" role="alert">
+                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                {{ form.in_game_name.errors.0 }}
+            </p>
+            {% endif %}
+            {% if form.in_game_name.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ form.in_game_name.help_text }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Skill Rating -->
+        <div class="form-group">
+            <label for="{{ form.skill_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Skill Rating
+            </label>
+            {{ form.skill_rating }}
+            {% if form.skill_rating.errors %}
+            <p class="mt-1 text-sm text-red-600" role="alert">
+                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                {{ form.skill_rating.errors.0 }}
+            </p>
+            {% endif %}
+            {% if form.skill_rating.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ form.skill_rating.help_text }}</p>
+            {% else %}
+            <p class="mt-1 text-sm text-gray-500">Enter a value between 0 and 5000</p>
+            {% endif %}
+        </div>
+
+        <!-- Rank -->
+        <div class="form-group">
+            <label for="{{ form.rank.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Rank
+            </label>
+            {{ form.rank }}
+            {% if form.rank.errors %}
+            <p class="mt-1 text-sm text-red-600" role="alert">
+                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                {{ form.rank.errors.0 }}
+            </p>
+            {% endif %}
+            {% if form.rank.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ form.rank.help_text }}</p>
+            {% else %}
+            <p class="mt-1 text-sm text-gray-500">e.g., Gold, Diamond, Platinum</p>
+            {% endif %}
+        </div>
+
+        <!-- Preferred Role -->
+        <div class="form-group">
+            <label for="{{ form.preferred_role.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Preferred Role
+            </label>
+            {{ form.preferred_role }}
+            {% if form.preferred_role.errors %}
+            <p class="mt-1 text-sm text-red-600" role="alert">
+                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                {{ form.preferred_role.errors.0 }}
+            </p>
+            {% endif %}
+            {% if form.preferred_role.help_text %}
+            <p class="mt-1 text-sm text-gray-500">{{ form.preferred_role.help_text }}</p>
+            {% else %}
+            <p class="mt-1 text-sm text-gray-500">e.g., Support, Tank, DPS, Mid, Jungle</p>
+            {% endif %}
+        </div>
+
+        <!-- Main Game Checkbox -->
+        <div class="form-group">
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    {{ form.is_main_game }}
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="{{ form.is_main_game.id_for_label }}" class="font-medium text-gray-700">
+                        Set as Main Game
+                    </label>
+                    <p class="text-gray-500">Your main game will be displayed prominently on your profile</p>
+                    {% if form.is_main_game.errors %}
+                    <p class="mt-1 text-sm text-red-600" role="alert">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        {{ form.is_main_game.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+            <a href="{% if is_edit %}{% url 'dashboard:game_profile_list' %}{% else %}{% url 'dashboard:game_profile_list' %}{% endif %}"
+                class="text-gray-600 hover:text-gray-800 font-medium">
+                Cancel
+            </a>
+            <button type="submit"
+                class="bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-6 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                {% if is_edit %}
+                <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Update Profile
+                {% else %}
+                <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Profile
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Form styling */
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #374151;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        color: #374151;
+        background-color: #fff;
+        border-color: #b91c1c;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.125rem;
+        vertical-align: top;
+        background-color: #fff;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-check-input:checked {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
+    }
+
+    .form-check-input:focus {
+        border-color: #b91c1c;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.25);
+    }
+</style>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Browser Compatibility Test Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .test-container {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+        
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-passed { background: #10b981; color: white; }
+        .status-failed { background: #ef4444; color: white; }
+        .status-warning { background: #f59e0b; color: white; }
+        .status-running { background: #6366f1; color: white; }
+        
+        .test-details {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #d1d5db;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #374151;
+            border-radius: 4px;
+        }
+        
+        .feature-icon {
+            font-size: 16px;
+        }
+        
+        .browser-info {
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .browser-name {
+            font-weight: 600;
+            color: #fbbf24;
+            margin-bottom: 8px;
+        }
+        
+        .test-log {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        
+        .log-success { color: #10b981; }
+        .log-error { color: #ef4444; }
+        .log-warning { color: #f59e0b; }
+        .log-info { color: #60a5fa; }
+        
+        .run-tests-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .run-tests-btn:hover {
+            background: #2563eb;
+        }
+        
+        .run-tests-btn:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #374151;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 Cross-Browser Compatibility Test Demo</h1>
+    <p><strong>Feature:</strong> tournament-detail-page-fixes, Property 11: Cross-Browser Compatibility Consistency</p>
+    <p><strong>Validates:</strong> Requirements 11.1, 11.2, 11.3, 11.4, 11.5</p>
+    
+    <div class="browser-info">
+        <div class="browser-name" id="browserName">Detecting Browser...</div>
+        <div id="browserDetails">Loading browser information...</div>
+    </div>
+    
+    <div class="summary-stats" id="summaryStats">
+        <div class="stat-card">
+            <div class="stat-number" id="totalTests">0</div>
+            <div class="stat-label">Total Tests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="passedTests">0</div>
+            <div class="stat-label">Passed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="failedTests">0</div>
+            <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="warningTests">0</div>
+            <div class="stat-label">Warnings</div>
+        </div>
+    </div>
+    
+    <button class="run-tests-btn" id="runTestsBtn" onclick="runAllTests()">
+        🚀 Run Cross-Browser Compatibility Tests
+    </button>
+    
+    <div class="test-log" id="testLog">
+        <div class="log-entry log-info">Ready to run cross-browser compatibility tests...</div>
+    </div>
+    
+    <div id="testResults"></div>
+
+    <script>
+        /**
+         * Cross-Browser Compatibility Property Test Implementation
+         * **Feature: tournament-detail-page-fixes, Property 11: Cross-Browser Compatibility Consistency**
+         * **Validates: Requirements 11.1, 11.2, 11.3, 11.4, 11.5**
+         */
+        
+        class CrossBrowserCompatibilityTester {
+            constructor() {
+                this.testResults = [];
+                this.logContainer = document.getElementById('testLog');
+                this.resultsContainer = document.getElementById('testResults');
+                this.startTime = null;
+                
+                this.detectBrowser();
+                this.updateStats();
+            }
+            
+            detectBrowser() {
+                const userAgent = navigator.userAgent;
+                let browserName = 'Unknown Browser';
+                let browserVersion = 'Unknown Version';
+                
+                if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) {
+                    browserName = 'Google Chrome';
+                    const match = userAgent.match(/Chrome\/([0-9.]+)/);
+                    browserVersion = match ? match[1] : 'Unknown';
+                } else if (userAgent.includes('Firefox')) {
+                    browserName = 'Mozilla Firefox';
+                    const match = userAgent.match(/Firefox\/([0-9.]+)/);
+                    browserVersion = match ? match[1] : 'Unknown';
+                } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+                    browserName = 'Safari';
+                    const match = userAgent.match(/Version\/([0-9.]+)/);
+                    browserVersion = match ? match[1] : 'Unknown';
+                } else if (userAgent.includes('Edg')) {
+                    browserName = 'Microsoft Edge';
+                    const match = userAgent.match(/Edg\/([0-9.]+)/);
+                    browserVersion = match ? match[1] : 'Unknown';
+                }
+                
+                document.getElementById('browserName').textContent = `${browserName} ${browserVersion}`;
+                document.getElementById('browserDetails').innerHTML = `
+                    <strong>User Agent:</strong> ${userAgent}<br>
+                    <strong>Platform:</strong> ${navigator.platform}<br>
+                    <strong>Language:</strong> ${navigator.language}<br>
+                    <strong>Viewport:</strong> ${window.innerWidth}x${window.innerHeight}
+                `;
+            }
+            
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry log-${type}`;
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                this.logContainer.appendChild(logEntry);
+                this.logContainer.scrollTop = this.logContainer.scrollHeight;
+                
+                console.log(`[CrossBrowserTest] ${message}`);
+            }
+            
+            async runAllTests() {
+                this.startTime = Date.now();
+                this.testResults = [];
+                this.resultsContainer.innerHTML = '';
+                
+                const runButton = document.getElementById('runTestsBtn');
+                runButton.disabled = true;
+                runButton.textContent = '🔄 Running Tests...';
+                
+                this.log('Starting cross-browser compatibility tests...', 'info');
+                
+                try {
+                    // Test 1: JavaScript Features
+                    await this.testJavaScriptFeatures();
+                    
+                    // Test 2: CSS Animation Support
+                    await this.testCSSAnimations();
+                    
+                    // Test 3: Clipboard Functionality
+                    await this.testClipboardFunctionality();
+                    
+                    // Test 4: Module Loading
+                    await this.testModuleLoading();
+                    
+                    // Test 5: DOM Manipulation
+                    await this.testDOMManipulation();
+                    
+                    // Test 6: Event Handling
+                    await this.testEventHandling();
+                    
+                    // Test 7: Storage APIs
+                    await this.testStorageAPIs();
+                    
+                    // Test 8: Network APIs
+                    await this.testNetworkAPIs();
+                    
+                    this.generateReport();
+                    
+                } catch (error) {
+                    this.log(`Test execution failed: ${error.message}`, 'error');
+                } finally {
+                    runButton.disabled = false;
+                    runButton.textContent = '🚀 Run Tests Again';
+                }
+            }
+            
+            async testJavaScriptFeatures() {
+                this.log('Testing JavaScript features...', 'info');
+                
+                const features = {
+                    'Promise Support': typeof Promise !== 'undefined',
+                    'Async/Await Support': this.checkAsyncAwaitSupport(),
+                    'Arrow Functions': this.checkArrowFunctionSupport(),
+                    'Template Literals': this.checkTemplateLiteralSupport(),
+                    'Destructuring': this.checkDestructuringSupport(),
+                    'Spread Operator': this.checkSpreadOperatorSupport(),
+                    'Map/Set Support': typeof Map !== 'undefined' && typeof Set !== 'undefined',
+                    'Symbol Support': typeof Symbol !== 'undefined'
+                };
+                
+                const supportedFeatures = Object.entries(features).filter(([name, supported]) => supported);
+                const supportedCount = supportedFeatures.length;
+                const totalCount = Object.keys(features).length;
+                
+                const status = supportedCount === totalCount ? 'passed' : 
+                              supportedCount >= totalCount * 0.8 ? 'warning' : 'failed';
+                
+                this.addTestResult('JavaScript Features', status, 
+                    `${supportedCount}/${totalCount} features supported`, features);
+                
+                this.log(`JavaScript features: ${supportedCount}/${totalCount} supported`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            checkAsyncAwaitSupport() {
+                try {
+                    new Function('return (async function() {})()');
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            checkArrowFunctionSupport() {
+                try {
+                    new Function('return () => {}');
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            checkTemplateLiteralSupport() {
+                try {
+                    new Function('return `template`');
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            checkDestructuringSupport() {
+                try {
+                    new Function('const {a} = {a: 1}; return a');
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            checkSpreadOperatorSupport() {
+                try {
+                    new Function('const arr = [1, 2]; return [...arr]');
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+            
+            async testCSSAnimations() {
+                this.log('Testing CSS animation support...', 'info');
+                
+                const testElement = document.createElement('div');
+                document.body.appendChild(testElement);
+                
+                const animationMethods = [];
+                
+                // Test Web Animations API
+                if (typeof testElement.animate === 'function') {
+                    animationMethods.push('Web Animations API');
+                    
+                    try {
+                        const animation = testElement.animate([
+                            { opacity: 0 },
+                            { opacity: 1 }
+                        ], { duration: 100 });
+                        
+                        if (animation && typeof animation.cancel === 'function') {
+                            animation.cancel();
+                            animationMethods.push('Animation Control');
+                        }
+                    } catch (error) {
+                        this.log(`Web Animations API error: ${error.message}`, 'warning');
+                    }
+                }
+                
+                // Test CSS Transitions
+                if (testElement.style.transition !== undefined) {
+                    animationMethods.push('CSS Transitions');
+                }
+                
+                // Test CSS Animations
+                if (testElement.style.animation !== undefined) {
+                    animationMethods.push('CSS Animations');
+                }
+                
+                // Test Transform support
+                if (testElement.style.transform !== undefined) {
+                    animationMethods.push('CSS Transforms');
+                }
+                
+                // Test requestAnimationFrame
+                if (typeof requestAnimationFrame === 'function') {
+                    animationMethods.push('requestAnimationFrame');
+                }
+                
+                document.body.removeChild(testElement);
+                
+                const status = animationMethods.length >= 3 ? 'passed' : 
+                              animationMethods.length >= 2 ? 'warning' : 'failed';
+                
+                this.addTestResult('CSS Animations', status, 
+                    `${animationMethods.length} animation methods available`, 
+                    { methods: animationMethods });
+                
+                this.log(`CSS animations: ${animationMethods.length} methods available`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            async testClipboardFunctionality() {
+                this.log('Testing clipboard functionality...', 'info');
+                
+                const availableMethods = [];
+                const testResults = {};
+                
+                // Test modern Clipboard API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    availableMethods.push('Clipboard API');
+                    testResults['Clipboard API'] = true;
+                    
+                    try {
+                        // Test if we can actually use it (requires user interaction or secure context)
+                        if (window.isSecureContext) {
+                            testResults['Secure Context'] = true;
+                        } else {
+                            testResults['Secure Context'] = false;
+                        }
+                    } catch (error) {
+                        testResults['Clipboard API'] = false;
+                    }
+                } else {
+                    testResults['Clipboard API'] = false;
+                }
+                
+                // Test legacy execCommand
+                if (document.execCommand) {
+                    availableMethods.push('execCommand');
+                    testResults['execCommand'] = true;
+                } else {
+                    testResults['execCommand'] = false;
+                }
+                
+                // Test Web Share API (mobile)
+                if (navigator.share) {
+                    availableMethods.push('Web Share API');
+                    testResults['Web Share API'] = true;
+                } else {
+                    testResults['Web Share API'] = false;
+                }
+                
+                // Manual fallback is always available
+                availableMethods.push('Manual Fallback');
+                testResults['Manual Fallback'] = true;
+                
+                const status = availableMethods.length >= 2 ? 'passed' : 'warning';
+                
+                this.addTestResult('Clipboard Functionality', status, 
+                    `${availableMethods.length} clipboard methods available`, testResults);
+                
+                this.log(`Clipboard: ${availableMethods.length} methods available`, 
+                    status === 'passed' ? 'success' : 'warning');
+            }
+            
+            async testModuleLoading() {
+                this.log('Testing module loading support...', 'info');
+                
+                const capabilities = {};
+                
+                // Test script loading
+                capabilities['Script Loading'] = typeof document.createElement === 'function';
+                
+                // Test Promise support for async loading
+                capabilities['Promise-based Loading'] = typeof Promise !== 'undefined';
+                
+                // Test dynamic script creation
+                try {
+                    const testScript = document.createElement('script');
+                    testScript.src = 'data:text/javascript,';
+                    capabilities['Dynamic Script Creation'] = true;
+                } catch (error) {
+                    capabilities['Dynamic Script Creation'] = false;
+                }
+                
+                // Test event handling for script loading
+                capabilities['Script Event Handling'] = typeof document.addEventListener === 'function';
+                
+                // Test error handling
+                capabilities['Error Handling'] = typeof window.addEventListener === 'function';
+                
+                const supportedCapabilities = Object.values(capabilities).filter(Boolean).length;
+                const totalCapabilities = Object.keys(capabilities).length;
+                
+                const status = supportedCapabilities >= totalCapabilities * 0.8 ? 'passed' : 'warning';
+                
+                this.addTestResult('Module Loading', status, 
+                    `${supportedCapabilities}/${totalCapabilities} capabilities supported`, capabilities);
+                
+                this.log(`Module loading: ${supportedCapabilities}/${totalCapabilities} capabilities`, 
+                    status === 'passed' ? 'success' : 'warning');
+            }
+            
+            async testDOMManipulation() {
+                this.log('Testing DOM manipulation...', 'info');
+                
+                const operations = {};
+                
+                try {
+                    // Test element creation
+                    const element = document.createElement('div');
+                    operations['Element Creation'] = true;
+                    
+                    // Test class manipulation
+                    element.className = 'test-class';
+                    element.classList.add('another-class');
+                    operations['Class Manipulation'] = element.classList.contains('test-class');
+                    
+                    // Test attribute manipulation
+                    element.setAttribute('data-test', 'value');
+                    operations['Attribute Manipulation'] = element.getAttribute('data-test') === 'value';
+                    
+                    // Test style manipulation
+                    element.style.color = 'red';
+                    operations['Style Manipulation'] = element.style.color === 'red';
+                    
+                    // Test DOM insertion
+                    document.body.appendChild(element);
+                    operations['DOM Insertion'] = document.body.contains(element);
+                    
+                    // Test DOM removal
+                    document.body.removeChild(element);
+                    operations['DOM Removal'] = !document.body.contains(element);
+                    
+                    // Test query selectors
+                    const testDiv = document.createElement('div');
+                    testDiv.id = 'test-query';
+                    document.body.appendChild(testDiv);
+                    operations['Query Selectors'] = document.getElementById('test-query') === testDiv;
+                    document.body.removeChild(testDiv);
+                    
+                } catch (error) {
+                    this.log(`DOM manipulation error: ${error.message}`, 'error');
+                    operations['Error'] = error.message;
+                }
+                
+                const successfulOps = Object.values(operations).filter(v => v === true).length;
+                const totalOps = Object.keys(operations).filter(k => k !== 'Error').length;
+                
+                const status = successfulOps === totalOps ? 'passed' : 
+                              successfulOps >= totalOps * 0.8 ? 'warning' : 'failed';
+                
+                this.addTestResult('DOM Manipulation', status, 
+                    `${successfulOps}/${totalOps} operations successful`, operations);
+                
+                this.log(`DOM manipulation: ${successfulOps}/${totalOps} operations successful`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            async testEventHandling() {
+                this.log('Testing event handling...', 'info');
+                
+                const eventTests = {};
+                
+                try {
+                    const element = document.createElement('button');
+                    let eventFired = false;
+                    
+                    // Test addEventListener
+                    element.addEventListener('click', () => {
+                        eventFired = true;
+                    });
+                    eventTests['addEventListener'] = true;
+                    
+                    // Test event dispatch
+                    const event = new Event('click');
+                    element.dispatchEvent(event);
+                    eventTests['Event Dispatch'] = eventFired;
+                    
+                    // Test custom events
+                    let customEventFired = false;
+                    element.addEventListener('custom', () => {
+                        customEventFired = true;
+                    });
+                    const customEvent = new CustomEvent('custom', { detail: { test: true } });
+                    element.dispatchEvent(customEvent);
+                    eventTests['Custom Events'] = customEventFired;
+                    
+                    // Test event removal
+                    const tempHandler = () => {};
+                    element.addEventListener('test', tempHandler);
+                    element.removeEventListener('test', tempHandler);
+                    eventTests['Event Removal'] = true;
+                    
+                } catch (error) {
+                    this.log(`Event handling error: ${error.message}`, 'error');
+                    eventTests['Error'] = error.message;
+                }
+                
+                const successfulTests = Object.values(eventTests).filter(v => v === true).length;
+                const totalTests = Object.keys(eventTests).filter(k => k !== 'Error').length;
+                
+                const status = successfulTests === totalTests ? 'passed' : 
+                              successfulTests >= totalTests * 0.8 ? 'warning' : 'failed';
+                
+                this.addTestResult('Event Handling', status, 
+                    `${successfulTests}/${totalTests} event tests passed`, eventTests);
+                
+                this.log(`Event handling: ${successfulTests}/${totalTests} tests passed`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            async testStorageAPIs() {
+                this.log('Testing storage APIs...', 'info');
+                
+                const storageTests = {};
+                
+                // Test localStorage
+                try {
+                    localStorage.setItem('test', 'value');
+                    storageTests['localStorage Write'] = localStorage.getItem('test') === 'value';
+                    localStorage.removeItem('test');
+                    storageTests['localStorage Remove'] = localStorage.getItem('test') === null;
+                } catch (error) {
+                    storageTests['localStorage'] = false;
+                }
+                
+                // Test sessionStorage
+                try {
+                    sessionStorage.setItem('test', 'value');
+                    storageTests['sessionStorage Write'] = sessionStorage.getItem('test') === 'value';
+                    sessionStorage.removeItem('test');
+                    storageTests['sessionStorage Remove'] = sessionStorage.getItem('test') === null;
+                } catch (error) {
+                    storageTests['sessionStorage'] = false;
+                }
+                
+                // Test IndexedDB availability
+                storageTests['IndexedDB Available'] = typeof indexedDB !== 'undefined';
+                
+                const successfulTests = Object.values(storageTests).filter(v => v === true).length;
+                const totalTests = Object.keys(storageTests).length;
+                
+                const status = successfulTests >= totalTests * 0.8 ? 'passed' : 
+                              successfulTests >= totalTests * 0.6 ? 'warning' : 'failed';
+                
+                this.addTestResult('Storage APIs', status, 
+                    `${successfulTests}/${totalTests} storage tests passed`, storageTests);
+                
+                this.log(`Storage APIs: ${successfulTests}/${totalTests} tests passed`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            async testNetworkAPIs() {
+                this.log('Testing network APIs...', 'info');
+                
+                const networkTests = {};
+                
+                // Test Fetch API
+                networkTests['Fetch API'] = typeof fetch !== 'undefined';
+                
+                // Test XMLHttpRequest
+                networkTests['XMLHttpRequest'] = typeof XMLHttpRequest !== 'undefined';
+                
+                // Test WebSocket
+                networkTests['WebSocket'] = typeof WebSocket !== 'undefined';
+                
+                // Test URL API
+                try {
+                    new URL('https://example.com');
+                    networkTests['URL API'] = true;
+                } catch (error) {
+                    networkTests['URL API'] = false;
+                }
+                
+                // Test URLSearchParams
+                try {
+                    new URLSearchParams('test=value');
+                    networkTests['URLSearchParams'] = true;
+                } catch (error) {
+                    networkTests['URLSearchParams'] = false;
+                }
+                
+                const successfulTests = Object.values(networkTests).filter(v => v === true).length;
+                const totalTests = Object.keys(networkTests).length;
+                
+                const status = successfulTests >= totalTests * 0.8 ? 'passed' : 
+                              successfulTests >= totalTests * 0.6 ? 'warning' : 'failed';
+                
+                this.addTestResult('Network APIs', status, 
+                    `${successfulTests}/${totalTests} network tests passed`, networkTests);
+                
+                this.log(`Network APIs: ${successfulTests}/${totalTests} tests passed`, 
+                    status === 'passed' ? 'success' : status === 'warning' ? 'warning' : 'error');
+            }
+            
+            addTestResult(category, status, details, features = null) {
+                this.testResults.push({
+                    category,
+                    status,
+                    details,
+                    features
+                });
+                
+                this.updateStats();
+                this.renderTestResult(category, status, details, features);
+            }
+            
+            renderTestResult(category, status, details, features) {
+                const container = document.createElement('div');
+                container.className = 'test-container';
+                
+                const header = document.createElement('div');
+                header.className = 'test-header';
+                
+                const title = document.createElement('div');
+                title.className = 'test-title';
+                title.textContent = category;
+                
+                const statusBadge = document.createElement('div');
+                statusBadge.className = `test-status status-${status}`;
+                statusBadge.textContent = status.toUpperCase();
+                
+                header.appendChild(title);
+                header.appendChild(statusBadge);
+                
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'test-details';
+                detailsDiv.textContent = details;
+                
+                container.appendChild(header);
+                container.appendChild(detailsDiv);
+                
+                if (features) {
+                    const featureList = document.createElement('div');
+                    featureList.className = 'feature-list';
+                    
+                    Object.entries(features).forEach(([feature, supported]) => {
+                        const featureItem = document.createElement('div');
+                        featureItem.className = 'feature-item';
+                        
+                        const icon = document.createElement('span');
+                        icon.className = 'feature-icon';
+                        icon.textContent = supported === true ? '✅' : 
+                                          supported === false ? '❌' : '⚠️';
+                        
+                        const name = document.createElement('span');
+                        name.textContent = feature;
+                        
+                        featureItem.appendChild(icon);
+                        featureItem.appendChild(name);
+                        featureList.appendChild(featureItem);
+                    });
+                    
+                    container.appendChild(featureList);
+                }
+                
+                this.resultsContainer.appendChild(container);
+            }
+            
+            updateStats() {
+                const total = this.testResults.length;
+                const passed = this.testResults.filter(r => r.status === 'passed').length;
+                const failed = this.testResults.filter(r => r.status === 'failed').length;
+                const warnings = this.testResults.filter(r => r.status === 'warning').length;
+                
+                document.getElementById('totalTests').textContent = total;
+                document.getElementById('passedTests').textContent = passed;
+                document.getElementById('failedTests').textContent = failed;
+                document.getElementById('warningTests').textContent = warnings;
+            }
+            
+            generateReport() {
+                const endTime = Date.now();
+                const duration = endTime - this.startTime;
+                
+                const total = this.testResults.length;
+                const passed = this.testResults.filter(r => r.status === 'passed').length;
+                const failed = this.testResults.filter(r => r.status === 'failed').length;
+                const warnings = this.testResults.filter(r => r.status === 'warning').length;
+                
+                const overallStatus = failed === 0 ? 'PASSED' : 'PARTIAL';
+                
+                this.log(`Test completed in ${duration}ms`, 'info');
+                this.log(`Results: ${passed} passed, ${warnings} warnings, ${failed} failed`, 'info');
+                this.log(`Overall status: ${overallStatus}`, overallStatus === 'PASSED' ? 'success' : 'warning');
+                
+                // Property assertion: Cross-browser compatibility should be maintained
+                const compatibilityScore = (passed + warnings * 0.5) / total;
+                const isCompatible = compatibilityScore >= 0.8; // 80% threshold
+                
+                this.log(`Compatibility score: ${(compatibilityScore * 100).toFixed(1)}%`, 
+                    isCompatible ? 'success' : 'error');
+                
+                if (isCompatible) {
+                    this.log('✅ Cross-browser compatibility property PASSED', 'success');
+                } else {
+                    this.log('❌ Cross-browser compatibility property FAILED', 'error');
+                }
+            }
+        }
+        
+        // Initialize the tester
+        let tester;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            tester = new CrossBrowserCompatibilityTester();
+        });
+        
+        function runAllTests() {
+            if (tester) {
+                tester.runAllTests();
+            }
+        }
+    </script>
+</body>
+</html>

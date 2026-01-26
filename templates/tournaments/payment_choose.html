@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Choose Payment Method - {{ tournament.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    margin: 0;
+    font: inherit;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+  }
+
+  input[type="radio"]::before {
+    content: "";
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 9999px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em #b91c1c;
+  }
+
+  input[type="radio"]:checked::before {
+    transform: scale(1);
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="flex flex-1 justify-center py-10 sm:py-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-gray-900">
+  <div class="flex flex-col w-full max-w-2xl">
+    <!-- Header Section -->
+    <div class="flex flex-wrap justify-between gap-4 items-center mb-8">
+      <div class="flex min-w-72 flex-col gap-2">
+        <h1 class="text-white text-4xl sm:text-5xl font-black leading-tight tracking-[-0.033em]">Choose Your Payment Method</h1>
+        <p class="text-white/60 text-base font-normal leading-normal">
+          Tournament: <span class="text-white font-medium">{{ tournament.name }}</span>
+        </p>
+        <p class="text-white/60 text-base font-normal leading-normal">
+          Total Amount Due: <span class="text-white font-bold">${{ tournament.registration_fee }} USD</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="mb-6">
+      {% for message in messages %}
+      <div class="rounded-lg p-4 mb-3 {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% elif message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %}">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl">
+            {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
+          </span>
+          <p class="text-sm font-medium">{{ message }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Payment Method Form -->
+    <form method="post" class="flex flex-col gap-4 mb-8">
+      {% csrf_token %}
+      
+      <!-- Stripe Payment Option -->
+      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
+        <div class="flex items-center gap-4 grow">
+          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-white/80">credit_card</span>
+          </div>
+          <div class="flex grow flex-col">
+            <p class="text-white text-base font-medium leading-normal">Stripe</p>
+            <p class="text-white/60 text-sm font-normal leading-normal">Credit or Debit Card (Visa, Mastercard, Amex)</p>
+          </div>
+        </div>
+        <input class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="stripe"/>
+      </label>
+
+      <!-- Paystack Payment Option -->
+      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
+        <div class="flex items-center gap-4 grow">
+          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-white/80">payment</span>
+          </div>
+          <div class="flex grow flex-col">
+            <p class="text-white text-base font-medium leading-normal">Paystack</p>
+            <p class="text-white/60 text-sm font-normal leading-normal">Secure payment via Paystack</p>
+          </div>
+        </div>
+        <input class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="paystack"/>
+      </label>
+
+      <!-- Local Payment Option (Development) -->
+      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
+        <div class="flex items-center gap-4 grow">
+          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-white/80">account_balance_wallet</span>
+          </div>
+          <div class="flex grow flex-col">
+            <p class="text-white text-base font-medium leading-normal">Pay Locally</p>
+            <p class="text-white/60 text-sm font-normal leading-normal">Development mode - Instant confirmation</p>
+          </div>
+        </div>
+        <input checked class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="local"/>
+      </label>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-2 mt-4">
+        <button type="submit" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 flex-1 bg-red-600 hover:bg-red-700 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors shadow-lg shadow-red-600/30">
+          <span class="truncate">Proceed to Payment</span>
+        </button>
+        <a href="{% url 'tournaments:detail' slug=tournament.slug %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 flex-1 bg-transparent hover:bg-white/5 text-white/60 hover:text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+          <span class="truncate">Back to Tournament</span>
+        </a>
+      </div>
+    </form>
+
+    <!-- Security Notice -->
+    <div class="flex items-center justify-center gap-2 mt-8 text-sm text-white/40">
+      <span class="material-symbols-outlined text-base">lock</span>
+      <p>All transactions are secure and encrypted.</p>
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tailwind CSS Graceful Fallbacks Demo</title>
+    
+    <!-- Load fallback CSS -->
+    <link rel="stylesheet" href="static/css/tailwind-fallback.css">
+    <link rel="stylesheet" href="static/css/graceful-fallbacks.css">
+    
+    <!-- Simulate Tailwind CSS failure by not loading it -->
+    <!-- <script src="https://cdn.tailwindcss.com" defer></script> -->
+    
+    <!-- Load polyfills -->
+    <script src="static/js/polyfills.js"></script>
+    
+    <!-- Load fallback handler -->
+    <script src="static/js/tailwind-fallback.js" defer></script>
+    
+    <style>
+        /* Additional demo styles */
+        .demo-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        html.dark .demo-section {
+            border-color: #374151;
+        }
+        
+        .demo-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #b91c1c;
+        }
+        
+        .demo-description {
+            margin-bottom: 1rem;
+            color: #6b7280;
+        }
+        
+        html.dark .demo-description {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="py-8">
+            <h1 class="text-3xl font-bold text-center text-primary">
+                Tailwind CSS Graceful Fallbacks Demo
+            </h1>
+            <p class="text-center text-gray-600 mt-4">
+                This page demonstrates graceful fallback mechanisms when Tailwind CSS fails to load
+            </p>
+        </header>
+        
+        <main>
+            <!-- Layout Demo -->
+            <section class="demo-section">
+                <h2 class="demo-title">Layout System</h2>
+                <p class="demo-description">
+                    Testing grid and flexbox layouts with fallbacks for older browsers
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-2">Card 1</h3>
+                        <p class="text-sm text-gray-600">This card uses CSS Grid with flexbox fallback</p>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-2">Card 2</h3>
+                        <p class="text-sm text-gray-600">Responsive design works across all browsers</p>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-2">Card 3</h3>
+                        <p class="text-sm text-gray-600">Graceful degradation ensures compatibility</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <span class="text-sm">Flexbox layout with fallbacks</span>
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary">Primary</button>
+                        <button class="btn btn-secondary">Secondary</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Form Demo -->
+            <section class="demo-section">
+                <h2 class="demo-title">Form Elements</h2>
+                <p class="demo-description">
+                    Form styling with cross-browser compatibility and no-JS fallbacks
+                </p>
+                
+                <form class="space-y-4" data-enhance>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Name</label>
+                        <input type="text" class="form-input" placeholder="Enter your name" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Message</label>
+                        <textarea class="form-textarea" rows="4" placeholder="Enter your message" required></textarea>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="reset" class="btn btn-outline">Reset</button>
+                    </div>
+                </form>
+            </section>
+            
+            <!-- Interactive Elements Demo -->
+            <section class="demo-section">
+                <h2 class="demo-title">Interactive Elements</h2>
+                <p class="demo-description">
+                    Elements that convert to static alternatives when JavaScript fails
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-2">Dynamic Content</h3>
+                        <div class="dynamic-content" data-dynamic-content="example">
+                            <p class="text-sm text-gray-600 mb-4">This content would normally be loaded dynamically</p>
+                            <button class="btn btn-primary" data-action="load" data-url="/api/content">
+                                Load Content
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <h3 class="font-semibold mb-2">Social Sharing</h3>
+                        <div class="social-sharing">
+                            <p class="text-sm text-gray-600 mb-4">Share this page on social media</p>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary text-xs" data-share="twitter">Twitter</button>
+                                <button class="btn btn-secondary text-xs" data-share="facebook">Facebook</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Accessibility Demo -->
+            <section class="demo-section">
+                <h2 class="demo-title">Accessibility Features</h2>
+                <p class="demo-description">
+                    Focus indicators, high contrast support, and screen reader compatibility
+                </p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Focus Test</label>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary focus:ring focus:ring-primary">Focus Me</button>
+                            <input type="text" class="form-input w-48" placeholder="Tab to me">
+                            <select class="form-select w-32">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            Use Tab key to navigate and see focus indicators. 
+                            Focus styles work across all browsers with appropriate fallbacks.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Status Indicators -->
+            <section class="demo-section">
+                <h2 class="demo-title">Status Indicators</h2>
+                <p class="demo-description">
+                    Visual feedback for different states and conditions
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-green-600/20 border border-green-600/50 rounded-lg p-4">
+                        <p class="text-green-400 text-sm font-medium">✅ Success State</p>
+                        <p class="text-green-300 text-xs mt-1">Everything is working correctly</p>
+                    </div>
+                    
+                    <div class="bg-yellow-600/20 border border-yellow-600/50 rounded-lg p-4">
+                        <p class="text-yellow-400 text-sm font-medium">⚠ Warning State</p>
+                        <p class="text-yellow-300 text-xs mt-1">Fallback mode is active</p>
+                    </div>
+                    
+                    <div class="bg-red-600/20 border border-red-600/50 rounded-lg p-4">
+                        <p class="text-red-400 text-sm font-medium">❌ Error State</p>
+                        <p class="text-red-300 text-xs mt-1">Critical resources failed to load</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="py-8 text-center text-gray-500">
+            <p>Graceful Fallbacks Demo - EYTGaming Platform</p>
+            <p class="text-xs mt-2">
+                This demo shows how the site maintains functionality even when modern features fail
+            </p>
+        </footer>
+    </div>
+    
+    <!-- Demo JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add demo functionality
+            console.log('Demo page loaded');
+            
+            // Simulate some dynamic behavior
+            setTimeout(function() {
+                const dynamicElements = document.querySelectorAll('[data-dynamic-content]');
+                dynamicElements.forEach(function(element) {
+                    const notice = document.createElement('div');
+                    notice.className = 'bg-blue-500/20 border border-blue-500/50 rounded p-2 mt-2';
+                    notice.innerHTML = '<p class="text-blue-400 text-xs">📡 Dynamic content simulation</p>';
+                    element.appendChild(notice);
+                });
+            }, 2000);
+            
+            // Test fallback detection
+            if (window.TailwindFallback) {
+                console.log('Tailwind Fallback system loaded');
+                console.log('Tailwind loaded:', window.TailwindFallback.isLoaded());
+                console.log('Fallback active:', window.TailwindFallback.isFallbackActive());
+            }
+        });
+    </script>
+</body>
+</html>

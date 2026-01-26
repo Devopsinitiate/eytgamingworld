@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Functionality Test - Tournament Detail</title>
+    <link rel="stylesheet" href="static/css/tournament-detail.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <style>
+        body { margin: 0; padding: 20px; background: #0f172a; color: white; font-family: system-ui; }
+        .test-section { margin-bottom: 40px; padding: 20px; border: 1px solid #334155; border-radius: 8px; }
+        .test-title { color: #b91c1c; font-size: 1.5rem; margin-bottom: 20px; }
+        .mobile-indicator { 
+            position: fixed; 
+            top: 10px; 
+            right: 10px; 
+            background: #b91c1c; 
+            color: white; 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-indicator" id="mobileIndicator">Desktop</div>
+    
+    <h1>Mobile-First Responsive Design Test</h1>
+    
+    <!-- Test 1: Tab Navigation with Horizontal Scrolling -->
+    <div class="test-section">
+        <h2 class="test-title">1. Tab Navigation with Mobile Scrolling</h2>
+        <div class="tab-navigation">
+            <div class="tab-nav-list">
+                <button class="tab-nav-item active" data-tab="details">
+                    <span class="material-symbols-outlined">info</span>
+                    Details
+                </button>
+                <button class="tab-nav-item" data-tab="bracket">
+                    <span class="material-symbols-outlined">account_tree</span>
+                    Bracket
+                </button>
+                <button class="tab-nav-item" data-tab="participants">
+                    <span class="material-symbols-outlined">group</span>
+                    Participants
+                </button>
+                <button class="tab-nav-item" data-tab="rules">
+                    <span class="material-symbols-outlined">gavel</span>
+                    Rules
+                </button>
+                <button class="tab-nav-item" data-tab="prizes">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                    Prizes
+                </button>
+                <button class="tab-nav-item" data-tab="schedule">
+                    <span class="material-symbols-outlined">schedule</span>
+                    Schedule
+                </button>
+            </div>
+        </div>
+        <p>Resize window to mobile width (&lt;768px) to see horizontal scrolling and indicators.</p>
+    </div>
+    
+    <!-- Test 2: Statistics Dashboard Mobile Layout -->
+    <div class="test-section">
+        <h2 class="test-title">2. Statistics Dashboard (2-column on mobile)</h2>
+        <div class="stats-dashboard">
+            <div class="stat-card" data-stat="participants">
+                <div class="stat-value">24</div>
+                <div class="stat-label">Registered</div>
+                <div class="stat-progress">
+                    <div class="stat-progress-fill" style="width: 75%"></div>
+                </div>
+            </div>
+            <div class="stat-card" data-stat="prize-pool">
+                <div class="stat-value">$5,000</div>
+                <div class="stat-label">Prize Pool</div>
+            </div>
+            <div class="stat-card" data-stat="views">
+                <div class="stat-value">1,234</div>
+                <div class="stat-label">Views</div>
+            </div>
+            <div class="stat-card" data-stat="capacity">
+                <div class="stat-value">32</div>
+                <div class="stat-label">Max Players</div>
+            </div>
+        </div>
+        <p>On mobile: 2-column grid. On desktop: 4-column grid.</p>
+    </div>
+    
+    <!-- Test 3: Mobile Registration Card -->
+    <div class="test-section">
+        <h2 class="test-title">3. Mobile Registration Card (Sticky Bottom)</h2>
+        <div class="enhanced-registration-card" id="testRegistrationCard">
+            <div class="registration-card-header">
+                <div class="registration-card-title">
+                    <span class="material-symbols-outlined">how_to_reg</span>
+                    Tournament Registration
+                </div>
+                <div class="capacity-indicator">
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: 75%"></div>
+                    </div>
+                    <div class="capacity-text">
+                        <span class="registered-count">24</span> / <span class="max-participants">32</span> players
+                    </div>
+                </div>
+            </div>
+            <div class="registration-card-content">
+                <div style="padding: 20px;">
+                    <button style="width: 100%; padding: 12px; background: #b91c1c; color: white; border: none; border-radius: 8px; font-weight: 600;">
+                        Register Now - $25
+                    </button>
+                    <p style="margin-top: 12px; font-size: 14px; color: #94a3b8;">
+                        Registration closes in 2 days
+                    </p>
+                </div>
+            </div>
+        </div>
+        <p>On mobile: Becomes sticky at bottom with minimize functionality and scroll hiding.</p>
+    </div>
+    
+    <!-- Test 4: Touch Target Optimization -->
+    <div class="test-section">
+        <h2 class="test-title">4. Touch Target Optimization (44px minimum)</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="action-btn">Small Button</button>
+            <button class="action-btn">Another Button</button>
+            <button class="action-btn">Touch Target</button>
+        </div>
+        <p>All interactive elements have minimum 44px touch targets on mobile.</p>
+    </div>
+    
+    <!-- Test Content for Scrolling -->
+    <div class="test-section">
+        <h2 class="test-title">5. Scroll Test Content</h2>
+        <div style="height: 800px; background: linear-gradient(to bottom, #1e293b, #0f172a); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <p>Scroll down to test mobile registration card hiding behavior</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2 class="test-title">6. More Scroll Content</h2>
+        <div style="height: 600px; background: linear-gradient(to bottom, #0f172a, #1e293b); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <p>Keep scrolling to see registration card hide/show behavior</p>
+        </div>
+    </div>
+
+    <script src="static/js/tournament-detail.js"></script>
+    <script>
+        // Update mobile indicator
+        function updateMobileIndicator() {
+            const indicator = document.getElementById('mobileIndicator');
+            const width = window.innerWidth;
+            if (width <= 640) {
+                indicator.textContent = 'Mobile (≤640px)';
+                indicator.style.background = '#dc2626';
+            } else if (width <= 768) {
+                indicator.textContent = 'Tablet (≤768px)';
+                indicator.style.background = '#f59e0b';
+            } else if (width <= 1024) {
+                indicator.textContent = 'Desktop (≤1024px)';
+                indicator.style.background = '#059669';
+            } else {
+                indicator.textContent = 'Large Desktop (>1024px)';
+                indicator.style.background = '#2563eb';
+            }
+        }
+        
+        updateMobileIndicator();
+        window.addEventListener('resize', updateMobileIndicator);
+        
+        // Initialize components for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tab navigation
+            const tabNavigation = document.querySelector('.tab-navigation');
+            if (tabNavigation && typeof TabNavigation !== 'undefined') {
+                new TabNavigation(tabNavigation);
+            }
+            
+            // Initialize registration card
+            const registrationCard = document.getElementById('testRegistrationCard');
+            if (registrationCard && typeof StickyRegistrationCard !== 'undefined') {
+                new StickyRegistrationCard(registrationCard);
+            }
+            
+            // Test touch target optimization
+            if (typeof window.MobileEnhancements !== 'undefined') {
+                window.MobileEnhancements.optimizeTouchTargets();
+            }
+            
+            console.log('Mobile functionality test initialized');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Complete Payment{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto py-12">
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Complete Payment for {{ tournament.name }}</h2>
+        <p class="mb-4">Registration fee: <strong>${{ tournament.registration_fee }}</strong></p>
+        <form method="post">
+            {% csrf_token %}
+            <p class="text-sm text-gray-600 mb-4">This page simulates payment processing in the development environment.</p>
+            <div class="flex justify-end">
+                <a href="{% url 'tournaments:detail' slug=tournament.slug %}" class="px-4 py-2 mr-2 border rounded">Cancel</a>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Pay Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

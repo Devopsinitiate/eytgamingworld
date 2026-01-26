@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Check In - {{ tournament.name }} - EYTGaming{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-background-dark">
+    <main class="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 py-10">
+        <div class="max-w-2xl mx-auto">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap gap-2 py-6">
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium"
+                    href="{% url 'home' %}">Home</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium"
+                    href="{% url 'tournaments:list' %}">Tournaments</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <a class="text-gray-400 hover:text-gray-200 transition-colors text-sm font-medium"
+                    href="{% url 'tournaments:detail' tournament.slug %}">{{ tournament.name }}</a>
+                <span class="text-gray-400 text-sm font-medium">/</span>
+                <span class="text-white text-sm font-medium">Check In</span>
+            </div>
+
+            <!-- Check-in Form -->
+            <div class="bg-gray-800 p-8 rounded-lg border border-white/10">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">Tournament Check-In</h1>
+                    <p class="text-gray-400">Confirm your participation in the tournament</p>
+                </div>
+
+                <!-- Tournament Details -->
+                <div class="bg-gray-900 p-6 rounded-lg mb-6">
+                    <h2 class="text-xl font-bold text-white mb-4">Tournament Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="text-gray-400">Tournament</p>
+                            <p class="text-white font-medium">{{ tournament.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Start Time</p>
+                            <p class="text-white font-medium">{{ tournament.start_datetime|date:"M d, Y g:i A" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Format</p>
+                            <p class="text-white font-medium">{{ tournament.get_format_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400">Your Status</p>
+                            <p class="text-green-400 font-medium">{{ participant.get_status_display }}</p>
+                        </div>
+                        {% if tournament.is_team_based and participant.team %}
+                        <div class="md:col-span-2">
+                            <p class="text-gray-400">Team</p>
+                            <p class="text-white font-medium">{{ participant.team.name }} [{{ participant.team.tag }}]
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Check-in Instructions -->
+                <div class="bg-primary/20 border border-primary/50 rounded-lg p-4 mb-6">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p class="text-blue-400 font-medium">Check-In Instructions</p>
+                            <div class="text-blue-300 text-sm mt-1 space-y-1">
+                                <p>• Make sure you're available for the entire tournament duration.</p>
+                                <p>• Have your game client ready and updated.</p>
+                                <p>• Join the tournament Discord server if required.</p>
+                                <p>• Check-in confirms your participation and readiness to compete.</p>
+                                <p>• Failure to check in may result in disqualification.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'tournaments:detail' tournament.slug %}"
+                        class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg text-center transition">
+                        Back to Tournament
+                    </a>
+                    <form method="post" class="flex-1">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition">
+                            ✓ Check In Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

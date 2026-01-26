@@ -1,0 +1,126 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}Team Invitations - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-6 md:mb-8">
+        <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Team Invitations</h1>
+        <p class="text-gray-400 text-sm md:text-base">Manage your team invitations and join requests</p>
+    </div>
+    
+    <!-- Received Invites Section -->
+    <div class="mb-8">
+        <h2 class="text-white text-2xl font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined">mail</span>
+            Received Invitations
+        </h2>
+        
+        {% if received_invites %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            {% for invite in received_invites %}
+            <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
+                <!-- Team Info -->
+                <div class="flex items-start gap-3 md:gap-4 mb-4">
+                    <!-- Team Logo -->
+                    <div class="flex-shrink-0">
+                        {% if invite.team.logo %}
+                        <img src="{{ invite.team.logo.url }}" alt="{{ invite.team.name }}" class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover border-2 border-primary">
+                        {% else %}
+                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-primary/20 flex items-center justify-center border-2 border-primary">
+                            <span class="material-symbols-outlined text-primary text-xl sm:text-2xl">groups</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Team Details -->
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-white text-lg md:text-xl font-bold mb-1 truncate">{{ invite.team.name }}</h3>
+                        <p class="text-gray-400 mb-2 text-sm">[{{ invite.team.tag }}]</p>
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-400 text-xs sm:text-sm rounded-full font-medium">
+                            {{ invite.team.game.name }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Invite Details -->
+                <div class="mb-4 p-4 bg-background-dark rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-400 text-sm">person</span>
+                        <p class="text-gray-300 text-sm">
+                            Invited by <span class="text-white font-medium">{{ invite.invited_by.get_display_name }}</span>
+                        </p>
+                    </div>
+                    
+                    {% if invite.message %}
+                    <div class="flex items-start gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-400 text-sm">chat</span>
+                        <p class="text-gray-300 text-sm">{{ invite.message }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gray-400 text-sm">schedule</span>
+                        <p class="text-gray-400 text-sm">
+                            Expires {{ invite.expires_at|timeuntil }}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Team Stats -->
+                <div class="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+                    <div class="bg-background-dark rounded-lg p-3 text-center">
+                        <p class="text-gray-400 text-xs mb-1">Members</p>
+                        <p class="text-white font-bold">{{ invite.team.member_count }}/{{ invite.team.max_members }}</p>
+                    </div>
+                    <div class="bg-background-dark rounded-lg p-3 text-center">
+                        <p class="text-gray-400 text-xs mb-1">Tournaments</p>
+                        <p class="text-white font-bold">{{ invite.team.tournaments_played }}</p>
+                    </div>
+                    <div class="bg-background-dark rounded-lg p-3 text-center">
+                        <p class="text-gray-400 text-xs mb-1">Win Rate</p>
+                        <p class="text-white font-bold">{{ invite.team.win_rate }}%</p>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-2 md:gap-3">
+                    <form method="post" action="{% url 'teams:invite_accept' invite_id=invite.id %}" class="flex-1">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full px-4 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            Accept
+                        </button>
+                    </form>
+                    
+                    <form method="post" action="{% url 'teams:invite_decline' invite_id=invite.id %}" class="flex-1" onsubmit="return confirm('Are you sure you want to decline this invitation?');">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full px-4 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">cancel</span>
+                            Decline
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- View Team Link -->
+                <a href="{% url 'teams:detail' slug=invite.team.slug %}" class="block mt-3 text-center text-primary hover:text-primary/80 text-sm transition-colors">
+                    View Team Profile →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
+            <span class="material-symbols-outlined text-gray-600 text-6xl mb-4 block">mail_outline</span>
+            <h3 class="text-white text-xl font-bold mb-2">No Pending Invitations</h3>
+            <p class="text-gray-400 mb-6">You don't have any team invitations at the moment.</p>
+            <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-sm">search</span>
+                Browse Teams
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

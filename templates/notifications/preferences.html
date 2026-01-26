@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Preferences - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+        font-family: 'Spline Sans', sans-serif;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-900 py-6 lg:py-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <a href="/" class="text-gray-400 text-base font-medium hover:text-white transition">
+                Home
+            </a>
+            <span class="text-gray-400 text-base font-medium">/</span>
+            <a href="{% url 'notifications:list' %}" class="text-gray-400 text-base font-medium hover:text-white transition">
+                Notifications
+            </a>
+            <span class="text-gray-400 text-base font-medium">/</span>
+            <span class="text-white text-base font-medium">Preferences</span>
+        </div>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-white text-4xl font-black leading-tight tracking-tight mb-2">
+                Notification Preferences
+            </h1>
+            <p class="text-gray-400 text-base font-normal leading-normal">
+                Customize how and when you receive notifications from EYTGaming.
+            </p>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden mb-6 p-4 bg-green-600/20 border border-green-600/50 rounded-lg">
+            <div class="flex items-center gap-2 text-green-400">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span class="font-medium">Preferences saved successfully!</span>
+            </div>
+        </div>
+
+        <form id="preferences-form" method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- In-App Notifications -->
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-red-600 text-2xl">app_badging</span>
+                    <h2 class="text-white text-xl font-bold">In-App Notifications</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Enable In-App Notifications</p>
+                            <p class="text-gray-400 text-sm mt-1">Show notifications within the platform</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="in_app_enabled" class="sr-only peer" {% if prefs.in_app_enabled %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Notifications -->
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-red-600 text-2xl">email</span>
+                    <h2 class="text-white text-xl font-bold">Email Notifications</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-700">
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Enable Email Notifications</p>
+                            <p class="text-gray-400 text-sm mt-1">Receive notifications via email</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="email_enabled" class="sr-only peer" {% if prefs.email_enabled %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="pl-4 space-y-3">
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Tournament Updates</label>
+                            <input type="checkbox" name="email_tournament_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_tournament_updates %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Coaching Reminders</label>
+                            <input type="checkbox" name="email_coaching_reminders" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_coaching_reminders %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Team Activity</label>
+                            <input type="checkbox" name="email_team_activity" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_team_activity %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Payment Receipts</label>
+                            <input type="checkbox" name="email_payment_receipts" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_payment_receipts %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Security Alerts</label>
+                            <input type="checkbox" name="email_security_alerts" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_security_alerts %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Marketing & Promotions</label>
+                            <input type="checkbox" name="email_marketing" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_marketing %}checked{% endif %}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Push Notifications -->
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-red-600 text-2xl">notifications_active</span>
+                    <h2 class="text-white text-xl font-bold">Push Notifications</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-700">
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Enable Push Notifications</p>
+                            <p class="text-gray-400 text-sm mt-1">Receive push notifications on your devices</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="push_enabled" class="sr-only peer" {% if prefs.push_enabled %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="pl-4 space-y-3">
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Tournament Updates</label>
+                            <input type="checkbox" name="push_tournament_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_tournament_updates %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Coaching Reminders</label>
+                            <input type="checkbox" name="push_coaching_reminders" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_coaching_reminders %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Team Activity</label>
+                            <input type="checkbox" name="push_team_activity" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_team_activity %}checked{% endif %}>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="text-gray-300 text-sm">Match Updates</label>
+                            <input type="checkbox" name="push_match_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_match_updates %}checked{% endif %}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiet Hours -->
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-red-600 text-2xl">bedtime</span>
+                    <h2 class="text-white text-xl font-bold">Quiet Hours</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between py-3">
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Enable Quiet Hours</p>
+                            <p class="text-gray-400 text-sm mt-1">Pause non-urgent notifications during specified hours</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="quiet_hours_enabled" class="sr-only peer" {% if prefs.quiet_hours_enabled %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm mb-2">Start Time</label>
+                            <input type="time" name="quiet_hours_start" value="{{ prefs.quiet_hours_start|default:'22:00' }}" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm mb-2">End Time</label>
+                            <input type="time" name="quiet_hours_end" value="{{ prefs.quiet_hours_end|default:'08:00' }}" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-600 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end gap-4">
+                <a href="{% url 'notifications:list' %}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
+                    Save Preferences
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('preferences-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{% url "notifications:preferences" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const successMsg = document.getElementById('success-message');
+            successMsg.classList.remove('hidden');
+            setTimeout(() => {
+                successMsg.classList.add('hidden');
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to save preferences. Please try again.');
+    });
+});
+</script>
+{% endblock %}

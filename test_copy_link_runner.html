@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Link Property Test Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-output {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        .info { color: #60a5fa; }
+        button {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #b91c1c;
+        }
+        button:disabled {
+            background-color: #6b7280;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>Copy Link Property Test Runner</h1>
+    <p>This test validates Property 4: Copy Link Cross-Browser Functionality</p>
+    
+    <div>
+        <button id="runTests" onclick="runPropertyTests()">Run Property Tests</button>
+        <button id="clearOutput" onclick="clearOutput()">Clear Output</button>
+    </div>
+    
+    <div id="testOutput" class="test-output">
+        Click "Run Property Tests" to start testing...
+    </div>
+
+    <!-- Include the modules -->
+    <script type="module">
+        // Import the CopyLinkHandler
+        import CopyLinkHandler from './static/js/modules/copy-link-handler.js';
+        window.CopyLinkHandler = CopyLinkHandler;
+        
+        // Simple property test implementation (simplified for browser testing)
+        class SimpleCopyLinkTest {
+            constructor() {
+                this.iterations = 20; // Reduced for browser testing
+                this.results = [];
+            }
+            
+            log(message, type = 'info') {
+                const output = document.getElementById('testOutput');
+                const timestamp = new Date().toLocaleTimeString();
+                const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+                output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            generateTestURL() {
+                const urls = [
+                    'https://eytgaming.com/tournaments/test-tournament',
+                    'http://localhost:8000/tournaments/sample',
+                    'https://example.com/tournaments/championship?utm_source=test',
+                    window.location.href
+                ];
+                return urls[Math.floor(Math.random() * urls.length)];
+            }
+            
+            createTestButton() {
+                const button = document.createElement('button');
+                button.className = 'copy-button';
+                button.textContent = Math.random() > 0.5 ? 'Copy Link' : 'btn-copy-class';
+                button.setAttribute('data-copy-link', '');
+                return button;
+            }
+            
+            async testCopyLinkFunctionality() {
+                this.log('Starting Copy Link Property Tests...', 'info');
+                this.log(`Running ${this.iterations} iterations`, 'info');
+                
+                let successCount = 0;
+                let failureCount = 0;
+                
+                for (let i = 0; i < this.iterations; i++) {
+                    try {
+                        const url = this.generateTestURL();
+                        const button = this.createTestButton();
+                        
+                        // Add button to DOM
+                        document.body.appendChild(button);
+                        
+                        // Create handler
+                        const handler = new CopyLinkHandler(button);
+                        
+                        // Test 1: Button text should be fixed
+                        const buttonText = button.textContent;
+                        if (buttonText.includes('class') || buttonText.includes('btn-')) {
+                            throw new Error(`Button text not fixed: "${buttonText}"`);
+                        }
+                        
+                        // Test 2: Handler should be created successfully
+                        if (!handler) {
+                            throw new Error('Handler not created');
+                        }
+                        
+                        // Test 3: Copy method should exist and be callable
+                        if (typeof handler.copyToClipboard !== 'function') {
+                            throw new Error('copyToClipboard method not found');
+                        }
+                        
+                        // Test 4: Browser support check should work
+                        const support = handler.checkBrowserSupport();
+                        if (!support || typeof support !== 'object') {
+                            throw new Error('Browser support check failed');
+                        }
+                        
+                        // Test 5: Fallback methods should be available
+                        if (!handler.fallbackMethods || handler.fallbackMethods.length === 0) {
+                            throw new Error('No fallback methods available');
+                        }
+                        
+                        // Clean up
+                        handler.destroy();
+                        document.body.removeChild(button);
+                        
+                        successCount++;
+                        
+                        if (i % 5 === 0) {
+                            this.log(`Progress: ${i + 1}/${this.iterations} iterations completed`, 'info');
+                        }
+                        
+                    } catch (error) {
+                        failureCount++;
+                        this.log(`Iteration ${i + 1} failed: ${error.message}`, 'error');
+                    }
+                }
+                
+                // Report results
+                this.log(`\\nTest Results:`, 'info');
+                this.log(`✓ Successful: ${successCount}/${this.iterations}`, 'success');
+                this.log(`✗ Failed: ${failureCount}/${this.iterations}`, failureCount > 0 ? 'error' : 'info');
+                
+                const successRate = (successCount / this.iterations) * 100;
+                this.log(`Success Rate: ${successRate.toFixed(1)}%`, successRate >= 95 ? 'success' : 'error');
+                
+                if (successRate >= 95) {
+                    this.log('🎉 Property test PASSED!', 'success');
+                    return true;
+                } else {
+                    this.log('❌ Property test FAILED!', 'error');
+                    return false;
+                }
+            }
+        }
+        
+        // Make test available globally
+        window.SimpleCopyLinkTest = SimpleCopyLinkTest;
+    </script>
+    
+    <script>
+        async function runPropertyTests() {
+            const button = document.getElementById('runTests');
+            button.disabled = true;
+            button.textContent = 'Running Tests...';
+            
+            try {
+                const tester = new SimpleCopyLinkTest();
+                await tester.testCopyLinkFunctionality();
+            } catch (error) {
+                const output = document.getElementById('testOutput');
+                output.innerHTML += `<span class="error">Test runner error: ${error.message}</span>\n`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Run Property Tests';
+            }
+        }
+        
+        function clearOutput() {
+            document.getElementById('testOutput').innerHTML = 'Output cleared. Click "Run Property Tests" to start testing...\n';
+        }
+    </script>
+</body>
+</html>

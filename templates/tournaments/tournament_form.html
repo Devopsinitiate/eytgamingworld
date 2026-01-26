@@ -1,0 +1,621 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Edit Tournament{% else %}Create Tournament{% endif %} - EYTGaming{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-50 dark:bg-background-dark py-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <a class="text-gray-500 dark:text-gray-400 hover:text-primary text-base font-medium leading-normal" href="{% url 'dashboard:home' %}">Dashboard</a>
+            <span class="text-gray-500 dark:text-gray-400 text-base font-medium leading-normal">/</span>
+            <a class="text-gray-500 dark:text-gray-400 hover:text-primary text-base font-medium leading-normal" href="{% url 'tournaments:list' %}">Tournaments</a>
+            <span class="text-gray-500 dark:text-gray-400 text-base font-medium leading-normal">/</span>
+            <span class="text-gray-900 dark:text-white text-base font-medium leading-normal">{% if form.instance.pk %}Edit{% else %}Create New{% endif %}</span>
+        </div>
+
+        <!-- Page Heading -->
+        <div class="flex flex-wrap justify-between gap-3 mb-6">
+            <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+                {% if form.instance.pk %}Edit Tournament{% else %}Create a New Tournament{% endif %}
+            </h1>
+        </div>
+
+        <!-- Form Container -->
+        <form method="post" enctype="multipart/form-data" class="flex flex-col gap-8 bg-white dark:bg-gray-800/20 border border-gray-200 dark:border-white/10 rounded-xl p-6 md:p-8">
+            {% csrf_token %}
+            
+            <!-- Display form errors -->
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                            Please correct the following errors:
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            {{ form.non_field_errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Section 1: Basic Information -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Basic Information
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Tournament Name -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.name.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Tournament Name <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Slug -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.slug.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            URL Slug <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.slug }}
+                        {% if form.slug.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.slug.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used in the tournament URL</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Game Selection -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.game.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Game <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.game }}
+                        {% if form.game.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.game.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Format -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.format.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Tournament Format <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.format }}
+                        {% if form.format.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.format.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tournament Banner -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.banner.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Tournament Banner
+                    </label>
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-900/50 hover:bg-gray-200 dark:hover:bg-gray-800/80">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <svg class="w-10 h-10 text-gray-500 dark:text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG or GIF (REC. 1200x480px)</p>
+                            </div>
+                            {{ form.banner }}
+                        </label>
+                    </div>
+                    {% if form.banner.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.banner.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 2: Details & Rules -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Details &amp; Rules
+                </h3>
+                
+                <!-- Description -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.description.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Detailed Description <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Rules -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.rules.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Rules
+                    </label>
+                    {{ form.rules }}
+                    {% if form.rules.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.rules.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 3: Configuration -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Configuration
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Tournament Type -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.tournament_type.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Tournament Type
+                        </label>
+                        {{ form.tournament_type }}
+                        {% if form.tournament_type.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.tournament_type.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Min Participants -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.min_participants.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Min Participants
+                        </label>
+                        {{ form.min_participants }}
+                        {% if form.min_participants.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.min_participants.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Max Participants -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.max_participants.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Max Participants <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.max_participants }}
+                        {% if form.max_participants.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.max_participants.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Team Based -->
+                    <div class="flex items-center gap-4">
+                        {{ form.is_team_based }}
+                        <label for="{{ form.is_team_based.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium">
+                            Team-Based Tournament
+                        </label>
+                    </div>
+
+                    <!-- Team Size -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.team_size.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Team Size
+                        </label>
+                        {{ form.team_size }}
+                        {% if form.team_size.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.team_size.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Schedule -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Schedule
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Registration Start -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.registration_start.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Registration Start <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.registration_start }}
+                        {% if form.registration_start.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_start.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Registration End -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.registration_end.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Registration End <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.registration_end }}
+                        {% if form.registration_end.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_end.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Check-in Start -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.check_in_start.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Check-in Start <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.check_in_start }}
+                        {% if form.check_in_start.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.check_in_start.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tournament Start -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.start_datetime.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Tournament Start <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.start_datetime }}
+                        {% if form.start_datetime.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.start_datetime.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Estimated End -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.estimated_end.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Estimated End (Optional)
+                    </label>
+                    {{ form.estimated_end }}
+                    {% if form.estimated_end.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.estimated_end.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 5: Participation & Prizing -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Participation &amp; Prizing
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Prize Pool -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.prize_pool.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Prize Pool ($)
+                        </label>
+                        {{ form.prize_pool }}
+                        {% if form.prize_pool.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.prize_pool.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Registration Fee -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.registration_fee.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Registration Fee ($)
+                        </label>
+                        {{ form.registration_fee }}
+                        {% if form.registration_fee.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_fee.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Seeding Method -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.seeding_method.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Seeding Method
+                        </label>
+                        {{ form.seeding_method }}
+                        {% if form.seeding_method.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.seeding_method.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Best Of -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.best_of.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Best Of
+                        </label>
+                        {{ form.best_of }}
+                        {% if form.best_of.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.best_of.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Prize Distribution -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.prize_distribution.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Prize Distribution (JSON)
+                    </label>
+                    {{ form.prize_distribution }}
+                    {% if form.prize_distribution.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.prize_distribution.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Example: {"1st": 50, "2nd": 30, "3rd": 20}</p>
+                </div>
+
+                <!-- Checkboxes -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-4">
+                        {{ form.requires_approval }}
+                        <label for="{{ form.requires_approval.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium">
+                            Require Approval for Registration
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Media & Links -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Media &amp; Links
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Thumbnail -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.thumbnail.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Thumbnail
+                        </label>
+                        {{ form.thumbnail }}
+                        {% if form.thumbnail.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.thumbnail.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Venue -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.venue.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Venue (for local tournaments)
+                        </label>
+                        {{ form.venue }}
+                        {% if form.venue.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.venue.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Stream URL -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.stream_url.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Stream URL
+                        </label>
+                        {{ form.stream_url }}
+                        {% if form.stream_url.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.stream_url.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Discord Invite -->
+                    <div class="flex flex-col w-full">
+                        <label for="{{ form.discord_invite.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Discord Invite
+                        </label>
+                        {{ form.discord_invite }}
+                        {% if form.discord_invite.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.discord_invite.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Access & Visibility -->
+            <div class="flex flex-col gap-6">
+                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-gray-200 dark:border-white/10">
+                    Access &amp; Visibility
+                </h3>
+                
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-4">
+                        {{ form.is_public }}
+                        <label for="{{ form.is_public.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium">
+                            Public Tournament
+                        </label>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        {{ form.is_featured }}
+                        <label for="{{ form.is_featured.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium">
+                            Featured Tournament
+                        </label>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        {{ form.requires_verification }}
+                        <label for="{{ form.requires_verification.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium">
+                            Require Verified Accounts
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Skill Requirement -->
+                <div class="flex flex-col w-full">
+                    <label for="{{ form.skill_requirement.id_for_label }}" class="text-gray-800 dark:text-white text-sm font-medium leading-normal pb-2">
+                        Skill Requirement
+                    </label>
+                    {{ form.skill_requirement }}
+                    {% if form.skill_requirement.errors %}
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.skill_requirement.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-white/10">
+                <a href="{% url 'tournaments:list' %}" class="flex w-full sm:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 text-base font-bold hover:bg-gray-300 dark:hover:bg-gray-600">
+                    Cancel
+                </a>
+                <button type="submit" class="flex w-full sm:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-primary text-white px-8 text-base font-bold shadow-lg shadow-primary/30 hover:bg-primary/90">
+                    {% if form.instance.pk %}Update Tournament{% else %}Create Tournament{% endif %}
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    /* Style form inputs to match the design */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="datetime-local"],
+    input[type="file"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        background-color: #ffffff;
+        color: #1f2937;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="url"]:focus,
+    input[type="datetime-local"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #135bec;
+        box-shadow: 0 0 0 3px rgba(19, 91, 236, 0.1);
+    }
+
+    /* Dark mode styles */
+    .dark input[type="text"],
+    .dark input[type="number"],
+    .dark input[type="email"],
+    .dark input[type="url"],
+    .dark input[type="datetime-local"],
+    .dark select,
+    .dark textarea {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+
+    .dark input[type="text"]:focus,
+    .dark input[type="number"]:focus,
+    .dark input[type="email"]:focus,
+    .dark input[type="url"]:focus,
+    .dark input[type="datetime-local"]:focus,
+    .dark select:focus,
+    .dark textarea:focus {
+        border-color: #135bec;
+        box-shadow: 0 0 0 3px rgba(19, 91, 236, 0.2);
+    }
+
+    /* Placeholder text */
+    input::placeholder,
+    textarea::placeholder {
+        color: #9ca3af;
+    }
+
+    .dark input::placeholder,
+    .dark textarea::placeholder {
+        color: #6b7280;
+    }
+
+    /* Select dropdown arrow */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+    .dark select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* Checkbox toggle styling */
+    input[type="checkbox"] {
+        width: 2.75rem;
+        height: 1.5rem;
+        background-color: #e5e7eb;
+        border-radius: 9999px;
+        position: relative;
+        cursor: pointer;
+        appearance: none;
+        transition: background-color 0.2s;
+    }
+
+    .dark input[type="checkbox"] {
+        background-color: #374151;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: #135bec;
+    }
+
+    input[type="checkbox"]::after {
+        content: '';
+        position: absolute;
+        top: 0.125rem;
+        left: 0.125rem;
+        background-color: white;
+        border: 1px solid #d1d5db;
+        border-radius: 9999px;
+        height: 1.25rem;
+        width: 1.25rem;
+        transition: all 0.2s;
+    }
+
+    input[type="checkbox"]:checked::after {
+        transform: translateX(1.25rem);
+        border-color: white;
+    }
+
+    /* File input */
+    input[type="file"] {
+        display: none;
+    }
+
+    /* Select height */
+    select {
+        height: 3rem;
+    }
+
+    /* Textarea min height */
+    textarea {
+        min-height: 8rem;
+        resize: vertical;
+    }
+
+    /* Option text in select */
+    select option {
+        background-color: #ffffff;
+        color: #1f2937;
+    }
+
+    .dark select option {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Rate Limit Exceeded - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-card-dark border border-card-border-dark rounded-xl p-8 text-center">
+        <!-- Icon -->
+        <div class="mb-6">
+            <div class="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-yellow-500 text-5xl">schedule</span>
+            </div>
+        </div>
+        
+        <!-- Title -->
+        <h1 class="text-white text-3xl font-bold mb-4">Too Many Requests</h1>
+        
+        <!-- Message -->
+        <p class="text-gray-400 text-lg mb-6">
+            You've made too many payment requests in a short period of time. 
+            This is a security measure to protect your account.
+        </p>
+        
+        <!-- Info Box -->
+        <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
+            <p class="text-yellow-400 text-sm">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">info</span>
+                Please wait about an hour before trying again.
+            </p>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{% url 'dashboard:home' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors">
+                <span class="material-symbols-outlined mr-2">home</span>
+                Go to Dashboard
+            </a>
+            <a href="{% url 'payments:history' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors">
+                <span class="material-symbols-outlined mr-2">history</span>
+                View Payment History
+            </a>
+        </div>
+        
+        <!-- Help Text -->
+        <div class="mt-8 pt-6 border-t border-card-border-dark">
+            <p class="text-gray-500 text-sm">
+                If you believe this is an error or need immediate assistance, 
+                please <a href="mailto:support@eytgaming.com" class="text-primary hover:underline">contact support</a>.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1096 @@
+/* ============================================
+   EYTGaming Payment Pages CSS
+   ============================================ */
+
+/* ============================================
+   Brand Colors & Variables
+   ============================================ */
+:root {
+    /* EYT Red Branding */
+    --primary: #b91c1c;
+    --primary-dark: #991b1b;
+    --primary-light: #dc2626;
+    
+    /* Background Colors */
+    --background-dark: #111827;
+    --card-dark: #1F2937;
+    --input-dark: #282e39;
+    
+    /* Border Colors */
+    --card-border-dark: #374151;
+    --border-gray: #4b5563;
+    
+    /* Text Colors */
+    --text-white: #ffffff;
+    --text-gray-light: #9da6b9;
+    --text-gray-dark: #6b7280;
+    
+    /* Status Colors */
+    --status-pending: #fbbf24;
+    --status-processing: #60a5fa;
+    --status-succeeded: #4ade80;
+    --status-failed: #f87171;
+    --status-refunded: #c084fc;
+    --status-cancelled: #9ca3af;
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+}
+
+/* ============================================
+   Stripe Element Styling
+   ============================================ */
+#card-element {
+    background-color: var(--input-dark);
+    padding: 12px 16px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--card-border-dark);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 40px;
+}
+
+#card-element:focus-within {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+#card-element.StripeElement--invalid {
+    border-color: var(--error);
+}
+
+#card-element.StripeElement--complete {
+    border-color: var(--success);
+}
+
+/* Card Errors Display */
+#card-errors {
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   Loading Spinner Styles
+   ============================================ */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--text-white);
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner-large {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+/* Button Loading State */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--text-white);
+    animation: spin 1s linear infinite;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay .loading-spinner {
+    width: 60px;
+    height: 60px;
+    border-width: 5px;
+}
+
+/* ============================================
+   Error Message Styles
+   ============================================ */
+.error-message {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--error);
+    border-radius: 0.5rem;
+    padding: 12px 16px;
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.error-message svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.error-message.hidden {
+    display: none;
+}
+
+/* Inline Field Errors */
+.field-error {
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.input-error {
+    border-color: var(--error) !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================
+   Success Message Styles
+   ============================================ */
+.success-message {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 0.5rem;
+    padding: 12px 16px;
+    color: var(--success);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.success-message svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.success-message.hidden {
+    display: none;
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 16px;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.toast.toast-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.toast.toast-error {
+    background-color: var(--error);
+    color: white;
+}
+
+.toast.toast-warning {
+    background-color: var(--warning);
+    color: white;
+}
+
+.toast.toast-info {
+    background-color: var(--info);
+    color: white;
+}
+
+.toast.hiding {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+/* ============================================
+   Modal Styles
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    padding: 1rem;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: var(--card-dark);
+    border: 1px solid var(--card-border-dark);
+    border-radius: 0.75rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--card-border-dark);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-white);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-gray-light);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--card-border-dark);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* ============================================
+   Payment Status Badges
+   ============================================ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge.status-pending {
+    background-color: rgba(251, 191, 36, 0.1);
+    color: var(--status-pending);
+}
+
+.status-badge.status-processing {
+    background-color: rgba(96, 165, 250, 0.1);
+    color: var(--status-processing);
+}
+
+.status-badge.status-succeeded {
+    background-color: rgba(74, 222, 128, 0.1);
+    color: var(--status-succeeded);
+}
+
+.status-badge.status-failed {
+    background-color: rgba(248, 113, 113, 0.1);
+    color: var(--status-failed);
+}
+
+.status-badge.status-refunded {
+    background-color: rgba(192, 132, 252, 0.1);
+    color: var(--status-refunded);
+}
+
+.status-badge.status-cancelled {
+    background-color: rgba(156, 163, 175, 0.1);
+    color: var(--status-cancelled);
+}
+
+/* ============================================
+   Payment Card Styles
+   ============================================ */
+.payment-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--card-border-dark);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 6px -1px rgba(185, 28, 28, 0.1);
+}
+
+.payment-method-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--card-border-dark);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.payment-method-card.default {
+    border-color: var(--primary);
+}
+
+.payment-method-card .card-brand {
+    width: 48px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--input-dark);
+    border-radius: 0.375rem;
+}
+
+/* ============================================
+   Security Badge
+   ============================================ */
+.security-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 0.5rem;
+    color: var(--success);
+    font-size: 0.875rem;
+}
+
+.security-badge svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    color: var(--text-gray-dark);
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    color: var(--text-gray-light);
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   Responsive Breakpoints
+   ============================================ */
+
+/* Mobile First - Base styles above are for mobile */
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+    .modal-content {
+        max-width: 600px;
+    }
+    
+    .payment-card {
+        padding: 2rem;
+    }
+    
+    .toast {
+        min-width: 350px;
+    }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+    .modal-content {
+        max-width: 700px;
+    }
+    
+    .payment-history-table {
+        display: table;
+    }
+    
+    .payment-history-cards {
+        display: none;
+    }
+}
+
+/* Large Desktop (1280px and up) */
+@media (min-width: 1280px) {
+    .payment-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+/* Mobile specific (max-width: 767px) */
+@media (max-width: 767px) {
+    .modal-content {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+    }
+    
+    .toast {
+        left: 1rem;
+        right: 1rem;
+        min-width: auto;
+    }
+    
+    .payment-history-table {
+        display: none;
+    }
+    
+    .payment-history-cards {
+        display: block;
+    }
+    
+    .payment-method-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+.hidden {
+    display: none !important;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.border-primary {
+    border-color: var(--primary);
+}
+
+/* ============================================
+   Focus States for Accessibility
+   ============================================ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    .modal-overlay,
+    .toast,
+    .loading-overlay {
+        display: none !important;
+    }
+    
+    .payment-card,
+    .payment-method-card {
+        border: 1px solid #000;
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================
+   Additional Animations
+   ============================================ */
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================
+   Custom Checkbox Styling
+   ============================================ */
+.custom-checkbox {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--card-border-dark);
+    border-radius: 4px;
+    background-color: var(--input-dark);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.custom-checkbox:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.custom-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.custom-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+/* ============================================
+   Payment Methods Grid
+   ============================================ */
+.payment-methods-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .payment-methods-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 769px) {
+    .payment-methods-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+}
+
+.payment-method-card {
+    transition: all 0.3s ease;
+}
+
+.payment-method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
+}
+
+/* ============================================
+   Desktop/Mobile Table Toggle
+   ============================================ */
+@media (max-width: 768px) {
+    .desktop-table {
+        display: none;
+    }
+    .mobile-cards {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .desktop-table {
+        display: table;
+    }
+    .mobile-cards {
+        display: none;
+    }
+}
+
+/* ============================================
+   Modal Active State
+   ============================================ */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===================================
+   MOBILE PAGINATION ENHANCEMENTS
+   =================================== */
+
+/* Touch-friendly button sizes for mobile */
+.pagination-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure adequate spacing between pagination buttons on mobile */
+@media (max-width: 767px) {
+    .pagination-btn {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px;
+    }
+    
+    /* Hide extended page numbers on mobile (show only current ± 1) */
+    .pagination-page-extended {
+        display: none !important;
+    }
+}
+
+/* Desktop: Show extended page numbers (current ± 2) */
+@media (min-width: 768px) {
+    .pagination-page-extended {
+        display: inline-flex !important;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY ENHANCEMENTS
+   =================================== */
+
+/* Screen Reader Only Class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Enhanced Focus Indicators */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid #b91c1c;
+    outline-offset: 2px;
+}
+
+/* High Contrast Focus for Dark Backgrounds */
+.bg-card-dark button:focus-visible,
+.bg-card-dark a:focus-visible {
+    outline-color: #ef4444;
+    outline-width: 3px;
+}
+
+/* Focus Trap for Modals */
+.modal:focus {
+    outline: none;
+}
+
+.modal-content:focus {
+    outline: none;
+}
+
+/* Ensure Interactive Elements Have Minimum Touch Target Size */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"],
+select {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Exception for inline links */
+a:not(.inline-flex):not(.flex) {
+    min-height: auto;
+    min-width: auto;
+}
+
+/* Improve Color Contrast for Gray Text */
+.text-gray-500 {
+    color: #9CA3AF; /* Upgraded from #6B7280 for better contrast */
+}
+
+/* Ensure Status Badges Have Good Contrast */
+.status-pending {
+    background-color: rgba(251, 191, 36, 0.2);
+    color: #FCD34D;
+}
+
+.status-processing {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #93C5FD;
+}
+
+.status-succeeded {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #6EE7B7;
+}
+
+.status-failed {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #FCA5A5;
+}
+
+.status-refunded {
+    background-color: rgba(168, 85, 247, 0.2);
+    color: #C4B5FD;
+}
+
+.status-cancelled {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #D1D5DB;
+}
+
+/* Keyboard Navigation Indicators */
+*:focus-visible {
+    outline: 3px solid #b91c1c;
+    outline-offset: 2px;
+}
+
+/* Skip to Content Link (if added) */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #b91c1c;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* Improve Table Accessibility */
+table caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Ensure Sufficient Spacing for Touch Targets */
+@media (pointer: coarse) {
+    button,
+    a.inline-flex,
+    select {
+        min-height: 48px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    button,
+    a,
+    input,
+    select,
+    textarea {
+        border-width: 2px;
+    }
+    
+    *:focus-visible {
+        outline-width: 4px;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Ensure Icons Don't Interfere with Screen Readers */
+.material-symbols-outlined[aria-hidden="true"] {
+    pointer-events: none;
+}
+
+/* Loading Spinner Accessibility */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ensure Modal Overlays Are Properly Hidden from Screen Readers */
+.modal.hidden,
+#removeModalOverlay.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+/* Focus Ring Offset for Better Visibility */
+.focus\:ring-3:focus {
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.5);
+}
+
+.focus\:ring-offset-2:focus {
+    box-shadow: 0 0 0 2px #111827, 0 0 0 5px rgba(185, 28, 28, 0.5);
+}
+
+/* ============================================
+   PAGINATION FOCUS INDICATORS
+   ============================================ */
+
+/* Visible focus indicators for pagination controls */
+/* Override Tailwind's focus:outline-none to ensure visible focus indicators */
+.pagination-btn:focus-visible {
+    outline: 3px solid #b91c1c !important; /* Primary color - 3px solid ring */
+    outline-offset: 2px !important;
+    /* Ensure minimum 3:1 contrast ratio against dark background */
+    box-shadow: 0 0 0 2px #111827, 0 0 0 5px #b91c1c !important;
+}
+
+/* Enhanced focus for pagination buttons on dark card backgrounds */
+.bg-card-dark .pagination-btn:focus-visible,
+[class*="bg-card-dark"] .pagination-btn:focus-visible {
+    outline: 3px solid #ef4444 !important; /* Lighter red for better contrast on dark backgrounds */
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px #1F2937, 0 0 0 5px #ef4444 !important;
+}
+
+/* Focus indicator for current page (already highlighted) */
+.pagination-btn[aria-current="page"]:focus-visible {
+    outline: 3px solid #ffffff !important; /* White outline for contrast against primary background */
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px #b91c1c, 0 0 0 5px #ffffff !important;
+}
+
+/* Disabled pagination buttons should show subtle focus for keyboard navigation */
+.pagination-btn:disabled:focus-visible,
+.pagination-btn[aria-disabled="true"]:focus-visible {
+    outline: 3px solid #6b7280 !important; /* Gray outline for disabled state */
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px #1F2937, 0 0 0 5px #6b7280 !important;
+}
+
+/* Ensure focus is visible during keyboard navigation */
+.pagination-btn:focus:not(:focus-visible) {
+    outline: none !important; /* Remove outline for mouse clicks */
+}
+
+/* High contrast mode support for pagination */
+@media (prefers-contrast: high) {
+    .pagination-btn:focus-visible {
+        outline-width: 4px !important;
+        outline-color: #ffffff !important;
+    }
+}
+
+/* Ensure focus indicators work with hover states */
+.pagination-btn:hover:focus-visible {
+    outline: 3px solid #ef4444 !important;
+    outline-offset: 2px !important;
+}
+
+/* Clear Filters button focus indicator */
+#clear-filters:focus-visible,
+#clear-filters-empty:focus-visible {
+    outline: 3px solid #b91c1c !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px #1F2937, 0 0 0 5px #b91c1c !important;
+}
+
+/* Ensure keyboard navigation works properly for all interactive elements */
+/* Tab order should be: Previous -> Page Numbers -> Next */
+.pagination-btn {
+    /* Ensure elements are keyboard accessible */
+    cursor: pointer;
+}
+
+.pagination-btn:disabled,
+.pagination-btn[aria-disabled="true"] {
+    /* Disabled buttons should still be focusable for screen readers */
+    cursor: not-allowed;
+}
+
+/* Focus indicator for filter controls */
+#status-filter:focus-visible,
+#type-filter:focus-visible,
+#date-filter:focus-visible {
+    outline: 3px solid #b91c1c !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px #111827, 0 0 0 5px #b91c1c !important;
+}

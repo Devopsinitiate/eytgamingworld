@@ -1,0 +1,220 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Pro Coaching - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Header -->
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-white text-3xl font-bold mb-2">Pro Coaching</h1>
+            <p class="text-gray-400">Find expert coaches to level up your game</p>
+        </div>
+        {% if user.can_coach %}
+        <a href="{% url 'coaching:coach_create' %}" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            Become a Coach
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 bg-card-dark border border-card-border-dark rounded-lg p-4">
+        <form method="get" id="filter-form" class="flex flex-wrap gap-4">
+            <!-- Search -->
+            <div class="flex-1 min-w-[200px]">
+                <div class="relative">
+                    <input type="text" name="search" id="search-input" value="{{ request.GET.search }}" 
+                           placeholder="Search coaches..." 
+                           class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl">search</span>
+                </div>
+            </div>
+            
+            <!-- Game Filter -->
+            <select name="game" id="game-filter" class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option value="">All Games</option>
+                {% for game in available_games %}
+                <option value="{{ game.slug }}" {% if request.GET.game == game.slug %}selected{% endif %}>{{ game.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Price Range -->
+            <select name="price_range" id="price-filter" class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option value="">Any Price</option>
+                <option value="0-30" {% if request.GET.price_range == '0-30' %}selected{% endif %}>$0 - $30/hr</option>
+                <option value="30-60" {% if request.GET.price_range == '30-60' %}selected{% endif %}>$30 - $60/hr</option>
+                <option value="60-100" {% if request.GET.price_range == '60-100' %}selected{% endif %}>$60 - $100/hr</option>
+                <option value="100+" {% if request.GET.price_range == '100+' %}selected{% endif %}>$100+/hr</option>
+            </select>
+            
+            <!-- Experience Level -->
+            <select name="experience" id="experience-filter" class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option value="">Any Experience</option>
+                <option value="beginner" {% if request.GET.experience == 'beginner' %}selected{% endif %}>Beginner Friendly</option>
+                <option value="intermediate" {% if request.GET.experience == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="advanced" {% if request.GET.experience == 'advanced' %}selected{% endif %}>Advanced</option>
+                <option value="professional" {% if request.GET.experience == 'professional' %}selected{% endif %}>Professional</option>
+            </select>
+            
+            <!-- Sort -->
+            <select name="sort" id="sort-filter" class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option value="-average_rating" {% if request.GET.sort == '-average_rating' %}selected{% endif %}>Highest Rated</option>
+                <option value="hourly_rate" {% if request.GET.sort == 'hourly_rate' %}selected{% endif %}>Price: Low to High</option>
+                <option value="-hourly_rate" {% if request.GET.sort == '-hourly_rate' %}selected{% endif %}>Price: High to Low</option>
+                <option value="-total_sessions" {% if request.GET.sort == '-total_sessions' %}selected{% endif %}>Most Experienced</option>
+            </select>
+            
+            <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Coach List -->
+    {% if coaches %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for coach in coaches %}
+        <div class="bg-card-dark border border-card-border-dark rounded-lg overflow-hidden hover:border-primary transition-colors">
+            <!-- Coach Header -->
+            <div class="p-6 pb-4">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full overflow-hidden bg-primary/20">
+                        {% if coach.user.avatar %}
+                        <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-primary flex items-center justify-center text-white font-bold text-xl">
+                            {{ coach.user.get_display_name|first|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-white font-bold">{{ coach.user.get_display_name }}</h3>
+                            {% if coach.is_verified %}
+                            <span class="material-symbols-outlined text-green-400 text-sm">verified</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center gap-1 mb-1">
+                            <div class="flex items-center text-yellow-400">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= coach.average_rating %}
+                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-sm">star</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-gray-400 text-sm">{{ coach.average_rating|floatformat:1 }} ({{ coach.total_reviews }})</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">{{ coach.get_experience_level_display }}</p>
+                    </div>
+                </div>
+                
+                <!-- Bio -->
+                <p class="text-gray-300 text-sm mb-4 line-clamp-2">{{ coach.bio|truncatewords:20|default:"Professional gaming coach ready to help you improve." }}</p>
+                
+                <!-- Games -->
+                {% if coach.game_expertise.all %}
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% for expertise in coach.game_expertise.all|slice:":3" %}
+                    <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">{{ expertise.game.name }}</span>
+                    {% endfor %}
+                    {% if coach.game_expertise.count > 3 %}
+                    <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded-full">+{{ coach.game_expertise.count|add:"-3" }} more</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-background-dark border-t border-card-border-dark">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-primary font-bold text-lg">${{ coach.hourly_rate }}/hr</span>
+                        <p class="text-gray-400 text-xs">{{ coach.response_time_hours }}h response time</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        {% if coach.is_available %}
+                        <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Available</span>
+                        {% else %}
+                        <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">Busy</span>
+                        {% endif %}
+                        <a href="{% url 'coaching:coach_detail' pk=coach.pk %}" 
+                           class="px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Previous</a>
+        {% endif %}
+        
+        <span class="px-4 py-2 bg-primary text-white rounded-lg">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- No Coaches -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
+        <div class="mb-6">
+            <span class="material-symbols-outlined text-gray-500 text-6xl">school</span>
+        </div>
+        <h2 class="text-white text-2xl font-bold mb-4">No Coaches Found</h2>
+        <p class="text-gray-400 mb-6">No coaches match your current filters. Try adjusting your search criteria or check back later!</p>
+        {% if user.can_coach %}
+        <a href="{% url 'coaching:coach_create' %}" class="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+            Become the First Coach
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filter-form');
+    const searchInput = document.getElementById('search-input');
+    
+    // Auto-submit form on filter change
+    ['game-filter', 'price-filter', 'experience-filter', 'sort-filter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+    });
+    
+    // Debounced search
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 3 || this.value.length === 0) {
+                    filterForm.submit();
+                }
+            }, 500);
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static responsive_images %}
+
+{% block title %}{{ profile_owner.get_display_name }} - Profile{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+        <!-- Main Content -->
+        <main class="flex-1 px-4 sm:px-6 lg:px-10 py-8">
+            <div class="mx-auto max-w-7xl">
+                <!-- Banner and Avatar Section -->
+                <div class="relative">
+                    <div class="relative w-full h-64 bg-center bg-no-repeat bg-cover rounded-xl overflow-hidden">
+                        {% if profile_owner.banner %}
+                            {% responsive_banner profile_owner.banner "Profile banner" "banner-image w-full h-full object-cover" %}
+                        {% else %}
+                            <div class="bg-center bg-no-repeat aspect-video bg-cover w-full h-full" style='background-image: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);'></div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent"></div>
+                    </div>
+                    <div class="absolute -bottom-16 left-8">
+                        <div class="relative group">
+                            {% if profile_owner.avatar %}
+                                {% responsive_avatar profile_owner.avatar "Profile avatar" "avatar size-32 rounded-full border-4 border-gray-900 ring-4 ring-gray-800/50 object-cover" %}
+                            {% else %}
+                                <div class="bg-center bg-no-repeat aspect-square bg-cover size-32 rounded-full border-4 border-gray-900 ring-4 ring-gray-800/50 flex items-center justify-content-center text-white font-bold text-2xl" style='background-image: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)'>
+                                    {{ profile_owner.get_display_name|first|upper }}
+                                </div>
+                            {% endif %}
+                            {% if is_own_profile %}
+                            <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <a href="{% url 'dashboard:profile_edit' %}" aria-label="Edit profile picture">
+                                    <span class="material-symbols-outlined text-white text-3xl" aria-hidden="true">photo_camera</span>
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Header -->
+                <div class="mt-24 px-4 sm:px-8 pb-8">
+                    <div class="flex w-full flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
+                        <div class="flex flex-col justify-center pt-2">
+                            <p class="text-white text-3xl sm:text-4xl font-bold leading-tight tracking-tight">{{ profile_owner.get_display_name }}</p>
+                            <p class="text-slate-400 text-base font-normal leading-normal mt-2 max-w-lg">
+                                {% if profile_owner.bio %}{{ profile_owner.bio }}{% else %}Gaming enthusiast and competitor{% endif %}
+                            </p>
+                            <p class="text-slate-500 text-sm font-normal leading-normal mt-2">Member Since {{ profile_owner.date_joined|date:"M Y" }}</p>
+                        </div>
+                        <div class="flex w-full max-w-[480px] gap-3 sm:w-auto items-center">
+                            {% if not is_own_profile %}
+                            <div class="relative group">
+                                <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-800 text-white text-sm font-medium leading-normal transition-colors gap-2 border border-white/10 hover:border-primary hover:text-primary">
+                                    <span class="material-symbols-outlined text-xl">share</span>
+                                    <span>Share Profile</span>
+                                </button>
+                                <div class="absolute bottom-full mb-3 right-0 w-max bg-gray-800 rounded-xl border border-white/10 p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
+                                    <div class="p-2 bg-gray-900 rounded-lg border border-white/10">
+                                        <p class="text-slate-400 text-sm">Copy profile link:</p>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <input class="form-input flex-1 bg-gray-800 border-none rounded-md text-slate-300 text-sm h-8" readonly type="text" value="{{ request.build_absolute_uri }}"/>
+                                            <button class="flex items-center justify-center size-8 rounded-md bg-primary hover:bg-red-700 text-white transition-colors">
+                                                <span class="material-symbols-outlined text-lg">content_copy</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if is_own_profile %}
+                            <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-800 text-white text-sm font-medium leading-normal flex-1 sm:flex-auto hover:bg-white/10 transition-colors gap-2 border border-white/10">
+                                <span class="material-symbols-outlined text-xl">edit</span>
+                                <a href="{% url 'dashboard:profile_edit' %}"><span>Edit Profile</span></a>
+                            </button>
+                            <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-medium leading-normal flex-1 sm:flex-auto hover:bg-red-700 transition-colors gap-2">
+                                <span class="material-symbols-outlined text-xl">settings</span>
+                                <a href="{% url 'dashboard:settings_profile' %}"><span>Account Settings</span></a>
+                            </button>
+                            {% else %}
+                            <a href="{% url 'dashboard:user_report' username=profile_owner.username %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-800 text-white text-sm font-medium leading-normal flex-1 sm:flex-auto hover:bg-white/10 transition-colors gap-2 border border-white/10">
+                                <span class="material-symbols-outlined text-xl">flag</span>
+                                <span>Report User</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab Navigation -->
+                <div class="px-4 sm:px-8">
+                    <div class="flex border-b border-white/10 gap-2 sm:gap-4" role="tablist" aria-label="Profile sections">
+                        <a class="flex flex-col items-center justify-center border-b-2 border-primary bg-gradient-to-t from-primary/20 to-transparent px-4 pb-3 pt-2 text-white transition-colors" href="#" aria-label="Overview tab, current" aria-current="page" role="tab">
+                            <p class="text-sm font-medium leading-normal tracking-[0.015em]">Overview</p>
+                        </a>
+                        <a class="flex flex-col items-center justify-center border-b-2 border-transparent px-4 pb-3 pt-2 text-slate-400 transition-colors hover:border-slate-500 hover:text-white" href="{% url 'dashboard:tournament_history' %}" aria-label="Game Stats tab" role="tab">
+                            <p class="text-sm font-medium leading-normal tracking-[0.015em]">Game Stats</p>
+                        </a>
+                        <a class="flex flex-col items-center justify-center border-b-2 border-transparent px-4 pb-3 pt-2 text-slate-400 transition-colors hover:border-slate-500 hover:text-white" href="{% url 'dashboard:team_membership' %}" aria-label="Match History tab" role="tab">
+                            <p class="text-sm font-medium leading-normal tracking-[0.015em]">Match History</p>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Content Grid -->
+                <div class="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Main Content (Left Column) -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Favorite Games -->
+                        {% if game_profiles %}
+                        <div class="p-6 bg-gray-800 rounded-xl border border-white/5">
+                            <h2 class="text-white text-xl font-bold leading-tight tracking-tight">Favorite Games</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+                                {% for profile in game_profiles|slice:":6" %}
+                                <div class="bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg group relative overflow-hidden" style='background-image: {% if profile.game.icon %}url("{{ profile.game.icon.url }}"){% else %}linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%){% endif %};'>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                    <div class="absolute bottom-3 left-3">
+                                        <p class="text-white font-bold">{{ profile.game.name }}</p>
+                                        {% if profile.is_main_game %}
+                                        <p class="text-primary text-xs">Main Game</p>
+                                        {% endif %}
+                                        {% if profile.skill_rating %}
+                                        <p class="text-slate-300 text-xs">Rating: {{ profile.skill_rating }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Recent Achievements -->
+                        {% if showcase_achievements %}
+                        <div class="p-6 bg-gray-800 rounded-xl border border-white/5">
+                            <h2 class="text-white text-xl font-bold leading-tight tracking-tight">Recent Achievements</h2>
+                            <ul class="space-y-4 mt-6">
+                                {% for user_achievement in showcase_achievements|slice:":3" %}
+                                <li class="flex items-center gap-4 p-4 bg-gray-900 rounded-lg border border-white/5">
+                                    <div class="flex items-center justify-center size-12 bg-primary/20 rounded-lg text-primary">
+                                        {% if user_achievement.achievement.icon %}
+                                            <img src="{{ user_achievement.achievement.icon.url }}" alt="{{ user_achievement.achievement.name }}" class="w-8 h-8">
+                                        {% else %}
+                                            <span class="material-symbols-outlined text-3xl">military_tech</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-white">{{ user_achievement.achievement.name }}</p>
+                                        <p class="text-sm text-slate-400">{{ user_achievement.achievement.description }}</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Sidebar (Right Column) -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <!-- Key Stats -->
+                        {% if can_view_statistics and user_stats %}
+                        <div class="p-6 bg-gray-800 rounded-xl border border-white/5">
+                            <h2 class="text-white text-xl font-bold leading-tight tracking-tight">Key Stats</h2>
+                            <div class="mt-6 grid grid-cols-2 gap-6">
+                                <div class="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-gray-900 p-4">
+                                    <span class="text-3xl font-bold text-white">{{ user_stats.win_rate|floatformat:1 }}%</span>
+                                    <span class="mt-1 text-sm text-slate-400">Win Rate</span>
+                                </div>
+                                <div class="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-gray-900 p-4">
+                                    <span class="text-3xl font-bold text-white">{{ user_stats.total_tournaments }}</span>
+                                    <span class="mt-1 text-sm text-slate-400">Played</span>
+                                </div>
+                                <div class="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-gray-900 p-4">
+                                    <span class="text-3xl font-bold text-white">{{ user_stats.matches_won }}</span>
+                                    <span class="mt-1 text-sm text-slate-400">Won</span>
+                                </div>
+                                <div class="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-gray-900 p-4">
+                                    <span class="text-3xl font-bold text-white">{{ user_stats.total_matches }}</span>
+                                    <span class="mt-1 text-sm text-slate-400">Total</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Social Links -->
+                        <div class="p-6 bg-gray-800 rounded-xl border border-white/5">
+                            <h2 class="text-white text-xl font-bold leading-tight tracking-tight">Social Links</h2>
+                            <div class="flex items-center gap-4 mt-6">
+                                {% if profile_owner.twitch_username %}
+                                <a class="flex items-center justify-center size-10 rounded-lg bg-gray-900 text-slate-400 hover:text-purple-400 hover:bg-white/5 transition-colors" href="https://twitch.tv/{{ profile_owner.twitch_username }}" target="_blank">
+                                    <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                {% if profile_owner.discord_username %}
+                                <a class="flex items-center justify-center size-10 rounded-lg bg-gray-900 text-slate-400 hover:text-indigo-400 hover:bg-white/5 transition-colors" href="#" title="Discord: {{ profile_owner.discord_username }}">
+                                    <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                {% if profile_owner.steam_id %}
+                                <a class="flex items-center justify-center size-10 rounded-lg bg-gray-900 text-slate-400 hover:text-blue-400 hover:bg-white/5 transition-colors" href="https://steamcommunity.com/id/{{ profile_owner.steam_id }}" target="_blank">
+                                    <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.624 0 11.999-5.375 11.999-12S18.603.001 11.979.001zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm9.423-8.68c0 1.665-1.351 3.016-3.015 3.016-1.665 0-3.016-1.351-3.016-3.016 0-1.665 1.351-3.015 3.016-3.015 1.664 0 3.015 1.35 3.015 3.015zm-5.267 0c0 1.252 1.013 2.266 2.265 2.266 1.252 0 2.265-1.014 2.265-2.266 0-1.252-1.013-2.265-2.265-2.265-1.252 0-2.265 1.013-2.265 2.265z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                {% if not profile_owner.discord_username and not profile_owner.steam_id and not profile_owner.twitch_username %}
+                                <p class="text-slate-500 text-sm">No social links added yet</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+{% endblock %}

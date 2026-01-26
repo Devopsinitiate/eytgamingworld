@@ -1,0 +1,320 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Notification Settings - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Settings Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
+                <nav class="space-y-2">
+                    <a href="{% url 'dashboard:settings_profile' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">privacy_tip</span>
+                        Privacy
+                    </a>
+                    <a href="{% url 'dashboard:settings_security' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">security</span>
+                        Security
+                    </a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white"
+                       aria-current="page">
+                        <span class="material-symbols-outlined text-base">notifications</span>
+                        Notifications
+                    </a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">link</span>
+                        Connected Accounts
+                    </a>
+                    <a href="{% url 'dashboard:account_delete' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                        Delete Account
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Notification Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Manage how you receive notifications about tournaments, teams, and platform activities</p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="space-y-3">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">
+                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Information Banner -->
+            <div class="bg-primary/10 border border-primary/20 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Manage how you receive notifications about tournaments, teams, payments, and other platform activities.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Notification Settings Form -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">notifications</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Notification Preferences</h2>
+                </div>
+                
+                <form id="notification-form" method="post" class="space-y-6">
+                    {% csrf_token %}
+                        
+                    {% if preferences %}
+                        <!-- In-App Notifications -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">notifications_active</span>
+                                In-App Notifications
+                            </h3>
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">notifications</span>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 dark:text-white">Enable in-app notifications</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show notifications in the notification center</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="in_app_enabled" id="in_app_enabled" 
+                                           class="w-5 h-5 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.in_app_enabled %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Notifications -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">email</span>
+                                Email Notifications
+                            </h3>
+                            
+                            <!-- Master Email Toggle -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">email</span>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 dark:text-white">Enable email notifications</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Receive notifications via email</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="email_enabled" id="email_enabled" 
+                                           class="w-5 h-5 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_enabled %}checked{% endif %}>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Categories -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_tournament_updates" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Tournament updates</label>
+                                    <input type="checkbox" name="email_tournament_updates" id="email_tournament_updates" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_tournament_updates %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_coaching_reminders" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Coaching reminders</label>
+                                    <input type="checkbox" name="email_coaching_reminders" id="email_coaching_reminders" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_coaching_reminders %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_team_activity" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Team activity</label>
+                                    <input type="checkbox" name="email_team_activity" id="email_team_activity" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_team_activity %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_payment_receipts" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Payment receipts</label>
+                                    <input type="checkbox" name="email_payment_receipts" id="email_payment_receipts" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_payment_receipts %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_security_alerts" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Security alerts (recommended)</label>
+                                    <input type="checkbox" name="email_security_alerts" id="email_security_alerts" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_security_alerts %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="email_marketing" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Marketing emails</label>
+                                    <input type="checkbox" name="email_marketing" id="email_marketing" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.email_marketing %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Push Notifications -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">mobile_friendly</span>
+                                Push Notifications
+                            </h3>
+                            
+                            <!-- Master Push Toggle -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">notifications_active</span>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 dark:text-white">Enable push notifications</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Receive push notifications on your devices</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="push_enabled" id="push_enabled" 
+                                           class="w-5 h-5 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.push_enabled %}checked{% endif %}>
+                                </div>
+                            </div>
+                            
+                            <!-- Push Categories -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="push_tournament_updates" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Tournament updates</label>
+                                    <input type="checkbox" name="push_tournament_updates" id="push_tournament_updates" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.push_tournament_updates %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="push_coaching_reminders" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Coaching reminders</label>
+                                    <input type="checkbox" name="push_coaching_reminders" id="push_coaching_reminders" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.push_coaching_reminders %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="push_team_activity" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Team activity</label>
+                                    <input type="checkbox" name="push_team_activity" id="push_team_activity" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.push_team_activity %}checked{% endif %}>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <label for="push_match_updates" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Match updates</label>
+                                    <input type="checkbox" name="push_match_updates" id="push_match_updates" 
+                                           class="w-4 h-4 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.push_match_updates %}checked{% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiet Hours -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">bedtime</span>
+                                Quiet Hours
+                            </h3>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">do_not_disturb</span>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 dark:text-white">Enable quiet hours</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Pause non-urgent notifications during specific hours</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="quiet_hours_enabled" id="quiet_hours_enabled" 
+                                           class="w-5 h-5 text-primary bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-primary focus:ring-2"
+                                           {% if preferences.quiet_hours_enabled %}checked{% endif %}>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="quiet_hours_start" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Start Time
+                                    </label>
+                                    <input type="time" name="quiet_hours_start" id="quiet_hours_start" 
+                                           class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all"
+                                           value="{{ preferences.quiet_hours_start|default:'' }}">
+                                </div>
+                                
+                                <div>
+                                    <label for="quiet_hours_end" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        End Time
+                                    </label>
+                                    <input type="time" name="quiet_hours_end" id="quiet_hours_end" 
+                                           class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all"
+                                           value="{{ preferences.quiet_hours_end|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-yellow-400">warning</span>
+                                <p class="text-sm text-yellow-300">
+                                    Notification preferences not found. Default settings will be created when you save.
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-between">
+                <a href="{% url 'dashboard:home' %}" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+                    Cancel
+                </a>
+                <button type="submit" form="notification-form" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <span class="material-symbols-outlined text-base">save</span>
+                    Save Notification Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+

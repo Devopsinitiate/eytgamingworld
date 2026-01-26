@@ -1,0 +1,243 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Privacy Settings - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Settings Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
+                <nav class="space-y-2">
+                    <a href="{% url 'dashboard:settings_profile' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white"
+                       aria-current="page">
+                        <span class="material-symbols-outlined text-base">privacy_tip</span>
+                        Privacy
+                    </a>
+                    <a href="{% url 'dashboard:settings_security' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">security</span>
+                        Security
+                    </a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">notifications</span>
+                        Notifications
+                    </a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">link</span>
+                        Connected Accounts
+                    </a>
+                    <a href="{% url 'dashboard:account_delete' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                        Delete Account
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Privacy Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Control what information is visible to other users on your profile</p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="space-y-3">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">
+                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Privacy Information Banner -->
+            <div class="bg-primary/10 border border-primary/20 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        These settings help you maintain your privacy while using the platform. Control what information is visible to other users.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Privacy Settings Form -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">privacy_tip</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Profile Visibility</h2>
+                </div>
+                
+                <form id="privacy-form" method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="space-y-6">
+                        <!-- Online Status -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">visibility</span>
+                                <div>
+                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.online_status_visible.label }}</h3>
+                                    {% if form.online_status_visible.help_text %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.online_status_visible.help_text }}</p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show when you're online with a green indicator</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                {{ form.online_status_visible }}
+                                {% if form.online_status_visible.errors %}
+                                    <p class="text-sm text-red-400 ml-2">{{ form.online_status_visible.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Activity Feed -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">activity_zone</span>
+                                <div>
+                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.activity_visible.label }}</h3>
+                                    {% if form.activity_visible.help_text %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.activity_visible.help_text }}</p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show your recent tournaments, teams, and achievements</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                {{ form.activity_visible }}
+                                {% if form.activity_visible.errors %}
+                                    <p class="text-sm text-red-400 ml-2">{{ form.activity_visible.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Statistics -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">analytics</span>
+                                <div>
+                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.statistics_visible.label }}</h3>
+                                    {% if form.statistics_visible.help_text %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.statistics_visible.help_text }}</p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show your tournament statistics and performance metrics</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                {{ form.statistics_visible }}
+                                {% if form.statistics_visible.errors %}
+                                    <p class="text-sm text-red-400 ml-2">{{ form.statistics_visible.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Privacy Information Section -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">info</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Privacy Information</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- What's Always Visible -->
+                    <div class="space-y-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">visibility</span>
+                            What's Always Visible
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                                Your username and display name
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                                Your avatar and banner images
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                                Your bio and basic profile information
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                                Your game profiles (games you play)
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- What You Can Control -->
+                    <div class="space-y-4">
+                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">tune</span>
+                            What You Can Control
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
+                                Online status indicator (green dot when you're active)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
+                                Recent activity feed (tournaments, teams, achievements)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
+                                Tournament statistics and performance metrics
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-between">
+                <a href="{% url 'dashboard:home' %}" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+                    Cancel
+                </a>
+                <button type="submit" form="privacy-form" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <span class="material-symbols-outlined text-base">save</span>
+                    Save Privacy Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+

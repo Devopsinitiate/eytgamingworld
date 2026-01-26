@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register for {{ tournament.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .registration-form {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary {
+        background-color: #3b82f6;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+    
+    .btn-secondary {
+        background-color: #6b7280;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #4b5563;
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-error {
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+    }
+    
+    .alert-success {
+        background-color: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #16a34a;
+    }
+    
+    .tournament-info {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .team-option {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .team-option:hover {
+        border-color: #3b82f6;
+        background-color: #f8fafc;
+    }
+    
+    .team-option.selected {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="registration-form">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6">
+            <a href="{% url 'home' %}" class="text-blue-600 hover:text-blue-800">Home</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{% url 'tournaments:list' %}" class="text-blue-600 hover:text-blue-800">Tournaments</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{% url 'tournaments:detail' tournament.slug %}" class="text-blue-600 hover:text-blue-800">{{ tournament.name }}</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-700">Register</span>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Tournament Registration</h1>
+            <p class="text-gray-600">Complete your registration for {{ tournament.name }}</p>
+        </div>
+
+        <!-- Tournament Information -->
+        <div class="tournament-info">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Tournament Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <strong>Tournament:</strong> {{ tournament.name }}
+                </div>
+                <div>
+                    <strong>Game:</strong> {{ tournament.game.name }}
+                </div>
+                <div>
+                    <strong>Start Date:</strong> {{ tournament.start_datetime|date:"M d, Y g:i A" }}
+                </div>
+                <div>
+                    <strong>Entry Fee:</strong> 
+                    {% if tournament.entry_fee %}
+                        ${{ tournament.entry_fee }}
+                    {% else %}
+                        Free
+                    {% endif %}
+                </div>
+                {% if tournament.max_participants %}
+                <div>
+                    <strong>Participants:</strong> {{ tournament.total_registered }}/{{ tournament.max_participants }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Registration Form -->
+        <form method="post" action="{% url 'tournaments:register' tournament.slug %}">
+            {% csrf_token %}
+
+            <!-- Player Information -->
+            <div class="form-group">
+                <label for="display_name">Display Name</label>
+                <input type="text" id="display_name" name="display_name" value="{{ user.get_display_name }}" readonly
+                       class="bg-gray-100 cursor-not-allowed">
+                <small class="text-gray-500">This is how you'll appear in the tournament</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" readonly
+                       class="bg-gray-100 cursor-not-allowed">
+            </div>
+
+            <!-- Team Selection (if team-based tournament) -->
+            {% if tournament.is_team_based %}
+            <div class="form-group">
+                <label>Team Selection</label>
+                {% if user_teams %}
+                <div class="space-y-2">
+                    {% for team in user_teams %}
+                    <div class="team-option" onclick="selectTeam({{ team.id }})">
+                        <input type="radio" name="team" value="{{ team.id }}" id="team_{{ team.id }}" class="hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold">{{ team.name }}</h4>
+                                <p class="text-sm text-gray-600">{{ team.members.count }} members</p>
+                            </div>
+                            <div class="radio-indicator w-5 h-5 border-2 border-gray-400 rounded-full"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <small class="text-gray-500">Team size requirement: {{ tournament.team_size }} players</small>
+                {% else %}
+                <div class="alert alert-error">
+                    You need to be part of a team to register for this tournament.
+                    <a href="{% url 'teams:list' %}" class="underline">Create or join a team</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Tournament Rules Agreement -->
+            {% if tournament.rules %}
+            <div class="form-group">
+                <label>Tournament Rules</label>
+                <div class="border border-gray-300 rounded p-4 max-h-64 overflow-y-auto bg-white mb-4">
+                    {{ tournament.rules|linebreaks }}
+                </div>
+                <div class="flex items-start">
+                    <input type="checkbox" id="rules_agreed" name="rules_agreed" required class="mt-1 mr-3">
+                    <label for="rules_agreed" class="text-sm">
+                        I have read and agree to abide by the tournament rules <span class="text-red-500">*</span>
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Form Actions -->
+            <div class="flex justify-between items-center mt-8">
+                <a href="{% url 'tournaments:detail' tournament.slug %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+                
+                {% if tournament.is_team_based and not user_teams %}
+                <button type="button" disabled class="btn bg-gray-400 text-gray-600 cursor-not-allowed">
+                    Complete Registration
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">
+                    Complete Registration
+                </button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Simple team selection function
+function selectTeam(teamId) {
+    // Remove selection from all team options
+    document.querySelectorAll('.team-option').forEach(option => {
+        option.classList.remove('selected');
+        const indicator = option.querySelector('.radio-indicator');
+        if (indicator) {
+            indicator.classList.remove('bg-blue-500', 'border-blue-500');
+            indicator.classList.add('border-gray-400');
+            indicator.innerHTML = '';
+        }
+    });
+
+    // Select the clicked team
+    const selectedOption = document.querySelector(`#team_${teamId}`).closest('.team-option');
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+        const indicator = selectedOption.querySelector('.radio-indicator');
+        if (indicator) {
+            indicator.classList.remove('border-gray-400');
+            indicator.classList.add('bg-blue-500', 'border-blue-500');
+            indicator.innerHTML = '<div class="w-2 h-2 bg-white rounded-full"></div>';
+        }
+
+        // Check the radio button
+        document.getElementById(`team_${teamId}`).checked = true;
+    }
+}
+</script>
+{% endblock %}

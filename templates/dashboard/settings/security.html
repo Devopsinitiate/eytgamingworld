@@ -1,0 +1,194 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Security Settings - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Settings Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
+                <nav class="space-y-2">
+                    <a href="{% url 'dashboard:settings_profile' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">privacy_tip</span>
+                        Privacy
+                    </a>
+                    <a href="{% url 'dashboard:settings_security' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white">
+                        <span class="material-symbols-outlined text-base">security</span>
+                        Security
+                    </a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">notifications</span>
+                        Notifications
+                    </a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">link</span>
+                        Connected Accounts
+                    </a>
+                    <a href="{% url 'dashboard:account_delete' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                        Delete Account
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Security Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Manage your account security and authentication settings</p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="space-y-3">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">
+                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Password Change Section -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">lock</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Change Password</h2>
+                </div>
+                
+                <form method="post" action="{% url 'account_change_password' %}">
+                    {% csrf_token %}
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="id_oldpassword">Current Password</label>
+                            <input type="password" name="oldpassword" id="id_oldpassword" required 
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="id_password1">New Password</label>
+                            <input type="password" name="password1" id="id_password1" required 
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="id_password2">Confirm New Password</label>
+                            <input type="password" name="password2" id="id_password2" required 
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/50 transition-all">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                            <span class="material-symbols-outlined text-base">save</span>
+                            Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Two-Factor Authentication Section -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Two-Factor Authentication</h2>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <div>
+                        <h3 class="font-medium text-gray-900 dark:text-white">Authenticator App</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Add an extra layer of security to your account</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-sm rounded-full">
+                            Not Enabled
+                        </span>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                            Enable
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Sessions Section -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">devices</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Active Sessions</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">computer</span>
+                            <div>
+                                <h3 class="font-medium text-gray-900 dark:text-white">Current Session</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Windows • Chrome • {{ request.META.REMOTE_ADDR }}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm rounded-full">
+                            Active
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end mt-6">
+                    <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                        Sign Out All Other Sessions
+                    </button>
+                </div>
+            </div>
+
+            <!-- Account Recovery Section -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">key</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Account Recovery</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <div>
+                            <h3 class="font-medium text-gray-900 dark:text-white">Recovery Email</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ user.email }}</p>
+                        </div>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm rounded-full">
+                            Verified
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

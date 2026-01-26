@@ -1,0 +1,317 @@
+/**
+ * Graceful Fallbacks CSS
+ * Styles for fallback content and no-JavaScript scenarios
+ * Addresses Requirements 9.1, 9.2, 9.3, 9.4, 9.5
+ */
+
+/* Basic mode styles */
+.basic-mode {
+    --animation-duration: 0s !important;
+}
+
+.basic-mode * {
+    animation: none !important;
+    transition: none !important;
+}
+
+.basic-mode-indicator {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #4b5563;
+    color: #d1d5db;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #6b7280;
+}
+
+/* Fallback content styles */
+.fallback-content {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: rgba(31, 41, 55, 0.5);
+    border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.fallback-content .fallback-message {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.fallback-content .fallback-message.warning {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+}
+
+.fallback-content .fallback-message.info {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    color: #60a5fa;
+}
+
+.fallback-content .fallback-message.error {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #f87171;
+}
+
+/* Static element styles */
+.static-element {
+    opacity: 0.8;
+    cursor: default;
+}
+
+.static-timeline {
+    position: relative;
+}
+
+.static-timeline::before {
+    content: "📅 Static Timeline";
+    display: block;
+    padding: 0.5rem;
+    background: rgba(75, 85, 99, 0.3);
+    color: #9ca3af;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Offline message styles */
+#offline-message {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #dc2626;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    max-width: 300px;
+}
+
+#offline-message .offline-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+/* No-script styles */
+noscript {
+    display: block !important;
+    padding: 1rem;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    border-radius: 0.5rem;
+    color: #f87171;
+    margin: 1rem 0;
+}
+
+noscript p {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* Disabled state for network-dependent features */
+[data-requires-network]:disabled,
+[data-ajax]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.offline-notice {
+    background: #4b5563;
+    color: #d1d5db;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+/* Fallback form styles */
+.fallback-form {
+    background: rgba(31, 41, 55, 0.8);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.fallback-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #d1d5db;
+}
+
+.fallback-form input,
+.fallback-form select,
+.fallback-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: #374151;
+    border: 1px solid #4b5563;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.fallback-form input:focus,
+.fallback-form select:focus,
+.fallback-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.fallback-form button {
+    background: #dc2626;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.fallback-form button:hover {
+    background: #b91c1c;
+}
+
+/* Cache indicator styles */
+.cache-indicator {
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Static share links */
+.static-share-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.static-share-links a {
+    display: block;
+    padding: 0.75rem;
+    text-align: center;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.static-share-links .twitter {
+    background: #1da1f2;
+    color: white;
+}
+
+.static-share-links .twitter:hover {
+    background: #1a91da;
+}
+
+.static-share-links .facebook {
+    background: #1877f2;
+    color: white;
+}
+
+.static-share-links .facebook:hover {
+    background: #166fe5;
+}
+
+.static-share-links .copy-manual {
+    background: #374151;
+    color: #d1d5db;
+    border: 1px solid #4b5563;
+}
+
+.static-share-links .copy-manual input {
+    background: #1f2937;
+    border: 1px solid #374151;
+    color: #d1d5db;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #offline-message {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        max-width: none;
+    }
+    
+    .basic-mode-indicator {
+        font-size: 0.75rem;
+        padding: 0.375rem;
+    }
+    
+    .fallback-content {
+        padding: 0.75rem;
+    }
+    
+    .fallback-form {
+        padding: 1rem;
+    }
+}
+
+/* Print styles for fallback content */
+@media print {
+    #offline-message,
+    .basic-mode-indicator,
+    .cache-indicator {
+        display: none !important;
+    }
+    
+    .fallback-content {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .static-share-links {
+        display: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .fallback-content {
+        border-width: 2px;
+        background: rgba(0, 0, 0, 0.9);
+    }
+    
+    .fallback-message {
+        border-width: 2px;
+    }
+    
+    #offline-message {
+        border: 2px solid white;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .basic-mode * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

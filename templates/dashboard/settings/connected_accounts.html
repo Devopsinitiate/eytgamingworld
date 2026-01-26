@@ -1,0 +1,271 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Connected Accounts - EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Settings Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
+                <nav class="space-y-2">
+                    <a href="{% url 'dashboard:settings_profile' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">privacy_tip</span>
+                        Privacy
+                    </a>
+                    <a href="{% url 'dashboard:settings_security' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">security</span>
+                        Security
+                    </a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="material-symbols-outlined text-base">notifications</span>
+                        Notifications
+                    </a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white"
+                       aria-current="page">
+                        <span class="material-symbols-outlined text-base">link</span>
+                        Connected Accounts
+                    </a>
+                    <a href="{% url 'dashboard:account_delete' %}" 
+                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        <span class="material-symbols-outlined text-base">delete</span>
+                        Delete Account
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Page Header -->
+            <div>
+                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Connected Accounts</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Link your gaming accounts to enhance your profile and connect with other players</p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="space-y-3">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined">
+                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p>{{ message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Information Banner -->
+            <div class="bg-primary/10 border border-primary/20 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Link your gaming accounts to enhance your profile and connect with other players. Your connected accounts will be displayed on your public profile.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Connected Accounts List -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">link</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Gaming Accounts</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Discord Account -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-gray-50 dark:bg-gray-800/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white text-2xl">forum</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Discord</h3>
+                                    {% if user.discord_username %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="inline-flex items-center">
+                                                <span class="material-symbols-outlined text-green-500 text-sm mr-1">check_circle</span>
+                                                Connected as <span class="font-medium ml-1">{{ user.discord_username }}</span>
+                                            </span>
+                                        </p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Not connected</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                {% if user.discord_username %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">edit</span>Edit
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">link</span>Connect
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Connect your Discord account to show your Discord username on your profile and enable Discord-based features.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Steam Account -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-gray-50 dark:bg-gray-800/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white text-2xl">videogame_asset</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Steam</h3>
+                                    {% if user.steam_id %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="inline-flex items-center">
+                                                <span class="material-symbols-outlined text-green-500 text-sm mr-1">check_circle</span>
+                                                Connected as <span class="font-medium ml-1">{{ user.steam_id }}</span>
+                                            </span>
+                                        </p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Not connected</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                {% if user.steam_id %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">edit</span>Edit
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">link</span>Connect
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Link your Steam account to display your Steam ID on your profile and participate in Steam-based tournaments.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Twitch Account -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-gray-50 dark:bg-gray-800/50 hover:shadow-md transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white text-2xl">live_tv</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Twitch</h3>
+                                    {% if user.twitch_username %}
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                                            <span class="inline-flex items-center">
+                                                <span class="material-symbols-outlined text-green-500 text-sm mr-1">check_circle</span>
+                                                Connected as <span class="font-medium ml-1">{{ user.twitch_username }}</span>
+                                            </span>
+                                        </p>
+                                    {% else %}
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Not connected</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                {% if user.twitch_username %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">edit</span>Edit
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'dashboard:settings_profile' %}" 
+                                       class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium">
+                                        <span class="material-symbols-outlined text-sm">link</span>Connect
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Connect your Twitch account to show your streaming channel on your profile and enable streaming features.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy & Security Information -->
+            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">security</span>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Privacy & Security</h2>
+                </div>
+
+                
+                <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                        Your connected accounts are displayed on your public profile
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                        We never store your account passwords
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                        You can disconnect accounts at any time by editing your profile
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xs text-green-500">check</span>
+                        Connected accounts help verify your identity in tournaments
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-between">
+                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-2 px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span>Back to Dashboard
+                </a>
+                <a href="{% url 'dashboard:settings_profile' %}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition font-medium">
+                    <span class="material-symbols-outlined text-sm">edit</span>Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+

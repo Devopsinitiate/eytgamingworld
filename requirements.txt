@@ -1,0 +1,67 @@
+# Core Django
+Django
+psycopg2-binary
+python-decouple
+django-environ
+
+# Authentication & Social Login
+django-allauth
+django-allauth[socialaccount]
+python3-openid
+
+# REST API (future-proof)
+djangorestframework
+django-cors-headers
+
+# Forms & UI Enhancement
+django-crispy-forms
+crispy-tailwind
+django-widget-tweaks
+
+# Frontend & Real-time
+django-tailwind
+django-browser-reload
+django-htmx
+
+# Database & Caching
+redis
+django-redis
+
+# Async Tasks
+celery
+django-celery-beat
+django-celery-results
+
+# File Storage & Media
+Pillow
+django-storages
+boto3
+
+# Payments
+stripe
+
+# Utilities
+python-slugify
+django-extensions
+django-timezone-field
+pytz
+
+# Security & Permissions
+django-braces
+django-guardian
+
+# Development Tools
+django-debug-toolbar
+ipython
+
+# Testing
+pytest
+pytest-django
+factory-boy
+hypothesis
+
+# Production
+gunicorn
+whitenoise
+dj-database-url
+sentry-sdk

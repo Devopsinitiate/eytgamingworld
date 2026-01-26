@@ -1,0 +1,451 @@
+{% extends "layouts/dashboard_base.html" %}
+
+{% block title %}Teams - EYTGaming{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl">
+    <!-- Header -->
+    <div class="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Teams</h1>
+            <p class="text-gray-400 text-sm md:text-base">Browse and join competitive gaming teams</p>
+        </div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'teams:create' %}" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            <span class="hidden sm:inline">Create Team</span>
+            <span class="sm:hidden">Create</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 bg-card-dark border border-card-border-dark rounded-lg p-4">
+        <form method="get" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3" role="search" aria-label="Team search and filters">
+            <!-- Search -->
+            <div class="flex-1 min-w-full sm:min-w-[200px]">
+                <label for="search-input" class="sr-only">Search teams by name, tag, or description</label>
+                <div class="relative">
+                    <input type="text" name="search" id="search-input" value="{{ filter_params.search }}" 
+                           placeholder="Search teams..." 
+                           aria-label="Search teams by name, tag, or description"
+                           class="w-full min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl" aria-hidden="true">search</span>
+                </div>
+            </div>
+            
+            <!-- Game Filter -->
+            <label for="game-filter" class="sr-only">Filter by game</label>
+            <select name="game" id="game-filter" aria-label="Filter teams by game" class="w-full sm:w-auto min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                <option value="">All Games</option>
+                {% for game in available_games %}
+                <option value="{{ game.slug }}" {% if filter_params.game == game.slug %}selected{% endif %}>{{ game.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Recruiting Status Filter -->
+            <label for="recruiting-filter" class="sr-only">Filter by recruiting status</label>
+            <select name="recruiting" id="recruiting-filter" aria-label="Filter teams by recruiting status" class="w-full sm:w-auto min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
+                <option value="">All Teams</option>
+                <option value="true" {% if filter_params.recruiting == 'true' %}selected{% endif %}>Recruiting Only</option>
+            </select>
+            
+            <button type="submit" aria-label="Apply filters" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark">
+                Filter
+            </button>
+            
+            <!-- Clear Filters Button -->
+            <button type="button" id="clear-filters" aria-label="Clear all filters" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark">
+                Clear
+            </button>
+        </form>
+    </div>
+
+    <!-- Team List -->
+    {% if teams %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Teams list">
+        {% for team in teams %}
+        <article role="listitem">
+        <a href="{% url 'teams:detail' slug=team.slug %}" 
+           class="bg-card-dark border border-card-border-dark rounded-lg overflow-hidden hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark block"
+           aria-label="View {{ team.name }} team details">
+            <!-- Team Logo/Banner -->
+            <div class="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
+                {% if team.banner %}
+                <img src="{{ team.banner.url }}" alt="{{ team.name }} banner" class="w-full h-full object-cover">
+                {% elif team.logo %}
+                <img src="{{ team.logo.url }}" alt="{{ team.name }} logo" class="w-24 h-24 object-contain">
+                {% else %}
+                <span class="material-symbols-outlined text-primary text-6xl" aria-hidden="true">groups</span>
+                {% endif %}
+                
+                <!-- Recruiting Badge -->
+                {% if team.is_recruiting %}
+                <span class="absolute top-2 right-2 px-2 py-1 bg-green-500/90 text-white text-xs rounded-full font-medium" role="status" aria-label="Currently recruiting">
+                    Recruiting
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Team Info -->
+            <div class="p-6">
+                <!-- Team Name and Tag -->
+                <div class="mb-3">
+                    <h3 class="text-white text-lg font-bold mb-1">{{ team.name }}</h3>
+                    <p class="text-gray-400 text-sm">[{{ team.tag }}]</p>
+                </div>
+                
+                <!-- Game Badge -->
+                <div class="mb-3">
+                    <span class="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
+                        {{ team.game.name }}
+                    </span>
+                </div>
+                
+                <!-- Description -->
+                {% if team.description %}
+                <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ team.description|truncatewords:15 }}</p>
+                {% endif %}
+                
+                <!-- Stats -->
+                <div class="flex items-center justify-between text-sm mb-3">
+                    <!-- Member Count -->
+                    <div class="text-gray-400 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">people</span>
+                        <span>{{ team.annotated_member_count }}/{{ team.max_members }}</span>
+                    </div>
+                    
+                    <!-- Win Rate -->
+                    {% if team.total_wins > 0 or team.total_losses > 0 %}
+                    <div class="text-gray-400 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">emoji_events</span>
+                        <span>{{ team.win_rate }}% WR</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Achievement Badges -->
+                    {% if team.annotated_achievement_count > 0 %}
+                    <div class="text-gray-400 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">military_tech</span>
+                        <span>{{ team.annotated_achievement_count }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress Bar (if team has capacity info) -->
+                <div class="w-full bg-gray-700 rounded-full h-2" role="progressbar" aria-valuenow="{{ team.annotated_member_count }}" aria-valuemin="0" aria-valuemax="{{ team.max_members }}" aria-label="Team capacity: {{ team.annotated_member_count }} of {{ team.max_members }} members">
+                    {% widthratio team.annotated_member_count team.max_members 100 as progress %}
+                    <div class="bg-primary h-2 rounded-full" style="width: {{ progress }}%"></div>
+                </div>
+            </div>
+        </a>
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav class="mt-8 flex flex-wrap justify-center gap-2 pagination" role="navigation" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
+           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           aria-label="Go to first page">
+            <span class="hidden sm:inline">First</span>
+            <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">first_page</span>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
+           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           aria-label="Go to previous page">
+            <span class="hidden sm:inline">Previous</span>
+            <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">chevron_left</span>
+        </a>
+        {% endif %}
+        
+        <span class="px-4 py-2 min-h-[48px] flex items-center bg-primary text-white rounded-lg" aria-current="page" aria-label="Current page, page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}">
+            <span class="hidden sm:inline">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <span class="sm:hidden">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
+           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           aria-label="Go to next page">
+            <span class="hidden sm:inline">Next</span>
+            <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">chevron_right</span>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
+           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           aria-label="Go to last page">
+            <span class="hidden sm:inline">Last</span>
+            <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">last_page</span>
+        </a>
+        {% endif %}
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
+        <div class="mb-6">
+            <span class="material-symbols-outlined text-gray-500 text-6xl">groups</span>
+        </div>
+        <h2 class="text-white text-2xl font-bold mb-4">No Teams Found</h2>
+        <p class="text-gray-400 mb-6">
+            {% if filter_params.search or filter_params.game or filter_params.recruiting %}
+                No teams match your search criteria. Try adjusting your filters or browse all teams.
+            {% else %}
+                There are no teams yet. Be the first to create one!
+            {% endif %}
+        </p>
+        <div class="flex justify-center gap-4">
+            {% if filter_params.search or filter_params.game or filter_params.recruiting %}
+            <button onclick="document.getElementById('clear-filters').click()" 
+                    class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                Clear Filters
+            </button>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <a href="{% url 'teams:create' %}" 
+               class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                Create Team
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Real-time search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const gameSelect = document.getElementById('game-filter');
+    const recruitingSelect = document.getElementById('recruiting-filter');
+    const filterForm = document.getElementById('filter-form');
+    const clearButton = document.getElementById('clear-filters');
+    
+    // Update URL without page reload
+    function updateURL() {
+        const params = new URLSearchParams();
+        
+        if (searchInput && searchInput.value) {
+            params.set('search', searchInput.value);
+        }
+        if (gameSelect && gameSelect.value) {
+            params.set('game', gameSelect.value);
+        }
+        if (recruitingSelect && recruitingSelect.value) {
+            params.set('recruiting', recruitingSelect.value);
+        }
+        
+        const newURL = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', newURL);
+    }
+    
+    // Restore filters from URL on page load
+    function restoreFiltersFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        
+        if (searchInput && params.has('search')) {
+            searchInput.value = params.get('search');
+        }
+        if (gameSelect && params.has('game')) {
+            gameSelect.value = params.get('game');
+        }
+        if (recruitingSelect && params.has('recruiting')) {
+            recruitingSelect.value = params.get('recruiting');
+        }
+        
+        updateClearButtonVisibility();
+    }
+    
+    // Debounce function for real-time search
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Real-time search with debouncing (500ms delay)
+    if (searchInput) {
+        const debouncedSearch = debounce(function() {
+            // Update URL without reload
+            updateURL();
+            // Store scroll position before submitting
+            sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+            filterForm.submit();
+        }, 500);
+        
+        searchInput.addEventListener('input', function() {
+            // Only auto-submit if there's text or if clearing search
+            if (this.value.length >= 3 || this.value.length === 0) {
+                debouncedSearch();
+            }
+        });
+        
+        // Allow Enter key to submit immediately
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                updateURL();
+                sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+                filterForm.submit();
+            }
+        });
+    }
+    
+    // Auto-submit form on filter change for better UX
+    if (gameSelect) {
+        gameSelect.addEventListener('change', function() {
+            updateURL();
+            sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+            filterForm.submit();
+        });
+    }
+    
+    if (recruitingSelect) {
+        recruitingSelect.addEventListener('change', function() {
+            updateURL();
+            sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+            filterForm.submit();
+        });
+    }
+    
+    // Clear all filters
+    if (clearButton) {
+        clearButton.addEventListener('click', function() {
+            // Clear all form inputs
+            if (searchInput) searchInput.value = '';
+            if (gameSelect) gameSelect.value = '';
+            if (recruitingSelect) recruitingSelect.value = '';
+            
+            // Clear URL parameters
+            window.history.replaceState({}, '', window.location.pathname);
+            
+            // Clear scroll position
+            sessionStorage.removeItem('teamListScrollPosition');
+            
+            // Submit form to show all teams
+            filterForm.submit();
+        });
+    }
+    
+    // Show/hide clear button based on whether filters are active
+    function updateClearButtonVisibility() {
+        const hasFilters = (
+            (searchInput && searchInput.value) ||
+            (gameSelect && gameSelect.value) ||
+            (recruitingSelect && recruitingSelect.value)
+        );
+        
+        if (clearButton) {
+            clearButton.style.display = hasFilters ? 'block' : 'none';
+        }
+    }
+    
+    // Initial check
+    restoreFiltersFromURL();
+    updateClearButtonVisibility();
+    
+    // Update on input changes
+    [searchInput, gameSelect, recruitingSelect].forEach(element => {
+        if (element) {
+            element.addEventListener('change', updateClearButtonVisibility);
+            element.addEventListener('input', updateClearButtonVisibility);
+        }
+    });
+    
+    // Preserve filter state in pagination links
+    const paginationLinks = document.querySelectorAll('.pagination a');
+    const currentParams = new URLSearchParams(window.location.search);
+    
+    paginationLinks.forEach(link => {
+        const url = new URL(link.href, window.location.origin);
+        // Preserve existing filters when paginating
+        currentParams.forEach((value, key) => {
+            if (key !== 'page') {
+                url.searchParams.set(key, value);
+            }
+        });
+        link.href = url.toString();
+        
+        // Store scroll position before navigating
+        link.addEventListener('click', function() {
+            sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+        });
+    });
+    
+    // Restore scroll position on back navigation
+    const savedScrollPosition = sessionStorage.getItem('teamListScrollPosition');
+    if (savedScrollPosition) {
+        window.scrollTo(0, parseInt(savedScrollPosition));
+        // Clear the saved position after restoring
+        sessionStorage.removeItem('teamListScrollPosition');
+    }
+    
+    // Store scroll position when clicking on team cards
+    const teamCards = document.querySelectorAll('a[href*="teams/"]');
+    teamCards.forEach(card => {
+        card.addEventListener('click', function() {
+            sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+        
+        // Escape to clear search when focused
+        if (e.key === 'Escape' && document.activeElement === searchInput) {
+            if (searchInput.value) {
+                searchInput.value = '';
+                updateURL();
+                sessionStorage.setItem('teamListScrollPosition', window.scrollY);
+                filterForm.submit();
+            }
+        }
+    });
+    
+    // Announce filter changes to screen readers
+    const filterAnnouncer = document.createElement('div');
+    filterAnnouncer.setAttribute('role', 'status');
+    filterAnnouncer.setAttribute('aria-live', 'polite');
+    filterAnnouncer.setAttribute('aria-atomic', 'true');
+    filterAnnouncer.className = 'sr-only';
+    document.body.appendChild(filterAnnouncer);
+    
+    // Announce when filters are applied
+    [searchInput, gameSelect, recruitingSelect].forEach(element => {
+        if (element) {
+            element.addEventListener('change', function() {
+                const activeFilters = [];
+                if (searchInput && searchInput.value) activeFilters.push('search');
+                if (gameSelect && gameSelect.value) activeFilters.push('game');
+                if (recruitingSelect && recruitingSelect.value) activeFilters.push('recruiting status');
+                
+                if (activeFilters.length > 0) {
+                    filterAnnouncer.textContent = `Filters applied: ${activeFilters.join(', ')}`;
+                } else {
+                    filterAnnouncer.textContent = 'All filters cleared';
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

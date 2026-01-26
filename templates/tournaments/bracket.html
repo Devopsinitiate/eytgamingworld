@@ -1,0 +1,608 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ tournament.name }} - Interactive Bracket{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bracket-container {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        min-height: 100vh;
+    }
+    
+    .match-card {
+        background: rgba(31, 41, 55, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .match-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #b91c1c, transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .match-card:hover {
+        border-color: rgba(185, 28, 28, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .match-card:hover::before {
+        opacity: 1;
+    }
+    
+    .participant-slot {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .participant-slot.winner {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(21, 128, 61, 0.1) 100%);
+        border-left: 4px solid #22c55e;
+    }
+    
+    .participant-slot.loser {
+        background: rgba(107, 114, 128, 0.1);
+        opacity: 0.7;
+    }
+    
+    .round-header {
+        background: linear-gradient(135deg, rgba(185, 28, 28, 0.2) 0%, rgba(0, 0, 0, 0.3) 100%);
+        border: 1px solid rgba(185, 28, 28, 0.3);
+    }
+    
+    .bracket-connector {
+        position: absolute;
+        background: rgba(185, 28, 28, 0.6);
+        z-index: 1;
+    }
+    
+    .zoom-controls {
+        background: rgba(31, 41, 55, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .live-indicator {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .match-status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-completed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    .status-live { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .status-ready { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .status-pending { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+    .status-disputed { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    
+    .bracket-navigation {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(17, 24, 39, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .participant-avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #b91c1c, #dc2626);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.75rem;
+    }
+    
+    .score-display {
+        font-size: 1.25rem;
+        font-weight: bold;
+        min-width: 2rem;
+        text-align: center;
+    }
+    
+    .match-time {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="bracket-container">
+    <!-- Navigation Header -->
+    <div class="bracket-navigation py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'tournaments:detail' tournament.slug %}" 
+                       class="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+                        <span class="material-symbols-outlined mr-2">arrow_back</span>
+                        Back to Tournament
+                    </a>
+                    <div class="h-6 w-px bg-gray-600"></div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">{{ tournament.name }}</h1>
+                        <p class="text-sm text-gray-400">Interactive Tournament Bracket</p>
+                    </div>
+                </div>
+                
+                <!-- Zoom Controls -->
+                <div class="zoom-controls flex items-center space-x-2 px-4 py-2 rounded-lg">
+                    <button id="zoom-out" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">zoom_out</span>
+                    </button>
+                    <span id="zoom-level" class="text-sm text-gray-300 font-medium min-w-[3rem] text-center">100%</span>
+                    <button id="zoom-in" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">zoom_in</span>
+                    </button>
+                    <div class="h-6 w-px bg-gray-600 mx-2"></div>
+                    <button id="reset-zoom" class="px-3 py-1 text-sm text-gray-300 hover:text-white transition-colors">
+                        Reset
+                    </button>
+                    <button id="fullscreen" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">fullscreen</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% if not brackets %}
+        <!-- No Bracket Yet -->
+        <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-white/10 p-12 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gray-700/50 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl text-gray-400">tournament</span>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Bracket Not Generated Yet</h3>
+            <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                The tournament bracket will be automatically generated once registration closes and all participants are confirmed.
+            </p>
+            
+            <!-- Tournament Status -->
+            <div class="bg-gray-900/50 rounded-lg p-4 mb-6 max-w-sm mx-auto">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-400">Registered Players:</span>
+                    <span class="text-white font-semibold">{{ tournament.total_registered }}/{{ tournament.max_participants }}</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                    <div class="bg-primary h-2 rounded-full transition-all" style="width: {{ tournament.registration_progress }}%"></div>
+                </div>
+            </div>
+            
+            {% if user == tournament.organizer or user.role == 'admin' %}
+            <div class="space-y-3">
+                <a href="{% url 'tournaments:generate_bracket' tournament.slug %}" 
+                   class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition shadow-lg font-semibold">
+                    <span class="material-symbols-outlined mr-2">auto_awesome</span>
+                    Generate Bracket Now
+                </a>
+                <p class="text-xs text-gray-500">
+                    As tournament organizer, you can generate the bracket manually
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <!-- Interactive Bracket Display -->
+        {% for bracket in brackets %}
+        <div class="mb-12">
+            <!-- Bracket Header -->
+            <div class="round-header rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <span class="material-symbols-outlined text-primary mr-3">emoji_events</span>
+                            {{ bracket.name }}
+                        </h2>
+                        <p class="text-gray-300 mt-1">{{ bracket.total_rounds }} rounds • {{ bracket.participants.count }} participants</p>
+                    </div>
+                    
+                    <!-- Live Updates Indicator -->
+                    <div class="flex items-center space-x-4">
+                        <div class="live-indicator flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span class="text-sm text-green-400 font-medium">Live Updates</span>
+                        </div>
+                        
+                        <!-- Bracket Stats -->
+                        <div class="text-right">
+                            <div class="text-sm text-gray-400">Matches Completed</div>
+                            <div class="text-lg font-bold text-white">
+                                {{ bracket.completed_matches }}/{{ bracket.total_matches }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bracket Container with Horizontal Scroll -->
+            <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <div id="bracket-container" class="p-8 min-w-max" style="transform-origin: top left;">
+                        <div class="flex space-x-12 relative">
+                            {% for round_num, matches in matches_by_bracket|get_item:bracket.id|dict_items %}
+                            <!-- Round Column -->
+                            <div class="flex flex-col space-y-6 min-w-[280px] relative">
+                                <!-- Round Header -->
+                                <div class="text-center mb-6">
+                                    <div class="round-header rounded-lg p-3 mx-4">
+                                        <h3 class="text-lg font-bold text-white">
+                                            {% if round_num == bracket.total_rounds %}
+                                                🏆 Grand Finals
+                                            {% elif round_num == bracket.total_rounds|add:"-1" %}
+                                                🥈 Semi-Finals
+                                            {% elif round_num == bracket.total_rounds|add:"-2" %}
+                                                🥉 Quarter-Finals
+                                            {% else %}
+                                                Round {{ round_num }}
+                                            {% endif %}
+                                        </h3>
+                                        <p class="text-sm text-gray-300 mt-1">{{ matches|length }} match{{ matches|length|pluralize:"es" }}</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Matches in Round -->
+                                {% for match in matches %}
+                                <div class="match-card rounded-xl p-6 relative" data-match-id="{{ match.id }}">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-medium text-gray-400">Match {{ match.match_number }}</span>
+                                            {% if match.scheduled_time %}
+                                            <div class="match-time text-gray-300">
+                                                {{ match.scheduled_time|date:"M d, g:i A" }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            {% if match.status == 'completed' %}status-completed
+                                            {% elif match.status == 'in_progress' %}status-live
+                                            {% elif match.status == 'ready' %}status-ready
+                                            {% elif match.status == 'disputed' %}status-disputed
+                                            {% else %}status-pending{% endif %}">
+                                            {% if match.status == 'completed' %}
+                                                <span class="material-symbols-outlined text-xs mr-1">check_circle</span>
+                                                Completed
+                                            {% elif match.status == 'in_progress' %}
+                                                <span class="material-symbols-outlined text-xs mr-1 live-indicator">radio_button_checked</span>
+                                                Live
+                                            {% elif match.status == 'ready' %}
+                                                <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                                Ready
+                                            {% elif match.status == 'disputed' %}
+                                                <span class="material-symbols-outlined text-xs mr-1">warning</span>
+                                                Disputed
+                                            {% else %}
+                                                <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                                Pending
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-lg p-4 mb-2 
+                                        {% if match.winner == match.participant1 %}winner
+                                        {% elif match.status == 'completed' %}loser{% endif %}">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                {% if match.participant1 %}
+                                                <div class="participant-avatar">
+                                                    {{ match.participant1.display_name|first|upper }}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        {{ match.participant1.display_name }}
+                                                    </div>
+                                                    {% if match.participant1.team %}
+                                                    <div class="text-xs text-gray-400 truncate">
+                                                        {{ match.participant1.team.name }}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                {% if match.winner == match.participant1 %}
+                                                <span class="material-symbols-outlined text-green-400">emoji_events</span>
+                                                {% endif %}
+                                                {% else %}
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if match.status == 'completed' %}
+                                            <div class="score-display 
+                                                {% if match.winner == match.participant1 %}text-green-400
+                                                {% else %}text-gray-500{% endif %}">
+                                                {{ match.score_p1|default:"-" }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-2">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-bold text-gray-400">
+                                            <div class="w-8 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-8 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-lg p-4 mb-4 
+                                        {% if match.winner == match.participant2 %}winner
+                                        {% elif match.status == 'completed' %}loser{% endif %}">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                {% if match.participant2 %}
+                                                <div class="participant-avatar">
+                                                    {{ match.participant2.display_name|first|upper }}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        {{ match.participant2.display_name }}
+                                                    </div>
+                                                    {% if match.participant2.team %}
+                                                    <div class="text-xs text-gray-400 truncate">
+                                                        {{ match.participant2.team.name }}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                {% if match.winner == match.participant2 %}
+                                                <span class="material-symbols-outlined text-green-400">emoji_events</span>
+                                                {% endif %}
+                                                {% else %}
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if match.status == 'completed' %}
+                                            <div class="score-display 
+                                                {% if match.winner == match.participant2 %}text-green-400
+                                                {% else %}text-gray-500{% endif %}">
+                                                {{ match.score_p2|default:"-" }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Match Actions -->
+                                    {% if user.is_authenticated and match.is_ready and match.status != 'completed' %}
+                                    {% if user == tournament.organizer or user.role == 'admin' or match.participant1.user == user or match.participant2.user == user %}
+                                    <div class="pt-4 border-t border-gray-700">
+                                        <a href="{% url 'tournaments:match_report_score' match.pk %}" 
+                                           class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                            <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                            Report Score
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('bracket-container');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const resetZoomBtn = document.getElementById('reset-zoom');
+    const fullscreenBtn = document.getElementById('fullscreen');
+    const zoomLevelDisplay = document.getElementById('zoom-level');
+    
+    if (!container) return;
+    
+    let currentZoom = 1.0;
+    const zoomStep = 0.1;
+    const minZoom = 0.3;
+    const maxZoom = 3.0;
+    
+    function updateZoom() {
+        container.style.transform = `scale(${currentZoom})`;
+        zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        
+        // Update button states
+        zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+        zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+    }
+    
+    // Zoom controls
+    zoomInBtn.addEventListener('click', function() {
+        if (currentZoom < maxZoom) {
+            currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+            updateZoom();
+        }
+    });
+    
+    zoomOutBtn.addEventListener('click', function() {
+        if (currentZoom > minZoom) {
+            currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+            updateZoom();
+        }
+    });
+    
+    resetZoomBtn.addEventListener('click', function() {
+        currentZoom = 1.0;
+        updateZoom();
+    });
+    
+    // Fullscreen toggle
+    fullscreenBtn.addEventListener('click', function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log('Error attempting to enable fullscreen:', err.message);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    });
+    
+    // Mouse wheel zoom
+    container.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+            const newZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
+            if (newZoom !== currentZoom) {
+                currentZoom = newZoom;
+                updateZoom();
+            }
+        }
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName.toLowerCase() === 'input') return;
+        
+        switch(e.key) {
+            case '+':
+            case '=':
+                if (currentZoom < maxZoom) {
+                    currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                    updateZoom();
+                }
+                break;
+            case '-':
+                if (currentZoom > minZoom) {
+                    currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                    updateZoom();
+                }
+                break;
+            case '0':
+                currentZoom = 1.0;
+                updateZoom();
+                break;
+            case 'f':
+            case 'F11':
+                e.preventDefault();
+                fullscreenBtn.click();
+                break;
+        }
+    });
+    
+    // Match card interactions
+    document.querySelectorAll('.match-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const matchId = this.dataset.matchId;
+            // Add click animation
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // You can add match detail modal or navigation here
+            console.log('Match clicked:', matchId);
+        });
+    });
+    
+    // Real-time updates simulation (replace with actual WebSocket connection)
+    function simulateRealTimeUpdates() {
+        const liveMatches = document.querySelectorAll('.status-live');
+        liveMatches.forEach(badge => {
+            // Add pulsing animation to live matches
+            setInterval(() => {
+                badge.style.opacity = badge.style.opacity === '0.5' ? '1' : '0.5';
+            }, 1000);
+        });
+    }
+    
+    // Initialize
+    updateZoom();
+    simulateRealTimeUpdates();
+    
+    // Auto-scroll to current round (if any live matches)
+    const liveMatch = document.querySelector('.status-live');
+    if (liveMatch) {
+        liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Touch gestures for mobile
+    let touchStartDistance = 0;
+    let touchStartZoom = 1;
+    
+    container.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            touchStartDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            touchStartZoom = currentZoom;
+        }
+    });
+    
+    container.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const touchDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            const scale = touchDistance / touchStartDistance;
+            const newZoom = Math.max(minZoom, Math.min(maxZoom, touchStartZoom * scale));
+            if (newZoom !== currentZoom) {
+                currentZoom = newZoom;
+                updateZoom();
+            }
+        }
+    });
+});
+
+// Fullscreen change handler
+document.addEventListener('fullscreenchange', function() {
+    const fullscreenBtn = document.getElementById('fullscreen');
+    const icon = fullscreenBtn.querySelector('.material-symbols-outlined');
+    if (document.fullscreenElement) {
+        icon.textContent = 'fullscreen_exit';
+    } else {
+        icon.textContent = 'fullscreen';
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

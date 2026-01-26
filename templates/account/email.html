@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Email Addresses - EYTGaming{% endblock %}
+
+{% block body %}
+<div class="flex h-screen w-full flex-col bg-background-dark p-4 sm:p-6 lg:p-8">
+    <!-- Header -->
+    <header class="mb-6">
+        <div class="flex items-center gap-3">
+            <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-8 w-8 rounded-lg object-cover"/>
+            <h1 class="text-2xl font-bold tracking-tight text-white">Account Settings</h1>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="flex flex-1 flex-col overflow-hidden rounded-xl border border-white/10 bg-gray-800/50 shadow-2xl shadow-gray-900/40 backdrop-blur-lg md:flex-row">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-full border-b border-gray-700 p-4 md:w-64 md:border-b-0 md:border-r md:p-6">
+            <nav class="flex flex-col gap-2 md:flex-col">
+                <a class="flex items-center gap-3 rounded-lg bg-gray-800/50 px-3 py-2 font-medium text-white transition-colors hover:bg-gray-800" href="{% url 'account_email' %}">
+                    <span class="material-symbols-outlined !text-xl text-primary">mail</span>
+                    <span class="text-sm font-medium">Email Addresses</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'account_change_password' %}">
+                    <span class="material-symbols-outlined !text-xl">lock</span>
+                    <span class="text-sm font-medium">Change Password</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'socialaccount_connections' %}">
+                    <span class="material-symbols-outlined !text-xl">link</span>
+                    <span class="text-sm font-medium">Account Connections</span>
+                </a>
+                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'account_logout' %}">
+                    <span class="material-symbols-outlined !text-xl">logout</span>
+                    <span class="text-sm font-medium">Sign Out</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-8">
+            <div class="mx-auto max-w-3xl">
+                
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-white">Email Addresses</h2>
+                    <p class="mt-1 text-sm text-gray-400">Manage the email addresses associated with your account.</p>
+                </div>
+                
+                <!-- Django Messages -->
+                {% if messages %}
+                    <div class="mb-6 space-y-2">
+                        {% for message in messages %}
+                            <div class="flex items-center gap-3 px-4 py-3 rounded-lg {% if message.tags == 'error' or message.tags == 'danger' %}bg-red-900/20 border border-red-800 text-red-200{% elif message.tags == 'success' %}bg-green-900/20 border border-green-800 text-green-200{% elif message.tags == 'warning' %}bg-yellow-900/20 border border-yellow-800 text-yellow-200{% else %}bg-blue-900/20 border border-blue-800 text-blue-200{% endif %}">
+                                <span class="material-symbols-outlined text-sm">
+                                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                                </span>
+                                <p class="text-sm">{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Email List Section -->
+                <section class="rounded-xl border border-gray-700 bg-gray-800/20 p-6">
+                    <h3 class="text-lg font-semibold text-white">Your Email Addresses</h3>
+                    <p class="mt-1 text-sm text-gray-400">The following email addresses are associated with your account.</p>
+                    
+                    {% if emailaddresses %}
+                        <form method="post" action="{% url 'account_email' %}" class="mt-6">
+                            {% csrf_token %}
+                            
+                            <div class="space-y-4">
+                                {% for emailaddress in emailaddresses %}
+                                    <div class="flex items-center justify-between rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+                                        <div class="flex items-center gap-4">
+                                            <input 
+                                                type="radio" 
+                                                name="email" 
+                                                value="{{ emailaddress.email }}"
+                                                {% if emailaddress.primary %}checked{% endif %}
+                                                class="h-4 w-4 border-gray-600 bg-gray-700 text-primary focus:ring-primary focus:ring-offset-gray-800"
+                                            />
+                                            <div>
+                                                <p class="font-medium text-white">{{ emailaddress.email }}</p>
+                                                <div class="mt-1 flex items-center gap-x-2">
+                                                    {% if emailaddress.primary %}
+                                                        <span class="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">Primary</span>
+                                                    {% endif %}
+                                                    {% if emailaddress.verified %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                                                            <span class="material-symbols-outlined !text-sm">verified</span>
+                                                            Verified
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-400 ring-1 ring-inset ring-amber-500/20">
+                                                            Unverified
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-2">
+                                            {% if not emailaddress.verified %}
+                                                <button 
+                                                    type="submit" 
+                                                    name="action_send" 
+                                                    value="{{ emailaddress.email }}"
+                                                    class="text-sm font-medium text-primary/80 transition-colors hover:text-primary"
+                                                >
+                                                    Resend Verification
+                                                </button>
+                                            {% endif %}
+                                            {% if not emailaddress.primary %}
+                                                <button 
+                                                    type="submit" 
+                                                    name="action_remove" 
+                                                    value="{{ emailaddress.email }}"
+                                                    class="text-sm font-medium text-gray-400 transition-colors hover:text-red-400"
+                                                >
+                                                    Remove
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button 
+                                    type="submit" 
+                                    name="action_primary"
+                                    class="flex h-11 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-5 text-sm font-bold leading-normal tracking-wide text-white transition-colors hover:bg-primary/90"
+                                >
+                                    <span class="truncate">Make Primary</span>
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <p class="mt-4 text-sm text-gray-400">No email addresses associated with your account.</p>
+                    {% endif %}
+                </section>
+                
+                <!-- Add Email Section -->
+                <section class="mt-8 rounded-xl border border-gray-700 bg-gray-800/20 p-6">
+                    <h3 class="text-lg font-semibold text-white">Add Email Address</h3>
+                    <p class="mt-1 text-sm text-gray-400">Add another email address to your account.</p>
+                    
+                    <form method="post" action="{% url 'account_email' %}" class="mt-6">
+                        {% csrf_token %}
+                        
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-300" for="email">Email Address</label>
+                                <div class="mt-2">
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        id="email"
+                                        placeholder="you@example.com"
+                                        required
+                                        class="block w-full rounded-lg border-gray-700 bg-gray-800/50 text-white placeholder-gray-500 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                    />
+                                </div>
+                            </div>
+                            <button 
+                                type="submit" 
+                                name="action_add"
+                                class="flex h-11 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-gray-700 bg-gray-800 px-5 text-sm font-bold leading-normal tracking-wide text-white transition-colors hover:bg-gray-700"
+                            >
+                                <span class="truncate">Add Email</span>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
