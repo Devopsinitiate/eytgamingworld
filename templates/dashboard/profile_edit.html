@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
     .material-symbols-outlined {
@@ -92,6 +93,58 @@
     /* Progress bar animation */
     .progress-bar {
         transition: width 0.5s ease-in-out;
+    }
+    
+    /* Force dark theme overrides for profile edit page */
+    .bg-white,
+    .bg-gray-50 {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+    
+    .text-gray-900 {
+        color: #ffffff !important;
+    }
+    
+    .text-gray-600 {
+        color: #9ca3af !important;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+    
+    /* Profile completeness widget styling */
+    .profile-completeness {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Quick links styling */
+    .quick-links {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    .quick-links a {
+        color: #e5e7eb !important;
+        transition: color 0.2s ease;
+    }
+    
+    .quick-links a:hover {
+        color: var(--eyt-primary) !important;
+    }
+    
+    /* Profile tips styling */
+    .profile-tips {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Account stats styling */
+    .account-stats {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
     }
 </style>
 {% endblock %}

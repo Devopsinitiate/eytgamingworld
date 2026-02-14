@@ -3,6 +3,11 @@
 
 {% block title %}{{ tournament.name }} - Match History{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <!-- Back Button -->

@@ -1,0 +1,83 @@
+{% load static %}
+
+<!-- Gaming Quick Actions Component -->
+<!-- Mobile-First with Skewed Buttons -->
+
+<div class="card-gaming-highlight" role="region" aria-labelledby="quick-actions-heading">
+    <div class="card-gaming-content p-6">
+        <h2 class="gaming-subheader text-2xl text-white mb-6" id="quick-actions-heading">
+            ⚡ QUICK ACTIONS
+        </h2>
+        
+        <!-- Desktop: 4 Columns, Mobile: 2x2 Grid -->
+        <div class="mobile-btn-group md:grid-cols-4 md:gap-6" role="navigation" aria-label="Quick action buttons">
+            <!-- Register for Tournament -->
+            <a 
+                href="{% url 'tournaments:list' %}" 
+                class="btn-gaming-primary mobile-btn-full"
+                aria-label="Register for tournament"
+            >
+                <span class="flex items-center gap-2">
+                    <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
+                    <span class="hidden md:inline">REGISTER</span>
+                    <span class="md:hidden">TOURNAMENTS</span>
+                </span>
+            </a>
+            
+            <!-- Join Team -->
+            <a 
+                href="{% url 'teams:list' %}" 
+                class="btn-gaming-secondary mobile-btn-full"
+                aria-label="Join team"
+            >
+                <span class="flex items-center gap-2">
+                    <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+                    <span class="hidden md:inline">JOIN TEAM</span>
+                    <span class="md:hidden">TEAMS</span>
+                </span>
+            </a>
+            
+            <!-- View Notifications -->
+            <a 
+                href="{% url 'notifications:list' %}" 
+                class="btn-gaming-ghost mobile-btn-full relative"
+                aria-label="View notifications{% if stats.unread_notifications %}, {{ stats.unread_notifications }} unread{% endif %}"
+            >
+                <span class="flex items-center gap-2">
+                    <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+                    <span class="hidden md:inline">ALERTS</span>
+                    <span class="md:hidden">ALERTS</span>
+                </span>
+                {% if stats.unread_notifications %}
+                <span class="absolute -top-2 -right-2 bg-yellow-500 text-deep-black text-xs font-black rounded-full h-6 w-6 flex items-center justify-center neon-red-glow">
+                    {{ stats.unread_notifications }}
+                </span>
+                {% endif %}
+            </a>
+            
+            <!-- Manage Payments -->
+            <a 
+                href="{% url 'payments:payment_methods' %}" 
+                class="btn-gaming-ghost mobile-btn-full"
+                aria-label="Manage payment methods"
+            >
+                <span class="flex items-center gap-2">
+                    <span class="material-symbols-outlined" aria-hidden="true">payments</span>
+                    <span class="hidden md:inline">PAYMENTS</span>
+                    <span class="md:hidden">PAY</span>
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Touch feedback for mobile */
+@media (max-width: 767px) {
+    .btn-gaming-primary:active,
+    .btn-gaming-secondary:active,
+    .btn-gaming-ghost:active {
+        transform: skewX(-8deg) scale(0.95);
+    }
+}
+</style>

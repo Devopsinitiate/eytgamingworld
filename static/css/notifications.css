@@ -1,0 +1,636 @@
+/**
+ * EYTGaming Notifications Page - Gaming Styled Design
+ * 
+ * Matches the Home page aesthetic: neon borders, gradient text,
+ * animated grid backgrounds, skewed elements, card glow effects.
+ * 
+ * Brand Colors:
+ * - Electric Red: #DC2626
+ * - Deep Black: #0A0A0A
+ * - Gunmetal Gray: #1F2937
+ * - Neon Cyan: #06B6D4
+ */
+
+/* ============================================
+   PAGE LAYOUT
+   ============================================ */
+
+.notifications-page {
+    min-height: 100vh;
+    background: #0A0A0A;
+    position: relative;
+    z-index: 1;
+    /* overflow: hidden removed — it creates a containing block that
+       traps pointer events and prevents the fixed-position mobile
+       nav buttons from being clickable */
+}
+
+.notifications-page .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(220, 38, 38, 0.08) 1px, transparent 0);
+    background-size: 24px 24px;
+    animation: notifGridMove 25s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes notifGridMove {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 24px 24px;
+    }
+}
+
+.notifications-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   BREADCRUMB (GAMING)
+   ============================================ */
+
+.notif-breadcrumb {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+    margin-bottom: 2rem;
+}
+
+.notif-breadcrumb a {
+    color: #9CA3AF;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.notif-breadcrumb a:hover {
+    color: #DC2626;
+    text-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+}
+
+.notif-breadcrumb .breadcrumb-separator {
+    color: #DC2626;
+    font-size: 0.875rem;
+    margin: 0 0.5rem;
+}
+
+.notif-breadcrumb .breadcrumb-current {
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   HEADER & STATS
+   ============================================ */
+
+.notif-header-title {
+    font-family: 'Barlow Condensed', 'Inter', sans-serif;
+    background: linear-gradient(135deg, #DC2626 0%, #991B1B 50%, #DC2626 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+@media (min-width: 768px) {
+    .notif-header-title {
+        font-size: 3.5rem;
+    }
+}
+
+.notif-header-subtitle {
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.notif-stat-card {
+    background: rgba(31, 41, 55, 0.5);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    min-width: 80px;
+}
+
+.notif-stat-card:hover {
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15);
+}
+
+.notif-stat-value {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #fff;
+    font-family: 'Barlow Condensed', 'Inter', sans-serif;
+    line-height: 1;
+}
+
+.notif-stat-value.highlight {
+    color: #DC2626;
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+}
+
+.notif-stat-label {
+    font-size: 0.625rem;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-top: 0.25rem;
+}
+
+/* ============================================
+   FILTER TABS (GAMING)
+   ============================================ */
+
+.notif-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid rgba(75, 85, 99, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+}
+
+.notif-filter-tab {
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.notif-filter-tab:hover {
+    color: #D1D5DB;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.notif-filter-tab.active {
+    background: #DC2626;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+    transform: skewX(-3deg);
+}
+
+.notif-filter-tab.active:hover {
+    background: #B91C1C;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.notif-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: rgba(31, 41, 55, 0.6);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    border-radius: 0.5rem;
+    color: #D1D5DB;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.notif-action-btn:hover {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.4);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.15);
+}
+
+.notif-action-btn .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+/* ============================================
+   NOTIFICATION CARDS (GAMING)
+   ============================================ */
+
+.notif-card {
+    position: relative;
+    background: rgba(31, 41, 55, 0.3);
+    border: 1px solid rgba(75, 85, 99, 0.3);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.notif-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    border: 2px solid transparent;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+}
+
+.notif-card:hover {
+    background: rgba(31, 41, 55, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.notif-card:hover::before {
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Unread card accent */
+.notif-card.unread {
+    border-left: 3px solid #DC2626;
+    background: rgba(220, 38, 38, 0.03);
+}
+
+.notif-card.unread::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: #DC2626;
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+}
+
+.notif-card-link {
+    display: block;
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.notif-card-link:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ============================================
+   NOTIFICATION ICON
+   ============================================ */
+
+.notif-icon-wrapper {
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.3s ease;
+}
+
+.notif-icon-wrapper.type-tournament {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.notif-icon-wrapper.type-tournament .material-symbols-outlined {
+    color: #3B82F6;
+}
+
+.notif-icon-wrapper.type-coaching {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.notif-icon-wrapper.type-coaching .material-symbols-outlined {
+    color: #22C55E;
+}
+
+.notif-icon-wrapper.type-team {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.notif-icon-wrapper.type-team .material-symbols-outlined {
+    color: #A855F7;
+}
+
+.notif-icon-wrapper.type-payment {
+    background: rgba(234, 179, 8, 0.1);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.notif-icon-wrapper.type-payment .material-symbols-outlined {
+    color: #EAB308;
+}
+
+.notif-icon-wrapper.type-match {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.notif-icon-wrapper.type-match .material-symbols-outlined {
+    color: #F97316;
+}
+
+.notif-icon-wrapper.type-security {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.notif-icon-wrapper.type-security .material-symbols-outlined {
+    color: #EF4444;
+}
+
+.notif-icon-wrapper.type-achievement {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.notif-icon-wrapper.type-achievement .material-symbols-outlined {
+    color: #F59E0B;
+}
+
+.notif-icon-wrapper.type-default {
+    background: rgba(107, 114, 128, 0.1);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.notif-icon-wrapper.type-default .material-symbols-outlined {
+    color: #6B7280;
+}
+
+.notif-card:hover .notif-icon-wrapper {
+    box-shadow: 0 0 12px currentColor;
+}
+
+/* ============================================
+   NOTIFICATION CONTENT
+   ============================================ */
+
+.notif-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.notif-message {
+    font-size: 0.8125rem;
+    color: #9CA3AF;
+    margin-top: 0.25rem;
+    line-height: 1.5;
+}
+
+.notif-unread-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: #DC2626;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.6);
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 4px rgba(220, 38, 38, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+    }
+}
+
+/* ============================================
+   META & BADGES
+   ============================================ */
+
+.notif-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.notif-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6875rem;
+    color: #6B7280;
+}
+
+.notif-time .material-symbols-outlined {
+    font-size: 0.875rem;
+}
+
+.notif-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    background: rgba(75, 85, 99, 0.3);
+    border: 1px solid rgba(75, 85, 99, 0.2);
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+.notif-priority-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.notif-priority-badge.urgent {
+    background: rgba(220, 38, 38, 0.15);
+    color: #EF4444;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.2);
+}
+
+.notif-priority-badge.high {
+    background: rgba(249, 115, 22, 0.15);
+    color: #F97316;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* ============================================
+   CARD ACTION BUTTONS
+   ============================================ */
+
+.notif-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.notif-card-action-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6B7280;
+}
+
+.notif-card-action-btn:hover {
+    background: rgba(75, 85, 99, 0.4);
+    color: #fff;
+}
+
+.notif-card-action-btn.delete:hover {
+    background: rgba(220, 38, 38, 0.15);
+    color: #EF4444;
+}
+
+.notif-card-action-btn .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.notif-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 1rem;
+    text-align: center;
+}
+
+.notif-empty-icon {
+    font-size: 4rem;
+    color: rgba(220, 38, 38, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.notif-empty-title {
+    font-family: 'Barlow Condensed', 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+}
+
+.notif-empty-text {
+    font-size: 0.875rem;
+    color: #6B7280;
+    max-width: 24rem;
+}
+
+/* ============================================
+   SECTION DIVIDER
+   ============================================ */
+
+.notif-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.3), transparent);
+    margin: 2rem 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+    .notif-header-title {
+        font-size: 2.25rem;
+    }
+
+    .notif-filter-tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .notif-stat-card {
+        padding: 0.75rem 1rem;
+        min-width: 65px;
+    }
+
+    .notif-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .notif-card-link {
+        padding: 1rem;
+    }
+
+    .notif-icon-wrapper {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    .notif-icon-wrapper .material-symbols-outlined {
+        font-size: 1.125rem;
+    }
+
+    /* Add bottom padding so content isn't hidden behind fixed bottom nav */
+    .notifications-page {
+        padding-bottom: 5rem;
+    }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .notifications-page .grid-bg {
+        animation: none;
+    }
+
+    .notif-unread-dot {
+        animation: none;
+    }
+
+    .notif-card {
+        transition: none;
+    }
+
+    .notif-filter-tab.active {
+        transform: none;
+    }
+}

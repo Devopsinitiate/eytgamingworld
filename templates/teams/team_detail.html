@@ -157,8 +157,7 @@
             <span class="material-symbols-outlined text-primary text-lg md:text-xl"
                 aria-hidden="true">emoji_events</span>
         </div>
-        <p class="text-white text-2xl md:text-3xl font-bold"
-            aria-label="Tournaments played: {{ team.tournaments_played }}">{{ team.tournaments_played }}</p>
+        <p class="text-white text-2xl md:text-3xl font-bold" aria-label="Tournaments played: {{ team.tournaments_played }}">{{ team.tournaments_played }}</p>
     </div>
 
     <!-- Tournaments Won -->
@@ -168,19 +167,16 @@
             <span class="material-symbols-outlined text-green-500 text-lg md:text-xl"
                 aria-hidden="true">military_tech</span>
         </div>
-        <p class="text-white text-2xl md:text-3xl font-bold" aria-label="Tournaments won: {{ team.tournaments_won }}">{{
-            team.tournaments_won }}</p>
+        <p class="text-white text-2xl md:text-3xl font-bold" aria-label="Tournaments won: {{ team.tournaments_won }}">{{ team.tournaments_won }}</p>
     </div>
 
     <!-- Win Rate -->
     <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
         <div class="flex items-center justify-between mb-2">
             <span class="text-gray-400 text-xs md:text-sm">Win Rate</span>
-            <span class="material-symbols-outlined text-blue-500 text-lg md:text-xl"
-                aria-hidden="true">trending_up</span>
+            <span class="material-symbols-outlined text-blue-500 text-lg md:text-xl" aria-hidden="true">trending_up</span>
         </div>
-        <p class="text-white text-2xl md:text-3xl font-bold" aria-label="Win rate: {{ team.win_rate }} percent">{{
-            team.win_rate }}%</p>
+        <p class="text-white text-2xl md:text-3xl font-bold" aria-label="Win rate: {{ team.win_rate }} percent">{{ team.win_rate }}%</p>
     </div>
 
     <!-- Members -->
@@ -190,8 +186,7 @@
             <span class="material-symbols-outlined text-purple-500 text-lg md:text-xl" aria-hidden="true">people</span>
         </div>
         <p class="text-white text-2xl md:text-3xl font-bold"
-            aria-label="Members: {{ team.member_count }} of {{ team.max_members }}">{{ team.member_count }}/{{
-            team.max_members }}</p>
+            aria-label="Members: {{ team.member_count }} of {{ team.max_members }}">{{ team.member_count }}/{{ team.max_members }}</p>
     </div>
 </section>
 
@@ -274,8 +269,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-white font-medium">{{ participation.tournament.name }}</p>
-                            <p class="text-gray-400 text-sm">{{ participation.tournament.start_datetime|date:"M d, Y" }}
-                            </p>
+                            <p class="text-gray-400 text-sm">{{ participation.tournament.start_datetime|date:"M d, Y" }}</p>
                         </div>
                         {% if participation.final_placement %}
                         <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium">

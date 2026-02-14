@@ -5,10 +5,53 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Force dark theme overrides for game stats page */
+    .bg-white,
+    .bg-gray-50 {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+    
+    .text-gray-900 {
+        color: #ffffff !important;
+    }
+    
+    .text-gray-600 {
+        color: #9ca3af !important;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+    
+    /* Stats cards styling */
+    .stats-card {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Tournament history table styling */
+    .tournament-table {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    .tournament-table th {
+        background-color: #1f2937 !important;
+        color: #ffffff !important;
+        border-color: #374151 !important;
+    }
+    
+    .tournament-table td {
+        border-color: #374151 !important;
+        color: #e5e7eb !important;
     }
 </style>
 {% endblock %}

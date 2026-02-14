@@ -1,0 +1,138 @@
+{% load static %}
+
+{# Media Highlights Section - Battle Moments and Gameplay Videos #}
+<section id="highlights" class="media-highlights py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
+  <div class="container mx-auto px-4">
+    {# Section Title #}
+    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+      BATTLE MOMENTS
+    </h2>
+    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+      Epic Highlights & Tournament Clips
+    </p>
+    
+    {# Featured Video - Large Display #}
+    {% if featured_video %}
+    <div class="featured-video mb-12 max-w-5xl mx-auto">
+      <div class="video-wrapper relative group cursor-pointer" data-video-url="{{ featured_video.video_url }}">
+        {% if featured_video.thumbnail %}
+        <img 
+          src="{{ featured_video.thumbnail.url }}" 
+          alt="{{ featured_video.title }}" 
+          class="video-thumbnail rounded-lg"
+          loading="lazy"
+        >
+        {% else %}
+        <div class="video-thumbnail rounded-lg bg-gray-800 flex items-center justify-center" style="aspect-ratio: 16/9;">
+          <span class="material-symbols-outlined text-gray-600 text-8xl">videocam</span>
+        </div>
+        {% endif %}
+        
+        {# Play Button with Pulsing Animation #}
+        <button class="play-button" aria-label="Play video: {{ featured_video.title }}">
+          <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
+        </button>
+        
+        {# Dark Overlay #}
+        <div class="video-overlay rounded-lg"></div>
+        
+        {# Video Info Overlay #}
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent z-10 rounded-b-lg">
+          <h3 class="text-2xl font-bold text-white uppercase tracking-tight mb-2">
+            {{ featured_video.title }}
+          </h3>
+          <div class="flex items-center gap-4 text-gray-300 text-sm">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">visibility</span>
+              {{ featured_video.views|default:"0" }} views
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">schedule</span>
+              {{ featured_video.published_date|date:"M d, Y" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {# Video Grid - Additional Highlights #}
+    <div class="video-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for video in highlight_videos %}
+      <div class="video-card group cursor-pointer" data-video-url="{{ video.video_url }}">
+        {# Video Thumbnail Wrapper #}
+        <div class="video-thumbnail-wrapper relative overflow-hidden rounded-lg mb-4">
+          {% if video.thumbnail %}
+          <img 
+            src="{{ video.thumbnail.url }}" 
+            alt="{{ video.title }}" 
+            class="video-thumbnail transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          >
+          {% else %}
+          <div class="video-thumbnail bg-gray-800 flex items-center justify-center" style="aspect-ratio: 16/9;">
+            <span class="material-symbols-outlined text-gray-600 text-6xl">videocam</span>
+          </div>
+          {% endif %}
+          
+          {# Duration Badge #}
+          {% if video.duration %}
+          <div class="video-duration absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-white text-xs font-bold">
+            {{ video.duration }}
+          </div>
+          {% endif %}
+          
+          {# Dark Overlay #}
+          <div class="video-overlay rounded-lg"></div>
+          
+          {# Play Icon Overlay #}
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-3xl">play_arrow</span>
+            </div>
+          </div>
+        </div>
+        
+        {# Video Info #}
+        <h3 class="video-title text-lg font-bold text-white uppercase tracking-tight mb-2 group-hover:text-red-500 transition-colors">
+          {{ video.title }}
+        </h3>
+        <p class="video-meta text-sm text-gray-400">
+          {{ video.views|default:"0" }} views • {{ video.published_date|date:"M d, Y" }}
+        </p>
+      </div>
+      {% empty %}
+      {# Empty State - No Videos (only if no featured video either) #}
+      {% if not featured_video %}
+      <div class="col-span-full text-center py-12">
+        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
+          videocam
+        </span>
+        <p class="text-gray-500 text-xl">
+          No highlight videos available yet. Check back soon!
+        </p>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# Video Modal - Hidden by default, shown via JavaScript #}
+<div id="video-modal" class="fixed inset-0 bg-black/95 z-[200] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="video-modal-title">
+  <div class="relative w-full max-w-6xl">
+    {# Close Button #}
+    <button 
+      id="close-video-modal" 
+      class="absolute -top-12 right-0 text-white hover:text-red-500 transition-colors"
+      aria-label="Close video"
+    >
+      <span class="material-symbols-outlined text-4xl">close</span>
+    </button>
+    
+    {# Video Container #}
+    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+      <div id="video-player-container" class="w-full h-full"></div>
+    </div>
+  </div>
+</div>

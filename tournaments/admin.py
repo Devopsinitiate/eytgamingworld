@@ -89,7 +89,8 @@ class TournamentAdmin(admin.ModelAdmin):
     inlines = [ParticipantInline]
     
     actions = ['publish_tournaments', 'start_tournaments', 'complete_tournaments',
-               'feature_tournaments']
+               'feature_tournaments', 'move_to_checkin', 'force_start_tournament',
+               'run_status_automation']
     
     def status_badge(self, obj):
         colors = {
@@ -140,6 +141,54 @@ class TournamentAdmin(admin.ModelAdmin):
         updated = queryset.update(is_featured=True)
         self.message_user(request, f'{updated} tournaments featured.')
     feature_tournaments.short_description = 'Feature selected tournaments'
+    
+    def move_to_checkin(self, request, queryset):
+        """Move tournaments from registration to check-in period"""
+        count = 0
+        for tournament in queryset.filter(status='registration'):
+            tournament.status = 'check_in'
+            tournament.save()
+            
+            # Send check-in notifications
+            from tournaments.tasks import send_check_in_notifications
+            send_check_in_notifications.delay(tournament.id)
+            count += 1
+            
+        self.message_user(request, f'{count} tournaments moved to check-in period.')
+    move_to_checkin.short_description = 'Move to check-in period'
+    
+    def force_start_tournament(self, request, queryset):
+        """Force start tournaments regardless of participant count"""
+        count = 0
+        for tournament in queryset.filter(status__in=['check_in', 'registration']):
+            tournament.status = 'in_progress'
+            tournament.save()
+            
+            # Generate bracket
+            from tournaments.services.bracket_generator import BracketGenerator
+            try:
+                generator = BracketGenerator(tournament)
+                generator.generate_bracket()
+                
+                # Send start notifications
+                from tournaments.tasks import send_tournament_start_notifications
+                send_tournament_start_notifications.delay(tournament.id)
+                count += 1
+            except Exception as e:
+                self.message_user(request, f'Error starting {tournament.name}: {e}', level='ERROR')
+                
+        self.message_user(request, f'{count} tournaments force started.')
+    force_start_tournament.short_description = 'Force start tournaments'
+    
+    def run_status_automation(self, request, queryset):
+        """Manually run status automation for selected tournaments"""
+        from tournaments.tasks import check_tournament_start_times
+        
+        # Run the automation task
+        result = check_tournament_start_times.delay()
+        
+        self.message_user(request, 'Tournament status automation task queued. Check tournament statuses in a few moments.')
+    run_status_automation.short_description = 'Run status automation now'
 
 
 @admin.register(Participant)

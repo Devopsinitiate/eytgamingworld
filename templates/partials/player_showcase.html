@@ -1,0 +1,113 @@
+{% load static %}
+
+{# Player Showcase Section - Elite Roster Display #}
+<section class="player-showcase py-20 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
+  {# Animated Grid Background #}
+  <div class="grid-pattern-animated absolute inset-0 opacity-30"></div>
+  
+  <div class="container mx-auto px-4 relative z-10">
+    {# Section Title #}
+    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+      ELITE ROSTER
+    </h2>
+    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+      Meet the Champions
+    </p>
+    
+    {# Player Grid - Responsive: 1 col mobile, 2 col tablet, 3 col small desktop, 4 col large desktop #}
+    <div class="player-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {% for player in players %}
+      <div class="player-card group">
+        {# Player Image #}
+        {% if player.image %}
+        <img 
+          src="{{ player.image.url }}" 
+          alt="{{ player.gamer_tag }} - {{ player.role }}" 
+          class="player-image"
+          loading="lazy"
+        >
+        {% else %}
+        <div class="player-image bg-gray-800 flex items-center justify-center">
+          <span class="material-symbols-outlined text-gray-600 text-6xl">person</span>
+        </div>
+        {% endif %}
+        
+        {# Player Info Overlay (Always Visible at Bottom) #}
+        <div class="player-info absolute bottom-0 left-0 right-0 p-4 z-10">
+          <h3 class="player-tag text-2xl font-bold uppercase tracking-tight text-white mb-1">
+            {{ player.gamer_tag }}
+          </h3>
+          <p class="player-role text-sm text-gray-300 uppercase tracking-wide">
+            {{ player.role }} • {{ player.game.name }}
+          </p>
+          <span class="player-flag text-2xl mt-2 inline-block" aria-label="Country: {{ player.country_flag }}">
+            {% if player.country_flag|length == 2 %}
+              {# If country code, display as text badge #}
+              <span class="inline-block px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
+                {{ player.country_flag }}
+              </span>
+            {% else %}
+              {# If emoji flag, display directly #}
+              {{ player.country_flag }}
+            {% endif %}
+          </span>
+        </div>
+        
+        {# Hover Overlay with Stats - Slides up from bottom #}
+        <div class="player-stats-overlay">
+          <div class="space-y-6">
+            {# K/D Ratio Stat #}
+            <div class="stat text-center">
+              <span class="material-symbols-outlined text-red-500 text-4xl mb-2" aria-hidden="true">
+                military_tech
+              </span>
+              <div class="stat-label text-gray-400 text-sm uppercase tracking-wide mb-1">
+                K/D Ratio
+              </div>
+              <div class="stat-value text-white text-3xl font-bold">
+                {{ player.kd_ratio }}
+              </div>
+            </div>
+            
+            {# Rank Stat #}
+            <div class="stat text-center">
+              <span class="material-symbols-outlined text-cyan-500 text-4xl mb-2" aria-hidden="true">
+                emoji_events
+              </span>
+              <div class="stat-label text-gray-400 text-sm uppercase tracking-wide mb-1">
+                Rank
+              </div>
+              <div class="stat-value text-white text-2xl font-bold">
+                {{ player.rank }}
+              </div>
+            </div>
+            
+            {# Wins Stat #}
+            <div class="stat text-center">
+              <span class="material-symbols-outlined text-green-500 text-4xl mb-2" aria-hidden="true">
+                workspace_premium
+              </span>
+              <div class="stat-label text-gray-400 text-sm uppercase tracking-wide mb-1">
+                Wins
+              </div>
+              <div class="stat-value text-white text-3xl font-bold">
+                {{ player.wins }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      {# Empty State - No Players #}
+      <div class="col-span-full text-center py-12">
+        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
+          sports_esports
+        </span>
+        <p class="text-gray-500 text-xl">
+          No featured players yet. Check back soon!
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

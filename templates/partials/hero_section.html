@@ -1,0 +1,110 @@
+{% load static %}
+
+<!-- Hero Section: Full-screen cinematic entry point with brand messaging -->
+<section id="main-content" class="hero-section relative h-screen overflow-hidden flex items-center justify-center" role="banner" aria-label="Hero section">
+  
+  <!-- Video Background (Optional - add your video file to static/videos/) -->
+  <video 
+    id="hero-video"
+    class="hero-video" 
+    autoplay 
+    muted 
+    loop 
+    playsinline
+    aria-hidden="true"
+    style="display: none;"
+  >
+    <!-- Uncomment when you have a video file -->
+    <!-- <source src="{% static 'videos/hero-background.mp4' %}" type="video/mp4"> -->
+    Your browser does not support the video tag.
+  </video>
+  
+  <!-- Overlay Effects Container -->
+  <div class="hero-overlay">
+    <!-- Particle Embers Effect -->
+    <div class="particle-embers" aria-hidden="true"></div>
+    
+    <!-- Glitch Lines Effect -->
+    <div class="glitch-lines" aria-hidden="true"></div>
+    
+    <!-- Light Flares Effect -->
+    <div class="light-flares" aria-hidden="true"></div>
+  </div>
+  
+  <!-- Hero Content -->
+  <div class="hero-content container mx-auto px-4 text-center">
+    <!-- Logo -->
+    <div class="mb-8 animate-fade-in">
+      <img 
+        src="{% static 'images/EYTLOGO.jpg' %}" 
+        alt="EYT Gaming Logo" 
+        class="hero-logo mx-auto w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 object-contain drop-shadow-2xl"
+        style="filter: drop-shadow(0 0 30px rgba(220, 38, 38, 0.8));"
+      >
+    </div>
+    
+    <!-- Headline with Gradient Effect -->
+    <h1 class="hero-headline text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase tracking-tighter mb-6 gradient-text-red leading-none">
+      Gear Up. Dominate. Evolve.
+    </h1>
+    
+    <!-- Subtext -->
+    <p class="hero-subtext text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto font-light tracking-wide">
+      Elite Competition. United Community. Future Esports.
+    </p>
+    
+    <!-- CTA Buttons -->
+    <div class="hero-ctas flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {% if user.is_authenticated %}
+        <a 
+          href="{% url 'dashboard:home' %}" 
+          class="cta-primary ripple-effect rounded-md inline-flex items-center gap-2 transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
+        >
+          <span class="skew-x-[12deg] inline-flex items-center gap-2">
+            <span class="material-symbols-outlined">dashboard</span>
+            Go to Dashboard
+          </span>
+        </a>
+        
+        <a 
+          href="{% url 'tournaments:list' %}" 
+          class="cta-secondary rounded-md inline-flex items-center gap-2 transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
+        >
+          <span class="skew-x-[12deg] inline-flex items-center gap-2">
+            <span class="material-symbols-outlined">emoji_events</span>
+            Join Tournament
+          </span>
+        </a>
+      {% else %}
+        <a 
+          href="{% url 'account_signup' %}" 
+          class="cta-primary ripple-effect rounded-md inline-flex items-center gap-2 transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
+        >
+          <span class="skew-x-[12deg] inline-flex items-center gap-2">
+            <span class="material-symbols-outlined">person_add</span>
+            Join the Army
+          </span>
+        </a>
+        
+        <a 
+          href="#highlights" 
+          class="cta-secondary rounded-md inline-flex items-center gap-2 transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
+        >
+          <span class="skew-x-[12deg] inline-flex items-center gap-2">
+            <span class="material-symbols-outlined">play_circle</span>
+            Watch Highlights
+          </span>
+        </a>
+      {% endif %}
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce" aria-hidden="true">
+      <div class="flex flex-col items-center text-gray-400">
+        <span class="text-xs uppercase tracking-widest mb-2">Scroll Down</span>
+        <span class="material-symbols-outlined text-3xl">keyboard_arrow_down</span>
+      </div>
+    </div>
+  </div>
+  
+</section>

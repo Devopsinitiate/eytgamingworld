@@ -5,10 +5,48 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Force dark theme overrides for match history page */
+    .bg-white,
+    .bg-gray-50 {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+    
+    .text-gray-900 {
+        color: #ffffff !important;
+    }
+    
+    .text-gray-600 {
+        color: #9ca3af !important;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+    
+    /* Match history cards styling */
+    .match-card {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Team membership styling */
+    .team-card {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Match results styling */
+    .match-result {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
     }
 </style>
 {% endblock %}

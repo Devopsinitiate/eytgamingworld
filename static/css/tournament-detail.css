@@ -60,12 +60,13 @@ a[role="button"]:focus {
 /* High Contrast Mode Enhancements */
 @media (prefers-contrast: high) {
     :root {
-        --eyt-primary: #ff0000; /* More contrasted red for high contrast mode */
+        --eyt-primary: #ff0000;
+        /* More contrasted red for high contrast mode */
         --eyt-text-primary: #ffffff;
         --eyt-bg-dark: #000000;
         --eyt-border-light: #ffffff;
     }
-    
+
     .tournament-status-badge,
     .featured-badge,
     .tournament-type-badge {
@@ -74,7 +75,7 @@ a[role="button"]:focus {
         background: var(--eyt-bg-dark);
         color: var(--eyt-text-primary);
     }
-    
+
     .stat-card,
     .content-card,
     .enhanced-participant-card {
@@ -82,13 +83,13 @@ a[role="button"]:focus {
         border-color: var(--eyt-text-primary);
         background: var(--eyt-bg-dark);
     }
-    
+
     .tab-nav-item.active {
         background: var(--eyt-primary);
         color: white;
         border-color: white;
     }
-    
+
     .phase-indicator.completed,
     .phase-indicator.active {
         background: var(--eyt-primary);
@@ -99,6 +100,7 @@ a[role="button"]:focus {
 
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -107,14 +109,14 @@ a[role="button"]:focus {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-    
+
     .tournament-status-badge .status-pulse,
     .featured-badge .featured-sparkle,
     .hero-pattern {
         animation: none;
         opacity: 0.7;
     }
-    
+
     .hero-section.hero-live,
     .hero-section.hero-registration,
     .hero-section.hero-featured::before {
@@ -161,11 +163,13 @@ a[role="button"]:focus {
 
 /* Ensure sufficient contrast for all text */
 .text-gray-400 {
-    color: #9ca3af; /* Ensure WCAG AA compliance */
+    color: #9ca3af;
+    /* Ensure WCAG AA compliance */
 }
 
 .text-gray-500 {
-    color: #6b7280; /* Ensure WCAG AA compliance */
+    color: #6b7280;
+    /* Ensure WCAG AA compliance */
 }
 
 /* Brand Color Utilities */
@@ -183,24 +187,25 @@ a[role="button"]:focus {
 
 /* Print Styles for Accessibility */
 @media print {
+
     .skip-to-main,
     .share-btn,
     .action-btn {
         display: none;
     }
-    
+
     .tournament-status-badge,
     .featured-badge {
         border: 2px solid black;
         background: white;
         color: black;
     }
-    
+
     .hero-section {
         background: white !important;
         color: black !important;
     }
-    
+
     .content-card,
     .stat-card {
         border: 1px solid black;
@@ -259,22 +264,22 @@ a[role="button"]:focus {
     --eyt-primary-alpha-20: rgba(185, 28, 28, 0.2);
     --eyt-primary-alpha-30: rgba(185, 28, 28, 0.3);
     --eyt-primary-alpha-50: rgba(185, 28, 28, 0.5);
-    
+
     /* Background Colors */
     --eyt-bg-dark: #0f172a;
     --eyt-bg-card: rgba(15, 23, 42, 0.8);
     --eyt-bg-overlay: rgba(15, 23, 42, 0.9);
-    
+
     /* Border Colors */
     --eyt-border-light: rgba(51, 65, 85, 0.3);
     --eyt-border-medium: rgba(51, 65, 85, 0.5);
     --eyt-border-dark: rgba(51, 65, 85, 0.8);
-    
+
     /* Text Colors */
     --eyt-text-primary: #ffffff;
     --eyt-text-secondary: rgba(148, 163, 184, 0.9);
     --eyt-text-muted: rgba(148, 163, 184, 0.7);
-    
+
     /* Status Colors */
     --eyt-success: #059669;
     --eyt-success-alpha: rgba(5, 150, 105, 0.2);
@@ -282,7 +287,7 @@ a[role="button"]:focus {
     --eyt-warning-alpha: rgba(217, 119, 6, 0.2);
     --eyt-info: #2563eb;
     --eyt-info-alpha: rgba(37, 99, 235, 0.2);
-    
+
     /* Spacing Scale */
     --eyt-space-xs: 0.25rem;
     --eyt-space-sm: 0.5rem;
@@ -290,20 +295,20 @@ a[role="button"]:focus {
     --eyt-space-lg: 1.5rem;
     --eyt-space-xl: 2rem;
     --eyt-space-2xl: 3rem;
-    
+
     /* Border Radius */
     --eyt-radius-sm: 0.375rem;
     --eyt-radius-md: 0.5rem;
     --eyt-radius-lg: 0.75rem;
     --eyt-radius-xl: 1rem;
     --eyt-radius-full: 9999px;
-    
+
     /* Shadows */
     --eyt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --eyt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --eyt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --eyt-shadow-primary: 0 4px 12px rgba(185, 28, 28, 0.3);
-    
+
     /* Transitions */
     --eyt-transition-fast: 0.15s ease;
     --eyt-transition-normal: 0.2s ease;
@@ -345,9 +350,19 @@ a[role="button"]:focus {
 }
 
 @keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(30px, -30px) rotate(120deg); }
-    66% { transform: translate(-20px, 20px) rotate(240deg); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(30px, -30px) rotate(120deg);
+    }
+
+    66% {
+        transform: translate(-20px, 20px) rotate(240deg);
+    }
 }
 
 /* Enhanced Overlay System for Better Contrast */
@@ -355,29 +370,28 @@ a[role="button"]:focus {
     position: absolute;
     inset: 0;
     z-index: 1;
+    pointer-events: none;
 }
 
 .hero-overlay-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        135deg,
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(0, 0, 0, 0.7) 30%,
-        rgba(0, 0, 0, 0.4) 60%,
-        rgba(0, 0, 0, 0.2) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(0, 0, 0, 0.9) 0%,
+            rgba(0, 0, 0, 0.7) 30%,
+            rgba(0, 0, 0, 0.4) 60%,
+            rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
 }
 
 .hero-overlay-radial {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-        ellipse at center,
-        transparent 0%,
-        rgba(0, 0, 0, 0.3) 70%,
-        rgba(0, 0, 0, 0.6) 100%
-    );
+    background: radial-gradient(ellipse at center,
+            transparent 0%,
+            rgba(0, 0, 0, 0.3) 70%,
+            rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
 }
 
 /* Enhanced Status Badges with Advanced Animations */
@@ -418,8 +432,17 @@ a[role="button"]:focus {
 }
 
 @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
-    50% { opacity: 0.5; transform: translateY(-50%) scale(1.2); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: translateY(-50%) scale(1.2);
+    }
 }
 
 .tournament-status-badge.status-draft {
@@ -436,8 +459,15 @@ a[role="button"]:focus {
 }
 
 @keyframes glow-green {
-    0%, 100% { box-shadow: 0 0 5px rgba(5, 150, 105, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(5, 150, 105, 0.6), 0 0 30px rgba(5, 150, 105, 0.3); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(5, 150, 105, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(5, 150, 105, 0.6), 0 0 30px rgba(5, 150, 105, 0.3);
+    }
 }
 
 .tournament-status-badge.status-check_in {
@@ -454,8 +484,15 @@ a[role="button"]:focus {
 }
 
 @keyframes glow-red {
-    0%, 100% { box-shadow: 0 0 5px rgba(185, 28, 28, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(185, 28, 28, 0.6), 0 0 30px rgba(185, 28, 28, 0.3); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(185, 28, 28, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(185, 28, 28, 0.6), 0 0 30px rgba(185, 28, 28, 0.3);
+    }
 }
 
 .tournament-status-badge.status-completed {
@@ -500,8 +537,17 @@ a[role="button"]:focus {
 }
 
 @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: translateY(-50%) scale(0); }
-    50% { opacity: 1; transform: translateY(-50%) scale(1.5); }
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.5);
+    }
 }
 
 .featured-badge::before {
@@ -514,8 +560,13 @@ a[role="button"]:focus {
 }
 
 @keyframes shimmer-featured {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Tournament Type Badge */
@@ -597,8 +648,15 @@ a[role="button"]:focus {
 }
 
 @keyframes live-pulse {
-    0%, 100% { box-shadow: inset 0 0 0 0 rgba(185, 28, 28, 0.1); }
-    50% { box-shadow: inset 0 0 50px 0 rgba(185, 28, 28, 0.2); }
+
+    0%,
+    100% {
+        box-shadow: inset 0 0 0 0 rgba(185, 28, 28, 0.1);
+    }
+
+    50% {
+        box-shadow: inset 0 0 50px 0 rgba(185, 28, 28, 0.2);
+    }
 }
 
 .hero-section.hero-registration {
@@ -606,8 +664,15 @@ a[role="button"]:focus {
 }
 
 @keyframes registration-glow {
-    0%, 100% { box-shadow: inset 0 0 0 0 rgba(5, 150, 105, 0.1); }
-    50% { box-shadow: inset 0 0 30px 0 rgba(5, 150, 105, 0.15); }
+
+    0%,
+    100% {
+        box-shadow: inset 0 0 0 0 rgba(5, 150, 105, 0.1);
+    }
+
+    50% {
+        box-shadow: inset 0 0 30px 0 rgba(5, 150, 105, 0.15);
+    }
 }
 
 .hero-section.hero-featured::before {
@@ -617,18 +682,23 @@ a[role="button"]:focus {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(245, 158, 11, 0.8), 
-        rgba(217, 119, 6, 0.8), 
-        transparent);
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(245, 158, 11, 0.8),
+            rgba(217, 119, 6, 0.8),
+            transparent);
     z-index: 10;
     animation: featured-sweep 3s ease-in-out infinite;
 }
 
 @keyframes featured-sweep {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Enhanced Responsive Design for Hero Section */
@@ -637,15 +707,15 @@ a[role="button"]:focus {
         min-height: 500px;
         padding: var(--eyt-space-xl) 0;
     }
-    
+
     .tournament-title {
         font-size: 3rem;
     }
-    
+
     .tournament-meta-info {
         padding: var(--eyt-space-lg);
     }
-    
+
     .meta-item {
         flex-direction: column;
         align-items: flex-start;
@@ -658,34 +728,34 @@ a[role="button"]:focus {
         min-height: 400px;
         padding: var(--eyt-space-lg) 0;
     }
-    
+
     .tournament-title {
         font-size: 2.5rem;
         line-height: 1.2;
     }
-    
+
     .tournament-meta-info {
         padding: var(--eyt-space-md);
         flex-direction: column;
         gap: var(--eyt-space-md);
     }
-    
+
     .tournament-meta-info .flex {
         flex-wrap: wrap;
         gap: var(--eyt-space-sm);
     }
-    
+
     .meta-item {
         flex: 1;
         min-width: calc(50% - var(--eyt-space-sm));
     }
-    
+
     .tournament-status-badge,
     .featured-badge {
         font-size: 0.75rem;
         padding: var(--eyt-space-sm) var(--eyt-space-md);
     }
-    
+
     .game-badge {
         font-size: 0.875rem;
         padding: var(--eyt-space-sm) var(--eyt-space-md);
@@ -696,23 +766,25 @@ a[role="button"]:focus {
     .hero-section {
         min-height: 350px;
     }
-    
+
     .tournament-title {
         font-size: 2rem;
     }
-    
+
     .meta-item {
         min-width: 100%;
     }
-    
+
     .tournament-status-badge .status-pulse,
     .featured-badge .featured-sparkle {
-        display: none; /* Hide decorative elements on very small screens */
+        display: none;
+        /* Hide decorative elements on very small screens */
     }
 }
 
 /* Accessibility Enhancements */
 @media (prefers-reduced-motion: reduce) {
+
     .tournament-status-badge.status-registration,
     .tournament-status-badge.status-in_progress,
     .featured-badge,
@@ -722,11 +794,11 @@ a[role="button"]:focus {
     .hero-pattern {
         animation: none;
     }
-    
+
     .hero-background {
         transform: none !important;
     }
-    
+
     .tournament-status-badge .status-pulse,
     .featured-badge .featured-sparkle {
         animation: none;
@@ -736,18 +808,19 @@ a[role="button"]:focus {
 
 /* High Contrast Mode Support */
 @media (prefers-contrast: high) {
+
     .tournament-status-badge,
     .featured-badge,
     .tournament-type-badge {
         border-width: 3px;
         font-weight: 700;
     }
-    
+
     .tournament-meta-info {
         border-width: 2px;
         background: rgba(0, 0, 0, 0.8);
     }
-    
+
     .meta-value {
         font-weight: 600;
     }
@@ -768,13 +841,13 @@ a[role="button"]:focus {
         background: white !important;
         color: black !important;
     }
-    
+
     .hero-background,
     .hero-overlay,
     .hero-pattern {
         display: none;
     }
-    
+
     .tournament-status-badge,
     .featured-badge {
         border: 2px solid black;
@@ -782,6 +855,7 @@ a[role="button"]:focus {
         color: black;
     }
 }
+
 .stats-dashboard {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -882,14 +956,27 @@ a[role="button"]:focus {
 
 /* Statistics Dashboard Animations */
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 @keyframes statUpdate {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .stat-card.updating {
@@ -943,15 +1030,15 @@ a[role="button"]:focus {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--eyt-space-sm);
     }
-    
+
     .stat-card {
         padding: var(--eyt-space-md);
     }
-    
+
     .stat-value {
         font-size: 1.5rem;
     }
-    
+
     .stat-label {
         font-size: 0.75rem;
     }
@@ -961,7 +1048,7 @@ a[role="button"]:focus {
     .stats-dashboard {
         grid-template-columns: 1fr;
     }
-    
+
     .stat-card {
         padding: var(--eyt-space-sm) var(--eyt-space-md);
     }
@@ -969,13 +1056,14 @@ a[role="button"]:focus {
 
 /* Accessibility Enhancements */
 @media (prefers-reduced-motion: reduce) {
+
     .stat-card,
     .stat-value,
     .stat-progress-fill {
         transition: none;
         animation: none;
     }
-    
+
     .stat-progress-fill::after {
         animation: none;
     }
@@ -986,12 +1074,12 @@ a[role="button"]:focus {
         border-width: 2px;
         border-color: var(--eyt-text-primary);
     }
-    
+
     .stat-card:hover {
         background: var(--eyt-primary);
         color: white;
     }
-    
+
     .stat-card:hover .stat-value,
     .stat-card:hover .stat-label {
         color: white;
@@ -1196,10 +1284,13 @@ a[role="button"]:focus {
 
 /* Timeline Animations */
 @keyframes pulse-timeline {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
         transform: scale(1);
     }
+
     50% {
         opacity: 0.8;
         transform: scale(1.05);
@@ -1211,7 +1302,9 @@ a[role="button"]:focus {
         transform: scale(1);
         opacity: 1;
     }
-    75%, 100% {
+
+    75%,
+    100% {
         transform: scale(2);
         opacity: 0;
     }
@@ -1263,7 +1356,7 @@ a[role="button"]:focus {
         gap: var(--eyt-space-lg);
         justify-content: center;
     }
-    
+
     .timeline-phase {
         flex: 0 0 auto;
         min-width: 120px;
@@ -1275,13 +1368,13 @@ a[role="button"]:focus {
         margin-top: var(--eyt-space-xl);
         padding-top: var(--eyt-space-lg);
     }
-    
+
     .timeline-phases {
         flex-direction: column;
         gap: var(--eyt-space-xl);
         align-items: center;
     }
-    
+
     .timeline-progress-line {
         top: 0;
         bottom: 0;
@@ -1291,11 +1384,11 @@ a[role="button"]:focus {
         height: auto;
         transform: translateX(-50%);
     }
-    
+
     .timeline-progress-fill {
         width: 100%;
     }
-    
+
     .timeline-progress-fill::after {
         top: auto;
         bottom: 0;
@@ -1306,7 +1399,7 @@ a[role="button"]:focus {
         transform: translateX(-50%);
         border-radius: 50%;
     }
-    
+
     .timeline-phase {
         flex-direction: row;
         text-align: left;
@@ -1315,26 +1408,26 @@ a[role="button"]:focus {
         max-width: 300px;
         align-items: center;
     }
-    
+
     .phase-indicator {
         flex-shrink: 0;
         width: 2.5rem;
         height: 2.5rem;
     }
-    
+
     .phase-info {
         flex: 1;
     }
-    
+
     .phase-label {
         font-size: 0.875rem;
         margin-bottom: 2px;
     }
-    
+
     .phase-date {
         font-size: 0.75rem;
     }
-    
+
     .phase-countdown,
     .phase-timestamp {
         margin-top: var(--eyt-space-xs);
@@ -1347,15 +1440,15 @@ a[role="button"]:focus {
         width: 2rem;
         height: 2rem;
     }
-    
+
     .phase-label {
         font-size: 0.75rem;
     }
-    
+
     .phase-date {
         font-size: 0.625rem;
     }
-    
+
     .countdown-timer,
     .timestamp-value {
         font-size: 0.625rem;
@@ -1367,11 +1460,11 @@ a[role="button"]:focus {
     .phase-indicator.active {
         animation: none;
     }
-    
+
     .phase-indicator.active::after {
         animation: none;
     }
-    
+
     .phase-indicator,
     .timeline-progress-fill {
         transition: none;
@@ -1382,18 +1475,18 @@ a[role="button"]:focus {
     .phase-indicator {
         border-width: 4px;
     }
-    
+
     .phase-indicator.completed,
     .phase-indicator.active {
         background: var(--eyt-primary);
         border-color: white;
     }
-    
+
     .phase-indicator.pending {
         border-color: var(--eyt-text-primary);
         background: transparent;
     }
-    
+
     .phase-countdown,
     .phase-timestamp {
         border-width: 2px;
@@ -1411,14 +1504,14 @@ a[role="button"]:focus {
     .tournament-timeline {
         break-inside: avoid;
     }
-    
+
     .phase-indicator.active,
     .phase-indicator.completed {
         background: black !important;
         color: white !important;
         border-color: black !important;
     }
-    
+
     .phase-countdown,
     .phase-timestamp {
         border: 1px solid black;
@@ -1533,6 +1626,7 @@ a[role="button"]:focus {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1573,23 +1667,23 @@ a[role="button"]:focus {
         border-left: none;
         border-right: none;
     }
-    
+
     .tab-nav-list {
         padding: 0 var(--eyt-space-md);
         gap: var(--eyt-space-xs);
     }
-    
+
     .tab-nav-item {
         padding: var(--eyt-space-sm) var(--eyt-space-md);
         font-size: 0.75rem;
         min-width: auto;
         flex-shrink: 0;
     }
-    
+
     .tab-nav-item .material-symbols-outlined {
         font-size: 1rem;
     }
-    
+
     /* Horizontal scrolling indicators */
     .tab-navigation::before,
     .tab-navigation::after {
@@ -1601,12 +1695,12 @@ a[role="button"]:focus {
         pointer-events: none;
         z-index: 10;
     }
-    
+
     .tab-navigation::before {
         left: 0;
         background: linear-gradient(to right, var(--eyt-bg-overlay), transparent);
     }
-    
+
     .tab-navigation::after {
         right: 0;
         background: linear-gradient(to left, var(--eyt-bg-overlay), transparent);
@@ -1618,7 +1712,7 @@ a[role="button"]:focus {
         padding: var(--eyt-space-xs) var(--eyt-space-sm);
         font-size: 0.625rem;
     }
-    
+
     .tab-nav-item .material-symbols-outlined {
         font-size: 0.875rem;
     }
@@ -1643,13 +1737,13 @@ a[role="button"]:focus {
         border-width: 2px;
         font-weight: 600;
     }
-    
+
     .tab-nav-item.active {
         background: var(--eyt-primary);
         color: white;
         border-color: white;
     }
-    
+
     .tab-nav-item:focus {
         outline-width: 3px;
     }
@@ -1657,13 +1751,14 @@ a[role="button"]:focus {
 
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
+
     .tab-nav-item,
     .tab-pane,
     .tab-nav-item .material-symbols-outlined {
         transition: none;
         animation: none;
     }
-    
+
     .tab-pane.active {
         animation: none;
     }
@@ -1674,7 +1769,7 @@ a[role="button"]:focus {
     .tab-navigation {
         display: none;
     }
-    
+
     .tab-pane {
         display: block !important;
         opacity: 1 !important;
@@ -1682,7 +1777,7 @@ a[role="button"]:focus {
         page-break-inside: avoid;
         margin-bottom: 2rem;
     }
-    
+
     .tab-pane::before {
         content: attr(data-tab-title);
         display: block;
@@ -1728,7 +1823,7 @@ a[role="button"]:focus {
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .timeline-phases {
         flex-wrap: wrap;
         gap: var(--eyt-space-lg);
@@ -1740,29 +1835,29 @@ a[role="button"]:focus {
         min-height: 400px;
         padding: var(--eyt-space-xl) 0;
     }
-    
+
     .hero-section h1 {
         font-size: 2rem;
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--eyt-space-md);
     }
-    
+
     .stat-card {
         padding: var(--eyt-space-md);
     }
-    
+
     .stat-value {
         font-size: 1.5rem;
     }
-    
+
     .timeline-phases {
         flex-direction: column;
         gap: var(--eyt-space-xl);
     }
-    
+
     .timeline-progress-line {
         top: 0;
         bottom: 0;
@@ -1772,15 +1867,15 @@ a[role="button"]:focus {
         height: auto;
         transform: translateX(-50%);
     }
-    
+
     .timeline-progress-fill {
         width: 100%;
     }
-    
+
     .tab-nav-list {
         flex-wrap: wrap;
     }
-    
+
     .tab-nav-item {
         flex: 1;
         justify-content: center;
@@ -1792,12 +1887,12 @@ a[role="button"]:focus {
     .stats-dashboard {
         grid-template-columns: 1fr;
     }
-    
+
     .phase-indicator {
         width: 2.5rem;
         height: 2.5rem;
     }
-    
+
     .phase-label {
         font-size: 0.75rem;
     }
@@ -1805,10 +1900,13 @@ a[role="button"]:focus {
 
 /* Enhanced Animations with Hardware Acceleration */
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
         transform: scale(1) translateZ(0);
     }
+
     50% {
         opacity: 0.8;
         transform: scale(1.05) translateZ(0);
@@ -1820,7 +1918,9 @@ a[role="button"]:focus {
         transform: scale(1) translateZ(0);
         opacity: 1;
     }
-    75%, 100% {
+
+    75%,
+    100% {
         transform: scale(2) translateZ(0);
         opacity: 0;
     }
@@ -1830,6 +1930,7 @@ a[role="button"]:focus {
     0% {
         transform: translateX(-100%) translateZ(0);
     }
+
     100% {
         transform: translateX(100%) translateZ(0);
     }
@@ -1840,6 +1941,7 @@ a[role="button"]:focus {
         opacity: 0;
         transform: translateY(20px) translateZ(0);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) translateZ(0);
@@ -1853,14 +1955,18 @@ a[role="button"]:focus {
 }
 
 @keyframes float {
-    0%, 100% { 
-        transform: translate(0, 0) rotate(0deg) translateZ(0); 
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg) translateZ(0);
     }
-    33% { 
-        transform: translate(30px, -30px) rotate(120deg) translateZ(0); 
+
+    33% {
+        transform: translate(30px, -30px) rotate(120deg) translateZ(0);
     }
-    66% { 
-        transform: translate(-20px, 20px) rotate(240deg) translateZ(0); 
+
+    66% {
+        transform: translate(-20px, 20px) rotate(240deg) translateZ(0);
     }
 }
 
@@ -1890,10 +1996,10 @@ a[role="button"]:focus {
 
 /* Progressive Loading States */
 .loading-skeleton {
-    background: linear-gradient(90deg, 
-        rgba(51, 65, 85, 0.3) 25%, 
-        rgba(51, 65, 85, 0.5) 50%, 
-        rgba(51, 65, 85, 0.3) 75%);
+    background: linear-gradient(90deg,
+            rgba(51, 65, 85, 0.3) 25%,
+            rgba(51, 65, 85, 0.5) 50%,
+            rgba(51, 65, 85, 0.3) 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
 }
@@ -1902,6 +2008,7 @@ a[role="button"]:focus {
     0% {
         background-position: 200% 0;
     }
+
     100% {
         background-position: -200% 0;
     }
@@ -1919,10 +2026,10 @@ a[role="button"]:focus {
     left: 0;
     right: 0;
     height: 20px;
-    background: linear-gradient(90deg, 
-        rgba(51, 65, 85, 0.3) 25%, 
-        rgba(51, 65, 85, 0.5) 50%, 
-        rgba(51, 65, 85, 0.3) 75%);
+    background: linear-gradient(90deg,
+            rgba(51, 65, 85, 0.3) 25%,
+            rgba(51, 65, 85, 0.5) 50%,
+            rgba(51, 65, 85, 0.3) 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
     border-radius: 4px;
@@ -1936,10 +2043,10 @@ a[role="button"]:focus {
     left: 0;
     right: 0;
     height: 100px;
-    background: linear-gradient(90deg, 
-        rgba(51, 65, 85, 0.3) 25%, 
-        rgba(51, 65, 85, 0.5) 50%, 
-        rgba(51, 65, 85, 0.3) 75%);
+    background: linear-gradient(90deg,
+            rgba(51, 65, 85, 0.3) 25%,
+            rgba(51, 65, 85, 0.5) 50%,
+            rgba(51, 65, 85, 0.3) 75%);
     background-size: 200% 100%;
     animation: skeleton-loading 1.5s infinite;
     border-radius: 8px;
@@ -1971,16 +2078,20 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes pulse-update {
-    0%, 100% { 
-        transform: scale(1) translateZ(0); 
+
+    0%,
+    100% {
+        transform: scale(1) translateZ(0);
     }
-    50% { 
-        transform: scale(1.02) translateZ(0); 
+
+    50% {
+        transform: scale(1.02) translateZ(0);
     }
 }
 
 /* Progressive Enhancement */
 @supports (backdrop-filter: blur(10px)) {
+
     .hero-section,
     .content-card,
     .stat-card,
@@ -1990,6 +2101,7 @@ img[loading="lazy"].loaded {
 }
 
 @supports not (backdrop-filter: blur(10px)) {
+
     .hero-section,
     .content-card,
     .stat-card,
@@ -2032,31 +2144,33 @@ img[loading="lazy"].loaded {
 
 /* Enhanced Accessibility */
 @media (prefers-reduced-motion: reduce) {
+
     .tournament-status-badge.status-registration,
     .tournament-status-badge.status-in_progress,
     .phase-indicator.active {
         animation: none;
     }
-    
+
     .stat-card,
     .content-card,
     .tab-nav-item,
     .phase-indicator {
         transition: none;
     }
-    
+
     .stat-progress-fill::after {
         animation: none;
     }
 }
 
 @media (prefers-contrast: high) {
+
     .content-card,
     .stat-card {
         border-width: 2px;
         border-color: var(--eyt-text-primary);
     }
-    
+
     .tab-nav-item.active {
         background: var(--eyt-primary);
         color: white;
@@ -2408,40 +2522,40 @@ img[loading="lazy"].loaded {
     .enhanced-participant-grid {
         @apply grid-cols-1 gap-4;
     }
-    
+
     .enhanced-participant-card {
         @apply p-4;
     }
-    
+
     .participant-avatar {
         @apply w-12 h-12;
     }
-    
+
     .team-avatar-fallback,
     .user-avatar-fallback {
         @apply w-12 h-12;
     }
-    
+
     .participant-name {
         @apply text-base;
     }
-    
+
     .participant-filters {
         @apply flex-wrap gap-2;
     }
-    
+
     .filter-btn {
         @apply px-2 py-1 text-xs;
     }
-    
+
     .summary-stats {
         @apply grid-cols-2 gap-3;
     }
-    
+
     .organizer-actions {
         @apply flex-col gap-2;
     }
-    
+
     .action-btn {
         @apply w-full justify-center;
     }
@@ -2453,6 +2567,7 @@ img[loading="lazy"].loaded {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -2464,12 +2579,29 @@ img[loading="lazy"].loaded {
 }
 
 /* Staggered animation for multiple cards */
-.enhanced-participant-card:nth-child(1) { animation-delay: 0.1s; }
-.enhanced-participant-card:nth-child(2) { animation-delay: 0.2s; }
-.enhanced-participant-card:nth-child(3) { animation-delay: 0.3s; }
-.enhanced-participant-card:nth-child(4) { animation-delay: 0.4s; }
-.enhanced-participant-card:nth-child(5) { animation-delay: 0.5s; }
-.enhanced-participant-card:nth-child(6) { animation-delay: 0.6s; }
+.enhanced-participant-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.enhanced-participant-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.enhanced-participant-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.enhanced-participant-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.enhanced-participant-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.enhanced-participant-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
 
 /* Focus and accessibility improvements */
 .enhanced-participant-card:focus-within .participant-name {
@@ -2489,15 +2621,15 @@ img[loading="lazy"].loaded {
     .enhanced-participant-card {
         @apply border-white/50;
     }
-    
+
     .team-info {
         @apply border-white/30;
     }
-    
+
     .status-indicator.checked-in {
         @apply bg-green-500;
     }
-    
+
     .status-indicator.pending {
         @apply bg-yellow-500;
     }
@@ -2509,16 +2641,17 @@ img[loading="lazy"].loaded {
         @apply transition-none;
         animation: none;
     }
-    
+
     .participant-avatar {
         @apply transition-none;
     }
-    
+
     .action-btn:hover {
         @apply transform-none;
     }
 }
-    @apply bg-green-500/20 text-green-400;
+
+@apply bg-green-500/20 text-green-400;
 }
 
 /* Enhanced Prize Pool Visualization Component */
@@ -2668,18 +2801,39 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes gold-shine {
-    0%, 100% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1); }
-    50% { filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.4)) brightness(1.1); }
+
+    0%,
+    100% {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.4)) brightness(1.1);
+    }
 }
 
 @keyframes silver-shine {
-    0%, 100% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1); }
-    50% { filter: drop-shadow(0 2px 8px rgba(156, 163, 175, 0.4)) brightness(1.1); }
+
+    0%,
+    100% {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 2px 8px rgba(156, 163, 175, 0.4)) brightness(1.1);
+    }
 }
 
 @keyframes bronze-shine {
-    0%, 100% { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1); }
-    50% { filter: drop-shadow(0 2px 8px rgba(217, 119, 6, 0.4)) brightness(1.1); }
+
+    0%,
+    100% {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) brightness(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 2px 8px rgba(217, 119, 6, 0.4)) brightness(1.1);
+    }
 }
 
 .prize-rank-text {
@@ -2807,35 +2961,35 @@ img[loading="lazy"].loaded {
     .prize-item {
         @apply flex-col items-start gap-4 p-4;
     }
-    
+
     .prize-position {
         @apply w-full;
     }
-    
+
     .prize-amount-container {
         @apply w-full text-left;
     }
-    
+
     .prize-rank-container {
         @apply gap-3;
     }
-    
+
     .prize-icon {
         @apply w-12 h-12;
     }
-    
+
     .prize-medal {
         @apply text-2xl;
     }
-    
+
     .prize-value {
         @apply text-lg;
     }
-    
+
     .sponsors-grid {
         @apply grid-cols-1;
     }
-    
+
     .additional-prizes-grid {
         @apply grid-cols-1;
     }
@@ -2919,8 +3073,13 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .capacity-text {
@@ -3075,8 +3234,15 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes urgencyPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
 }
 
 .urgency-icon {
@@ -3085,9 +3251,19 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-2px); }
-    75% { transform: translateX(2px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
 }
 
 .urgency-content {
@@ -3223,8 +3399,15 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
 }
 
 /* Registration Closed States */
@@ -3384,7 +3567,7 @@ img[loading="lazy"].loaded {
         position: static;
         margin-bottom: var(--eyt-space-xl);
     }
-    
+
     .enhanced-registration-card.mobile-sticky {
         position: fixed;
         bottom: 0;
@@ -3397,20 +3580,20 @@ img[loading="lazy"].loaded {
         transform: translateY(0);
         transition: transform var(--eyt-transition-normal);
     }
-    
+
     .enhanced-registration-card.mobile-sticky.scroll-hidden {
         transform: translateY(100%);
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized {
         transform: translateY(calc(100% - 60px));
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-header {
         cursor: pointer;
         position: relative;
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-header::after {
         content: '';
         position: absolute;
@@ -3422,40 +3605,41 @@ img[loading="lazy"].loaded {
         background: var(--eyt-border-medium);
         border-radius: var(--eyt-radius-full);
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-content {
         max-height: 60vh;
         overflow-y: auto;
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized .registration-card-content {
         display: none;
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized .registration-card-footer {
         display: none;
     }
-    
+
     /* Adjust button sizes for mobile */
     .registration-button {
         padding: var(--eyt-space-lg) var(--eyt-space-md);
         font-size: 1.125rem;
-        min-height: 48px; /* Touch target size */
+        min-height: 48px;
+        /* Touch target size */
     }
-    
+
     .button-icon {
         font-size: 1.5rem;
     }
-    
+
     /* Adjust spacing for mobile */
     .registration-card-content {
         padding: var(--eyt-space-md);
     }
-    
+
     .registration-card-header {
         padding: var(--eyt-space-md);
     }
-    
+
     .registration-card-footer {
         padding: var(--eyt-space-sm) var(--eyt-space-md);
     }
@@ -3467,8 +3651,15 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes numberPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 .critical-urgency {
@@ -3476,11 +3667,14 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes criticalPulse {
-    0%, 100% { 
+
+    0%,
+    100% {
         border-color: var(--eyt-primary-alpha-30);
         box-shadow: var(--eyt-shadow-lg);
     }
-    50% { 
+
+    50% {
         border-color: var(--eyt-primary);
         box-shadow: var(--eyt-shadow-primary);
     }
@@ -3491,11 +3685,14 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes buttonCriticalPulse {
-    0%, 100% { 
+
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: var(--eyt-shadow-md);
     }
-    50% { 
+
+    50% {
         transform: scale(1.02);
         box-shadow: var(--eyt-shadow-primary);
     }
@@ -3686,7 +3883,7 @@ img[loading="lazy"].loaded {
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
     }
-    
+
     .share-btn {
         padding: 0.75rem 0.5rem;
         font-size: 0.75rem;
@@ -3723,23 +3920,23 @@ img[loading="lazy"].loaded {
     .stat-card {
         @apply p-3;
     }
-    
+
     .stat-value {
         @apply text-lg;
     }
-    
+
     .tab-button {
         @apply px-3 py-2 text-xs;
     }
-    
+
     .tab-button .material-symbols-outlined {
         @apply text-base;
     }
-    
+
     .content-card {
         @apply p-4;
     }
-    
+
     .participant-grid {
         @apply grid-cols-1;
     }
@@ -3747,9 +3944,12 @@ img[loading="lazy"].loaded {
 
 /* Animations */
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.7;
     }
@@ -3873,6 +4073,7 @@ img[loading="lazy"].loaded {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -3885,33 +4086,33 @@ img[loading="lazy"].loaded {
         @apply py-8;
         min-height: 350px;
     }
-    
+
     .hero-section h1 {
         @apply text-2xl;
         font-size: 2rem;
         line-height: 1.2;
     }
-    
+
     .tournament-meta {
         @apply flex-col items-start gap-3;
     }
-    
+
     .quick-stats {
         @apply grid-cols-2;
     }
-    
+
     .tab-navigation nav {
         @apply flex-wrap;
     }
-    
+
     .tab-button {
         @apply flex-1 min-w-0 justify-center;
     }
-    
+
     .registration-card {
         @apply p-4;
     }
-    
+
     .info-card {
         @apply p-4;
     }
@@ -3921,29 +4122,31 @@ img[loading="lazy"].loaded {
 
 /* Base Mobile Styles (320px and up) */
 @media (min-width: 320px) {
+
     /* Hero Section Mobile Optimizations */
     .hero-section {
         min-height: 350px;
         padding: 2rem 0;
     }
-    
+
     .tournament-title {
-        font-size: 1.875rem; /* 30px */
+        font-size: 1.875rem;
+        /* 30px */
         line-height: 1.2;
         margin-bottom: 1rem;
     }
-    
+
     .tournament-meta-info {
         padding: 1rem;
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .tournament-meta-info .flex {
         flex-wrap: wrap;
         gap: 0.75rem;
     }
-    
+
     .meta-item {
         flex: 1;
         min-width: calc(50% - 0.375rem);
@@ -3951,28 +4154,28 @@ img[loading="lazy"].loaded {
         align-items: flex-start;
         gap: 0.25rem;
     }
-    
+
     /* Statistics Dashboard Mobile Layout */
     .stats-dashboard {
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-top: 1.5rem;
     }
-    
+
     .stat-card {
         padding: 1rem;
         min-height: 80px;
     }
-    
+
     .stat-value {
         font-size: 1.25rem;
         margin-bottom: 0.25rem;
     }
-    
+
     .stat-label {
         font-size: 0.75rem;
     }
-    
+
     /* Tab Navigation Mobile Optimizations */
     .tab-navigation {
         margin: 0 -1rem 2rem -1rem;
@@ -3984,17 +4187,17 @@ img[loading="lazy"].loaded {
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
-    
+
     .tab-navigation::-webkit-scrollbar {
         display: none;
     }
-    
+
     .tab-nav-list {
         padding: 0 1rem;
         gap: 0.5rem;
         min-width: max-content;
     }
-    
+
     .tab-nav-item {
         padding: 0.75rem 1rem;
         font-size: 0.75rem;
@@ -4002,93 +4205,94 @@ img[loading="lazy"].loaded {
         flex-shrink: 0;
         white-space: nowrap;
     }
-    
+
     .tab-nav-item .material-symbols-outlined {
         font-size: 1rem;
     }
-    
+
     /* Registration Card Mobile Positioning */
     .registration-sidebar {
         position: static;
         margin-bottom: 2rem;
     }
-    
+
     .enhanced-registration-card {
         margin-bottom: 1.5rem;
     }
-    
+
     .registration-card-content {
         padding: 1rem;
     }
-    
+
     .registration-card-header {
         padding: 1rem;
     }
-    
+
     .registration-card-footer {
         padding: 0.75rem 1rem;
     }
-    
+
     /* Registration Button Touch Optimization */
     .registration-button {
         padding: 1rem;
         font-size: 1rem;
-        min-height: 48px; /* Touch target size */
+        min-height: 48px;
+        /* Touch target size */
         border-radius: 0.5rem;
     }
-    
+
     .button-icon {
         font-size: 1.25rem;
     }
-    
+
     /* Content Cards Mobile Spacing */
     .content-card {
         padding: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .content-card-title {
         font-size: 1.125rem;
         margin-bottom: 1rem;
     }
-    
+
     /* Participant Grid Mobile Layout */
     .enhanced-participant-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .enhanced-participant-card {
         padding: 1rem;
     }
-    
+
     .participant-avatar {
         width: 3rem;
         height: 3rem;
     }
-    
+
     .team-avatar-fallback,
     .user-avatar-fallback {
         width: 3rem;
         height: 3rem;
     }
-    
+
     .participant-name {
         font-size: 1rem;
     }
-    
+
     /* Timeline Mobile Layout */
     .tournament-timeline {
         margin-top: 1.5rem;
         padding-top: 1rem;
     }
-    
+
     .timeline-phases {
         flex-direction: column;
         gap: 2rem;
         align-items: center;
     }
-    
+
     .timeline-progress-line {
         top: 0;
         bottom: 0;
@@ -4098,11 +4302,11 @@ img[loading="lazy"].loaded {
         height: auto;
         transform: translateX(-50%);
     }
-    
+
     .timeline-progress-fill {
         width: 100%;
     }
-    
+
     .timeline-phase {
         flex-direction: row;
         text-align: left;
@@ -4111,22 +4315,22 @@ img[loading="lazy"].loaded {
         max-width: 280px;
         align-items: center;
     }
-    
+
     .phase-indicator {
         flex-shrink: 0;
         width: 2.5rem;
         height: 2.5rem;
     }
-    
+
     .phase-info {
         flex: 1;
     }
-    
+
     .phase-label {
         font-size: 0.875rem;
         margin-bottom: 0.125rem;
     }
-    
+
     .phase-date {
         font-size: 0.75rem;
     }
@@ -4135,23 +4339,24 @@ img[loading="lazy"].loaded {
 /* Small Mobile Devices (375px and up) */
 @media (min-width: 375px) {
     .tournament-title {
-        font-size: 2.25rem; /* 36px */
+        font-size: 2.25rem;
+        /* 36px */
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
-    
+
     .meta-item {
         min-width: calc(50% - 0.5rem);
     }
-    
+
     .tab-nav-item {
         padding: 0.75rem 1.25rem;
         font-size: 0.875rem;
     }
-    
+
     .registration-button {
         font-size: 1.125rem;
     }
@@ -4163,28 +4368,29 @@ img[loading="lazy"].loaded {
         min-height: 400px;
         padding: 2.5rem 0;
     }
-    
+
     .tournament-title {
-        font-size: 2.5rem; /* 40px */
+        font-size: 2.5rem;
+        /* 40px */
     }
-    
+
     .tournament-meta-info {
         flex-direction: row;
         flex-wrap: wrap;
         gap: 1.5rem;
     }
-    
+
     .meta-item {
         flex-direction: row;
         align-items: center;
         gap: 0.5rem;
         min-width: auto;
     }
-    
+
     .content-card {
         padding: 1.5rem;
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -4196,50 +4402,51 @@ img[loading="lazy"].loaded {
         min-height: 500px;
         padding: 3rem 0;
     }
-    
+
     .tournament-title {
-        font-size: 3rem; /* 48px */
+        font-size: 3rem;
+        /* 48px */
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
     }
-    
+
     .tab-navigation {
         margin: 0 0 2rem 0;
         border-radius: 0.75rem;
         border: 1px solid var(--eyt-border-light);
         padding: 0.25rem;
     }
-    
+
     .tab-nav-list {
         padding: 0 0.5rem;
         gap: 0.5rem;
     }
-    
+
     .tab-nav-item {
         padding: 1rem 1.5rem;
         font-size: 0.875rem;
     }
-    
+
     .registration-sidebar {
         position: sticky;
         top: 2rem;
         height: fit-content;
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
     }
-    
+
     .timeline-phases {
         flex-direction: row;
         justify-content: space-between;
         gap: 1rem;
     }
-    
+
     .timeline-progress-line {
         top: 50%;
         bottom: auto;
@@ -4249,14 +4456,14 @@ img[loading="lazy"].loaded {
         height: 2px;
         transform: translateY(-50%);
     }
-    
+
     .timeline-phase {
         flex-direction: column;
         text-align: center;
         align-items: center;
         max-width: 200px;
     }
-    
+
     .phase-indicator {
         width: 3rem;
         height: 3rem;
@@ -4269,19 +4476,20 @@ img[loading="lazy"].loaded {
         min-height: 600px;
         padding: 4rem 0;
     }
-    
+
     .tournament-title {
-        font-size: 4rem; /* 64px */
+        font-size: 4rem;
+        /* 64px */
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(4, 1fr);
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .content-card {
         padding: 2rem;
     }
@@ -4290,13 +4498,14 @@ img[loading="lazy"].loaded {
 /* Desktop (1280px and up) */
 @media (min-width: 1280px) {
     .tournament-title {
-        font-size: 5rem; /* 80px */
+        font-size: 5rem;
+        /* 80px */
     }
-    
+
     .stats-dashboard {
         gap: 2rem;
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
@@ -4306,9 +4515,10 @@ img[loading="lazy"].loaded {
 /* Large Desktop (1536px and up) */
 @media (min-width: 1536px) {
     .tournament-title {
-        font-size: 6rem; /* 96px */
+        font-size: 6rem;
+        /* 96px */
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -4316,6 +4526,7 @@ img[loading="lazy"].loaded {
 
 /* Mobile-Specific Registration Card Behavior */
 @media (max-width: 768px) {
+
     /* Sticky Registration Card for Mobile */
     .enhanced-registration-card.mobile-sticky {
         position: fixed;
@@ -4331,21 +4542,21 @@ img[loading="lazy"].loaded {
         max-height: 70vh;
         overflow-y: auto;
     }
-    
+
     .enhanced-registration-card.mobile-sticky.scroll-hidden {
         transform: translateY(100%);
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized {
         transform: translateY(calc(100% - 60px));
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-header {
         cursor: pointer;
         position: relative;
         border-bottom: 1px solid var(--eyt-border-light);
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-header::after {
         content: '';
         position: absolute;
@@ -4357,16 +4568,16 @@ img[loading="lazy"].loaded {
         background: var(--eyt-border-medium);
         border-radius: var(--eyt-radius-full);
     }
-    
+
     .enhanced-registration-card.mobile-sticky .registration-card-content {
         max-height: 50vh;
         overflow-y: auto;
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized .registration-card-content {
         display: none;
     }
-    
+
     .enhanced-registration-card.mobile-sticky.minimized .registration-card-footer {
         display: none;
     }
@@ -4374,6 +4585,7 @@ img[loading="lazy"].loaded {
 
 /* Touch Target Optimization */
 @media (max-width: 768px) {
+
     /* Ensure all interactive elements meet 44px minimum touch target */
     .tab-nav-item,
     .registration-button,
@@ -4384,22 +4596,22 @@ img[loading="lazy"].loaded {
         min-width: 44px;
         padding: 0.75rem 1rem;
     }
-    
+
     /* Larger touch targets for primary actions */
     .registration-button {
         min-height: 48px;
         padding: 1rem 1.5rem;
     }
-    
+
     /* Adequate spacing between touch targets */
     .share-buttons {
         gap: 0.75rem;
     }
-    
+
     .participant-actions {
         gap: 0.75rem;
     }
-    
+
     .tab-nav-list {
         gap: 0.5rem;
     }
@@ -4407,6 +4619,7 @@ img[loading="lazy"].loaded {
 
 /* Horizontal Scrolling Indicators for Mobile */
 @media (max-width: 768px) {
+
     .tab-navigation::before,
     .tab-navigation::after {
         content: '';
@@ -4417,17 +4630,17 @@ img[loading="lazy"].loaded {
         pointer-events: none;
         z-index: 10;
     }
-    
+
     .tab-navigation::before {
         left: 0;
         background: linear-gradient(to right, var(--eyt-bg-overlay), transparent);
     }
-    
+
     .tab-navigation::after {
         right: 0;
         background: linear-gradient(to left, var(--eyt-bg-overlay), transparent);
     }
-    
+
     /* Show scroll indicators when content overflows */
     .tab-navigation.scrollable::before,
     .tab-navigation.scrollable::after {
@@ -4437,34 +4650,35 @@ img[loading="lazy"].loaded {
 
 /* Content Spacing Adjustments for Mobile */
 @media (max-width: 768px) {
+
     /* Reduce spacing between sections on mobile */
-    .space-y-8 > * + * {
+    .space-y-8>*+* {
         margin-top: 1.5rem;
     }
-    
-    .space-y-6 > * + * {
+
+    .space-y-6>*+* {
         margin-top: 1rem;
     }
-    
+
     /* Adjust padding for mobile containers */
     .max-w-7xl {
         padding-left: 1rem;
         padding-right: 1rem;
     }
-    
+
     /* Reduce margins for mobile */
     .mb-8 {
         margin-bottom: 1.5rem;
     }
-    
+
     .mb-6 {
         margin-bottom: 1rem;
     }
-    
+
     .mt-8 {
         margin-top: 1.5rem;
     }
-    
+
     .mt-6 {
         margin-top: 1rem;
     }
@@ -4472,22 +4686,24 @@ img[loading="lazy"].loaded {
 
 /* Performance Optimizations for Mobile */
 @media (max-width: 768px) {
+
     /* Reduce animation complexity on mobile */
     .stat-card,
     .content-card,
     .enhanced-participant-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
     /* Simplify hover effects on mobile (touch devices) */
     @media (hover: none) {
+
         .stat-card:hover,
         .content-card:hover,
         .enhanced-participant-card:hover {
             transform: none;
         }
     }
-    
+
     /* Optimize backdrop blur for mobile performance */
     .enhanced-registration-card,
     .stat-card,
@@ -4498,6 +4714,7 @@ img[loading="lazy"].loaded {
 
 /* Accessibility Improvements for Mobile */
 @media (max-width: 768px) {
+
     /* Larger focus indicators on mobile */
     .tab-nav-item:focus,
     .registration-button:focus,
@@ -4505,7 +4722,7 @@ img[loading="lazy"].loaded {
         outline: 3px solid var(--eyt-primary);
         outline-offset: 2px;
     }
-    
+
     /* Ensure text remains readable at mobile sizes */
     .stat-label,
     .meta-label,
@@ -4513,7 +4730,7 @@ img[loading="lazy"].loaded {
         font-size: 0.75rem;
         line-height: 1.4;
     }
-    
+
     .stat-value,
     .meta-value {
         font-size: 1.125rem;
@@ -4523,35 +4740,36 @@ img[loading="lazy"].loaded {
 
 /* Print Styles - Mobile Friendly */
 @media print {
+
     .tab-navigation,
     .share-buttons,
     .registration-card {
         display: none;
     }
-    
+
     .tab-pane {
         display: block !important;
         page-break-inside: avoid;
         margin-bottom: 2rem;
     }
-    
+
     .hero-section {
         min-height: auto;
         background: white !important;
         color: black !important;
         page-break-inside: avoid;
     }
-    
+
     .tournament-title {
         font-size: 2rem;
         color: black !important;
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
-    
+
     .enhanced-participant-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -4560,16 +4778,17 @@ img[loading="lazy"].loaded {
 
 /* Print Styles */
 @media print {
+
     .tab-navigation,
     .share-buttons,
     .registration-card {
         @apply hidden;
     }
-    
+
     .tab-pane {
         @apply block !important;
     }
-    
+
     .content-card {
         @apply border border-gray-400 mb-4;
     }
@@ -4580,11 +4799,11 @@ img[loading="lazy"].loaded {
     .content-card {
         @apply border-2 border-white;
     }
-    
+
     .tab-button.active {
         @apply bg-primary text-white border-2 border-white;
     }
-    
+
     .btn-primary {
         @apply border-2 border-white;
     }
@@ -4595,7 +4814,7 @@ img[loading="lazy"].loaded {
     .tournament-status-badge.status-in_progress {
         animation: none;
     }
-    
+
     .tab-button,
     .btn,
     .share-btn,
@@ -4604,11 +4823,12 @@ img[loading="lazy"].loaded {
     .content-card {
         transition: none;
     }
-    
+
     .notification {
         animation: none;
     }
 }
+
 /* Mobile-First Responsive Design Enhancements */
 
 /* Mobile Tab Navigation Scroll Indicators */
@@ -4670,7 +4890,8 @@ img[loading="lazy"].loaded {
 
 .enhanced-registration-card.mobile-sticky .registration-card-header {
     position: relative;
-    padding-right: 60px; /* Space for minimize button */
+    padding-right: 60px;
+    /* Space for minimize button */
 }
 
 .minimize-btn {
@@ -4702,6 +4923,7 @@ img[loading="lazy"].loaded {
 
 /* Mobile Touch Target Optimization */
 @media (max-width: 768px) {
+
     /* Ensure minimum 44px touch targets */
     button,
     a,
@@ -4718,7 +4940,7 @@ img[loading="lazy"].loaded {
         justify-content: center;
         touch-action: manipulation;
     }
-    
+
     /* Tab navigation mobile optimizations */
     .tab-navigation {
         position: relative;
@@ -4729,7 +4951,7 @@ img[loading="lazy"].loaded {
         border-left: none;
         border-right: none;
     }
-    
+
     .tab-nav-list {
         padding: 0 var(--eyt-space-md);
         gap: var(--eyt-space-xs);
@@ -4738,11 +4960,11 @@ img[loading="lazy"].loaded {
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
-    
+
     .tab-nav-list::-webkit-scrollbar {
         display: none;
     }
-    
+
     .tab-nav-item {
         padding: var(--eyt-space-sm) var(--eyt-space-md);
         font-size: 0.75rem;
@@ -4750,33 +4972,33 @@ img[loading="lazy"].loaded {
         flex-shrink: 0;
         white-space: nowrap;
     }
-    
+
     .tab-nav-item .material-symbols-outlined {
         font-size: 1rem;
     }
-    
+
     /* Hero section mobile optimizations */
     .hero-section {
         min-height: 400px;
         padding: var(--eyt-space-xl) 0;
     }
-    
+
     .tournament-title {
         font-size: 2.5rem;
         line-height: 1.2;
     }
-    
+
     .tournament-meta-info {
         padding: var(--eyt-space-md);
         flex-direction: column;
         gap: var(--eyt-space-md);
     }
-    
+
     .tournament-meta-info .flex {
         flex-wrap: wrap;
         gap: var(--eyt-space-sm);
     }
-    
+
     .meta-item {
         flex: 1;
         min-width: calc(50% - var(--eyt-space-sm));
@@ -4784,32 +5006,32 @@ img[loading="lazy"].loaded {
         align-items: flex-start;
         gap: var(--eyt-space-xs);
     }
-    
+
     /* Statistics dashboard mobile layout */
     .stats-dashboard {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--eyt-space-md);
     }
-    
+
     .stat-card {
         padding: var(--eyt-space-md);
     }
-    
+
     .stat-value {
         font-size: 1.5rem;
     }
-    
+
     .stat-label {
         font-size: 0.75rem;
     }
-    
+
     /* Timeline mobile layout */
     .timeline-phases {
         flex-direction: column;
         gap: var(--eyt-space-xl);
         align-items: center;
     }
-    
+
     .timeline-progress-line {
         top: 0;
         bottom: 0;
@@ -4819,11 +5041,11 @@ img[loading="lazy"].loaded {
         height: auto;
         transform: translateX(-50%);
     }
-    
+
     .timeline-progress-fill {
         width: 100%;
     }
-    
+
     .timeline-progress-fill::after {
         top: auto;
         bottom: 0;
@@ -4834,7 +5056,7 @@ img[loading="lazy"].loaded {
         transform: translateX(-50%);
         border-radius: 50%;
     }
-    
+
     .timeline-phase {
         flex-direction: row;
         text-align: left;
@@ -4843,83 +5065,83 @@ img[loading="lazy"].loaded {
         max-width: 300px;
         align-items: center;
     }
-    
+
     .phase-indicator {
         flex-shrink: 0;
         width: 2.5rem;
         height: 2.5rem;
     }
-    
+
     .phase-info {
         flex: 1;
     }
-    
+
     .phase-label {
         font-size: 0.875rem;
         margin-bottom: 2px;
     }
-    
+
     .phase-date {
         font-size: 0.75rem;
     }
-    
+
     .phase-countdown,
     .phase-timestamp {
         margin-top: var(--eyt-space-xs);
         margin-left: 0;
     }
-    
+
     /* Content cards mobile optimization */
     .content-card {
         padding: var(--eyt-space-lg);
         margin-bottom: var(--eyt-space-lg);
     }
-    
+
     .content-card-title {
         font-size: 1.125rem;
     }
-    
+
     /* Participant grid mobile layout */
     .enhanced-participant-grid {
         grid-template-columns: 1fr;
         gap: var(--eyt-space-md);
     }
-    
+
     .enhanced-participant-card {
         padding: var(--eyt-space-md);
     }
-    
+
     .participant-avatar,
     .team-avatar-fallback,
     .user-avatar-fallback {
         width: 3rem;
         height: 3rem;
     }
-    
+
     .participant-name {
         font-size: 1rem;
     }
-    
+
     .participant-filters {
         flex-wrap: wrap;
         gap: var(--eyt-space-sm);
     }
-    
+
     .filter-btn {
         padding: var(--eyt-space-xs) var(--eyt-space-sm);
         font-size: 0.75rem;
     }
-    
+
     .organizer-actions {
         flex-direction: column;
         gap: var(--eyt-space-sm);
     }
-    
+
     .action-btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     /* Prize visualization mobile layout */
     .prize-item {
         flex-direction: column;
@@ -4927,39 +5149,39 @@ img[loading="lazy"].loaded {
         gap: var(--eyt-space-md);
         padding: var(--eyt-space-md);
     }
-    
+
     .prize-position {
         width: 100%;
     }
-    
+
     .prize-amount-container {
         width: 100%;
         text-align: left;
     }
-    
+
     .prize-rank-container {
         gap: var(--eyt-space-sm);
     }
-    
+
     .prize-icon {
         width: 3rem;
         height: 3rem;
     }
-    
+
     .prize-medal {
         font-size: 1.5rem;
     }
-    
+
     .prize-value {
         font-size: 1.25rem;
     }
-    
+
     /* Social sharing mobile optimization */
     .share-buttons {
         flex-wrap: wrap;
         gap: var(--eyt-space-sm);
     }
-    
+
     .share-btn {
         flex: 1;
         min-width: calc(50% - var(--eyt-space-sm));
@@ -4972,42 +5194,42 @@ img[loading="lazy"].loaded {
     .stats-dashboard {
         grid-template-columns: 1fr;
     }
-    
+
     .tournament-title {
         font-size: 2rem;
     }
-    
+
     .meta-item {
         min-width: 100%;
     }
-    
+
     .phase-indicator {
         width: 2rem;
         height: 2rem;
     }
-    
+
     .phase-label {
         font-size: 0.75rem;
     }
-    
+
     .phase-date {
         font-size: 0.625rem;
     }
-    
+
     .countdown-timer,
     .timestamp-value {
         font-size: 0.625rem;
     }
-    
+
     .tab-nav-item {
         padding: var(--eyt-space-xs) var(--eyt-space-sm);
         font-size: 0.625rem;
     }
-    
+
     .tab-nav-item .material-symbols-outlined {
         font-size: 0.875rem;
     }
-    
+
     .share-btn {
         min-width: 100%;
     }
@@ -5015,6 +5237,7 @@ img[loading="lazy"].loaded {
 
 /* Touch-friendly hover states for mobile */
 @media (hover: none) and (pointer: coarse) {
+
     .stat-card:hover,
     .content-card:hover,
     .enhanced-participant-card:hover,
@@ -5022,21 +5245,21 @@ img[loading="lazy"].loaded {
         transform: none;
         box-shadow: none;
     }
-    
+
     .tab-nav-item:hover {
         transform: none;
         background: transparent;
     }
-    
+
     /* Use active states instead of hover for touch devices */
     .stat-card:active {
         transform: scale(0.98);
     }
-    
+
     .tab-nav-item:active {
         background: rgba(51, 65, 85, 0.3);
     }
-    
+
     .action-btn:active {
         transform: scale(0.95);
     }
@@ -5048,21 +5271,21 @@ img[loading="lazy"].loaded {
         min-height: 300px;
         padding: var(--eyt-space-lg) 0;
     }
-    
+
     .tournament-title {
         font-size: 2rem;
     }
-    
+
     .stats-dashboard {
         grid-template-columns: repeat(4, 1fr);
     }
-    
+
     .timeline-phases {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .timeline-progress-line {
         top: 50%;
         bottom: auto;
@@ -5076,6 +5299,7 @@ img[loading="lazy"].loaded {
 
 /* High contrast mode mobile support */
 @media (prefers-contrast: high) and (max-width: 768px) {
+
     .tab-nav-item,
     .stat-card,
     .enhanced-participant-card,
@@ -5083,13 +5307,13 @@ img[loading="lazy"].loaded {
         border-width: 2px;
         border-color: var(--eyt-text-primary);
     }
-    
+
     .tab-nav-item.active {
         background: var(--eyt-primary);
         color: white;
         border-color: white;
     }
-    
+
     .scroll-indicator {
         border-width: 2px;
         border-color: white;
@@ -5098,6 +5322,7 @@ img[loading="lazy"].loaded {
 
 /* Reduced motion support for mobile */
 @media (prefers-reduced-motion: reduce) and (max-width: 768px) {
+
     .enhanced-registration-card.mobile-sticky,
     .scroll-indicator,
     .tab-nav-item,
@@ -5106,11 +5331,11 @@ img[loading="lazy"].loaded {
         transition: none;
         animation: none;
     }
-    
+
     .tab-nav-list {
         scroll-behavior: auto;
     }
-    
+
     .prize-medal {
         animation: none;
     }
@@ -5118,22 +5343,23 @@ img[loading="lazy"].loaded {
 
 /* Print styles for mobile */
 @media print {
+
     .scroll-indicator,
     .minimize-btn,
     .enhanced-registration-card.mobile-sticky {
         display: none !important;
     }
-    
+
     .enhanced-registration-card {
         position: static !important;
         transform: none !important;
         box-shadow: none !important;
     }
-    
+
     .tab-navigation {
         display: none;
     }
-    
+
     .tab-pane {
         display: block !important;
         opacity: 1 !important;
@@ -5145,6 +5371,7 @@ img[loading="lazy"].loaded {
 
 /* Focus states for mobile accessibility */
 @media (max-width: 768px) {
+
     .tab-nav-item:focus,
     .tournament-status-badge:focus,
     .action-btn:focus,
@@ -5154,7 +5381,7 @@ img[loading="lazy"].loaded {
         outline: 3px solid var(--eyt-primary);
         outline-offset: 2px;
     }
-    
+
     .enhanced-participant-card:focus-within {
         border-color: var(--eyt-primary);
         box-shadow: 0 0 0 2px var(--eyt-primary-alpha-30);
@@ -5167,12 +5394,12 @@ img[loading="lazy"].loaded {
         .enhanced-registration-card.mobile-sticky {
             padding-bottom: max(var(--eyt-space-lg), env(safe-area-inset-bottom));
         }
-        
+
         .tab-navigation {
             padding-left: max(var(--eyt-space-md), env(safe-area-inset-left));
             padding-right: max(var(--eyt-space-md), env(safe-area-inset-right));
         }
-        
+
         .hero-section {
             padding-left: max(var(--eyt-space-md), env(safe-area-inset-left));
             padding-right: max(var(--eyt-space-md), env(safe-area-inset-right));
@@ -5270,13 +5497,25 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes pulse-border {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Enhanced Statistics Animation */
@@ -5321,10 +5560,13 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes phase-pulse {
-    0%, 100% { 
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.7);
     }
-    50% { 
+
+    50% {
         box-shadow: 0 0 0 10px rgba(185, 28, 28, 0);
     }
 }
@@ -5345,10 +5587,13 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes match-live {
-    0%, 100% { 
+
+    0%,
+    100% {
         background-color: rgba(185, 28, 28, 0.05);
     }
-    50% { 
+
+    50% {
         background-color: rgba(185, 28, 28, 0.1);
     }
 }
@@ -5368,14 +5613,16 @@ img[loading="lazy"].loaded {
 }
 
 @keyframes check-in-success {
-    0% { 
+    0% {
         transform: scale(0.8);
         opacity: 0;
     }
-    50% { 
+
+    50% {
         transform: scale(1.2);
     }
-    100% { 
+
+    100% {
         transform: scale(1);
         opacity: 1;
     }
@@ -5393,28 +5640,34 @@ img[loading="lazy"].loaded {
 
 /* Loading State */
 .loading-skeleton {
-    background: linear-gradient(90deg, 
-        rgba(51, 65, 85, 0.3) 25%, 
-        rgba(51, 65, 85, 0.5) 50%, 
-        rgba(51, 65, 85, 0.3) 75%);
+    background: linear-gradient(90deg,
+            rgba(51, 65, 85, 0.3) 25%,
+            rgba(51, 65, 85, 0.5) 50%,
+            rgba(51, 65, 85, 0.3) 75%);
     background-size: 200% 100%;
     animation: loading-shimmer 1.5s infinite;
 }
 
 @keyframes loading-shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 /* Accessibility Enhancements for Real-time Updates */
 @media (prefers-reduced-motion: reduce) {
+
     .stats-dashboard[data-updating="true"]::before,
     .phase-indicator.active,
     .match-item[data-status="in_progress"],
     .update-indicator.updating .material-symbols-outlined {
         animation: none;
     }
-    
+
     .stat-card::before {
         display: none;
     }
@@ -5425,11 +5678,11 @@ img[loading="lazy"].loaded {
     .connection-status.status-connected .status-icon {
         color: #00ff00;
     }
-    
+
     .connection-status.status-error .status-icon {
         color: #ff0000;
     }
-    
+
     .retry-button {
         border-width: 2px;
         font-weight: 600;

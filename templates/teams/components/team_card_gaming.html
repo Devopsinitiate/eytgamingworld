@@ -1,0 +1,116 @@
+<!-- Gaming-Styled Team Card -->
+<div class="card-gaming group hover:scale-105 transition-transform duration-300">
+    <a href="{% url 'teams:detail' team.slug %}" class="block">
+        <div class="card-gaming-content p-6">
+            <!-- Team Header -->
+            <div class="flex items-start gap-4 mb-4">
+                <!-- Team Logo -->
+                <div class="flex-shrink-0">
+                    <div class="w-16 h-16 rounded-lg bg-deep-black border-2 border-electric-red/30 flex items-center justify-center neon-red-glow group-hover:border-electric-red transition-colors">
+                        {% if team.logo %}
+                            <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="w-full h-full object-cover rounded-lg">
+                        {% else %}
+                            <span class="material-symbols-outlined text-electric-red text-3xl">groups</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Team Info -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="gaming-header text-xl text-electric-red mb-1 truncate group-hover:text-neon-cyan transition-colors">
+                        {{ team.name|upper }}
+                    </h3>
+                    <p class="gaming-body text-gray-400 text-sm line-clamp-2">
+                        {% if team.description %}{{ team.description }}{% else %}A competitive gaming team{% endif %}
+                    </p>
+                </div>
+
+                <!-- Status Badge -->
+                {% if team.is_recruiting %}
+                <div class="flex-shrink-0">
+                    <span class="px-3 py-1 bg-neon-cyan/20 text-neon-cyan text-xs gaming-subheader rounded border border-neon-cyan/30">
+                        RECRUITING
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Team Stats Grid -->
+            <div class="grid grid-cols-3 gap-4 mb-4 py-4 border-y border-gray-800">
+                <!-- Members -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="material-symbols-outlined text-electric-red text-lg">group</span>
+                        <p class="stat-value text-lg">{{ team.members_count }}</p>
+                    </div>
+                    <p class="stat-label text-xs">MEMBERS</p>
+                </div>
+
+                <!-- Tournaments -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="material-symbols-outlined text-neon-cyan text-lg">emoji_events</span>
+                        <p class="stat-value text-lg">{{ team.tournaments_count|default:0 }}</p>
+                    </div>
+                    <p class="stat-label text-xs">TOURNAMENTS</p>
+                </div>
+
+                <!-- Wins -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span class="material-symbols-outlined text-yellow-500 text-lg">military_tech</span>
+                        <p class="stat-value text-lg">{{ team.wins|default:0 }}</p>
+                    </div>
+                    <p class="stat-label text-xs">WINS</p>
+                </div>
+            </div>
+
+            <!-- Games -->
+            {% if team.games.all %}
+            <div class="mb-4">
+                <p class="stat-label text-xs mb-2">GAMES</p>
+                <div class="flex flex-wrap gap-2">
+                    {% for game in team.games.all|slice:":3" %}
+                    <span class="px-2 py-1 bg-electric-red/10 text-gray-300 text-xs rounded border border-electric-red/20">
+                        {{ game.name }}
+                    </span>
+                    {% endfor %}
+                    {% if team.games.count > 3 %}
+                    <span class="px-2 py-1 bg-gray-800/50 text-gray-400 text-xs rounded">
+                        +{{ team.games.count|add:"-3" }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Captain -->
+            <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-gray-500 text-sm">person</span>
+                <span class="stat-label text-xs">CAPTAIN: </span>
+                <span class="gaming-body text-sm text-gray-300">{{ team.captain.get_display_name }}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+                <div class="btn-gaming-primary flex-1 text-center">
+                    <span class="btn-gaming-text">VIEW TEAM</span>
+                </div>
+                {% if team.is_recruiting and not user_is_member %}
+                <button class="btn-gaming-secondary flex-1 text-center" onclick="applyToTeam({{ team.id }}); event.preventDefault();">
+                    <span class="btn-gaming-text">APPLY</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>
+
+<script>
+function applyToTeam(teamId) {
+    // Team application logic
+    console.log('Applying to team:', teamId);
+    // You can implement AJAX call here
+    alert('Application submitted! The team captain will review your request.');
+}
+</script>

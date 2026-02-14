@@ -1,0 +1,263 @@
+/**
+ * Mobile-Friendly Breadcrumb & Navigation Styles
+ * Ensures breadcrumbs and navigation links are clickable on mobile devices
+ * with proper touch targets and spacing
+ */
+
+/* Navigation z-index fix - ensure navigation is always on top and clickable */
+/* IMPORTANT: Only apply to specific navigation elements, not all nav elements */
+#main-navigation.fixed-nav,
+nav[role="navigation"].fixed-nav,
+.navigation.fixed-nav {
+    position: fixed !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure navigation links are clickable */
+#main-navigation a,
+nav[role="navigation"] a,
+.navigation a,
+.nav-menu a,
+.mobile-menu a,
+.mobile-menu-toggle,
+.mobile-menu-close {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Base breadcrumb styles */
+.breadcrumb,
+nav[aria-label="Breadcrumb"] > div,
+nav.breadcrumb {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto !important;
+}
+
+/* Ensure breadcrumb nav doesn't block mobile bottom nav or mobile menu button */
+nav[aria-label="Breadcrumb"] {
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Ensure breadcrumb containers don't block mobile navigation */
+.flex.flex-wrap.gap-2,
+.flex.items-center.text-sm {
+    position: relative;
+    z-index: 10;
+}
+
+/* Breadcrumb link styles - mobile-friendly touch targets */
+.breadcrumb a,
+nav[aria-label="Breadcrumb"] a,
+.flex.items-center.text-sm a,
+.flex.flex-wrap.gap-2 a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.5rem;
+    margin: -0.5rem;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(236, 19, 19, 0.2);
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+/* Navigation link improvements for landing page */
+.nav-link,
+.nav-menu a,
+.mobile-menu a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(236, 19, 19, 0.2);
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+/* Active/hover states */
+.breadcrumb a:hover,
+.breadcrumb a:active,
+nav[aria-label="Breadcrumb"] a:hover,
+nav[aria-label="Breadcrumb"] a:active,
+.nav-link:hover,
+.nav-link:active {
+    color: #ec1313 !important;
+    transform: scale(1.05);
+}
+
+/* Ensure icons don't interfere with clicks */
+.breadcrumb .material-symbols-outlined,
+nav[aria-label="Breadcrumb"] .material-symbols-outlined {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+    /* Increase touch target size on mobile */
+    .breadcrumb a,
+    nav[aria-label="Breadcrumb"] a,
+    .flex.items-center.text-sm a {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 0.75rem;
+        margin: -0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Ensure breadcrumb container doesn't block clicks */
+    .breadcrumb,
+    nav[aria-label="Breadcrumb"],
+    .flex.flex-wrap.gap-2,
+    .flex.items-center.text-sm {
+        position: relative;
+        z-index: 10;
+        pointer-events: auto;
+    }
+
+    /* Make sure separators don't interfere */
+    .breadcrumb > span,
+    nav[aria-label="Breadcrumb"] > div > span {
+        pointer-events: none;
+        user-select: none;
+        padding: 0 0.25rem;
+    }
+
+    /* Improve spacing for wrapped breadcrumbs */
+    .flex.flex-wrap.gap-2 {
+        gap: 0.5rem;
+        row-gap: 0.75rem;
+    }
+
+    /* Mobile navigation improvements */
+    .mobile-menu a {
+        min-height: 48px;
+        padding: 0.75rem 0;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ensure mobile menu toggle is easily tappable */
+    .mobile-menu-toggle,
+    .mobile-menu-close {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 0.5rem;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(236, 19, 19, 0.2);
+    }
+
+    /* Mobile menu should be on top but below mobile menu button */
+    .mobile-menu,
+    #mobile-menu {
+        z-index: 99998 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Ensure mobile menu buttons are always clickable and on top */
+    #mobile-menu-button,
+    .mobile-menu-button,
+    .mobile-nav-item,
+    button[aria-label*="menu" i],
+    button[aria-controls="mobile-menu"],
+    .mobile-bottom-nav button,
+    .mobile-bottom-nav a,
+    nav button[onclick*="toggleMobileMenu"],
+    button[id*="menu" i],
+    button[onclick="toggleMobileMenu()"] {
+        position: relative !important;
+        z-index: 100000 !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* Ensure mobile bottom nav is always on top */
+    .mobile-bottom-nav {
+        z-index: 99999 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Ensure top navigation bar doesn't block mobile menu button */
+    header,
+    .header,
+    nav[role="navigation"]:not(.mobile-bottom-nav),
+    nav.bg-surface-dark {
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    
+    /* Ensure page content doesn't block mobile navigation */
+    .min-h-screen,
+    .max-w-5xl,
+    .max-w-4xl,
+    .max-w-7xl,
+    .bg-gray-900,
+    .py-6,
+    .lg\:py-10,
+    form,
+    .space-y-6,
+    .space-y-4,
+    .space-y-2 {
+        position: relative;
+        z-index: 1 !important;
+    }
+    
+    /* Ensure all page containers have lower z-index than mobile nav */
+    body > div:not(.mobile-bottom-nav):not(#mobile-menu),
+    main,
+    .container,
+    .mx-auto {
+        position: relative;
+        z-index: 1 !important;
+    }
+    
+    /* Force mobile navigation elements to be on top */
+    .mobile-bottom-nav,
+    .mobile-bottom-nav *,
+    #mobile-menu,
+    #mobile-menu *,
+    #mobile-menu-button,
+    button[onclick="toggleMobileMenu()"] {
+        z-index: 99999 !important;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .breadcrumb a,
+    nav[aria-label="Breadcrumb"] a {
+        font-size: 0.8125rem;
+    }
+
+    /* Reduce icon size on very small screens */
+    .breadcrumb .material-symbols-outlined,
+    nav[aria-label="Breadcrumb"] .material-symbols-outlined {
+        font-size: 0.875rem !important;
+    }
+}
+
+/* Accessibility improvements */
+.breadcrumb a:focus,
+nav[aria-label="Breadcrumb"] a:focus,
+.nav-link:focus,
+.mobile-menu a:focus {
+    outline: 2px solid #ec1313;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Prevent text selection on breadcrumb separators */
+.breadcrumb > span:not(a),
+nav[aria-label="Breadcrumb"] span:not(a) {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

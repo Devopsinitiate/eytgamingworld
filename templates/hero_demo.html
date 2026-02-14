@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Hero Section Demo - EYTGaming{% endblock %}
+
+{% block navigation %}
+<!-- Use the new navigation partial -->
+{% include 'partials/navigation.html' %}
+{% endblock %}
+
+{% block body %}
+<!-- Hero Section Demo -->
+{% include 'partials/hero_section.html' %}
+
+<!-- Demo Info Section -->
+<section class="py-20 bg-gradient-to-b from-black to-gray-900">
+  <div class="container mx-auto px-4 max-w-4xl">
+    <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 border border-red-600/30">
+      <h2 class="text-3xl font-bold text-white mb-6 font-barlow uppercase">Hero Section Demo</h2>
+      
+      <div class="space-y-6 text-gray-300">
+        <div>
+          <h3 class="text-xl font-bold text-red-600 mb-2">✅ Features Implemented</h3>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li>Full-screen cinematic layout with video background support</li>
+            <li>Animated overlay effects (particle embers, glitch lines, light flares)</li>
+            <li>Gradient text effect on headline</li>
+            <li>Skewed CTA buttons with hover effects</li>
+            <li>Scroll indicator with bounce animation</li>
+            <li>Responsive design (mobile, tablet, desktop)</li>
+            <li>Automatic fallback to animated gradient if video fails</li>
+            <li>Performance optimized with Intersection Observer</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold text-red-600 mb-2">📹 Video Setup</h3>
+          <p class="mb-2">To add the hero background video:</p>
+          <ol class="list-decimal list-inside space-y-2 ml-4">
+            <li>Place your optimized video at: <code class="bg-gray-900 px-2 py-1 rounded">static/videos/hero-background.mp4</code></li>
+            <li>Video specs: 1920x1080, MP4 format, under 5MB, 10-30 seconds</li>
+            <li>The video will autoplay, loop, and be muted automatically</li>
+            <li>If no video is present, an animated gradient background will show instead</li>
+          </ol>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold text-red-600 mb-2">🎨 Animations</h3>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li><strong>Particle Embers:</strong> Red particles float upward (4s loop)</li>
+            <li><strong>Glitch Lines:</strong> Horizontal sweep effect (3s loop)</li>
+            <li><strong>Light Flares:</strong> Pulsing red glows (2s loop)</li>
+            <li><strong>Gradient Text:</strong> Red gradient on headline</li>
+            <li><strong>Fade In:</strong> Content fades up on page load (0.8s)</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold text-red-600 mb-2">♿ Accessibility</h3>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li>Semantic HTML structure</li>
+            <li>Proper ARIA labels and attributes</li>
+            <li>Keyboard navigation support</li>
+            <li>Respects prefers-reduced-motion settings</li>
+            <li>Descriptive alt text on images</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold text-red-600 mb-2">🚀 Next Steps</h3>
+          <ol class="list-decimal list-inside space-y-2 ml-4">
+            <li>Add your hero background video to <code class="bg-gray-900 px-2 py-1 rounded">static/videos/</code></li>
+            <li>Integrate hero section into main landing page</li>
+            <li>Continue with remaining sections (player showcase, games, etc.)</li>
+            <li>Test across different devices and browsers</li>
+          </ol>
+        </div>
+        
+        <div class="mt-8 p-4 bg-red-900/20 border border-red-600/50 rounded">
+          <p class="text-sm">
+            <strong>Note:</strong> This is a demonstration page. The hero section partial can be included in any template using:
+            <code class="block mt-2 bg-gray-900 px-3 py-2 rounded">{% verbatim %}{% include 'partials/hero_section.html' %}{% endverbatim %}</code>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Placeholder for other sections -->
+<section id="highlights" class="py-20 bg-black">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-4xl font-bold text-white mb-4 font-barlow uppercase">Highlights Section</h2>
+    <p class="text-gray-400">This is where video highlights would appear.</p>
+    <p class="text-gray-500 text-sm mt-4">(Placeholder for demonstration)</p>
+  </div>
+</section>
+
+{% endblock %}

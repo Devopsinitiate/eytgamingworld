@@ -17,6 +17,11 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
 
@@ -31,14 +36,33 @@
                             DEFAULT: '#b91c1c', // Official EYT Red from logo
                             'dark': '#991b1b',
                             'light': '#dc2626',
+                            'accent': '#dc2626',
                         },
-                        'background-dark': '#0a0e1a', // Deep dark blue-black from design
-                        'card-dark': '#151c2c',
-                        'card-border-dark': '#282e39',
+                        'background': {
+                            'dark': '#0a0a0a',
+                            'light': '#f6f6f8',
+                        },
+                        'surface': {
+                            'dark': '#1f1f1f',
+                        },
+                        'card-dark': '#1f1f1f',
+                        // Landing Page Brand Colors
+                        'electric-red': '#DC2626',
+                        'deep-black': '#0A0A0A',
+                        'gunmetal-gray': '#1F2937',
+                        'neon-cyan': '#06B6D4',
+                    },
+                    fontFamily: {
+                        'barlow': ['Barlow Condensed', 'sans-serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                        'spline': ['Spline Sans', 'sans-serif'],
+                        'grotesk': ['Space Grotesk', 'sans-serif'],
                     },
                     boxShadow: {
                         'glow-red': '0 0 20px rgba(185, 28, 28, 0.5), 0 0 40px rgba(185, 28, 28, 0.3)',
                         'glow-red-lg': '0 0 30px rgba(185, 28, 28, 0.6), 0 0 60px rgba(185, 28, 28, 0.4)',
+                        'neon-red': '0 0 10px rgba(220, 38, 38, 0.5), inset 0 0 10px rgba(220, 38, 38, 0.2)',
+                        'neon-cyan': '0 0 10px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(6, 182, 212, 0.2)',
                     }
                 }
             }
@@ -47,16 +71,26 @@
 
     <!-- Brand Colors CSS -->
     <link rel="stylesheet" href="{% static 'css/brand-colors.css' %}">
-    
+
     <!-- Brand Consistency Fix - Ensures all pages use correct EYT colors -->
     <link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+
+    <!-- Breadcrumb Mobile Fix - Ensures breadcrumbs and navigation are clickable on mobile -->
+    <link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
+
+    <!-- Dashboard Gaming CSS - For mobile navigation on base.html pages -->
+    <link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard-mobile.css' %}">
+
+    <!-- Landing Page Custom Animations and Effects -->
+    <link rel="stylesheet" href="{% static 'css/landing-page.css' %}">
 
     <!-- Basic CSS -->
     <style>
         body {
             font-family: 'Spline Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-            background-color: #0a0e1a;
-            /* Dark background from design */
+            background-color: #0a0a0a;
+            /* Pure dark background from brand */
         }
 
         /* Add glow effect to primary buttons like in the design */
@@ -76,27 +110,33 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-background-dark text-gray-100">
+    {% block navigation %}
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
+    <nav class="bg-surface-dark shadow-sm border-b border-white/10 relative z-[100]" style="pointer-events: auto;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="{% url 'home' %}" class="flex items-center">
                         <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-8 w-8 rounded">
-                        <span class="ml-2 text-xl font-bold text-gray-900">EYTGaming</span>
+                        <span class="ml-2 text-xl font-bold text-white">EYTGaming</span>
                     </a>
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-4">
                     <a href="{% url 'tournaments:list' %}"
-                        class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                         Tournaments
+                    </a>
+                    <a href="{% url 'store:product_list' %}"
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Store
                     </a>
 
                     {% if user.is_authenticated %}
                     <a href="{% url 'dashboard:home' %}"
-                        class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                         Dashboard
                     </a>
                     <a href="{% url 'account_logout' %}"
@@ -105,7 +145,7 @@
                     </a>
                     {% else %}
                     <a href="{% url 'account_login' %}"
-                        class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                         Login
                     </a>
                     <a href="{% url 'account_signup' %}"
@@ -114,9 +154,178 @@
                     </a>
                     {% endif %}
                 </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white hover:text-red-600 transition-colors p-2 relative z-[10000]"
+                    id="mobile-menu-button" aria-label="Toggle mobile menu" aria-expanded="false"
+                    style="pointer-events: auto; cursor: pointer; touch-action: manipulation;"
+                    onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined text-3xl pointer-events-none">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Inline dropdown for base pages without mobile_bottom_nav) -->
+        <div class="hidden md:hidden bg-surface-dark border-t border-white/10" id="mobile-menu-inline">
+            <div class="px-4 py-4 space-y-2">
+                <!-- Primary Navigation -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Main</h3>
+                    <a href="{% url 'home' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">home</span>
+                        Home
+                    </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:home' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">dashboard</span>
+                        Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Competition -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Competition</h3>
+                    <a href="{% url 'tournaments:list' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">emoji_events</span>
+                        Tournaments
+                    </a>
+                    <a href="{% url 'teams:list' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">groups</span>
+                        Teams
+                    </a>
+                </div>
+
+                <!-- Training -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Training</h3>
+                    <a href="{% url 'coaching:coach_list' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">sports_esports</span>
+                        Coaching
+                    </a>
+                </div>
+
+                <!-- Marketplace -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Marketplace</h3>
+                    <a href="{% url 'store:product_list' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">shopping_bag</span>
+                        Store
+                    </a>
+                    <a href="{% url 'venues:list' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">location_on</span>
+                        Venues
+                    </a>
+                </div>
+
+                <!-- Personal & System -->
+                {% if user.is_authenticated %}
+                <div class="mb-4 pt-4 border-t border-gray-700">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Personal</h3>
+                    <a href="{% url 'dashboard:profile_view' username=user.username %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">person</span>
+                        Profile
+                    </a>
+                    <a href="{% url 'payments:payment_methods' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">payment</span>
+                        Payments
+                    </a>
+                    <a href="{% url 'notifications:preferences' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">settings</span>
+                        Settings
+                    </a>
+                </div>
+                <a href="{% url 'account_logout' %}"
+                    class="block bg-red-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-red-700 text-center mt-4">
+                    <span class="material-symbols-outlined text-sm inline-block mr-2">logout</span>
+                    Logout
+                </a>
+                {% else %}
+                <div class="pt-4 border-t border-gray-700">
+                    <a href="{% url 'account_login' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium mb-2">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">login</span>
+                        Login
+                    </a>
+                    <a href="{% url 'account_signup' %}"
+                        class="block bg-primary text-white px-3 py-2 rounded-md text-base font-medium hover:bg-primary/90 text-center">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">person_add</span>
+                        Sign Up
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </nav>
+
+    <script>
+        // Global mobile menu toggle function
+        // Handles both the slide-out panel (from mobile_bottom_nav.html) and the inline dropdown
+        function toggleMobileMenu() {
+            // Prefer the slide-out panel menu (from mobile_bottom_nav.html)
+            const slideOutMenu = document.getElementById('mobile-menu');
+            // Fallback to the inline dropdown menu
+            const inlineMenu = document.getElementById('mobile-menu-inline');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const bottomNavMenuButton = document.querySelector('.mobile-bottom-nav button[aria-controls="mobile-menu"]');
+
+            // Use the slide-out menu if it exists, otherwise fall back to inline
+            const targetMenu = slideOutMenu || inlineMenu;
+
+            if (targetMenu) {
+                const isHidden = targetMenu.classList.contains('hidden');
+                targetMenu.classList.toggle('hidden');
+
+                // Prevent body scroll when menu is open
+                if (isHidden) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Update aria-expanded for all menu buttons
+            const allMenuButtons = [mobileMenuButton, bottomNavMenuButton].filter(Boolean);
+            allMenuButtons.forEach(button => {
+                if (button) {
+                    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+                    button.setAttribute('aria-expanded', !isExpanded);
+                }
+            });
+        }
+
+        // Mobile menu toggle for base.html
+        document.addEventListener('DOMContentLoaded', function () {
+            // NOTE: Click handlers for toggleMobileMenu() are already attached inline
+            // via onclick="toggleMobileMenu()" on the buttons. Do NOT add duplicate
+            // addEventListener('click') handlers here — that causes double-toggle
+            // (menu opens then immediately closes, appearing non-responsive).
+
+            // Close menu when clicking on a link inside any mobile menu
+            const allMenus = document.querySelectorAll('#mobile-menu, #mobile-menu-inline');
+            allMenus.forEach(menu => {
+                if (menu) {
+                    const menuLinks = menu.querySelectorAll('a');
+                    menuLinks.forEach(link => {
+                        link.addEventListener('click', function () {
+                            toggleMobileMenu();
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+    {% endblock navigation %}
 
     <!-- Main Content -->
     <main>
@@ -124,13 +333,24 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-16">
+    {% block footer %}
+    <footer class="bg-surface-dark text-white mt-16 border-t border-white/10 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="text-center">
                 <p>&copy; 2026 EYTGaming. All rights reserved.</p>
             </div>
         </div>
     </footer>
+    {% endblock footer %}
+
+    <!-- Mobile Bottom Navigation - Only for pages extending base.html -->
+    {% block mobile_nav %}
+    {% include "components/mobile_bottom_nav.html" %}
+    {% endblock mobile_nav %}
+
+    <!-- Landing Page JavaScript -->
+    <script src="{% static 'js/landing-animations.js' %}"></script>
+    <script src="{% static 'js/video-player.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

@@ -9,9 +9,9 @@ Context variables:
 - show_incomplete_fields: Boolean to show list of incomplete fields (default: True)
 {% endcomment %}
 
-<div class="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 shadow-sm">
+<div class="bg-surface-dark border border-card-border-dark rounded-lg p-6 shadow-sm">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold text-gray-900">Profile Completeness</h3>
+        <h3 class="text-lg font-bold text-white">Profile Completeness</h3>
         <span
             class="text-2xl font-bold {% if completeness.percentage == 100 %}text-green-600{% elif completeness.percentage >= 75 %}text-blue-600{% elif completeness.percentage >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}"
             aria-label="Profile is {{ completeness.percentage }} percent complete">
@@ -20,14 +20,14 @@ Context variables:
     </div>
 
     <!-- Progress Bar -->
-    <div class="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-4" role="progressbar"
+    <div class="relative w-full h-4 bg-background-dark rounded-full overflow-hidden mb-4" role="progressbar"
         aria-valuenow="{{ completeness.percentage }}" aria-valuemin="0" aria-valuemax="100"
         aria-label="Profile completeness progress">
         <div class="absolute top-0 left-0 h-full transition-all duration-500 ease-out rounded-full
-                    {% if completeness.percentage == 100 %}bg-gradient-to-r from-green-400 to-green-600
-                    {% elif completeness.percentage >= 75 %}bg-gradient-to-r from-blue-400 to-blue-600
-                    {% elif completeness.percentage >= 50 %}bg-gradient-to-r from-yellow-400 to-yellow-600
-                    {% else %}bg-gradient-to-r from-red-400 to-red-600{% endif %}"
+                    {% if completeness.percentage == 100 %}bg-gradient-to-r from-green-500 to-green-600
+                    {% elif completeness.percentage >= 75 %}bg-gradient-to-r from-primary to-primary-dark
+                    {% elif completeness.percentage >= 50 %}bg-gradient-to-r from-yellow-500 to-yellow-600
+                    {% else %}bg-gradient-to-r from-red-500 to-red-600{% endif %}"
             style="width: {{ completeness.percentage }}%;">
         </div>
     </div>
@@ -35,7 +35,7 @@ Context variables:
     <!-- Status Message -->
     <div class="mb-4">
         {% if completeness.percentage == 100 %}
-        <div class="flex items-center text-green-700 bg-green-100 rounded-lg p-3">
+        <div class="flex items-center text-green-400 bg-green-500/20 rounded-lg p-3">
             <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path fill-rule="evenodd"
@@ -63,7 +63,7 @@ Context variables:
             <span class="text-sm font-medium">Almost there! Just a few more fields to complete.</span>
         </div>
         {% elif completeness.percentage >= 50 %}
-        <div class="flex items-center text-yellow-700 bg-yellow-100 rounded-lg p-3">
+        <div class="flex items-center text-yellow-400 bg-yellow-500/20 rounded-lg p-3">
             <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path fill-rule="evenodd"
@@ -73,7 +73,7 @@ Context variables:
             <span class="text-sm font-medium">You're halfway there! Keep going to unlock all features.</span>
         </div>
         {% else %}
-        <div class="flex items-center text-red-700 bg-red-100 rounded-lg p-3">
+        <div class="flex items-center text-red-400 bg-red-500/20 rounded-lg p-3">
             <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path fill-rule="evenodd"
@@ -86,17 +86,17 @@ Context variables:
     </div>
 
     <!-- Points Display -->
-    <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
+    <div class="flex items-center justify-between text-sm text-gray-300 mb-4">
         <span>{{ completeness.total_points }} / {{ completeness.max_points }} points</span>
-        {% if completeness.percentage < 100 %} <span class="text-blue-600 font-medium">{{
+        {% if completeness.percentage < 100 %} <span class="text-primary font-medium">{{
             completeness.max_points|add:"-"|add:completeness.total_points }} points remaining</span>
             {% endif %}
     </div>
 
     <!-- Incomplete Fields List -->
     {% if show_incomplete_fields and completeness.incomplete_fields %}
-    <div class="mt-4 pt-4 border-t border-gray-200">
-        <h4 class="text-sm font-semibold text-gray-700 mb-3">Complete these fields to boost your profile:</h4>
+    <div class="mt-4 pt-4 border-t border-card-border-dark">
+        <h4 class="text-sm font-semibold text-gray-200 mb-3">Complete these fields to boost your profile:</h4>
         <ul class="space-y-2" role="list">
             {% for field in completeness.incomplete_fields %}
             <li class="flex items-start text-sm">
@@ -104,7 +104,7 @@ Context variables:
                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-                <span class="text-gray-700">
+                <span class="text-gray-300">
                     {% if field == "first_name" %}First Name (5 points)
                     {% elif field == "last_name" %}Last Name (5 points)
                     {% elif field == "display_name" %}Display Name (5 points)
@@ -129,8 +129,8 @@ Context variables:
     {% endif %}
 
     <!-- Achievement Reward Info -->
-    {% if completeness.percentage < 100 %} <div class="mt-4 pt-4 border-t border-gray-200">
-        <div class="flex items-center text-sm text-purple-700 bg-purple-100 rounded-lg p-3">
+    {% if completeness.percentage < 100 %} <div class="mt-4 pt-4 border-t border-card-border-dark">
+        <div class="flex items-center text-sm text-purple-400 bg-purple-500/20 rounded-lg p-3">
             <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path

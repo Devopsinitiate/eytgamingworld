@@ -10,19 +10,19 @@ class TournamentDetailPage {
         this.currentTab = 'details';
         this.updateInterval = null;
         this.components = {};
-        
+
         this.init();
     }
 
     init() {
         console.log('🎮 Initializing Tournament Detail Page');
-        
+
         // Initialize core components in proper order
         this.initializeComponents();
-        
+
         // Load initial data
         this.loadInitialData();
-        
+
         console.log('✅ Tournament Detail Page initialized');
     }
 
@@ -32,22 +32,25 @@ class TournamentDetailPage {
     initializeComponents() {
         // Initialize HeroSection component for animations and counters
         this.initHeroSection();
-        
+
         // Initialize StatisticsDashboard component for real-time updates
         this.initStatisticsDashboard();
-        
+
         // Initialize TabNavigation component for content switching
         this.initTabNavigation();
-        
+
+        // Initialize TournamentTimeline component for phase countdowns
+        this.initTournamentTimeline();
+
         // Initialize SocialSharing component for platform integration
         this.initSocialSharing();
-        
+
         // Initialize performance optimizations
         this.initPerformanceOptimizations();
-        
+
         // Initialize real-time updates
         this.initRealTimeUpdates();
-        
+
         // Initialize accessibility features
         this.initAccessibility();
     }
@@ -58,19 +61,19 @@ class TournamentDetailPage {
     initPerformanceOptimizations() {
         // Enable lazy loading for images
         this.initLazyLoading();
-        
+
         // Initialize progressive loading for tab content
         this.initProgressiveLoading();
-        
+
         // Set up efficient caching strategies
         this.initCachingStrategies();
-        
+
         // Initialize intersection observer for performance
         this.initIntersectionObserver();
-        
+
         // Preload critical resources
         this.preloadCriticalResources();
-        
+
         console.log('⚡ Performance optimizations initialized');
     }
 
@@ -90,7 +93,7 @@ class TournamentDetailPage {
             // Fallback for browsers without native lazy loading
             this.initIntersectionObserverLazyLoading();
         }
-        
+
         // Lazy load non-critical sections
         this.initSectionLazyLoading();
     }
@@ -100,7 +103,7 @@ class TournamentDetailPage {
      */
     initIntersectionObserverLazyLoading() {
         const lazyImages = document.querySelectorAll('img[loading="lazy"]');
-        
+
         if ('IntersectionObserver' in window) {
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
@@ -115,7 +118,7 @@ class TournamentDetailPage {
                 rootMargin: '50px 0px',
                 threshold: 0.01
             });
-            
+
             lazyImages.forEach(img => imageObserver.observe(img));
         } else {
             // Fallback: load all images immediately
@@ -131,7 +134,7 @@ class TournamentDetailPage {
      */
     initSectionLazyLoading() {
         const lazySections = document.querySelectorAll('.lazy-section');
-        
+
         if ('IntersectionObserver' in window && lazySections.length > 0) {
             const sectionObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -144,7 +147,7 @@ class TournamentDetailPage {
                 rootMargin: '100px 0px',
                 threshold: 0.1
             });
-            
+
             lazySections.forEach(section => sectionObserver.observe(section));
         } else {
             // Fallback: show all sections immediately
@@ -158,9 +161,9 @@ class TournamentDetailPage {
     initProgressiveLoading() {
         this.tabContentCache = new Map();
         this.loadingStates = new Map();
-        
-        // Preload the active tab content
-        const activeTab = document.querySelector('.tab-nav-item.active');
+
+        // Preload the active tab content - support both old and new class names
+        const activeTab = document.querySelector('.gaming-tab-item.active, .tab-nav-item.active');
         if (activeTab) {
             const tabId = activeTab.getAttribute('data-tab');
             this.preloadTabContent(tabId);
@@ -174,13 +177,13 @@ class TournamentDetailPage {
         if (this.tabContentCache.has(tabId) || this.loadingStates.get(tabId)) {
             return;
         }
-        
+
         this.loadingStates.set(tabId, true);
-        
+
         try {
             // Simulate content loading - in real implementation, this would fetch from API
             await new Promise(resolve => setTimeout(resolve, 100));
-            
+
             const tabPane = document.querySelector(`#${tabId}-tab`);
             if (tabPane && !this.tabContentCache.has(tabId)) {
                 this.tabContentCache.set(tabId, tabPane.innerHTML);
@@ -202,10 +205,10 @@ class TournamentDetailPage {
             timestamp: 0,
             ttl: 30000 // 30 seconds
         };
-        
+
         // Enable browser caching for static assets
         this.enableAssetCaching();
-        
+
         // Initialize memory-efficient data structures
         this.initDataStructures();
     }
@@ -221,7 +224,7 @@ class TournamentDetailPage {
                 img.crossOrigin = 'anonymous';
             }
         });
-        
+
         // Preconnect to external domains
         this.preconnectExternalDomains();
     }
@@ -234,7 +237,7 @@ class TournamentDetailPage {
             'fonts.googleapis.com',
             'fonts.gstatic.com'
         ];
-        
+
         domains.forEach(domain => {
             const link = document.createElement('link');
             link.rel = 'preconnect';
@@ -250,7 +253,7 @@ class TournamentDetailPage {
     initDataStructures() {
         // Use WeakMap for component references to prevent memory leaks
         this.componentRefs = new WeakMap();
-        
+
         // Initialize object pools for frequently created objects
         this.objectPools = {
             animations: [],
@@ -276,7 +279,7 @@ class TournamentDetailPage {
                 rootMargin: '50px',
                 threshold: [0, 0.25, 0.5, 0.75, 1]
             });
-            
+
             // Observe performance-critical elements
             const criticalElements = document.querySelectorAll('.stats-dashboard, .tournament-timeline, .enhanced-participant-grid');
             criticalElements.forEach(element => {
@@ -320,10 +323,10 @@ class TournamentDetailPage {
         if (criticalCSS && !criticalCSS.dataset.preloaded) {
             criticalCSS.dataset.preloaded = 'true';
         }
-        
+
         // Preload critical JavaScript modules
         this.preloadJSModules();
-        
+
         // Prefetch likely next pages
         this.prefetchLikelyPages();
     }
@@ -334,18 +337,18 @@ class TournamentDetailPage {
     preloadJSModules() {
         // Note: All components are included in the main tournament-detail.js file
         // No separate component files needed for preloading
-        
+
         // If we had separate component files, they would be preloaded here:
         // const modules = [
         //     '/static/js/components/statistics-dashboard.js',
         //     '/static/js/components/tournament-timeline.js'
         // ];
-        
+
         // For now, we'll preload other critical resources instead
         const criticalResources = [
             '/static/css/tournament-detail.css'
         ];
-        
+
         criticalResources.forEach(resource => {
             const link = document.createElement('link');
             if (resource.endsWith('.css')) {
@@ -371,7 +374,7 @@ class TournamentDetailPage {
             link.href = registrationButton.href;
             document.head.appendChild(link);
         }
-        
+
         // Prefetch bracket page if tournament is in progress
         const bracketTab = document.querySelector('[data-tab="bracket"]');
         if (bracketTab) {
@@ -387,7 +390,7 @@ class TournamentDetailPage {
             const response = await fetch(`/tournaments/${this.tournamentSlug}/api/bracket/`, {
                 headers: { 'X-Prefetch': 'true' }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 this.tabContentCache.set('bracket', data);
@@ -402,7 +405,7 @@ class TournamentDetailPage {
      */
     startStatisticsUpdates() {
         if (this.statisticsUpdateInterval) return;
-        
+
         this.statisticsUpdateInterval = setInterval(() => {
             this.updateStatisticsEfficiently();
         }, 30000);
@@ -423,13 +426,13 @@ class TournamentDetailPage {
      */
     async updateStatisticsEfficiently() {
         const now = Date.now();
-        
+
         // Check cache first
         if (this.statsCache.data && (now - this.statsCache.timestamp) < this.statsCache.ttl) {
             this.updateStatisticsDisplay(this.statsCache.data);
             return;
         }
-        
+
         try {
             const response = await fetch(`/tournaments/${this.tournamentSlug}/api/stats/`, {
                 headers: {
@@ -437,17 +440,17 @@ class TournamentDetailPage {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
-                
+
                 // Update cache
                 this.statsCache = {
                     data: data,
                     timestamp: now,
                     ttl: 30000
                 };
-                
+
                 this.updateStatisticsDisplay(data);
             }
         } catch (error) {
@@ -461,15 +464,15 @@ class TournamentDetailPage {
     updateStatisticsDisplay(data) {
         const dashboard = document.querySelector('.stats-dashboard');
         if (!dashboard) return;
-        
+
         // Mark as updating for CSS animations
         dashboard.setAttribute('data-updating', 'true');
-        
+
         // Update values with animation
         if (this.components.statisticsDashboard) {
-            this.components.statisticsDashboard.updateValues(data);
+            this.components.statisticsDashboard.updateStatistics(data);
         }
-        
+
         // Remove updating state after animation
         setTimeout(() => {
             dashboard.setAttribute('data-updating', 'false');
@@ -521,7 +524,7 @@ class TournamentDetailPage {
             tournamentSlug: this.tournamentSlug,
             onStatsUpdate: (stats) => this.handleStatsUpdate(stats)
         });
-        
+
         console.log('✅ HeroSection component initialized');
     }
 
@@ -538,7 +541,7 @@ class TournamentDetailPage {
             updateInterval: 30000, // 30 seconds
             onUpdate: (data) => this.handleDashboardUpdate(data)
         });
-        
+
         console.log('✅ StatisticsDashboard component initialized');
     }
 
@@ -556,8 +559,21 @@ class TournamentDetailPage {
             enableMobileScrolling: true,
             enableKeyboardNavigation: true
         });
-        
+
         console.log('✅ TabNavigation component initialized');
+    }
+
+    /**
+     * Initialize TournamentTimeline component for phase countdowns
+     * Requirements: 12.1, 12.4
+     */
+    initTournamentTimeline() {
+        const timelineElement = document.querySelector('.tournament-timeline');
+        if (!timelineElement) return;
+
+        this.components.tournamentTimeline = new TournamentTimeline(timelineElement);
+
+        console.log('✅ TournamentTimeline component initialized');
     }
 
     /**
@@ -576,7 +592,7 @@ class TournamentDetailPage {
             tournamentData: this.getTournamentData(),
             onShare: (platform) => this.handleShare(platform)
         });
-        
+
         console.log('✅ SocialSharing component initialized');
     }
 
@@ -602,7 +618,7 @@ class TournamentDetailPage {
                 </button>
             </div>
         `;
-        
+
         heroSection.appendChild(shareElement);
     }
 
@@ -610,10 +626,10 @@ class TournamentDetailPage {
         const gameColors = heroSection.dataset.gameColors;
         const tournamentStatus = heroSection.dataset.tournamentStatus;
         const isFeatured = heroSection.dataset.isFeatured === 'true';
-        
+
         if (gameColors) {
             const [primaryColor, secondaryColor] = gameColors.split(',');
-            
+
             // Apply dynamic gradient if no banner image
             const gradientBg = heroSection.querySelector('.hero-gradient-bg');
             if (gradientBg) {
@@ -622,7 +638,7 @@ class TournamentDetailPage {
                     ${secondaryColor} 50%, 
                     #0f172a 100%)`;
             }
-            
+
             // Update pattern colors
             const pattern = heroSection.querySelector('.hero-pattern');
             if (pattern) {
@@ -632,14 +648,14 @@ class TournamentDetailPage {
                 `;
             }
         }
-        
+
         // Add status-specific effects
         if (tournamentStatus === 'in_progress') {
             heroSection.classList.add('hero-live');
         } else if (tournamentStatus === 'registration') {
             heroSection.classList.add('hero-registration');
         }
-        
+
         // Add featured tournament effects
         if (isFeatured) {
             heroSection.classList.add('hero-featured');
@@ -648,29 +664,29 @@ class TournamentDetailPage {
 
     initStatusBadgeAnimations() {
         const statusBadges = document.querySelectorAll('.tournament-status-badge');
-        
+
         statusBadges.forEach(badge => {
             const status = badge.dataset.status;
-            
+
             // Add hover effects
             badge.addEventListener('mouseenter', () => {
                 badge.style.transform = 'translateY(-2px) scale(1.05)';
             });
-            
+
             badge.addEventListener('mouseleave', () => {
                 badge.style.transform = 'translateY(0) scale(1)';
             });
-            
+
             // Add click effects for interactive badges
             if (status === 'registration' || status === 'in_progress') {
                 badge.addEventListener('click', () => {
                     this.showStatusDetails(status);
                 });
-                
+
                 badge.style.cursor = 'pointer';
                 badge.setAttribute('tabindex', '0');
                 badge.setAttribute('role', 'button');
-                
+
                 // Keyboard support
                 badge.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -685,15 +701,15 @@ class TournamentDetailPage {
     initFeaturedBadgeEffects() {
         const featuredBadge = document.querySelector('.featured-badge');
         if (!featuredBadge) return;
-        
+
         // Add interactive sparkle effect
         featuredBadge.addEventListener('mouseenter', () => {
             featuredBadge.style.transform = 'translateY(-2px) scale(1.05)';
-            
+
             // Create additional sparkles
             this.createSparkleEffect(featuredBadge);
         });
-        
+
         featuredBadge.addEventListener('mouseleave', () => {
             featuredBadge.style.transform = 'translateY(0) scale(1)';
         });
@@ -701,7 +717,7 @@ class TournamentDetailPage {
 
     createSparkleEffect(element) {
         const sparkles = 3;
-        
+
         for (let i = 0; i < sparkles; i++) {
             const sparkle = document.createElement('div');
             sparkle.className = 'sparkle-particle';
@@ -716,16 +732,16 @@ class TournamentDetailPage {
                 left: ${Math.random() * 100}%;
                 top: ${Math.random() * 100}%;
             `;
-            
+
             element.appendChild(sparkle);
-            
+
             setTimeout(() => {
                 if (sparkle.parentNode) {
                     sparkle.parentNode.removeChild(sparkle);
                 }
             }, 1000);
         }
-        
+
         // Add sparkle animation if not already present
         if (!document.querySelector('#sparkle-styles')) {
             const styles = document.createElement('style');
@@ -743,7 +759,7 @@ class TournamentDetailPage {
 
     initMetaInformationEffects() {
         const metaItems = document.querySelectorAll('.meta-item');
-        
+
         metaItems.forEach(item => {
             item.addEventListener('mouseenter', () => {
                 const icon = item.querySelector('.meta-icon');
@@ -752,7 +768,7 @@ class TournamentDetailPage {
                     icon.style.color = '#dc2626'; // Primary light color
                 }
             });
-            
+
             item.addEventListener('mouseleave', () => {
                 const icon = item.querySelector('.meta-icon');
                 if (icon) {
@@ -766,7 +782,7 @@ class TournamentDetailPage {
     showStatusDetails(status) {
         let message = '';
         let type = 'info';
-        
+
         switch (status) {
             case 'registration':
                 message = 'Registration is currently open! Click the registration button to join.';
@@ -777,7 +793,7 @@ class TournamentDetailPage {
                 type = 'info';
                 break;
         }
-        
+
         if (message) {
             this.showNotification(message, type);
         }
@@ -791,7 +807,7 @@ class TournamentDetailPage {
         if (this.components.statisticsDashboard) {
             this.components.statisticsDashboard.updateStatistics(stats);
         }
-        
+
         // Update social sharing data
         if (this.components.socialSharing) {
             this.components.socialSharing.updateTournamentData(this.getTournamentData());
@@ -806,7 +822,7 @@ class TournamentDetailPage {
         if (this.components.heroSection) {
             this.components.heroSection.updateStatistics(data);
         }
-        
+
         // Dispatch custom event for other components
         document.dispatchEvent(new CustomEvent('tournamentStatsUpdated', {
             detail: { data, timestamp: new Date() }
@@ -818,12 +834,12 @@ class TournamentDetailPage {
      */
     handleTabChange(tabId) {
         this.currentTab = tabId;
-        
+
         // Update URL without page reload
         const url = new URL(window.location);
         url.searchParams.set('tab', tabId);
         window.history.replaceState({}, '', url);
-        
+
         // Track tab change for analytics
         this.trackEvent('tab_change', { tab: tabId });
     }
@@ -834,7 +850,7 @@ class TournamentDetailPage {
     handleShare(platform) {
         // Track sharing event
         this.trackEvent('tournament_share', { platform });
-        
+
         // Show success notification
         this.showNotification(`Tournament shared on ${platform}!`, 'success');
     }
@@ -845,7 +861,7 @@ class TournamentDetailPage {
     getTournamentData() {
         const heroSection = document.querySelector('.hero-section');
         const titleElement = document.querySelector('h1');
-        
+
         return {
             name: titleElement?.textContent || 'Tournament',
             slug: this.tournamentSlug,
@@ -892,11 +908,11 @@ class TournamentDetailPage {
      */
     loadInitialData() {
         console.log('Loading initial tournament data...');
-        
+
         // Set initial tab from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const initialTab = urlParams.get('tab') || 'details';
-        
+
         if (this.components.tabNavigation && initialTab !== 'details') {
             this.components.tabNavigation.switchTab(initialTab);
         }
@@ -966,22 +982,22 @@ class TournamentDetailPage {
      */
     destroy() {
         console.log('🧹 Cleaning up Tournament Detail Page');
-        
+
         // Destroy all components
         Object.values(this.components).forEach(component => {
             if (component && typeof component.destroy === 'function') {
                 component.destroy();
             }
         });
-        
+
         // Clear intervals
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
         }
-        
+
         // Clear components
         this.components = {};
-        
+
         console.log('✅ Tournament Detail Page cleaned up');
     }
 
@@ -993,7 +1009,7 @@ class TournamentDetailPage {
         if (!participantTab) return;
 
         this.components.participantDisplay = new ParticipantDisplay(participantTab);
-        
+
         // Initialize participant filters
         const filterButtons = participantTab.querySelectorAll('.filter-btn');
         filterButtons.forEach(button => {
@@ -1001,13 +1017,13 @@ class TournamentDetailPage {
                 e.preventDefault();
                 const filter = button.getAttribute('data-filter');
                 this.components.participantDisplay.filterParticipants(filter);
-                
+
                 // Update active filter button
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
             });
         });
-        
+
         // Initialize organizer actions if user is organizer
         this.initOrganizerActions();
     }
@@ -1018,7 +1034,7 @@ class TournamentDetailPage {
     initOrganizerActions() {
         const checkInButtons = document.querySelectorAll('.check-in-btn');
         const seedButtons = document.querySelectorAll('.seed-btn');
-        
+
         // Check-in functionality
         checkInButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
@@ -1027,7 +1043,7 @@ class TournamentDetailPage {
                 await this.handleParticipantCheckIn(participantId, button);
             });
         });
-        
+
         // Seed assignment functionality
         seedButtons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -1045,7 +1061,7 @@ class TournamentDetailPage {
         try {
             button.disabled = true;
             button.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">refresh</span><span>Checking In...</span>';
-            
+
             const response = await fetch(`/tournaments/${this.tournamentSlug}/participants/${participantId}/check-in/`, {
                 method: 'POST',
                 headers: {
@@ -1053,12 +1069,12 @@ class TournamentDetailPage {
                     'X-CSRFToken': this.getCSRFToken()
                 }
             });
-            
+
             if (response.ok) {
                 // Update UI to show checked-in status
                 const participantCard = button.closest('.enhanced-participant-card');
                 const statusIndicator = participantCard.querySelector('.status-indicator');
-                
+
                 if (statusIndicator) {
                     statusIndicator.classList.remove('pending');
                     statusIndicator.classList.add('checked-in');
@@ -1066,13 +1082,13 @@ class TournamentDetailPage {
                     statusIndicator.setAttribute('aria-label', 'Checked in');
                     statusIndicator.setAttribute('title', 'Participant has checked in');
                 }
-                
+
                 // Remove check-in button
                 button.remove();
-                
+
                 // Update statistics
                 this.components.statisticsDashboard?.updateCheckedInCount();
-                
+
                 // Show success message
                 this.showToast('Participant checked in successfully', 'success');
             } else {
@@ -1081,7 +1097,7 @@ class TournamentDetailPage {
         } catch (error) {
             console.error('Check-in error:', error);
             this.showToast('Failed to check in participant', 'error');
-            
+
             // Reset button
             button.disabled = false;
             button.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span><span>Check In</span>';
@@ -1094,7 +1110,7 @@ class TournamentDetailPage {
     handleSeedAssignment(participantId, button) {
         const participantCard = button.closest('.enhanced-participant-card');
         const participantName = participantCard.querySelector('.participant-name').textContent;
-        
+
         const seed = prompt(`Enter seed position for ${participantName}:`);
         if (seed && !isNaN(seed) && parseInt(seed) > 0) {
             this.assignSeed(participantId, parseInt(seed), button);
@@ -1114,26 +1130,26 @@ class TournamentDetailPage {
                 },
                 body: JSON.stringify({ seed: seed })
             });
-            
+
             if (response.ok) {
                 // Update seed display
                 const participantCard = button.closest('.enhanced-participant-card');
                 const nameContainer = participantCard.querySelector('.participant-name-container');
-                
+
                 let seedBadge = nameContainer.querySelector('.seed-badge');
                 if (!seedBadge) {
                     seedBadge = document.createElement('span');
                     seedBadge.className = 'seed-badge';
                     nameContainer.appendChild(seedBadge);
                 }
-                
+
                 seedBadge.textContent = `#${seed}`;
                 seedBadge.setAttribute('aria-label', `Seed position ${seed}`);
                 seedBadge.setAttribute('title', `Tournament seed #${seed}`);
-                
+
                 // Update card data attribute
                 participantCard.setAttribute('data-seed', seed);
-                
+
                 this.showToast(`Seed #${seed} assigned successfully`, 'success');
             } else {
                 throw new Error('Failed to assign seed');
@@ -1149,22 +1165,22 @@ class TournamentDetailPage {
      */
     initAccessibility() {
         console.log('🔧 Initializing accessibility features');
-        
+
         // Initialize keyboard navigation for tabs
         this.initTabKeyboardNavigation();
-        
+
         // Initialize focus management
         this.initFocusManagement();
-        
+
         // Initialize screen reader announcements
         this.initScreenReaderSupport();
-        
+
         // Initialize high contrast mode detection
         this.initHighContrastSupport();
-        
+
         // Initialize reduced motion support
         this.initReducedMotionSupport();
-        
+
         console.log('✅ Accessibility features initialized');
     }
 
@@ -1172,12 +1188,12 @@ class TournamentDetailPage {
      * Initialize keyboard navigation for tab system
      */
     initTabKeyboardNavigation() {
-        const tabButtons = document.querySelectorAll('.tab-nav-item');
-        
+        const tabButtons = document.querySelectorAll('.gaming-tab-item, .tab-nav-item');
+
         tabButtons.forEach((button, index) => {
             button.addEventListener('keydown', (e) => {
                 let targetIndex = index;
-                
+
                 switch (e.key) {
                     case 'ArrowRight':
                     case 'ArrowDown':
@@ -1205,13 +1221,13 @@ class TournamentDetailPage {
                     default:
                         return;
                 }
-                
+
                 // Update tabindex and focus
                 tabButtons.forEach((btn, i) => {
                     btn.setAttribute('tabindex', i === targetIndex ? '0' : '-1');
                     btn.setAttribute('aria-selected', i === targetIndex ? 'true' : 'false');
                 });
-                
+
                 tabButtons[targetIndex].focus();
             });
         });
@@ -1223,16 +1239,16 @@ class TournamentDetailPage {
     initFocusManagement() {
         // Store the last focused element before tab switches
         let lastFocusedElement = null;
-        
+
         document.addEventListener('focusin', (e) => {
             lastFocusedElement = e.target;
         });
-        
+
         // Restore focus after dynamic content loads
         document.addEventListener('tabContentLoaded', (e) => {
             const newContent = e.detail.content;
             const firstFocusable = newContent.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            
+
             if (firstFocusable) {
                 firstFocusable.focus();
             }
@@ -1252,13 +1268,13 @@ class TournamentDetailPage {
             liveRegion.className = 'sr-only';
             document.body.appendChild(liveRegion);
         }
-        
+
         // Announce tab changes
         document.addEventListener('tabChanged', (e) => {
             const tabName = e.detail.tabName;
             this.announceToScreenReader(`Switched to ${tabName} tab`);
         });
-        
+
         // Announce statistics updates
         document.addEventListener('statisticsUpdated', (e) => {
             const stats = e.detail.stats;
@@ -1273,7 +1289,7 @@ class TournamentDetailPage {
         const liveRegion = document.querySelector('#sr-announcements');
         if (liveRegion) {
             liveRegion.textContent = message;
-            
+
             // Clear after announcement
             setTimeout(() => {
                 liveRegion.textContent = '';
@@ -1287,12 +1303,12 @@ class TournamentDetailPage {
     initHighContrastSupport() {
         // Detect high contrast mode
         const isHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
-        
+
         if (isHighContrast) {
             document.documentElement.classList.add('high-contrast');
             console.log('🎨 High contrast mode detected');
         }
-        
+
         // Listen for changes
         window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
             if (e.matches) {
@@ -1310,12 +1326,12 @@ class TournamentDetailPage {
      */
     initReducedMotionSupport() {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
+
         if (prefersReducedMotion) {
             document.documentElement.classList.add('reduced-motion');
             console.log('🎭 Reduced motion preference detected');
         }
-        
+
         // Listen for changes
         window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
             if (e.matches) {
@@ -1330,53 +1346,53 @@ class TournamentDetailPage {
      * Enhanced tab switching with progressive loading and accessibility support
      */
     switchTab(tabId) {
-        const currentTab = document.querySelector('.tab-nav-item.active');
+        const currentTab = document.querySelector('.gaming-tab-item.active, .tab-nav-item.active');
         const targetTab = document.querySelector(`[data-tab="${tabId}"]`);
         const currentPanel = document.querySelector('.tab-pane.active');
         const targetPanel = document.querySelector(`#${tabId}-tab`);
-        
+
         if (!targetTab || !targetPanel) return;
-        
+
         // Show loading state for progressive loading
         this.showTabLoadingState(targetPanel);
-        
+
         // Update tab states
-        document.querySelectorAll('.tab-nav-item').forEach(tab => {
+        document.querySelectorAll('.gaming-tab-item, .tab-nav-item').forEach(tab => {
             tab.classList.remove('active');
             tab.setAttribute('aria-selected', 'false');
             tab.setAttribute('tabindex', '-1');
         });
-        
+
         targetTab.classList.add('active');
         targetTab.setAttribute('aria-selected', 'true');
         targetTab.setAttribute('tabindex', '0');
-        
+
         // Update panel states with progressive loading
         document.querySelectorAll('.tab-pane').forEach(panel => {
             panel.classList.remove('active');
             panel.setAttribute('aria-hidden', 'true');
         });
-        
+
         // Load content progressively
         this.loadTabContentProgressively(tabId, targetPanel).then(() => {
             targetPanel.classList.add('active');
             targetPanel.setAttribute('aria-hidden', 'false');
-            
+
             // Hide loading state
             this.hideTabLoadingState(targetPanel);
-            
+
             // Announce change to screen readers
             const tabName = targetTab.textContent.trim();
             this.announceToScreenReader(`Switched to ${tabName} tab`);
-            
+
             // Dispatch custom event
             document.dispatchEvent(new CustomEvent('tabChanged', {
                 detail: { tabId, tabName }
             }));
-            
+
             // Update current tab reference
             this.currentTab = tabId;
-            
+
             // Preload adjacent tabs for better UX
             this.preloadAdjacentTabs(tabId);
         });
@@ -1388,7 +1404,7 @@ class TournamentDetailPage {
     showTabLoadingState(panel) {
         panel.classList.add('loading-content');
         panel.setAttribute('aria-busy', 'true');
-        
+
         // Add loading skeleton if content is empty
         if (!panel.innerHTML.trim()) {
             panel.innerHTML = `
@@ -1404,7 +1420,7 @@ class TournamentDetailPage {
     hideTabLoadingState(panel) {
         panel.classList.remove('loading-content');
         panel.setAttribute('aria-busy', 'false');
-        
+
         // Remove loading skeletons
         const skeletons = panel.querySelectorAll('.loading-skeleton');
         skeletons.forEach(skeleton => skeleton.remove());
@@ -1422,10 +1438,10 @@ class TournamentDetailPage {
             }
             return;
         }
-        
+
         // Simulate progressive loading delay for better UX
         await new Promise(resolve => setTimeout(resolve, 150));
-        
+
         try {
             // Load specific tab content
             switch (tabId) {
@@ -1445,10 +1461,10 @@ class TournamentDetailPage {
                     // Content already loaded in HTML
                     break;
             }
-            
+
             // Cache the loaded content
             this.tabContentCache.set(tabId, panel.innerHTML);
-            
+
         } catch (error) {
             console.error(`Failed to load content for tab ${tabId}:`, error);
             this.showTabError(panel, 'Failed to load content. Please try again.');
@@ -1464,7 +1480,7 @@ class TournamentDetailPage {
             this.renderBracketContent(panel, bracketData);
             return;
         }
-        
+
         try {
             const response = await fetch(`/tournaments/${this.tournamentSlug}/api/bracket/`);
             if (response.ok) {
@@ -1528,7 +1544,7 @@ class TournamentDetailPage {
         if (existingContent && !existingContent.includes('loading-skeleton')) {
             return; // Content already loaded
         }
-        
+
         // Simulate loading delay
         await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -1571,14 +1587,14 @@ class TournamentDetailPage {
      * Preload adjacent tabs for better UX
      */
     preloadAdjacentTabs(currentTabId) {
-        const tabButtons = Array.from(document.querySelectorAll('.tab-nav-item'));
+        const tabButtons = Array.from(document.querySelectorAll('.gaming-tab-item, .tab-nav-item'));
         const currentIndex = tabButtons.findIndex(tab => tab.getAttribute('data-tab') === currentTabId);
-        
+
         if (currentIndex === -1) return;
-        
+
         // Preload next and previous tabs
         const adjacentIndices = [currentIndex - 1, currentIndex + 1];
-        
+
         adjacentIndices.forEach(index => {
             if (index >= 0 && index < tabButtons.length) {
                 const tabId = tabButtons[index].getAttribute('data-tab');
@@ -1607,14 +1623,14 @@ class TournamentDetailPage {
      */
     initShareButtons() {
         const shareButtons = document.querySelectorAll('.share-btn');
-        
+
         shareButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 const shareType = button.getAttribute('data-share');
                 this.handleShare(shareType);
             });
-            
+
             // Add keyboard support for accessibility
             button.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1624,7 +1640,7 @@ class TournamentDetailPage {
                 }
             });
         });
-        
+
         // Initialize share tracking
         this.initShareTracking();
     }
@@ -1633,7 +1649,7 @@ class TournamentDetailPage {
         const url = window.location.href;
         const title = document.querySelector('h1').textContent;
         const tournament = this.getTournamentData();
-        
+
         // Generate optimized share text with tournament details
         const shareText = this.generateShareText(tournament, type);
 
@@ -1643,34 +1659,34 @@ class TournamentDetailPage {
                     await this.copyToClipboard(url);
                     this.showShareConfirmation('Link copied to clipboard!', 'success');
                     break;
-                
+
                 case 'twitter':
                     const twitterText = this.formatTwitterShare(tournament);
                     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(url)}&hashtags=EYTGaming,Tournament,Gaming`;
                     window.open(twitterUrl, '_blank', 'width=600,height=400');
                     this.trackShare('twitter');
                     break;
-                
+
                 case 'discord':
                     const discordText = this.formatDiscordShare(tournament, url);
                     await this.copyToClipboard(discordText);
                     this.showShareConfirmation('Tournament info copied for Discord! Paste it in your server.', 'success');
                     this.trackShare('discord');
                     break;
-                
+
                 case 'facebook':
                     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
                     window.open(facebookUrl, '_blank', 'width=600,height=400');
                     this.trackShare('facebook');
                     break;
-                
+
                 default:
                     // Try native Web Share API if available
                     if (navigator.share) {
-                        await navigator.share({ 
-                            title: title, 
-                            text: shareText, 
-                            url: url 
+                        await navigator.share({
+                            title: title,
+                            text: shareText,
+                            url: url
                         });
                         this.trackShare('native');
                     } else {
@@ -1692,7 +1708,7 @@ class TournamentDetailPage {
     getTournamentData() {
         const heroSection = document.querySelector('.hero-section');
         const statsCards = document.querySelectorAll('.stat-card');
-        
+
         const tournament = {
             name: document.querySelector('h1').textContent,
             game: document.querySelector('.game-badge span:last-child')?.textContent || '',
@@ -1703,7 +1719,7 @@ class TournamentDetailPage {
             date: document.querySelector('.meta-value')?.textContent || '',
             venue: document.querySelector('[data-venue]')?.textContent || ''
         };
-        
+
         return tournament;
     }
 
@@ -1720,7 +1736,7 @@ class TournamentDetailPage {
      */
     generateShareText(tournament, platform) {
         const baseText = `🎮 ${tournament.name} Tournament`;
-        
+
         switch (platform) {
             case 'twitter':
                 return this.formatTwitterShare(tournament);
@@ -1738,31 +1754,31 @@ class TournamentDetailPage {
      */
     formatTwitterShare(tournament) {
         let text = `🎮 ${tournament.name}`;
-        
+
         if (tournament.game) {
             text += ` - ${tournament.game}`;
         }
-        
+
         if (tournament.prizePool !== '0') {
             text += ` 💰 ${tournament.prizePool} prize pool`;
         }
-        
+
         if (tournament.participants !== '0') {
             text += ` 👥 ${tournament.participants}/${tournament.maxParticipants} players`;
         }
-        
+
         if (tournament.status === 'registration') {
             text += ' 🔥 Registration open!';
         } else if (tournament.status === 'in_progress') {
             text += ' 🚀 Live now!';
         }
-        
+
         // Ensure we stay under Twitter's character limit (leaving room for URL)
         const maxLength = 240; // Leave room for URL and hashtags
         if (text.length > maxLength) {
             text = text.substring(0, maxLength - 3) + '...';
         }
-        
+
         return text;
     }
 
@@ -1771,23 +1787,23 @@ class TournamentDetailPage {
      */
     formatDiscordShare(tournament, url = '') {
         let text = `🎮 **${tournament.name}** Tournament\n`;
-        
+
         if (tournament.game) {
             text += `🎯 **Game:** ${tournament.game}\n`;
         }
-        
+
         if (tournament.prizePool !== '0') {
             text += `💰 **Prize Pool:** ${tournament.prizePool}\n`;
         }
-        
+
         if (tournament.participants !== '0') {
             text += `👥 **Players:** ${tournament.participants}/${tournament.maxParticipants}\n`;
         }
-        
+
         if (tournament.date) {
             text += `📅 **Date:** ${tournament.date}\n`;
         }
-        
+
         if (tournament.status === 'registration') {
             text += `🔥 **Status:** Registration Open - Join Now!\n`;
         } else if (tournament.status === 'in_progress') {
@@ -1795,9 +1811,9 @@ class TournamentDetailPage {
         } else if (tournament.status === 'completed') {
             text += `🏆 **Status:** Tournament Completed\n`;
         }
-        
+
         text += `\n🔗 **Join here:** ${url}`;
-        
+
         return text;
     }
 
@@ -1813,7 +1829,7 @@ class TournamentDetailPage {
                 console.warn('Clipboard API failed, using fallback:', error);
             }
         }
-        
+
         // Fallback for older browsers or insecure contexts
         return this.fallbackCopyToClipboard(text);
     }
@@ -1829,11 +1845,11 @@ class TournamentDetailPage {
         textArea.style.top = '-999999px';
         textArea.setAttribute('readonly', '');
         textArea.setAttribute('aria-hidden', 'true');
-        
+
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             document.body.removeChild(textArea);
@@ -1850,7 +1866,7 @@ class TournamentDetailPage {
     showShareConfirmation(message, type = 'success') {
         // Create or update existing notification
         let notification = document.querySelector('.share-notification');
-        
+
         if (!notification) {
             notification = document.createElement('div');
             notification.className = 'share-notification';
@@ -1858,10 +1874,10 @@ class TournamentDetailPage {
             notification.setAttribute('aria-live', 'polite');
             document.body.appendChild(notification);
         }
-        
+
         notification.className = `share-notification ${type}`;
         notification.textContent = message;
-        
+
         // Add animation classes
         notification.style.cssText = `
             position: fixed;
@@ -1876,12 +1892,12 @@ class TournamentDetailPage {
             transition: transform 0.3s ease;
             ${type === 'success' ? 'background: #059669;' : 'background: #dc2626;'}
         `;
-        
+
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 10);
-        
+
         // Animate out and remove
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
@@ -1909,7 +1925,7 @@ class TournamentDetailPage {
                     timestamp: new Date().toISOString()
                 })
             });
-            
+
             if (response.ok) {
                 // Update share count display if present
                 this.updateShareCount();
@@ -1944,7 +1960,7 @@ class TournamentDetailPage {
     initShareTracking() {
         // Track page views for sharing analytics
         this.trackPageView();
-        
+
         // Update share counts on page load
         this.updateShareCount();
     }
@@ -1979,10 +1995,10 @@ class TournamentDetailPage {
         const statusElement = document.querySelector('.tournament-status-badge');
         if (!statusElement) return;
 
-        const status = statusElement.classList.contains('status-in_progress') || 
-                      statusElement.classList.contains('status-registration') ||
-                      statusElement.classList.contains('status-check_in');
-        
+        const status = statusElement.classList.contains('status-in_progress') ||
+            statusElement.classList.contains('status-registration') ||
+            statusElement.classList.contains('status-check_in');
+
         if (status) {
             this.startRealTimeUpdates();
         }
@@ -1994,7 +2010,7 @@ class TournamentDetailPage {
         this.retryCount = 0;
         this.maxRetries = 5;
         this.retryDelay = 1000; // Start with 1 second
-        
+
         // Update every 30 seconds
         this.updateInterval = setInterval(() => {
             this.fetchUpdates();
@@ -2006,9 +2022,9 @@ class TournamentDetailPage {
                 this.fetchUpdates();
             }
         };
-        
+
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        
+
         // Initial fetch
         this.fetchUpdates();
     }
@@ -2017,7 +2033,7 @@ class TournamentDetailPage {
         try {
             // Show updating indicator
             this.setUpdatingState(true);
-            
+
             const response = await fetch(`/tournaments/${this.tournamentSlug}/api/updates/`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -2061,10 +2077,10 @@ class TournamentDetailPage {
         if (data.status) {
             this.updateTournamentStatus(data.status);
         }
-        
+
         // Update last updated timestamp
         this.updateLastUpdatedTime(data.timestamp);
-        
+
         // Dispatch custom event for other components
         document.dispatchEvent(new CustomEvent('tournamentUpdated', {
             detail: { data, timestamp: new Date() }
@@ -2078,10 +2094,10 @@ class TournamentDetailPage {
             const statType = card.dataset.stat;
             const value = card.querySelector('.stat-value');
             const progressBar = card.querySelector('.stat-progress-fill');
-            
+
             if (value && statType) {
                 let newValue;
-                
+
                 switch (statType) {
                     case 'participants':
                         newValue = stats.participants?.registered || 0;
@@ -2096,12 +2112,12 @@ class TournamentDetailPage {
                         newValue = stats.matches?.completed || 0;
                         break;
                 }
-                
+
                 if (newValue !== undefined) {
                     this.animateValueChange(value, newValue);
                 }
             }
-            
+
             // Update progress bars
             if (progressBar && stats.participants) {
                 const percentage = stats.participants.percentage_full || 0;
@@ -2125,20 +2141,20 @@ class TournamentDetailPage {
                 }
             }
         });
-        
+
         // Announce statistics update to screen readers
         this.announceToScreenReader(`Tournament statistics updated. ${stats.participants?.registered || 0} participants registered.`);
     }
 
     animateValueChange(element, newValue) {
         const currentValue = parseInt(element.textContent.replace(/[^\d]/g, '')) || 0;
-        
+
         if (currentValue !== newValue) {
             // Highlight change with brand color
             element.style.transform = 'scale(1.1)';
             element.style.color = '#b91c1c'; // EYTGaming brand color
             element.style.transition = 'all 0.3s ease';
-            
+
             setTimeout(() => {
                 element.textContent = newValue.toLocaleString();
                 element.style.transform = 'scale(1)';
@@ -2163,10 +2179,10 @@ class TournamentDetailPage {
                     <div class="match-time">${this.formatMatchTime(match.completed_at)}</div>
                 </div>
             `).join('');
-            
+
             recentMatchesContainer.innerHTML = matchElements;
         }
-        
+
         // Update bracket information if bracket tab is active
         if (this.currentTab === 'bracket') {
             this.updateBracketMatches(matches);
@@ -2180,17 +2196,17 @@ class TournamentDetailPage {
             if (matchElement) {
                 // Update match status
                 matchElement.className = `bracket-match status-${match.status}`;
-                
+
                 // Update score
                 const scoreElement = matchElement.querySelector('.match-score');
                 if (scoreElement) {
                     scoreElement.textContent = match.score || 'vs';
                 }
-                
+
                 // Update winner highlighting
                 const participants = matchElement.querySelectorAll('.participant');
                 participants.forEach((participant, index) => {
-                    participant.classList.toggle('winner', 
+                    participant.classList.toggle('winner',
                         match.winner && match.winner === (index === 0 ? match.participant1 : match.participant2)
                     );
                 });
@@ -2204,12 +2220,12 @@ class TournamentDetailPage {
         participantCountElements.forEach(element => {
             this.animateValueChange(element, participantData.count);
         });
-        
+
         // Update participant list if participants tab is active
         if (this.currentTab === 'participants') {
             this.refreshParticipantList();
         }
-        
+
         // Update registration card if participant count changed
         this.updateRegistrationCard(participantData);
     }
@@ -2219,7 +2235,7 @@ class TournamentDetailPage {
             const response = await fetch(`/tournaments/${this.tournamentSlug}/api/participants/`);
             if (response.ok) {
                 const data = await response.json();
-                
+
                 // Update participant grid
                 const participantGrid = document.querySelector('.enhanced-participant-grid');
                 if (participantGrid && data.participants) {
@@ -2266,21 +2282,21 @@ class TournamentDetailPage {
                 </div>
             </div>
         `).join('');
-        
+
         container.innerHTML = participantHTML;
     }
 
     updateRegistrationCard(participantData) {
         const registrationCard = document.querySelector('.enhanced-registration-card');
         if (!registrationCard) return;
-        
+
         // Update spots remaining
         const spotsElement = registrationCard.querySelector('.spots-remaining');
         if (spotsElement && participantData.count !== undefined) {
             const tournament = this.getTournamentData();
             const spotsRemaining = tournament.maxParticipants - participantData.count;
             spotsElement.textContent = spotsRemaining;
-            
+
             // Update urgency indicator
             const urgencyIndicator = registrationCard.querySelector('.urgency-indicator');
             if (urgencyIndicator) {
@@ -2299,19 +2315,19 @@ class TournamentDetailPage {
         if (statusBadge) {
             // Update status badge classes and content
             statusBadge.className = `tournament-status-badge status-${status.toLowerCase()}`;
-            
+
             const statusText = statusBadge.querySelector('.status-text');
             if (statusText) {
                 statusText.textContent = this.formatStatusText(status);
             }
-            
+
             // Update ARIA label
             statusBadge.setAttribute('aria-label', `Tournament status: ${this.formatStatusText(status)}`);
         }
-        
+
         // Update timeline progress if status changed
         this.updateTimelineProgress(status);
-        
+
         // Announce status change to screen readers
         this.announceToScreenReader(`Tournament status updated to ${this.formatStatusText(status)}`);
     }
@@ -2319,11 +2335,11 @@ class TournamentDetailPage {
     updateTimelineProgress(status) {
         const timeline = document.querySelector('.tournament-timeline');
         if (!timeline) return;
-        
+
         const phases = timeline.querySelectorAll('.phase-indicator');
         phases.forEach((phase, index) => {
             const phaseStatus = phase.dataset.phase;
-            
+
             // Update phase status based on tournament status
             if (this.isPhaseCompleted(phaseStatus, status)) {
                 phase.classList.add('completed');
@@ -2336,7 +2352,7 @@ class TournamentDetailPage {
                 phase.classList.remove('completed', 'active');
             }
         });
-        
+
         // Update progress line
         const progressFill = timeline.querySelector('.timeline-progress-fill');
         if (progressFill) {
@@ -2401,7 +2417,7 @@ class TournamentDetailPage {
         const diffMins = Math.floor(diffMs / 60000);
         const diffHours = Math.floor(diffMins / 60);
         const diffDays = Math.floor(diffHours / 24);
-        
+
         if (diffMins < 1) return 'Just now';
         if (diffMins < 60) return `${diffMins}m ago`;
         if (diffHours < 24) return `${diffHours}h ago`;
@@ -2414,10 +2430,10 @@ class TournamentDetailPage {
         this.connectionStatus = 'connected';
         this.retryCount = 0;
         this.retryDelay = 1000;
-        
+
         // Update connection status indicator
         this.updateConnectionStatus('connected');
-        
+
         // Hide retry button if visible
         this.hideRetryButton();
     }
@@ -2425,21 +2441,21 @@ class TournamentDetailPage {
     handleConnectionError(error) {
         this.connectionStatus = 'error';
         console.error('Real-time update connection error:', error);
-        
+
         // Update connection status indicator
         this.updateConnectionStatus('error');
-        
+
         // Implement exponential backoff for retries
         if (this.retryCount < this.maxRetries) {
             this.retryCount++;
             this.retryDelay = Math.min(this.retryDelay * 2, 30000); // Max 30 seconds
-            
+
             setTimeout(() => {
                 if (this.connectionStatus === 'error') {
                     this.fetchUpdates();
                 }
             }, this.retryDelay);
-            
+
             // Show retry information
             this.showRetryInfo();
         } else {
@@ -2453,7 +2469,7 @@ class TournamentDetailPage {
         statusIndicators.forEach(indicator => {
             indicator.className = `connection-status status-${status}`;
             indicator.setAttribute('aria-label', `Connection status: ${status}`);
-            
+
             const icon = indicator.querySelector('.status-icon');
             if (icon) {
                 switch (status) {
@@ -2479,7 +2495,7 @@ class TournamentDetailPage {
         if (dashboard) {
             dashboard.setAttribute('data-updating', isUpdating.toString());
         }
-        
+
         // Update loading indicators
         const loadingIndicators = document.querySelectorAll('.update-indicator');
         loadingIndicators.forEach(indicator => {
@@ -2519,7 +2535,7 @@ class TournamentDetailPage {
         if (retryButton) {
             retryButton.style.display = 'none';
         }
-        
+
         const retryInfo = document.querySelector('.retry-info');
         if (retryInfo) {
             retryInfo.style.display = 'none';
@@ -2604,9 +2620,9 @@ class TournamentDetailPage {
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
         announcement.textContent = `Switched to ${tabId} tab`;
-        
+
         document.body.appendChild(announcement);
-        
+
         setTimeout(() => {
             document.body.removeChild(announcement);
         }, 1000);
@@ -2691,7 +2707,7 @@ class TournamentDetailPage {
             window.showToast(message, type);
             return;
         }
-        
+
         // Fallback toast implementation
         const toast = document.createElement('div');
         const colors = {
@@ -2700,18 +2716,18 @@ class TournamentDetailPage {
             'warning': 'bg-yellow-600',
             'info': 'bg-blue-600'
         };
-        
+
         toast.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
         toast.textContent = message;
         toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
         toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
         toast.setAttribute('aria-atomic', 'true');
-        
+
         document.body.appendChild(toast);
-        
+
         // Fade in
         setTimeout(() => toast.style.opacity = '1', 10);
-        
+
         // Remove after 3 seconds
         setTimeout(() => {
             toast.style.opacity = '0';
@@ -2727,66 +2743,66 @@ class TournamentDetailPage {
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
         }
-        
+
         if (this.statisticsUpdateInterval) {
             clearInterval(this.statisticsUpdateInterval);
         }
-        
+
         // Disconnect observers
         if (this.viewportObserver) {
             this.viewportObserver.disconnect();
         }
-        
+
         if (this.imageObserver) {
             this.imageObserver.disconnect();
         }
-        
+
         if (this.sectionObserver) {
             this.sectionObserver.disconnect();
         }
-        
+
         // Clear caches
         if (this.tabContentCache) {
             this.tabContentCache.clear();
         }
-        
+
         if (this.statsCache) {
             this.statsCache.data = null;
         }
-        
+
         // Clear loading states
         if (this.loadingStates) {
             this.loadingStates.clear();
         }
-        
+
         // Destroy components
         if (this.components.heroSection) {
             this.components.heroSection.destroy();
         }
-        
+
         if (this.components.statisticsDashboard) {
             this.components.statisticsDashboard.destroy();
         }
-        
+
         if (this.components.tournamentTimeline) {
             this.components.tournamentTimeline.destroy();
         }
-        
+
         // Clear component references
         if (this.componentRefs) {
             // WeakMap will be garbage collected automatically
             this.componentRefs = null;
         }
-        
+
         // Clear object pools
         if (this.objectPools) {
             this.objectPools.animations = [];
             this.objectPools.events = [];
         }
-        
+
         // Remove event listeners
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-        
+
         console.log('🧹 Tournament Detail Page cleaned up with performance optimizations');
     }
 }
@@ -2806,26 +2822,26 @@ class HeroSection {
         };
         this.animationFrameId = null;
         this.counters = new Map();
-        
+
         this.init();
     }
 
     init() {
         console.log('🎯 Initializing Hero Section');
-        
+
         this.initCounters();
         this.initDynamicBackground();
         this.initStatusBadgeAnimations();
         this.initFeaturedBadgeEffects();
         this.initParallaxEffect();
         this.initResponsiveText();
-        
+
         console.log('✅ Hero Section initialized');
     }
 
     initCounters() {
         const statValues = this.element.querySelectorAll('[data-value]');
-        
+
         statValues.forEach(element => {
             const targetValue = parseInt(element.dataset.value) || 0;
             this.animateCounter(element, targetValue);
@@ -2835,22 +2851,22 @@ class HeroSection {
     animateCounter(element, targetValue, duration = 2000) {
         const startValue = 0;
         const startTime = performance.now();
-        
+
         const animate = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             // Easing function for smooth animation
             const easeOutQuart = 1 - Math.pow(1 - progress, 4);
             const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
-            
+
             element.textContent = this.formatCounterValue(currentValue, element);
-            
+
             if (progress < 1) {
                 this.animationFrameId = requestAnimationFrame(animate);
             }
         };
-        
+
         requestAnimationFrame(animate);
     }
 
@@ -2859,12 +2875,12 @@ class HeroSection {
         if (element.textContent.includes('$')) {
             return `$${value.toLocaleString()}`;
         }
-        
+
         // Check if element is a percentage
         if (element.textContent.includes('%')) {
             return `${value}%`;
         }
-        
+
         return value.toLocaleString();
     }
 
@@ -2872,10 +2888,10 @@ class HeroSection {
         const gameColors = this.element.dataset.gameColors;
         const tournamentStatus = this.element.dataset.tournamentStatus;
         const isFeatured = this.element.dataset.isFeatured === 'true';
-        
+
         if (gameColors) {
             const [primaryColor, secondaryColor] = gameColors.split(',');
-            
+
             // Apply dynamic gradient if no banner image
             const gradientBg = this.element.querySelector('.hero-gradient-bg');
             if (gradientBg) {
@@ -2885,14 +2901,14 @@ class HeroSection {
                     #0f172a 100%)`;
             }
         }
-        
+
         // Add status-specific effects
         if (tournamentStatus === 'in_progress') {
             this.element.classList.add('hero-live');
         } else if (tournamentStatus === 'registration') {
             this.element.classList.add('hero-registration');
         }
-        
+
         // Add featured tournament effects
         if (isFeatured) {
             this.element.classList.add('hero-featured');
@@ -2901,29 +2917,29 @@ class HeroSection {
 
     initStatusBadgeAnimations() {
         const statusBadges = this.element.querySelectorAll('.tournament-status-badge');
-        
+
         statusBadges.forEach(badge => {
             const status = badge.dataset.status;
-            
+
             // Add hover effects
             badge.addEventListener('mouseenter', () => {
                 badge.style.transform = 'translateY(-2px) scale(1.05)';
             });
-            
+
             badge.addEventListener('mouseleave', () => {
                 badge.style.transform = 'translateY(0) scale(1)';
             });
-            
+
             // Add click effects for interactive badges
             if (status === 'registration' || status === 'in_progress') {
                 badge.addEventListener('click', () => {
                     this.showStatusDetails(status);
                 });
-                
+
                 badge.style.cursor = 'pointer';
                 badge.setAttribute('tabindex', '0');
                 badge.setAttribute('role', 'button');
-                
+
                 // Keyboard support
                 badge.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -2938,13 +2954,13 @@ class HeroSection {
     initFeaturedBadgeEffects() {
         const featuredBadge = this.element.querySelector('.featured-badge');
         if (!featuredBadge) return;
-        
+
         // Add interactive sparkle effect
         featuredBadge.addEventListener('mouseenter', () => {
             featuredBadge.style.transform = 'translateY(-2px) scale(1.05)';
             this.createSparkleEffect(featuredBadge);
         });
-        
+
         featuredBadge.addEventListener('mouseleave', () => {
             featuredBadge.style.transform = 'translateY(0) scale(1)';
         });
@@ -2952,7 +2968,7 @@ class HeroSection {
 
     createSparkleEffect(element) {
         const sparkles = 3;
-        
+
         for (let i = 0; i < sparkles; i++) {
             const sparkle = document.createElement('div');
             sparkle.className = 'sparkle-particle';
@@ -2967,16 +2983,16 @@ class HeroSection {
                 left: ${Math.random() * 100}%;
                 top: ${Math.random() * 100}%;
             `;
-            
+
             element.appendChild(sparkle);
-            
+
             setTimeout(() => {
                 if (sparkle.parentNode) {
                     sparkle.parentNode.removeChild(sparkle);
                 }
             }, 1000);
         }
-        
+
         // Add sparkle animation if not already present
         if (!document.querySelector('#sparkle-styles')) {
             const styles = document.createElement('style');
@@ -2995,14 +3011,14 @@ class HeroSection {
     initParallaxEffect() {
         const background = this.element.querySelector('.hero-background');
         if (!background) return;
-        
+
         const handleScroll = () => {
             const scrolled = window.pageYOffset;
             const rate = scrolled * -0.5;
-            
+
             background.style.transform = `translateY(${rate}px)`;
         };
-        
+
         // Throttle scroll events for performance
         let ticking = false;
         const throttledScroll = () => {
@@ -3014,7 +3030,7 @@ class HeroSection {
                 ticking = true;
             }
         };
-        
+
         window.addEventListener('scroll', throttledScroll, { passive: true });
         this.scrollHandler = throttledScroll;
     }
@@ -3022,18 +3038,18 @@ class HeroSection {
     initResponsiveText() {
         const title = this.element.querySelector('.tournament-title');
         if (!title) return;
-        
+
         const adjustTitleSize = () => {
             const containerWidth = this.element.offsetWidth;
             const titleLength = title.textContent.length;
-            
+
             // Adjust font size based on container width and title length
             let fontSize = Math.min(containerWidth / titleLength * 2.5, 96);
             fontSize = Math.max(fontSize, 32); // Minimum font size
-            
+
             title.style.fontSize = `${fontSize}px`;
         };
-        
+
         // Adjust on load and resize
         adjustTitleSize();
         window.addEventListener('resize', adjustTitleSize);
@@ -3043,7 +3059,7 @@ class HeroSection {
     showStatusDetails(status) {
         let message = '';
         let type = 'info';
-        
+
         switch (status) {
             case 'registration':
                 message = 'Registration is currently open! Click the registration button to join.';
@@ -3054,7 +3070,7 @@ class HeroSection {
                 type = 'info';
                 break;
         }
-        
+
         if (message && this.options.onStatsUpdate) {
             // Notify parent component
             this.options.onStatsUpdate({ message, type });
@@ -3063,7 +3079,7 @@ class HeroSection {
 
     updateStatistics(stats) {
         if (!stats) return;
-        
+
         // Update participant count with animation
         if (stats.participants) {
             const participantElements = this.element.querySelectorAll('[data-stat="participants"] .stat-value');
@@ -3071,7 +3087,7 @@ class HeroSection {
                 this.animateValueChange(element, stats.participants.registered);
             });
         }
-        
+
         // Update views with animation
         if (stats.engagement) {
             const viewElements = this.element.querySelectorAll('[data-stat="views"] .stat-value');
@@ -3083,15 +3099,15 @@ class HeroSection {
 
     animateValueChange(element, newValue) {
         const currentValue = parseInt(element.textContent.replace(/[^\d]/g, '')) || 0;
-        
+
         if (currentValue !== newValue) {
             // Highlight change
             element.style.transform = 'scale(1.1)';
             element.style.color = '#dc2626';
-            
+
             // Animate to new value
             this.animateCounter(element, newValue, 800);
-            
+
             // Reset styles
             setTimeout(() => {
                 element.style.transform = 'scale(1)';
@@ -3104,19 +3120,19 @@ class HeroSection {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        
+
         // Remove event listeners
         if (this.scrollHandler) {
             window.removeEventListener('scroll', this.scrollHandler);
         }
-        
+
         if (this.resizeHandler) {
             window.removeEventListener('resize', this.resizeHandler);
         }
-        
+
         // Clear counters
         this.counters.clear();
-        
+
         console.log('🧹 Hero Section destroyed');
     }
 }
@@ -3142,29 +3158,29 @@ class StatisticsDashboard {
             timestamp: 0,
             ttl: 30000 // 30 seconds
         };
-        
+
         this.init();
     }
 
     init() {
         console.log('📊 Initializing Statistics Dashboard');
-        
+
         this.initProgressBars();
         this.initCounterAnimations();
         this.initHoverEffects();
         this.initAccessibility();
         this.startRealTimeUpdates();
-        
+
         console.log('✅ Statistics Dashboard initialized');
     }
 
     initProgressBars() {
         const progressBars = this.element.querySelectorAll('.stat-progress-fill');
-        
+
         progressBars.forEach(bar => {
             const width = bar.style.width;
             bar.style.width = '0%';
-            
+
             // Animate progress bar on load
             setTimeout(() => {
                 bar.style.transition = 'width 1.5s ease-out';
@@ -3175,7 +3191,7 @@ class StatisticsDashboard {
 
     initCounterAnimations() {
         const statValues = this.element.querySelectorAll('.stat-value[data-value]');
-        
+
         statValues.forEach(element => {
             const targetValue = parseFloat(element.dataset.value) || 0;
             this.animateCounter(element, targetValue);
@@ -3187,15 +3203,15 @@ class StatisticsDashboard {
         const startTime = performance.now();
         const isDecimal = targetValue % 1 !== 0;
         const isCurrency = element.textContent.includes('$');
-        
+
         const animate = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             // Easing function for smooth animation
             const easeOutQuart = 1 - Math.pow(1 - progress, 4);
             const currentValue = startValue + (targetValue - startValue) * easeOutQuart;
-            
+
             // Format the value appropriately
             let displayValue;
             if (isCurrency) {
@@ -3205,26 +3221,26 @@ class StatisticsDashboard {
             } else {
                 displayValue = Math.floor(currentValue).toLocaleString();
             }
-            
+
             element.textContent = displayValue;
-            
+
             if (progress < 1) {
                 this.animationFrameId = requestAnimationFrame(animate);
             }
         };
-        
+
         requestAnimationFrame(animate);
     }
 
     initHoverEffects() {
         const statCards = this.element.querySelectorAll('.stat-card');
-        
+
         statCards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 card.style.transform = 'translateY(-4px) scale(1.02)';
                 card.style.boxShadow = '0 8px 25px rgba(185, 28, 28, 0.15)';
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0) scale(1)';
                 card.style.boxShadow = '';
@@ -3234,16 +3250,16 @@ class StatisticsDashboard {
 
     initAccessibility() {
         const statCards = this.element.querySelectorAll('.stat-card');
-        
+
         statCards.forEach(card => {
             const statType = card.dataset.stat;
             const value = card.querySelector('.stat-value').textContent;
             const label = card.querySelector('.stat-label').textContent;
-            
+
             card.setAttribute('role', 'img');
             card.setAttribute('aria-label', `${label}: ${value}`);
             card.setAttribute('tabindex', '0');
-            
+
             // Add keyboard support
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -3256,7 +3272,7 @@ class StatisticsDashboard {
 
     showStatDetails(statType) {
         let message = '';
-        
+
         switch (statType) {
             case 'participants':
                 message = 'Current participant registration status and capacity information.';
@@ -3271,7 +3287,7 @@ class StatisticsDashboard {
                 message = 'Maximum number of participants allowed in this tournament.';
                 break;
         }
-        
+
         if (message && this.options.onUpdate) {
             this.options.onUpdate({ message, type: 'info' });
         }
@@ -3279,47 +3295,47 @@ class StatisticsDashboard {
 
     startRealTimeUpdates() {
         if (!this.options.tournamentSlug) return;
-        
+
         // Update immediately
         this.fetchUpdates();
-        
+
         // Set up interval for regular updates
         this.updateInterval = setInterval(() => {
             this.fetchUpdates();
         }, this.options.updateInterval);
-        
+
         console.log(`🔄 Real-time updates started (${this.options.updateInterval}ms interval)`);
     }
 
     async fetchUpdates() {
         try {
             const now = Date.now();
-            
+
             // Check cache first
             if (this.cache.data && (now - this.cache.timestamp) < this.cache.ttl) {
                 this.updateStatistics(this.cache.data);
                 return;
             }
-            
+
             const response = await fetch(`/tournaments/${this.options.tournamentSlug}/api/stats/`, {
                 headers: {
                     'Cache-Control': 'max-age=30',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
-                
+
                 // Update cache
                 this.cache = {
                     data: data,
                     timestamp: now,
                     ttl: 30000
                 };
-                
+
                 this.updateStatistics(data);
-                
+
                 // Notify parent component
                 if (this.options.onUpdate) {
                     this.options.onUpdate(data);
@@ -3332,26 +3348,26 @@ class StatisticsDashboard {
 
     updateStatistics(newStats) {
         if (!newStats) return;
-        
+
         // Mark as updating for CSS animations
         this.element.setAttribute('data-updating', 'true');
-        
+
         // Update participant statistics
         if (newStats.participants) {
             this.updateStatCard('participants', newStats.participants.registered);
             this.updateProgressBar(newStats.participants.percentage_full);
         }
-        
+
         // Update engagement statistics
         if (newStats.engagement) {
             this.updateStatCard('views', newStats.engagement.views);
         }
-        
+
         // Update match statistics if available
         if (newStats.matches) {
             this.updateStatCard('matches', newStats.matches.completed);
         }
-        
+
         // Remove updating state after animation
         setTimeout(() => {
             this.element.setAttribute('data-updating', 'false');
@@ -3361,21 +3377,22 @@ class StatisticsDashboard {
     updateStatCard(statType, newValue) {
         const card = this.element.querySelector(`[data-stat="${statType}"]`);
         if (!card) return;
-        
+
         const valueElement = card.querySelector('.stat-value');
+        if (!valueElement) return;
         const currentValue = parseFloat(valueElement.dataset.value) || 0;
-        
+
         if (currentValue !== newValue) {
             // Highlight the change
             card.style.borderColor = '#b91c1c';
             card.style.boxShadow = '0 0 20px rgba(185, 28, 28, 0.3)';
-            
+
             // Update the data attribute
             valueElement.dataset.value = newValue;
-            
+
             // Animate to new value
             this.animateCounter(valueElement, newValue, 1000);
-            
+
             // Reset highlighting after animation
             setTimeout(() => {
                 card.style.borderColor = '';
@@ -3387,7 +3404,7 @@ class StatisticsDashboard {
     updateProgressBar(newPercentage) {
         const progressBar = this.element.querySelector('.stat-progress-fill');
         if (!progressBar) return;
-        
+
         progressBar.style.transition = 'width 0.8s ease-out';
         progressBar.style.width = `${newPercentage}%`;
         progressBar.setAttribute('aria-label', `Registration progress: ${newPercentage}% full`);
@@ -3403,14 +3420,14 @@ class StatisticsDashboard {
 
     destroy() {
         this.stopRealTimeUpdates();
-        
+
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        
+
         // Clear cache
         this.cache.data = null;
-        
+
         console.log('🧹 Statistics Dashboard destroyed');
     }
 }
@@ -3421,11 +3438,11 @@ class StatisticsDashboard {
 class TabNavigation {
     constructor(element) {
         this.element = element;
-        this.tabButtons = element.querySelectorAll('.tab-nav-item');
+        this.tabButtons = element.querySelectorAll('.gaming-tab-item, .tab-nav-item');
         this.tabPanes = document.querySelectorAll('.tab-pane');
         this.currentTab = 'details';
         this.loadingTabs = new Set();
-        
+
         this.init();
     }
 
@@ -3434,7 +3451,7 @@ class TabNavigation {
         this.setupAccessibility();
         this.setupKeyboardNavigation();
         this.setupMobileScrolling();
-        
+
         // Set initial active tab
         this.setActiveTab('details', false);
     }
@@ -3468,7 +3485,7 @@ class TabNavigation {
             button.setAttribute('role', 'tab');
             button.setAttribute('aria-controls', `${button.dataset.tab}-tab`);
             button.setAttribute('id', `tab-${button.dataset.tab}`);
-            
+
             if (index === 0) {
                 button.setAttribute('aria-selected', 'true');
                 button.setAttribute('tabindex', '0');
@@ -3484,7 +3501,7 @@ class TabNavigation {
             const tabId = pane.id.replace('-tab', '');
             pane.setAttribute('aria-labelledby', `tab-${tabId}`);
             pane.setAttribute('tabindex', '0');
-            
+
             if (pane.id === 'details-tab') {
                 pane.setAttribute('aria-hidden', 'false');
             } else {
@@ -3497,7 +3514,7 @@ class TabNavigation {
         this.tabButtons.forEach((button, index) => {
             button.addEventListener('keydown', (e) => {
                 let targetIndex = index;
-                
+
                 switch (e.key) {
                     case 'ArrowLeft':
                         e.preventDefault();
@@ -3523,7 +3540,7 @@ class TabNavigation {
                     default:
                         return;
                 }
-                
+
                 // Focus and activate the target tab
                 this.tabButtons[targetIndex].focus();
                 this.switchTab(this.tabButtons[targetIndex].dataset.tab);
@@ -3595,10 +3612,10 @@ class TabNavigation {
     setActiveTab(tabId, updateTabIndex = true) {
         this.tabButtons.forEach(button => {
             const isActive = button.dataset.tab === tabId;
-            
+
             button.classList.toggle('active', isActive);
             button.setAttribute('aria-selected', isActive.toString());
-            
+
             if (updateTabIndex) {
                 button.setAttribute('tabindex', isActive ? '0' : '-1');
             }
@@ -3608,21 +3625,21 @@ class TabNavigation {
     setActivePanel(tabId) {
         this.tabPanes.forEach(pane => {
             const isActive = pane.id === `${tabId}-tab`;
-            
+
             if (isActive) {
                 // Show the panel with animation
                 pane.style.display = 'block';
                 pane.setAttribute('aria-hidden', 'false');
-                
+
                 // Trigger reflow for animation
                 pane.offsetHeight;
-                
+
                 pane.classList.add('active');
             } else {
                 // Hide the panel
                 pane.classList.remove('active');
                 pane.setAttribute('aria-hidden', 'true');
-                
+
                 // Hide after animation completes
                 setTimeout(() => {
                     if (!pane.classList.contains('active')) {
@@ -3663,7 +3680,7 @@ class TabNavigation {
         try {
             const tournamentSlug = this.getTournamentSlug();
             let apiUrl = '';
-            
+
             switch (tabId) {
                 case 'bracket':
                     apiUrl = `/tournaments/${tournamentSlug}/api/bracket/`;
@@ -3753,23 +3770,23 @@ class TabNavigation {
                         ${data.participants.map(participant => `
                             <div class="participant-card">
                                 <div class="flex items-center space-x-3">
-                                    ${participant.avatar_url ? 
-                                        `<img src="${participant.avatar_url}" alt="${participant.display_name}" class="w-10 h-10 rounded-full">` :
-                                        `<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                    ${participant.avatar_url ?
+                    `<img src="${participant.avatar_url}" alt="${participant.display_name}" class="w-10 h-10 rounded-full">` :
+                    `<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                                             <span class="material-symbols-outlined text-primary">person</span>
                                         </div>`
-                                    }
+                }
                                     <div class="flex-1">
                                         <div class="font-medium text-white">${participant.display_name}</div>
                                         ${participant.team ? `<div class="text-sm text-gray-400">${participant.team}</div>` : ''}
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         ${participant.seed ? `<span class="seed-badge">#${participant.seed}</span>` : ''}
-                                        ${participant.checked_in ? 
-                                            `<span class="status-badge checked-in">
+                                        ${participant.checked_in ?
+                    `<span class="status-badge checked-in">
                                                 <span class="material-symbols-outlined text-xs">check_circle</span>
                                             </span>` : ''
-                                        }
+                }
                                     </div>
                                 </div>
                             </div>
@@ -3820,13 +3837,13 @@ class TabNavigation {
     }
 
     scrollActiveTabIntoView() {
-        const activeTab = this.element.querySelector('.tab-nav-item.active');
-        const tabList = this.element.querySelector('.tab-nav-list');
-        
+        const activeTab = this.element.querySelector('.gaming-tab-item.active, .tab-nav-item.active');
+        const tabList = this.element.querySelector('.tab-nav-list, .gaming-tab-nav');
+
         if (activeTab && tabList && window.innerWidth <= 768) {
             const tabRect = activeTab.getBoundingClientRect();
             const listRect = tabList.getBoundingClientRect();
-            
+
             if (tabRect.left < listRect.left || tabRect.right > listRect.right) {
                 activeTab.scrollIntoView({
                     behavior: 'smooth',
@@ -3843,9 +3860,9 @@ class TabNavigation {
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
         announcement.textContent = `Switched to ${this.getTabTitle(tabId)} tab`;
-        
+
         document.body.appendChild(announcement);
-        
+
         setTimeout(() => {
             document.body.removeChild(announcement);
         }, 1000);
@@ -3874,7 +3891,7 @@ class TabNavigation {
             button.removeEventListener('mouseenter', this.handleMouseEnter);
             button.removeEventListener('mouseleave', this.handleMouseLeave);
         });
-        
+
         // Clear loading states
         this.loadingTabs.clear();
     }
@@ -3900,7 +3917,7 @@ class TournamentTimeline {
                 end: element.dataset.estimatedEnd ? new Date(element.dataset.estimatedEnd) : null
             }
         };
-        
+
         this.init();
     }
 
@@ -3909,7 +3926,7 @@ class TournamentTimeline {
         this.initCountdownTimers();
         this.initProgressCalculation();
         this.initAccessibility();
-        
+
         // Update timeline every minute
         this.updateInterval = setInterval(() => {
             this.updateTimeline();
@@ -3918,32 +3935,32 @@ class TournamentTimeline {
 
     initPhaseInteractions() {
         const phaseElements = this.element.querySelectorAll('.timeline-phase');
-        
+
         phaseElements.forEach(phase => {
             const indicator = phase.querySelector('.phase-indicator');
             const phaseType = phase.dataset.phase;
-            
+
             // Add click handlers for interactive phases
             indicator.addEventListener('click', () => {
                 this.showPhaseDetails(phaseType);
             });
-            
+
             // Add keyboard support
             indicator.setAttribute('tabindex', '0');
             indicator.setAttribute('role', 'button');
-            
+
             indicator.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     this.showPhaseDetails(phaseType);
                 }
             });
-            
+
             // Add hover effects
             indicator.addEventListener('mouseenter', () => {
                 this.showPhaseTooltip(indicator, phaseType);
             });
-            
+
             indicator.addEventListener('mouseleave', () => {
                 this.hidePhaseTooltip(indicator);
             });
@@ -3952,17 +3969,20 @@ class TournamentTimeline {
 
     initCountdownTimers() {
         const countdownElements = this.element.querySelectorAll('.phase-countdown');
-        
+
         countdownElements.forEach(countdown => {
-            const targetDate = new Date(countdown.dataset.target);
+            const targetStr = countdown.dataset.target;
+            if (!targetStr) return;
+
+            const targetDate = new Date(targetStr);
             const timerElement = countdown.querySelector('.countdown-timer');
-            
-            if (targetDate && timerElement) {
+
+            if (targetDate && !isNaN(targetDate.getTime()) && timerElement) {
                 // Start countdown
                 const intervalId = setInterval(() => {
                     const timeRemaining = this.calculateTimeRemaining(targetDate);
                     timerElement.textContent = this.formatTimeRemaining(timeRemaining);
-                    
+
                     // Stop countdown when time is up
                     if (timeRemaining.total <= 0) {
                         clearInterval(intervalId);
@@ -3970,31 +3990,46 @@ class TournamentTimeline {
                         this.handlePhaseTransition();
                     }
                 }, 1000);
-                
+
                 this.countdownIntervals.set(countdown, intervalId);
             }
         });
     }
 
+    startAnimations() {
+        // Resume countdowns if they were paused
+        if (this.countdownIntervals.size === 0) {
+            this.initCountdownTimers();
+        }
+    }
+
+    pauseAnimations() {
+        // Clear all intervals but keep the target dates
+        this.countdownIntervals.forEach(intervalId => {
+            clearInterval(intervalId);
+        });
+        this.countdownIntervals.clear();
+    }
+
     calculateTimeRemaining(targetDate) {
         const now = new Date();
         const total = targetDate - now;
-        
+
         if (total <= 0) {
             return { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
         }
-        
+
         const days = Math.floor(total / (1000 * 60 * 60 * 24));
         const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((total % (1000 * 60)) / 1000);
-        
+
         return { total, days, hours, minutes, seconds };
     }
 
     formatTimeRemaining(timeRemaining) {
         const { days, hours, minutes, seconds } = timeRemaining;
-        
+
         if (days > 0) {
             return `${days}d ${hours}h ${minutes}m`;
         } else if (hours > 0) {
@@ -4007,9 +4042,9 @@ class TournamentTimeline {
     initProgressCalculation() {
         const progressFill = this.element.querySelector('.timeline-progress-fill');
         if (!progressFill) return;
-        
+
         const progress = this.calculateOverallProgress();
-        
+
         // Animate progress bar
         setTimeout(() => {
             progressFill.style.width = `${progress}%`;
@@ -4019,7 +4054,7 @@ class TournamentTimeline {
 
     calculateOverallProgress() {
         const now = new Date();
-        
+
         switch (this.tournamentStatus) {
             case 'registration':
                 // Progress within registration phase (0-25%)
@@ -4027,26 +4062,26 @@ class TournamentTimeline {
                 const regEnd = this.phases.registration.end;
                 const regProgress = Math.min(25, (now - regStart) / (regEnd - regStart) * 25);
                 return Math.max(0, regProgress);
-                
+
             case 'check_in':
                 // Registration complete, check-in active (25-50%)
                 return 35;
-                
+
             case 'in_progress':
                 // Tournament active (50-90%)
                 const tournamentStart = this.phases.tournament.start;
                 const tournamentEnd = this.phases.tournament.end;
-                
+
                 if (tournamentEnd) {
                     const tournamentProgress = (now - tournamentStart) / (tournamentEnd - tournamentStart) * 40;
                     return Math.min(90, 50 + tournamentProgress);
                 } else {
                     return 70; // Default progress for active tournament
                 }
-                
+
             case 'completed':
                 return 100;
-                
+
             default:
                 return 0;
         }
@@ -4055,7 +4090,7 @@ class TournamentTimeline {
     showPhaseDetails(phaseType) {
         let message = '';
         let type = 'info';
-        
+
         switch (phaseType) {
             case 'registration':
                 if (this.tournamentStatus === 'registration') {
@@ -4066,7 +4101,7 @@ class TournamentTimeline {
                     message = 'Registration phase has ended.';
                 }
                 break;
-                
+
             case 'check_in':
                 if (this.tournamentStatus === 'check_in') {
                     message = 'Check-in is now open! Please check in before the tournament starts.';
@@ -4077,7 +4112,7 @@ class TournamentTimeline {
                     message = 'Check-in phase has ended.';
                 }
                 break;
-                
+
             case 'tournament':
                 if (this.tournamentStatus === 'in_progress') {
                     message = 'Tournament is currently in progress! Check the bracket for live matches.';
@@ -4088,7 +4123,7 @@ class TournamentTimeline {
                     message = 'Tournament will begin after check-in is complete.';
                 }
                 break;
-                
+
             case 'results':
                 if (this.tournamentStatus === 'completed') {
                     message = 'Tournament results are now available!';
@@ -4098,7 +4133,7 @@ class TournamentTimeline {
                 }
                 break;
         }
-        
+
         if (message && window.tournamentDetailPage) {
             window.tournamentDetailPage.showNotification(message, type);
         }
@@ -4129,7 +4164,7 @@ class TournamentTimeline {
             progressFill.style.width = `${progress}%`;
             progressFill.setAttribute('aria-label', `Tournament progress: ${progress}%`);
         }
-        
+
         // Update any dynamic content
         this.updatePhaseStates();
     }
@@ -4144,7 +4179,7 @@ class TournamentTimeline {
         const timeline = this.element;
         timeline.setAttribute('role', 'progressbar');
         timeline.setAttribute('aria-label', 'Tournament timeline progress');
-        
+
         // Add live region for countdown updates
         const countdownElements = this.element.querySelectorAll('.countdown-timer');
         countdownElements.forEach(timer => {
@@ -4159,12 +4194,12 @@ class TournamentTimeline {
             clearInterval(intervalId);
         });
         this.countdownIntervals.clear();
-        
+
         // Clear update interval
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
         }
-        
+
         // Remove event listeners
         const phaseElements = this.element.querySelectorAll('.timeline-phase .phase-indicator');
         phaseElements.forEach(indicator => {
@@ -4184,15 +4219,15 @@ class ParticipantDisplay {
         this.element = element;
         this.participants = [];
         this.currentFilter = 'all';
-        
+
         this.init();
     }
-    
+
     init() {
         this.cacheParticipants();
         this.setupAccessibility();
     }
-    
+
     /**
      * Cache participant cards for filtering
      */
@@ -4205,16 +4240,16 @@ class ParticipantDisplay {
             seed: card.getAttribute('data-seed')
         }));
     }
-    
+
     /**
      * Filter participants based on type
      */
     filterParticipants(filter) {
         this.currentFilter = filter;
-        
+
         this.participants.forEach(participant => {
             let shouldShow = true;
-            
+
             switch (filter) {
                 case 'teams':
                     shouldShow = participant.type === 'team';
@@ -4230,7 +4265,7 @@ class ParticipantDisplay {
                     shouldShow = true;
                     break;
             }
-            
+
             if (shouldShow) {
                 participant.element.style.display = '';
                 participant.element.setAttribute('aria-hidden', 'false');
@@ -4239,37 +4274,37 @@ class ParticipantDisplay {
                 participant.element.setAttribute('aria-hidden', 'true');
             }
         });
-        
+
         // Update visible count
         this.updateVisibleCount();
-        
+
         // Announce filter change to screen readers
         this.announceFilterChange(filter);
     }
-    
+
     /**
      * Update visible participant count
      */
     updateVisibleCount() {
-        const visibleCount = this.participants.filter(p => 
+        const visibleCount = this.participants.filter(p =>
             p.element.style.display !== 'none'
         ).length;
-        
+
         const titleElement = this.element.querySelector('.content-card-title');
         if (titleElement) {
             const baseText = titleElement.textContent.split('(')[0].trim();
             titleElement.textContent = `${baseText} (${visibleCount} shown)`;
         }
     }
-    
+
     /**
      * Announce filter changes to screen readers
      */
     announceFilterChange(filter) {
-        const visibleCount = this.participants.filter(p => 
+        const visibleCount = this.participants.filter(p =>
             p.element.style.display !== 'none'
         ).length;
-        
+
         let message = '';
         switch (filter) {
             case 'teams':
@@ -4286,18 +4321,18 @@ class ParticipantDisplay {
                 message = `Showing all ${visibleCount} participants`;
                 break;
         }
-        
+
         // Create temporary announcement element
         const announcement = document.createElement('div');
         announcement.setAttribute('aria-live', 'polite');
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
         announcement.textContent = message;
-        
+
         document.body.appendChild(announcement);
         setTimeout(() => document.body.removeChild(announcement), 1000);
     }
-    
+
     /**
      * Setup accessibility features
      */
@@ -4305,12 +4340,12 @@ class ParticipantDisplay {
         // Add keyboard navigation for participant cards
         this.participants.forEach(participant => {
             const card = participant.element;
-            
+
             // Make cards focusable
             if (!card.hasAttribute('tabindex')) {
                 card.setAttribute('tabindex', '0');
             }
-            
+
             // Add keyboard event listeners
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -4322,17 +4357,17 @@ class ParticipantDisplay {
                 }
             });
         });
-        
+
         // Setup filter button accessibility
         const filterButtons = this.element.querySelectorAll('.filter-btn');
         filterButtons.forEach((button, index) => {
             button.setAttribute('role', 'tab');
             button.setAttribute('aria-selected', button.classList.contains('active'));
-            
+
             // Keyboard navigation between filter buttons
             button.addEventListener('keydown', (e) => {
                 let targetIndex = index;
-                
+
                 if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                     e.preventDefault();
                     targetIndex = (index + 1) % filterButtons.length;
@@ -4346,14 +4381,14 @@ class ParticipantDisplay {
                     e.preventDefault();
                     targetIndex = filterButtons.length - 1;
                 }
-                
+
                 if (targetIndex !== index) {
                     filterButtons[targetIndex].focus();
                 }
             });
         });
     }
-    
+
     /**
      * Update participant data (for real-time updates)
      */
@@ -4361,7 +4396,7 @@ class ParticipantDisplay {
         // Find and update participant card
         const participantCard = this.element.querySelector(`[data-participant-id="${participantData.id}"]`);
         if (!participantCard) return;
-        
+
         // Update check-in status
         if (participantData.checked_in !== undefined) {
             const statusIndicator = participantCard.querySelector('.status-indicator');
@@ -4377,12 +4412,12 @@ class ParticipantDisplay {
                 }
             }
         }
-        
+
         // Update seed
         if (participantData.seed !== undefined) {
             const nameContainer = participantCard.querySelector('.participant-name-container');
             let seedBadge = nameContainer.querySelector('.seed-badge');
-            
+
             if (participantData.seed) {
                 if (!seedBadge) {
                     seedBadge = document.createElement('span');
@@ -4395,7 +4430,7 @@ class ParticipantDisplay {
                 seedBadge.remove();
             }
         }
-        
+
         // Refresh cached data
         this.cacheParticipants();
     }
@@ -4412,22 +4447,22 @@ class StickyRegistrationCard {
         this.registrationStatus = element.dataset.registrationStatus;
         this.spotsRemaining = parseInt(element.dataset.spotsRemaining) || 0;
         this.registrationFee = parseFloat(element.dataset.registrationFee) || 0;
-        
+
         this.updateInterval = null;
         this.urgencyThreshold = 5; // Show urgency when <= 5 spots remain
-        
+
         this.init();
     }
 
     init() {
         console.log('🎫 Initializing Sticky Registration Card');
-        
+
         this.initStickyBehavior();
         this.initUrgencyIndicators();
         this.initRealTimeUpdates();
         this.initAccessibility();
         this.initMobileOptimizations();
-        
+
         console.log('✅ Sticky Registration Card initialized');
     }
 
@@ -4435,22 +4470,22 @@ class StickyRegistrationCard {
         // Enhanced sticky positioning with scroll detection
         let lastScrollY = window.scrollY;
         let isScrollingDown = false;
-        
+
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             isScrollingDown = currentScrollY > lastScrollY;
             lastScrollY = currentScrollY;
-            
+
             // Add scroll direction class for enhanced animations
             this.element.classList.toggle('scrolling-down', isScrollingDown);
             this.element.classList.toggle('scrolling-up', !isScrollingDown);
-            
+
             // Handle mobile sticky behavior
             this.handleMobileStickyBehavior(currentScrollY);
         };
-        
+
         window.addEventListener('scroll', handleScroll, { passive: true });
-        
+
         // Store cleanup function
         this.cleanup = () => {
             window.removeEventListener('scroll', handleScroll);
@@ -4459,17 +4494,17 @@ class StickyRegistrationCard {
 
     initUrgencyIndicators() {
         if (this.tournamentStatus !== 'registration') return;
-        
+
         const urgencyIndicator = this.element.querySelector('.urgency-indicator');
         const registrationButton = this.element.querySelector('.registration-button');
-        
+
         // Update urgency based on spots remaining
         this.updateUrgencyDisplay();
-        
+
         // Add pulsing animation for very low spots
         if (this.spotsRemaining <= 2 && this.spotsRemaining > 0) {
             this.element.classList.add('critical-urgency');
-            
+
             // Add critical urgency effects
             if (registrationButton) {
                 registrationButton.classList.add('critical-pulse');
@@ -4480,12 +4515,12 @@ class StickyRegistrationCard {
     updateUrgencyDisplay() {
         const urgencyIndicator = this.element.querySelector('.urgency-indicator');
         const footerStats = this.element.querySelector('.footer-stats');
-        
+
         if (this.spotsRemaining <= this.urgencyThreshold && this.spotsRemaining > 0) {
             // Show urgency indicator
             if (urgencyIndicator) {
                 urgencyIndicator.style.display = 'flex';
-                
+
                 // Update urgency message based on spots remaining
                 const urgencySubtitle = urgencyIndicator.querySelector('.urgency-subtitle');
                 if (urgencySubtitle) {
@@ -4493,7 +4528,7 @@ class StickyRegistrationCard {
                     urgencySubtitle.textContent = `Only ${this.spotsRemaining} ${spotsText} remaining`;
                 }
             }
-            
+
             // Hide spots remaining in footer to avoid redundancy
             if (footerStats) {
                 const spotsStatItem = footerStats.querySelector('.stat-item:last-child');
@@ -4506,7 +4541,7 @@ class StickyRegistrationCard {
             if (urgencyIndicator) {
                 urgencyIndicator.style.display = 'none';
             }
-            
+
             // Show spots remaining in footer
             if (footerStats) {
                 const spotsStatItem = footerStats.querySelector('.stat-item:last-child');
@@ -4519,12 +4554,12 @@ class StickyRegistrationCard {
 
     initRealTimeUpdates() {
         if (this.tournamentStatus !== 'registration') return;
-        
+
         // Start real-time updates for registration data
         this.updateInterval = setInterval(() => {
             this.fetchRegistrationUpdates();
         }, 30000); // Update every 30 seconds
-        
+
         // Listen for real-time events from the main page
         document.addEventListener('tournament-stats-updated', (event) => {
             this.handleStatsUpdate(event.detail);
@@ -4535,13 +4570,13 @@ class StickyRegistrationCard {
         try {
             const tournamentSlug = window.tournamentDetailPage?.tournamentSlug;
             if (!tournamentSlug) return;
-            
+
             const response = await fetch(`/tournaments/${tournamentSlug}/api/registration-status/`);
             if (!response.ok) return;
-            
+
             const data = await response.json();
             this.updateRegistrationData(data);
-            
+
         } catch (error) {
             console.warn('Failed to fetch registration updates:', error);
         }
@@ -4549,22 +4584,22 @@ class StickyRegistrationCard {
 
     updateRegistrationData(data) {
         const oldSpotsRemaining = this.spotsRemaining;
-        
+
         // Update internal state
         this.spotsRemaining = data.spots_remaining || 0;
-        
+
         // Update capacity display
         this.updateCapacityDisplay(data);
-        
+
         // Update urgency indicators if spots changed
         if (oldSpotsRemaining !== this.spotsRemaining) {
             this.updateUrgencyDisplay();
             this.announceCapacityChange(oldSpotsRemaining, this.spotsRemaining);
         }
-        
+
         // Update footer stats
         this.updateFooterStats(data);
-        
+
         // Handle tournament full state
         if (this.spotsRemaining === 0 && oldSpotsRemaining > 0) {
             this.handleTournamentFull();
@@ -4575,18 +4610,18 @@ class StickyRegistrationCard {
         const capacityFill = this.element.querySelector('.capacity-fill');
         const registeredCount = this.element.querySelector('.registered-count');
         const maxParticipants = this.element.querySelector('.max-participants');
-        
+
         if (capacityFill && data.percentage_full !== undefined) {
             capacityFill.style.width = `${data.percentage_full}%`;
-            capacityFill.parentElement.setAttribute('aria-label', 
+            capacityFill.parentElement.setAttribute('aria-label',
                 `Registration progress: ${data.percentage_full}% full`);
         }
-        
+
         if (registeredCount && data.registered !== undefined) {
             // Animate number change
             this.animateNumberChange(registeredCount, data.registered);
         }
-        
+
         if (maxParticipants && data.capacity !== undefined) {
             maxParticipants.textContent = data.capacity;
         }
@@ -4595,14 +4630,14 @@ class StickyRegistrationCard {
     updateFooterStats(data) {
         const footerStats = this.element.querySelector('.footer-stats');
         if (!footerStats) return;
-        
+
         const registeredStat = footerStats.querySelector('.stat-item:first-child .stat-text');
         const spotsStat = footerStats.querySelector('.stat-item:last-child .stat-text');
-        
+
         if (registeredStat && data.registered !== undefined) {
             registeredStat.textContent = `${data.registered} registered`;
         }
-        
+
         if (spotsStat && data.spots_remaining !== undefined) {
             const spotsText = data.spots_remaining === 1 ? 'spot' : 'spots';
             spotsStat.textContent = `${data.spots_remaining} ${spotsText} left`;
@@ -4611,30 +4646,30 @@ class StickyRegistrationCard {
 
     animateNumberChange(element, newValue) {
         const currentValue = parseInt(element.textContent) || 0;
-        
+
         if (currentValue === newValue) return;
-        
+
         // Add animation class
         element.classList.add('number-changing');
-        
+
         // Animate the number change
         const duration = 1000;
         const startTime = performance.now();
-        
+
         const animate = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            
+
             const currentDisplayValue = Math.round(currentValue + (newValue - currentValue) * progress);
             element.textContent = currentDisplayValue;
-            
+
             if (progress < 1) {
                 requestAnimationFrame(animate);
             } else {
                 element.classList.remove('number-changing');
             }
         };
-        
+
         requestAnimationFrame(animate);
     }
 
@@ -4642,7 +4677,7 @@ class StickyRegistrationCard {
         // Replace registration button with full indicator
         const registrationActions = this.element.querySelector('.registration-actions');
         if (!registrationActions) return;
-        
+
         registrationActions.innerHTML = `
             <div class="tournament-full-indicator" role="alert" aria-live="assertive">
                 <span class="material-symbols-outlined" aria-hidden="true">group_off</span>
@@ -4652,7 +4687,7 @@ class StickyRegistrationCard {
                 </div>
             </div>
         `;
-        
+
         // Show notification
         if (window.tournamentDetailPage) {
             window.tournamentDetailPage.showNotification(
@@ -4668,14 +4703,14 @@ class StickyRegistrationCard {
         announcement.setAttribute('aria-live', 'polite');
         announcement.setAttribute('aria-atomic', 'true');
         announcement.className = 'sr-only';
-        
+
         if (newSpots < oldSpots) {
             const spotsText = newSpots === 1 ? 'spot' : 'spots';
             announcement.textContent = `${newSpots} ${spotsText} remaining in tournament`;
         }
-        
+
         document.body.appendChild(announcement);
-        
+
         // Remove after announcement
         setTimeout(() => {
             document.body.removeChild(announcement);
@@ -4693,16 +4728,16 @@ class StickyRegistrationCard {
                 }
             });
         }
-        
+
         // Add focus management
         this.element.addEventListener('focusin', () => {
             this.element.classList.add('focused');
         });
-        
+
         this.element.addEventListener('focusout', () => {
             this.element.classList.remove('focused');
         });
-        
+
         // Ensure proper ARIA labels are updated dynamically
         this.updateAriaLabels();
     }
@@ -4712,8 +4747,8 @@ class StickyRegistrationCard {
         if (capacityIndicator) {
             const registered = this.element.querySelector('.registered-count')?.textContent || '0';
             const capacity = this.element.querySelector('.max-participants')?.textContent || '0';
-            
-            capacityIndicator.setAttribute('aria-label', 
+
+            capacityIndicator.setAttribute('aria-label',
                 `Tournament capacity: ${registered} of ${capacity} spots filled`);
         }
     }
@@ -4723,7 +4758,7 @@ class StickyRegistrationCard {
         if (window.innerWidth <= 768) {
             this.initMobileStickyBehavior();
         }
-        
+
         // Listen for resize events
         window.addEventListener('resize', () => {
             if (window.innerWidth <= 768) {
@@ -4737,7 +4772,7 @@ class StickyRegistrationCard {
     initMobileStickyBehavior() {
         // On mobile, make the card stick to bottom instead of sidebar
         this.element.classList.add('mobile-sticky');
-        
+
         // Add minimize/expand functionality
         const header = this.element.querySelector('.registration-card-header');
         if (header) {
@@ -4753,7 +4788,7 @@ class StickyRegistrationCard {
 
     handleMobileStickyBehavior(scrollY) {
         if (!this.element.classList.contains('mobile-sticky')) return;
-        
+
         // Hide card when scrolling down, show when scrolling up
         if (scrollY > 100) {
             this.element.classList.add('scroll-hidden');
@@ -4778,11 +4813,11 @@ class StickyRegistrationCard {
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
         }
-        
+
         if (this.cleanup) {
             this.cleanup();
         }
-        
+
         // Remove event listeners
         document.removeEventListener('tournament-stats-updated', this.handleStatsUpdate);
     }
@@ -4808,50 +4843,50 @@ window.addEventListener('beforeunload', () => {
 if (typeof TabNavigation !== 'undefined') {
     // Add mobile scrolling setup to existing TabNavigation
     const originalInit = TabNavigation.prototype.init;
-    TabNavigation.prototype.init = function() {
+    TabNavigation.prototype.init = function () {
         originalInit.call(this);
         this.setupMobileScrolling();
     };
 
-    TabNavigation.prototype.setupMobileScrolling = function() {
+    TabNavigation.prototype.setupMobileScrolling = function () {
         const tabNavigation = this.element;
         const tabList = tabNavigation.querySelector('.tab-nav-list');
-        
+
         if (!tabList) return;
-        
+
         // Add mobile scrolling indicators
         this.addScrollIndicators(tabNavigation, tabList);
-        
+
         // Handle horizontal scrolling for mobile
         this.initHorizontalScrolling(tabList);
-        
+
         // Add touch/swipe support
         this.initTouchSupport(tabList);
-        
+
         // Update scroll indicators on scroll
         tabList.addEventListener('scroll', () => {
             this.updateScrollIndicators(tabNavigation, tabList);
         });
-        
+
         // Update indicators on resize
         window.addEventListener('resize', () => {
             this.updateScrollIndicators(tabNavigation, tabList);
         });
-        
+
         // Initial indicator update
         setTimeout(() => {
             this.updateScrollIndicators(tabNavigation, tabList);
         }, 100);
     };
 
-    TabNavigation.prototype.addScrollIndicators = function(container, scrollElement) {
+    TabNavigation.prototype.addScrollIndicators = function (container, scrollElement) {
         // Only add indicators on mobile
         if (window.innerWidth > 768) return;
-        
+
         // Remove existing indicators
         const existingIndicators = container.querySelectorAll('.scroll-indicator');
         existingIndicators.forEach(indicator => indicator.remove());
-        
+
         // Left scroll indicator
         const leftIndicator = document.createElement('div');
         leftIndicator.className = 'scroll-indicator scroll-indicator-left';
@@ -4877,7 +4912,7 @@ if (typeof TabNavigation !== 'undefined') {
             transition: opacity 0.3s ease;
             pointer-events: none;
         `;
-        
+
         // Right scroll indicator
         const rightIndicator = document.createElement('div');
         rightIndicator.className = 'scroll-indicator scroll-indicator-right';
@@ -4903,29 +4938,29 @@ if (typeof TabNavigation !== 'undefined') {
             transition: opacity 0.3s ease;
             pointer-events: none;
         `;
-        
+
         container.appendChild(leftIndicator);
         container.appendChild(rightIndicator);
-        
+
         // Add click handlers for indicators
         leftIndicator.addEventListener('click', () => {
             scrollElement.scrollBy({ left: -200, behavior: 'smooth' });
         });
-        
+
         rightIndicator.addEventListener('click', () => {
             scrollElement.scrollBy({ left: 200, behavior: 'smooth' });
         });
     };
 
-    TabNavigation.prototype.updateScrollIndicators = function(container, scrollElement) {
+    TabNavigation.prototype.updateScrollIndicators = function (container, scrollElement) {
         const leftIndicator = container.querySelector('.scroll-indicator-left');
         const rightIndicator = container.querySelector('.scroll-indicator-right');
-        
+
         if (!leftIndicator || !rightIndicator) return;
-        
+
         const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
         const maxScroll = scrollWidth - clientWidth;
-        
+
         // Show/hide left indicator
         if (scrollLeft > 10) {
             leftIndicator.style.opacity = '1';
@@ -4934,7 +4969,7 @@ if (typeof TabNavigation !== 'undefined') {
             leftIndicator.style.opacity = '0';
             leftIndicator.style.pointerEvents = 'none';
         }
-        
+
         // Show/hide right indicator
         if (scrollLeft < maxScroll - 10) {
             rightIndicator.style.opacity = '1';
@@ -4945,58 +4980,58 @@ if (typeof TabNavigation !== 'undefined') {
         }
     };
 
-    TabNavigation.prototype.initHorizontalScrolling = function(scrollElement) {
+    TabNavigation.prototype.initHorizontalScrolling = function (scrollElement) {
         // Ensure active tab is visible when switching
         const scrollToActiveTab = () => {
-            const activeTab = scrollElement.querySelector('.tab-nav-item.active');
+            const activeTab = scrollElement.querySelector('.gaming-tab-item.active, .tab-nav-item.active');
             if (activeTab) {
                 const containerRect = scrollElement.getBoundingClientRect();
                 const tabRect = activeTab.getBoundingClientRect();
-                
+
                 if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
                     const scrollLeft = activeTab.offsetLeft - (scrollElement.clientWidth / 2) + (activeTab.clientWidth / 2);
                     scrollElement.scrollTo({ left: scrollLeft, behavior: 'smooth' });
                 }
             }
         };
-        
+
         // Store reference for later use
         this.scrollToActiveTab = scrollToActiveTab;
-        
+
         // Override switchTab to include scrolling
         const originalSwitchTab = this.switchTab;
-        this.switchTab = function(tabId) {
+        this.switchTab = function (tabId) {
             originalSwitchTab.call(this, tabId);
             setTimeout(scrollToActiveTab, 100);
         };
     };
 
-    TabNavigation.prototype.initTouchSupport = function(scrollElement) {
+    TabNavigation.prototype.initTouchSupport = function (scrollElement) {
         let startX = 0;
         let scrollLeft = 0;
         let isScrolling = false;
-        
+
         // Touch start
         scrollElement.addEventListener('touchstart', (e) => {
             startX = e.touches[0].pageX - scrollElement.offsetLeft;
             scrollLeft = scrollElement.scrollLeft;
             isScrolling = true;
         }, { passive: true });
-        
+
         // Touch move
         scrollElement.addEventListener('touchmove', (e) => {
             if (!isScrolling) return;
-            
+
             const x = e.touches[0].pageX - scrollElement.offsetLeft;
             const walk = (x - startX) * 2; // Scroll speed multiplier
             scrollElement.scrollLeft = scrollLeft - walk;
         }, { passive: true });
-        
+
         // Touch end
         scrollElement.addEventListener('touchend', () => {
             isScrolling = false;
         }, { passive: true });
-        
+
         // Prevent default touch behavior on tab buttons during scroll
         this.tabButtons.forEach(button => {
             button.addEventListener('touchstart', (e) => {
@@ -5018,18 +5053,18 @@ if (typeof TabNavigation !== 'undefined') {
 // Extend StickyRegistrationCard class with mobile functionality
 if (typeof StickyRegistrationCard !== 'undefined') {
     const originalInit = StickyRegistrationCard.prototype.init;
-    StickyRegistrationCard.prototype.init = function() {
+    StickyRegistrationCard.prototype.init = function () {
         originalInit.call(this);
         this.initMobileBehavior();
     };
 
-    StickyRegistrationCard.prototype.initMobileBehavior = function() {
+    StickyRegistrationCard.prototype.initMobileBehavior = function () {
         if (window.innerWidth <= 768) {
             this.initMobileSticky();
             this.initScrollHiding();
             this.initMinimizedState();
         }
-        
+
         // Re-initialize on resize
         window.addEventListener('resize', () => {
             if (window.innerWidth <= 768) {
@@ -5040,9 +5075,9 @@ if (typeof StickyRegistrationCard !== 'undefined') {
         });
     };
 
-    StickyRegistrationCard.prototype.initMobileSticky = function() {
+    StickyRegistrationCard.prototype.initMobileSticky = function () {
         const card = this.element;
-        
+
         // Make card sticky at bottom on mobile
         card.style.cssText += `
             position: fixed;
@@ -5056,20 +5091,20 @@ if (typeof StickyRegistrationCard !== 'undefined') {
             transform: translateY(0);
             transition: transform 0.3s ease;
         `;
-        
+
         // Add mobile-specific classes
         card.classList.add('mobile-sticky');
     };
 
-    StickyRegistrationCard.prototype.initScrollHiding = function() {
+    StickyRegistrationCard.prototype.initScrollHiding = function () {
         let lastScrollY = window.scrollY;
         let isHidden = false;
-        
+
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             const scrollingDown = currentScrollY > lastScrollY;
             const scrollThreshold = 100;
-            
+
             if (scrollingDown && currentScrollY > scrollThreshold && !isHidden) {
                 // Hide card when scrolling down
                 this.element.style.transform = 'translateY(100%)';
@@ -5079,10 +5114,10 @@ if (typeof StickyRegistrationCard !== 'undefined') {
                 this.element.style.transform = 'translateY(0)';
                 isHidden = false;
             }
-            
+
             lastScrollY = currentScrollY;
         };
-        
+
         // Throttle scroll events
         let ticking = false;
         const throttledScroll = () => {
@@ -5094,20 +5129,20 @@ if (typeof StickyRegistrationCard !== 'undefined') {
                 ticking = true;
             }
         };
-        
+
         window.addEventListener('scroll', throttledScroll, { passive: true });
-        
+
         // Store reference for cleanup
         this.scrollHandler = throttledScroll;
     };
 
-    StickyRegistrationCard.prototype.initMinimizedState = function() {
+    StickyRegistrationCard.prototype.initMinimizedState = function () {
         const card = this.element;
         const header = card.querySelector('.registration-card-header');
         const content = card.querySelector('.registration-card-content');
-        
+
         if (!header || !content) return;
-        
+
         // Add minimize button
         const minimizeBtn = document.createElement('button');
         minimizeBtn.className = 'minimize-btn';
@@ -5129,11 +5164,11 @@ if (typeof StickyRegistrationCard !== 'undefined') {
             cursor: pointer;
             transition: all 0.2s ease;
         `;
-        
+
         header.appendChild(minimizeBtn);
-        
+
         let isMinimized = false;
-        
+
         minimizeBtn.addEventListener('click', () => {
             if (isMinimized) {
                 // Expand
@@ -5151,7 +5186,7 @@ if (typeof StickyRegistrationCard !== 'undefined') {
                 isMinimized = true;
             }
         });
-        
+
         // Auto-minimize after 5 seconds of inactivity
         let inactivityTimer;
         const resetInactivityTimer = () => {
@@ -5162,19 +5197,19 @@ if (typeof StickyRegistrationCard !== 'undefined') {
                 }
             }, 5000);
         };
-        
+
         // Reset timer on user interaction
         card.addEventListener('touchstart', resetInactivityTimer);
         card.addEventListener('click', resetInactivityTimer);
         window.addEventListener('scroll', resetInactivityTimer);
-        
+
         // Initial timer
         resetInactivityTimer();
     };
 
-    StickyRegistrationCard.prototype.resetDesktopBehavior = function() {
+    StickyRegistrationCard.prototype.resetDesktopBehavior = function () {
         const card = this.element;
-        
+
         // Remove mobile-specific styles
         card.style.position = '';
         card.style.bottom = '';
@@ -5183,19 +5218,19 @@ if (typeof StickyRegistrationCard !== 'undefined') {
         card.style.transform = '';
         card.style.borderRadius = '';
         card.classList.remove('mobile-sticky');
-        
+
         // Remove minimize button
         const minimizeBtn = card.querySelector('.minimize-btn');
         if (minimizeBtn) {
             minimizeBtn.remove();
         }
-        
+
         // Show content
         const content = card.querySelector('.registration-card-content');
         if (content) {
             content.style.display = '';
         }
-        
+
         // Remove scroll handler
         if (this.scrollHandler) {
             window.removeEventListener('scroll', this.scrollHandler);
@@ -5210,7 +5245,7 @@ function optimizeTouchTargets() {
     // Ensure minimum 44px touch targets on mobile
     if (window.innerWidth <= 768) {
         const touchElements = document.querySelectorAll('button, a, .tab-nav-item, .stat-card, .action-btn');
-        
+
         touchElements.forEach(element => {
             const rect = element.getBoundingClientRect();
             if (rect.height < 44) {
@@ -5230,47 +5265,47 @@ function initMobileGestures() {
     // Add swipe gesture support for tab navigation
     const tabContent = document.querySelector('.tab-content');
     if (!tabContent) return;
-    
+
     let startX = 0;
     let startY = 0;
     let isSwipeGesture = false;
-    
+
     tabContent.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         isSwipeGesture = false;
     }, { passive: true });
-    
+
     tabContent.addEventListener('touchmove', (e) => {
         if (!startX || !startY) return;
-        
+
         const currentX = e.touches[0].clientX;
         const currentY = e.touches[0].clientY;
-        
+
         const diffX = Math.abs(currentX - startX);
         const diffY = Math.abs(currentY - startY);
-        
+
         // Determine if this is a horizontal swipe
         if (diffX > diffY && diffX > 50) {
             isSwipeGesture = true;
         }
     }, { passive: true });
-    
+
     tabContent.addEventListener('touchend', (e) => {
         if (!isSwipeGesture || !startX) return;
-        
+
         const endX = e.changedTouches[0].clientX;
         const diffX = startX - endX;
-        
+
         // Minimum swipe distance
         if (Math.abs(diffX) < 100) return;
-        
+
         const tabNavigation = window.tournamentDetailPage?.components?.tabNavigation;
         if (!tabNavigation) return;
-        
+
         const currentTabIndex = Array.from(tabNavigation.tabButtons).findIndex(btn => btn.classList.contains('active'));
         let targetIndex;
-        
+
         if (diffX > 0) {
             // Swipe left - next tab
             targetIndex = currentTabIndex < tabNavigation.tabButtons.length - 1 ? currentTabIndex + 1 : 0;
@@ -5278,13 +5313,13 @@ function initMobileGestures() {
             // Swipe right - previous tab
             targetIndex = currentTabIndex > 0 ? currentTabIndex - 1 : tabNavigation.tabButtons.length - 1;
         }
-        
+
         const targetTab = tabNavigation.tabButtons[targetIndex];
         if (targetTab) {
             const tabId = targetTab.getAttribute('data-tab');
             tabNavigation.switchTab(tabId);
         }
-        
+
         // Reset
         startX = 0;
         startY = 0;
@@ -5306,7 +5341,7 @@ function initMobileEnhancements() {
         optimizeTouchTargets();
         initMobileGestures();
     }
-    
+
     // Re-optimize on resize
     window.addEventListener('resize', () => {
         setTimeout(optimizeTouchTargets, 100);
@@ -5337,31 +5372,31 @@ class SocialSharing {
             onShare: null,
             ...options
         };
-        
+
         this.init();
     }
 
     init() {
         console.log('🔗 Initializing Social Sharing');
-        
+
         this.setupShareButtons();
         this.setupClipboardAPI();
         this.setupNativeShareAPI();
         this.initShareTracking();
-        
+
         console.log('✅ Social Sharing initialized');
     }
 
     setupShareButtons() {
         const shareButtons = this.element.querySelectorAll('.share-btn');
-        
+
         shareButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 const platform = button.dataset.platform;
                 this.handleShare(platform);
             });
-            
+
             // Add keyboard support
             button.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -5370,12 +5405,12 @@ class SocialSharing {
                     this.handleShare(platform);
                 }
             });
-            
+
             // Add hover effects
             button.addEventListener('mouseenter', () => {
                 button.style.transform = 'translateY(-2px) scale(1.05)';
             });
-            
+
             button.addEventListener('mouseleave', () => {
                 button.style.transform = 'translateY(0) scale(1)';
             });
@@ -5385,7 +5420,7 @@ class SocialSharing {
     setupClipboardAPI() {
         // Check if Clipboard API is available
         this.hasClipboardAPI = navigator.clipboard && window.isSecureContext;
-        
+
         if (!this.hasClipboardAPI) {
             console.warn('Clipboard API not available, using fallback method');
         }
@@ -5394,7 +5429,7 @@ class SocialSharing {
     setupNativeShareAPI() {
         // Check if Web Share API is available
         this.hasNativeShare = navigator.share && navigator.canShare;
-        
+
         if (this.hasNativeShare) {
             console.log('Native Web Share API available');
         }
@@ -5403,31 +5438,31 @@ class SocialSharing {
     async handleShare(platform) {
         const url = window.location.href;
         const tournament = this.options.tournamentData;
-        
+
         try {
             switch (platform) {
                 case 'copy':
                     await this.copyToClipboard(url);
                     this.showShareConfirmation('Link copied to clipboard!', 'success');
                     break;
-                
+
                 case 'twitter':
                     const twitterText = this.formatTwitterShare(tournament);
                     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(url)}&hashtags=EYTGaming,Tournament,Gaming`;
                     window.open(twitterUrl, '_blank', 'width=600,height=400');
                     break;
-                
+
                 case 'discord':
                     const discordText = this.formatDiscordShare(tournament, url);
                     await this.copyToClipboard(discordText);
                     this.showShareConfirmation('Tournament info copied for Discord! Paste it in your server.', 'success');
                     break;
-                
+
                 case 'facebook':
                     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
                     window.open(facebookUrl, '_blank', 'width=600,height=400');
                     break;
-                
+
                 case 'native':
                     if (this.hasNativeShare) {
                         await navigator.share({
@@ -5441,21 +5476,21 @@ class SocialSharing {
                         this.showShareConfirmation('Link copied to clipboard!', 'success');
                     }
                     break;
-                
+
                 default:
                     await this.copyToClipboard(url);
                     this.showShareConfirmation('Link copied to clipboard!', 'success');
                     break;
             }
-            
+
             // Track the share
             this.trackShare(platform);
-            
+
             // Notify parent component
             if (this.options.onShare) {
                 this.options.onShare(platform);
             }
-            
+
         } catch (error) {
             console.error('Share failed:', error);
             this.showShareConfirmation('Share failed. Please try again.', 'error');
@@ -5464,53 +5499,53 @@ class SocialSharing {
 
     formatTwitterShare(tournament) {
         let text = `🎮 ${tournament.name || 'Tournament'}`;
-        
+
         if (tournament.game) {
             text += ` - ${tournament.game}`;
         }
-        
+
         if (tournament.prizePool && tournament.prizePool !== '0') {
             text += ` 💰 ${tournament.prizePool} prize pool`;
         }
-        
+
         if (tournament.participants && tournament.participants !== '0') {
             text += ` 👥 ${tournament.participants}/${tournament.maxParticipants} players`;
         }
-        
+
         if (tournament.status === 'registration') {
             text += ' 🔥 Registration open!';
         } else if (tournament.status === 'in_progress') {
             text += ' 🚀 Live now!';
         }
-        
+
         // Ensure we stay under Twitter's character limit
         const maxLength = 240;
         if (text.length > maxLength) {
             text = text.substring(0, maxLength - 3) + '...';
         }
-        
+
         return text;
     }
 
     formatDiscordShare(tournament, url = '') {
         let text = `🎮 **${tournament.name || 'Tournament'}** Tournament\n`;
-        
+
         if (tournament.game) {
             text += `🎯 **Game:** ${tournament.game}\n`;
         }
-        
+
         if (tournament.prizePool && tournament.prizePool !== '0') {
             text += `💰 **Prize Pool:** ${tournament.prizePool}\n`;
         }
-        
+
         if (tournament.participants && tournament.participants !== '0') {
             text += `👥 **Players:** ${tournament.participants}/${tournament.maxParticipants}\n`;
         }
-        
+
         if (tournament.date) {
             text += `📅 **Date:** ${tournament.date}\n`;
         }
-        
+
         if (tournament.status === 'registration') {
             text += `🔥 **Status:** Registration Open - Join Now!\n`;
         } else if (tournament.status === 'in_progress') {
@@ -5518,9 +5553,9 @@ class SocialSharing {
         } else if (tournament.status === 'completed') {
             text += `🏆 **Status:** Tournament Completed\n`;
         }
-        
+
         text += `\n🔗 **Join here:** ${url}`;
-        
+
         return text;
     }
 
@@ -5538,7 +5573,7 @@ class SocialSharing {
                 console.warn('Clipboard API failed, using fallback:', error);
             }
         }
-        
+
         // Fallback method
         return this.fallbackCopyToClipboard(text);
     }
@@ -5551,11 +5586,11 @@ class SocialSharing {
         textArea.style.top = '-999999px';
         textArea.setAttribute('readonly', '');
         textArea.setAttribute('aria-hidden', 'true');
-        
+
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         try {
             const successful = document.execCommand('copy');
             document.body.removeChild(textArea);
@@ -5569,7 +5604,7 @@ class SocialSharing {
     showShareConfirmation(message, type = 'success') {
         // Create or update existing notification
         let notification = document.querySelector('.share-notification');
-        
+
         if (!notification) {
             notification = document.createElement('div');
             notification.className = 'share-notification';
@@ -5577,10 +5612,10 @@ class SocialSharing {
             notification.setAttribute('aria-live', 'polite');
             document.body.appendChild(notification);
         }
-        
+
         notification.className = `share-notification ${type}`;
         notification.textContent = message;
-        
+
         // Add styles
         notification.style.cssText = `
             position: fixed;
@@ -5595,12 +5630,12 @@ class SocialSharing {
             transition: transform 0.3s ease;
             ${type === 'success' ? 'background: #059669;' : 'background: #dc2626;'}
         `;
-        
+
         // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 10);
-        
+
         // Animate out and remove
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
@@ -5625,7 +5660,7 @@ class SocialSharing {
                     timestamp: new Date().toISOString()
                 })
             });
-            
+
             if (response.ok) {
                 this.updateShareCount();
             }
@@ -5652,7 +5687,7 @@ class SocialSharing {
     initShareTracking() {
         // Track page views for sharing analytics
         this.trackPageView();
-        
+
         // Update share counts on page load
         this.updateShareCount();
     }
@@ -5695,7 +5730,7 @@ class SocialSharing {
             button.removeEventListener('click', this.handleShare);
             button.removeEventListener('keydown', this.handleKeyDown);
         });
-        
+
         console.log('🧹 Social Sharing destroyed');
     }
 }
@@ -5707,6 +5742,7 @@ if (typeof module !== 'undefined' && module.exports) {
         HeroSection,
         StatisticsDashboard,
         TabNavigation,
+        TournamentTimeline,
         SocialSharing
     };
 }

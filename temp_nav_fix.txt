@@ -1,0 +1,32 @@
+            <!-- Main Navigation -->
+            <nav class="flex flex-col gap-2" role="navigation" aria-label="Main navigation">
+                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
+                    <p class="text-sm font-medium">Dashboard</p>
+                </a>
+                
+                <a href="{% url 'tournaments:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'tournaments' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
+                    <p class="text-sm font-medium">Tournaments</p>
+                </a>
+                
+                <a href="{% url 'coaching:coach_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'coaching' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Coaching{% if 'coaching' in request.path %}, current page{% endif %}" {% if 'coaching' in request.path %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">sports_esports</span>
+                    <p class="text-sm font-medium">Coaching</p>
+                </a>
+                
+                <a href="{% url 'teams:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'teams' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+                    <p class="text-sm font-medium">Teams</p>
+                </a>
+                
+                <a href="{% url 'venues:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'venues' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Venues{% if 'venues' in request.path %}, current page{% endif %}" {% if 'venues' in request.path %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    <p class="text-sm font-medium">Venues</p>
+                </a>
+                
+                <a href="{% url 'dashboard:profile_view' username=request.user.username %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'profile' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-surface-dark hover:text-white transition-colors{% endif %}" aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}" {% if 'profile' in request.path %}aria-current="page"{% endif %}>
+                    <span class="material-symbols-outlined" aria-hidden="true">person</span>
+                    <p class="text-sm font-medium">Profile</p>
+                </a>
+            </nav>

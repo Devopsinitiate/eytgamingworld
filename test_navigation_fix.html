@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: white;
+        }
+        .test-section {
+            background: #1f1f1f;
+            border: 2px solid #ec1313;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-section h2 {
+            color: #ec1313;
+            margin-top: 0;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #0a0a0a;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .checklist li:hover {
+            background: #2a2a2a;
+        }
+        .checklist li::before {
+            content: "☐ ";
+            color: #ec1313;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #059669;
+            color: white;
+        }
+        .status.fail {
+            background: #dc2626;
+            color: white;
+        }
+        .instructions {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .code {
+            background: #0a0a0a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #ec1313;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Navigation Fix Test Page</h1>
+    <p>Use this page to verify that the navigation fixes are working correctly.</p>
+
+    <div class="test-section">
+        <h2>1. Console Errors Check</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <ol>
+                <li>Open browser console (F12 → Console tab)</li>
+                <li>Navigate to the landing page</li>
+                <li>Check for errors</li>
+            </ol>
+        </div>
+        <ul class="checklist">
+            <li>No 404 error for <span class="code">hero-background.mp4</span></li>
+            <li>CSS file <span class="code">breadcrumb-mobile-fix.css</span> loads (200 or 304)</li>
+            <li>No JavaScript errors</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Desktop Navigation Test</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Click each navigation link on desktop view</p>
+        </div>
+        <ul class="checklist">
+            <li>Logo click navigates to home</li>
+            <li>"Home" link works</li>
+            <li>"Teams" link works</li>
+            <li>"Games" link scrolls to section</li>
+            <li>"Tournaments" link works</li>
+            <li>"Store" link scrolls to section</li>
+            <li>"Community" link scrolls to section</li>
+            <li>CTA button works</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Mobile Navigation Test</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Test on mobile device or use Chrome DevTools mobile emulation (F12 → Device Toolbar)</p>
+        </div>
+        <ul class="checklist">
+            <li>Hamburger menu (☰) button is visible</li>
+            <li>Tap hamburger menu - menu opens</li>
+            <li>Menu appears on top of content</li>
+            <li>Tap "Home" - link works and menu closes</li>
+            <li>Tap "Teams" - link works and menu closes</li>
+            <li>Tap "Tournaments" - link works and menu closes</li>
+            <li>Tap close button (×) - menu closes</li>
+            <li>Tap outside menu - menu closes</li>
+            <li>CTA button in mobile menu works</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Touch Feedback Test (Mobile)</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Test on actual mobile device</p>
+        </div>
+        <ul class="checklist">
+            <li>Tapping links shows brief red highlight</li>
+            <li>Links respond on first tap (no double-tap needed)</li>
+            <li>Touch targets feel large enough</li>
+            <li>No accidental clicks on wrong elements</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Z-Index Verification</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Use browser DevTools to inspect elements</p>
+        </div>
+        <ul class="checklist">
+            <li>Navigation has <span class="code">z-index: 9999</span></li>
+            <li>Mobile menu has <span class="code">z-index: 9998</span></li>
+            <li>Navigation has <span class="code">pointer-events: auto</span></li>
+            <li>Hero overlays have <span class="code">pointer-events: none</span></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Video Background Check</h2>
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Verify video is properly disabled</p>
+        </div>
+        <ul class="checklist">
+            <li>Video element has <span class="code">display: none</span></li>
+            <li>No 404 error in console for video file</li>
+            <li>Hero section still looks good without video</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Final Verification</h2>
+        <div class="instructions">
+            <p><strong>All tests passed?</strong></p>
+            <p>If yes: <span class="status pass">NAVIGATION FIX SUCCESSFUL</span></p>
+            <p>If no: <span class="status fail">NEEDS ATTENTION</span></p>
+            <br>
+            <p><strong>Common fixes:</strong></p>
+            <ul>
+                <li>Hard refresh: <span class="code">Ctrl+Shift+R</span> (Windows) or <span class="code">Cmd+Shift+R</span> (Mac)</li>
+                <li>Clear browser cache</li>
+                <li>Check console for specific errors</li>
+                <li>Verify CSS file is loaded in Network tab</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Make checklist items interactive
+        document.querySelectorAll('.checklist li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.style.textDecoration === 'line-through') {
+                    this.style.textDecoration = 'none';
+                    this.style.opacity = '1';
+                    this.querySelector('::before') || (this.innerHTML = '☐ ' + this.innerHTML.substring(2));
+                } else {
+                    this.style.textDecoration = 'line-through';
+                    this.style.opacity = '0.6';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Activity Feed - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<main id="main-content" class="space-y-6 pb-20 md:pb-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-white text-2xl sm:text-3xl font-bold">Activity Feed</h1>
+            <p class="text-gray-400 mt-1">View your complete activity history</p>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+        <form method="get" action="{% url 'dashboard:activity' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Activity Type Filter -->
+            <div>
+                <label for="activity_type" class="block text-sm font-medium text-gray-400 mb-2">Activity Type</label>
+                <select name="activity_type" id="activity_type" class="w-full px-4 py-2 bg-neutral-900 border border-card-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">All Activities</option>
+                    {% for type in activity_types %}
+                    <option value="{{ type.value }}" {% if selected_activity_type == type.value %}selected{% endif %}>
+                        {{ type.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Date Range Filter -->
+            <div>
+                <label for="date_range" class="block text-sm font-medium text-gray-400 mb-2">Date Range</label>
+                <select name="date_range" id="date_range" class="w-full px-4 py-2 bg-neutral-900 border border-card-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                    <option value="all" {% if selected_date_range == 'all' %}selected{% endif %}>All Time</option>
+                    <option value="7d" {% if selected_date_range == '7d' %}selected{% endif %}>Last 7 Days</option>
+                    <option value="30d" {% if selected_date_range == '30d' %}selected{% endif %}>Last 30 Days</option>
+                    <option value="90d" {% if selected_date_range == '90d' %}selected{% endif %}>Last 90 Days</option>
+                </select>
+            </div>
+            
+            <!-- Filter Button -->
+            <div class="flex items-end">
+                <button type="submit" class="w-full px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">filter_alt</span>
+                    Apply Filters
+                </button>
+            </div>
+            
+            <!-- Reset Button -->
+            <div class="flex items-end">
+                <a href="{% url 'dashboard:activity' %}" class="w-full px-6 py-2 bg-neutral-800 hover:bg-neutral-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Activity List -->
+    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-white text-xl font-bold">
+                {% if total_count > 0 %}
+                    {{ total_count }} {% if total_count == 1 %}Activity{% else %}Activities{% endif %}
+                {% else %}
+                    Activities
+                {% endif %}
+            </h2>
+            {% if page > 1 or has_next %}
+            <p class="text-gray-400 text-sm">
+                Page {{ page }} of {{ total_pages }}
+            </p>
+            {% endif %}
+        </div>
+        
+        {% if activities %}
+            <div class="space-y-3">
+                {% for activity in activities %}
+                    <div class="p-4 bg-neutral-900/50 hover:bg-neutral-800/50 rounded-lg border border-card-border-dark transition-colors">
+                        <div class="flex items-start gap-3">
+                            <!-- Activity Icon -->
+                            <div class="flex-shrink-0 bg-primary/20 p-2 rounded-lg">
+                                <span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">
+                                    {% if activity.activity_type == 'tournament_registered' %}emoji_events
+                                    {% elif activity.activity_type == 'tournament_completed' %}emoji_events
+                                    {% elif activity.activity_type == 'team_joined' %}groups
+                                    {% elif activity.activity_type == 'team_left' %}groups
+                                    {% elif activity.activity_type == 'achievement_earned' %}military_tech
+                                    {% elif activity.activity_type == 'payment_completed' %}payment
+                                    {% elif activity.activity_type == 'profile_updated' %}person
+                                    {% elif activity.activity_type == 'game_profile_added' %}sports_esports
+                                    {% elif activity.activity_type == 'coaching_session_booked' %}school
+                                    {% elif activity.activity_type == 'coaching_session_completed' %}school
+                                    {% else %}circle{% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Activity Content -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium text-sm">
+                                    {% if activity.activity_type == 'tournament_registered' %}
+                                        Registered for tournament
+                                    {% elif activity.activity_type == 'tournament_completed' %}
+                                        Completed tournament
+                                    {% elif activity.activity_type == 'team_joined' %}
+                                        Joined a team
+                                    {% elif activity.activity_type == 'team_left' %}
+                                        Left a team
+                                    {% elif activity.activity_type == 'achievement_earned' %}
+                                        Earned an achievement
+                                    {% elif activity.activity_type == 'payment_completed' %}
+                                        Payment completed
+                                    {% elif activity.activity_type == 'profile_updated' %}
+                                        Updated profile
+                                    {% elif activity.activity_type == 'game_profile_added' %}
+                                        Added game profile
+                                    {% elif activity.activity_type == 'coaching_session_booked' %}
+                                        Booked coaching session
+                                    {% elif activity.activity_type == 'coaching_session_completed' %}
+                                        Completed coaching session
+                                    {% else %}
+                                        Activity recorded
+                                    {% endif %}
+                                </p>
+                                
+                                {% if activity.data %}
+                                    <p class="text-gray-400 text-xs mt-1">
+                                        {% if activity.data.game %}{{ activity.data.game }}{% endif %}
+                                        {% if activity.data.tournament %}{{ activity.data.tournament }}{% endif %}
+                                        {% if activity.data.team %}{{ activity.data.team }}{% endif %}
+                                        {% if activity.data.achievement %}{{ activity.data.achievement }}{% endif %}
+                                        {% if activity.data.coach %}{{ activity.data.coach }}{% endif %}
+                                    </p>
+                                {% endif %}
+                                
+                                <p class="text-gray-500 text-xs mt-1">
+                                    <time datetime="{{ activity.created_at|date:'c' }}">
+                                        {{ activity.created_at|date:"M d, Y - g:i A" }}
+                                    </time>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div class="flex items-center justify-between mt-6 pt-6 border-t border-card-border-dark">
+                <div class="flex gap-2">
+                    {% if has_previous %}
+                        <a href="?page={{ page|add:'-1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" 
+                           class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                            Previous
+                        </a>
+                    {% else %}
+                        <button disabled class="px-4 py-2 bg-neutral-900 text-gray-600 rounded-lg cursor-not-allowed flex items-center gap-2">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                            Previous
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <div class="text-gray-400 text-sm">
+                    Page {{ page }} of {{ total_pages }}
+                </div>
+                
+                <div class="flex gap-2">
+                    {% if has_next %}
+                        <a href="?page={{ page|add:'1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" 
+                           class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                            Next
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </a>
+                    {% else %}
+                        <button disabled class="px-4 py-2 bg-neutral-900 text-gray-600 rounded-lg cursor-not-allowed flex items-center gap-2">
+                            Next
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">history</span>
+                <p class="text-gray-400 text-lg font-medium">No activities found</p>
+                <p class="text-gray-500 text-sm mt-2">
+                    {% if selected_activity_type or selected_date_range != 'all' %}
+                        Try adjusting your filters to see more activities
+                    {% else %}
+                        Your activities will appear here as you participate in tournaments, join teams, and more
+                    {% endif %}
+                </p>
+                {% if selected_activity_type or selected_date_range != 'all' %}
+                <a href="{% url 'dashboard:activity' %}" class="inline-block mt-4 px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                    Reset Filters
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Back to Dashboard -->
+    <div class="flex justify-center">
+        <a href="{% url 'dashboard:home' %}" class="px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Dashboard
+        </a>
+    </div>
+</main>
+{% endblock %}

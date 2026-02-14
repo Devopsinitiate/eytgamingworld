@@ -495,51 +495,91 @@ def purchase_package(request, pk):
 
 def get_available_slots(request, coach_pk):
     """API endpoint to get available time slots"""
-    coach = get_object_or_404(CoachProfile, pk=coach_pk)
-    date_str = request.GET.get('date')
-    
-    if not date_str:
-        return JsonResponse({'error': 'Date required'}, status=400)
-    
     try:
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
-    
-    # Get coach's availability for this weekday
-    weekday = date.weekday()
-    availability = coach.availability.filter(weekday=weekday, is_active=True)
-    
-    # Get existing bookings
-    existing_sessions = CoachingSession.objects.filter(
-        coach=coach,
-        scheduled_start__date=date,
-        status__in=['pending', 'confirmed', 'in_progress']
-    ).values_list('scheduled_start', 'scheduled_end')
-    
-    # Generate available slots
-    slots = []
-    for avail in availability:
-        start_datetime = datetime.combine(date, avail.start_time)
-        end_datetime = datetime.combine(date, avail.end_time)
+        coach = get_object_or_404(CoachProfile, pk=coach_pk)
+        date_str = request.GET.get('date')
         
-        current = start_datetime
-        while current < end_datetime:
-            slot_end = current + timedelta(minutes=coach.session_increment)
+        if not date_str:
+            return JsonResponse({'error': 'Date required'}, status=400)
+        
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return JsonResponse({'error': 'Invalid date format'}, status=400)
+        
+        # Ensure date is not in the past
+        if date < timezone.now().date():
+            return JsonResponse({'slots': []})  # No slots for past dates
+        
+        # Get coach's availability for this weekday
+        weekday = date.weekday()
+        availability = coach.availability.filter(weekday=weekday, is_active=True)
+        
+        if not availability.exists():
+            return JsonResponse({'slots': []})  # No availability for this day
+        
+        # Get session increment with fallback
+        session_increment = getattr(coach, 'session_increment', 30)
+        if not session_increment or session_increment <= 0:
+            session_increment = 30
+        
+        # Get existing bookings
+        existing_sessions = CoachingSession.objects.filter(
+            coach=coach,
+            scheduled_start__date=date,
+            status__in=['pending', 'confirmed', 'in_progress']
+        ).values_list('scheduled_start', 'scheduled_end')
+        
+        # Generate available slots
+        slots = []
+        current_time = timezone.now()
+        
+        for avail in availability:
+            # Create timezone-aware datetimes
+            start_datetime = timezone.make_aware(datetime.combine(date, avail.start_time))
+            end_datetime = timezone.make_aware(datetime.combine(date, avail.end_time))
             
-            # Check if slot is available
-            is_available = True
-            for session_start, session_end in existing_sessions:
-                if (current < session_end and slot_end > session_start):
-                    is_available = False
+            # If the date is today, start from current time + buffer
+            if date == timezone.now().date():
+                buffer_time = current_time + timedelta(hours=1)  # 1 hour buffer
+                if start_datetime < buffer_time:
+                    start_datetime = buffer_time
+            
+            current = start_datetime
+            while current < end_datetime:
+                slot_end = current + timedelta(minutes=session_increment)
+                
+                # Don't create slots that extend past availability end time
+                if slot_end > end_datetime:
                     break
-            
-            if is_available:
-                slots.append({
-                    'time': current.strftime('%H:%M'),
-                    'datetime': current.isoformat()
-                })
-            
-            current = slot_end
+                
+                # Check if slot is available
+                is_available = True
+                for session_start, session_end in existing_sessions:
+                    # Ensure session times are timezone-aware
+                    if timezone.is_naive(session_start):
+                        session_start = timezone.make_aware(session_start)
+                    if timezone.is_naive(session_end):
+                        session_end = timezone.make_aware(session_end)
+                    
+                    # Check for overlap
+                    if (current < session_end and slot_end > session_start):
+                        is_available = False
+                        break
+                
+                if is_available:
+                    slots.append({
+                        'time': current.strftime('%I:%M %p'),  # 12-hour format
+                        'datetime': current.isoformat()
+                    })
+                
+                current = slot_end
+        
+        return JsonResponse({'slots': slots})
     
-    return JsonResponse({'slots': slots})
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in get_available_slots: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'error': 'An error occurred loading time slots'}, status=500)

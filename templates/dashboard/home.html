@@ -3,170 +3,245 @@
 
 {% block title %}Dashboard - EYTGaming{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-{% endblock %}
-
 {% block content %}
-<main id="main-content" class="space-y-6 pb-20 md:pb-6">
-    <!-- Welcome Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-white text-2xl sm:text-3xl font-bold">Welcome back, {{ user.get_display_name }}!</h1>
-            <p class="text-gray-400 mt-1">Ready to dominate the arena?</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="text-right">
-                <p class="text-gray-400 text-sm">Level</p>
-                <p class="text-white text-2xl font-bold">{{ stats.level|default:1 }}</p>
-            </div>
-            <div class="text-right">
-                <p class="text-gray-400 text-sm">Points</p>
-                <p class="text-primary text-2xl font-bold">{{ stats.total_points|default:0 }}</p>
+<!-- Include Skeleton Loaders -->
+{% include "dashboard/components/skeleton_loaders.html" %}
+
+<main id="main-content" class="space-y-6 animate-fade-in-up">
+    <!-- Hero Welcome Section with Gaming Style -->
+    <div class="card-gaming-highlight overflow-hidden content-loaded">
+        <div class="card-gaming-content p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <!-- Welcome Text -->
+                <div class="flex-1">
+                    <h1 class="gaming-header text-3xl md:text-4xl text-electric-red mb-2">
+                        WELCOME BACK, {{ user.get_display_name|upper }}!
+                    </h1>
+                    <p class="gaming-body text-gray-400 text-lg">Ready to dominate the arena and claim victory?</p>
+                </div>
+                
+                <!-- Level & XP Stats -->
+                <div class="flex items-center gap-6">
+                    <!-- Level Badge -->
+                    <div class="text-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-electric-red to-neon-cyan flex items-center justify-center neon-red-glow-lg">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-deep-black flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-xs gaming-subheader">LVL</p>
+                                    <p class="gaming-stat text-2xl md:text-3xl text-electric-red">{{ stats.level|default:1 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- XP Points -->
+                    <div class="text-left">
+                        <p class="stat-label text-xs">TOTAL XP</p>
+                        <p class="stat-value text-3xl md:text-4xl">{{ stats.total_points|default:0 }}</p>
+                        <div class="progress-gaming mt-2" style="width: 120px;">
+                            <div class="progress-gaming-bar" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <!-- Statistics Cards Component -->
-    <!-- Requirements: 1.2 - Display statistics cards -->
-    {% include 'dashboard/components/stats_cards.html' %}
+    {% include 'dashboard/components/stats_cards_gaming.html' %}
+    
+    <!-- Quick Actions - Mobile First -->
+    <div class="block md:hidden">
+        {% include 'dashboard/components/quick_actions_gaming.html' %}
+    </div>
     
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column - Activity & Upcoming Events -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Activity Feed Component -->
-            <!-- Requirements: 1.3 - Display recent activity feed -->
-            {% include 'dashboard/components/activity_feed.html' %}
+            {% include 'dashboard/components/activity_feed_gaming.html' %}
             
             <!-- Upcoming Events Section -->
-            <!-- Requirements: 1.4 - Display upcoming tournaments (7-day window) -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-white text-xl font-bold">Upcoming Events</h2>
-                    <a href="{% url 'tournaments:list' %}" class="text-primary hover:text-primary/80 text-sm font-medium transition-colors" aria-label="View all tournaments">
-                        View All →
-                    </a>
-                </div>
-                
-                {% if upcoming_tournaments %}
-                    <div class="space-y-3" role="list" aria-label="Upcoming tournaments">
-                        {% for tournament in upcoming_tournaments %}
-                            <a href="{% url 'tournaments:detail' tournament.slug %}" class="block p-4 bg-neutral-900/50 hover:bg-neutral-800/50 rounded-lg border border-card-border-dark transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark" role="listitem">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <div class="flex-shrink-0 bg-primary/20 p-2 rounded">
-                                            <span class="material-symbols-outlined text-primary" aria-hidden="true">emoji_events</span>
+            <div class="card-gaming">
+                <div class="card-gaming-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="gaming-subheader text-2xl text-white">UPCOMING BATTLES</h2>
+                        <a href="{% url 'tournaments:list' %}" 
+                           class="btn-gaming-ghost px-4 py-2 text-sm" 
+                           aria-label="View all tournaments">
+                            VIEW ALL →
+                        </a>
+                    </div>
+                    
+                    {% if upcoming_tournaments %}
+                        <!-- Desktop View -->
+                        <div class="hidden md:block space-y-3" role="list" aria-label="Upcoming tournaments">
+                            {% for tournament in upcoming_tournaments %}
+                                <a href="{% url 'tournaments:detail' tournament.slug %}" 
+                                   class="block p-4 card-gaming-flat hover:neon-border-red transition-all" 
+                                   role="listitem">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                                            <div class="flex-shrink-0 w-12 h-12 bg-electric-red/20 rounded flex items-center justify-center neon-red-glow">
+                                                <span class="material-symbols-outlined text-electric-red text-2xl" aria-hidden="true">emoji_events</span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h3 class="text-white font-bold truncate gaming-body">{{ tournament.name }}</h3>
+                                                <p class="text-gray-400 text-sm mt-1 flex items-center gap-2">
+                                                    <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>
+                                                    {{ tournament.game.name }}
+                                                    <span class="mx-1">•</span>
+                                                    <span class="material-symbols-outlined text-xs" aria-hidden="true">schedule</span>
+                                                    <time datetime="{{ tournament.start_datetime|date:'c' }}">
+                                                        {{ tournament.start_datetime|date:"M d, Y" }}
+                                                    </time>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h3 class="text-white font-semibold truncate">{{ tournament.name }}</h3>
-                                            <p class="text-gray-400 text-sm">
-                                                <span class="material-symbols-outlined text-xs align-middle" aria-hidden="true">sports_esports</span>
+                                        <div class="text-right flex-shrink-0">
+                                            <p class="text-electric-red font-black text-xl gaming-stat">${{ tournament.registration_fee|default:"0" }}</p>
+                                            <p class="text-gray-400 text-xs uppercase">Entry Fee</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Mobile Carousel -->
+                        <div class="mobile-carousel md:hidden">
+                            {% for tournament in upcoming_tournaments %}
+                                <div class="mobile-carousel-item">
+                                    <a href="{% url 'tournaments:detail' tournament.slug %}" 
+                                       class="block mobile-card neon-border-red">
+                                        <div class="mobile-card-header">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-electric-red/20 rounded flex items-center justify-center">
+                                                    <span class="material-symbols-outlined text-electric-red" aria-hidden="true">emoji_events</span>
+                                                </div>
+                                                <h3 class="text-white font-bold flex-1 gaming-body">{{ tournament.name }}</h3>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <p class="text-gray-400 text-sm flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>
                                                 {{ tournament.game.name }}
-                                                <span class="mx-1">•</span>
-                                                <span class="material-symbols-outlined text-xs align-middle" aria-hidden="true">schedule</span>
+                                            </p>
+                                            <p class="text-gray-400 text-sm flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-xs" aria-hidden="true">schedule</span>
                                                 <time datetime="{{ tournament.start_datetime|date:'c' }}">
                                                     {{ tournament.start_datetime|date:"M d, Y" }}
                                                 </time>
                                             </p>
+                                            <div class="pt-3 border-t border-electric-red/30 flex justify-between items-center">
+                                                <span class="text-gray-400 text-xs uppercase">Entry Fee</span>
+                                                <span class="text-electric-red font-black text-xl">${{ tournament.registration_fee|default:"0" }}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="text-left sm:text-right flex-shrink-0">
-                                        <p class="text-primary font-bold">${{ tournament.registration_fee|default:"0" }}</p>
-                                        <p class="text-gray-400 text-xs">Entry Fee</p>
-                                    </div>
+                                    </a>
                                 </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-12">
+                            <span class="material-symbols-outlined text-gray-600 text-6xl animate-glow-pulse" aria-hidden="true">emoji_events</span>
+                            <p class="text-gray-400 mt-4 gaming-body">No upcoming tournaments</p>
+                            <a href="{% url 'tournaments:list' %}" 
+                               class="btn-gaming-primary mt-4 inline-flex">
+                                <span>Browse Tournaments</span>
                             </a>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-8">
-                        <span class="material-symbols-outlined text-gray-600 text-5xl" aria-hidden="true">emoji_events</span>
-                        <p class="text-gray-400 mt-2">No upcoming tournaments</p>
-                        <a href="{% url 'tournaments:list' %}" class="text-primary hover:text-primary/80 text-sm mt-2 inline-block">
-                            Browse Tournaments →
-                        </a>
-                    </div>
-                {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
         
         <!-- Right Column - Recommendations & Payment Summary -->
         <div class="space-y-6">
             <!-- Recommendations Component -->
-            <!-- Requirements: 13.1, 13.2 - Display tournament and team recommendations -->
-            {% include 'dashboard/components/recommendations.html' %}
+            {% include 'dashboard/components/recommendations_gaming.html' %}
             
             <!-- Payment Summary Section -->
-            <!-- Requirements: 12.1 - Display payment summary -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-white text-xl font-bold">Payment Summary</h2>
-                    <a href="{% url 'payments:history' %}" class="text-primary hover:text-primary/80 text-sm font-medium transition-colors" aria-label="View payment history">
-                        View All →
-                    </a>
-                </div>
-                
-                <div class="space-y-4">
-                    <!-- Total Spent -->
-                    <div class="flex items-center justify-between p-3 bg-neutral-900/50 rounded-lg">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-green-500" aria-hidden="true">account_balance_wallet</span>
-                            <span class="text-gray-400 text-sm">Total Spent</span>
-                        </div>
-                        <span class="text-white font-bold">${{ payment_summary.total_spent|default:"0.00" }}</span>
+            <div class="card-gaming">
+                <div class="card-gaming-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="gaming-subheader text-xl text-white">PAYMENT VAULT</h2>
+                        <a href="{% url 'payments:history' %}" 
+                           class="text-electric-red hover:text-neon-cyan text-sm font-bold transition-colors uppercase" 
+                           aria-label="View payment history">
+                            VIEW ALL →
+                        </a>
                     </div>
                     
-                    <!-- Recent Payments -->
-                    {% if payment_summary.recent_payments %}
-                        <div>
-                            <h3 class="text-gray-400 text-xs font-medium mb-2">Recent Payments</h3>
-                            <div class="space-y-2">
-                                {% for payment in payment_summary.recent_payments %}
-                                    <div class="flex items-center justify-between p-2 bg-neutral-900/30 rounded">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-white text-sm truncate">{{ payment.description|default:"Payment" }}</p>
-                                            <p class="text-gray-500 text-xs">
-                                                <time datetime="{{ payment.created_at|date:'c' }}">
-                                                    {{ payment.created_at|date:"M d, Y" }}
-                                                </time>
-                                            </p>
+                    <div class="space-y-4">
+                        <!-- Total Spent -->
+                        <div class="stat-card-gaming p-4">
+                            <div class="stat-card-content">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-green-500/20 rounded flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-green-500" aria-hidden="true">account_balance_wallet</span>
                                         </div>
-                                        <span class="text-primary text-sm font-medium ml-2">${{ payment.amount }}</span>
+                                        <span class="stat-label">TOTAL SPENT</span>
                                     </div>
-                                {% endfor %}
+                                    <span class="text-white font-black text-2xl gaming-stat">${{ payment_summary.total_spent|default:"0.00" }}</span>
+                                </div>
                             </div>
                         </div>
-                    {% endif %}
-                    
-                    <!-- Payment Methods -->
-                    <div class="flex items-center justify-between p-3 bg-neutral-900/50 rounded-lg">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-blue-500" aria-hidden="true">credit_card</span>
-                            <span class="text-gray-400 text-sm">Saved Methods</span>
+                        
+                        <!-- Recent Payments -->
+                        {% if payment_summary.recent_payments %}
+                            <div>
+                                <h3 class="stat-label mb-3">RECENT TRANSACTIONS</h3>
+                                <div class="space-y-2">
+                                    {% for payment in payment_summary.recent_payments %}
+                                        <div class="flex items-center justify-between p-3 card-gaming-flat">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-white text-sm font-medium truncate">{{ payment.description|default:"Payment" }}</p>
+                                                <p class="text-gray-500 text-xs mt-1">
+                                                    <time datetime="{{ payment.created_at|date:'c' }}">
+                                                        {{ payment.created_at|date:"M d, Y" }}
+                                                    </time>
+                                                </p>
+                                            </div>
+                                            <span class="text-electric-red text-sm font-bold ml-3">${{ payment.amount }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Payment Methods -->
+                        <div class="stat-card-gaming p-4">
+                            <div class="stat-card-content">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-500/20 rounded flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-blue-500" aria-hidden="true">payments</span>
+                                        </div>
+                                        <span class="stat-label">SAVED METHODS</span>
+                                    </div>
+                                    <span class="text-white font-black text-2xl gaming-stat">{{ payment_summary.saved_payment_methods_count|default:0 }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <span class="text-white font-bold">{{ payment_summary.saved_payment_methods_count|default:0 }}</span>
+                        
+                        <!-- Manage Payment Methods Button -->
+                        <a 
+                            href="{% url 'payments:payment_methods' %}" 
+                            class="btn-gaming-primary w-full justify-center"
+                        >
+                            <span>MANAGE PAYMENTS</span>
+                        </a>
                     </div>
-                    
-                    <!-- Manage Payment Methods Button -->
-                    <a 
-                        href="{% url 'payments:payment_methods' %}" 
-                        class="block w-full text-center py-2 px-4 bg-primary hover:bg-primary/80 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark"
-                    >
-                        Manage Payment Methods
-                    </a>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Quick Actions Component -->
-    <!-- Requirements: 1.5 - Display quick action buttons -->
-    {% include 'dashboard/components/quick_actions.html' %}
+    <!-- Quick Actions Component - Desktop -->
+    <div class="hidden md:block">
+        {% include 'dashboard/components/quick_actions_gaming.html' %}
+    </div>
 </main>
-
-<!-- Mobile Bottom Navigation Component -->
-<!-- Requirements: 14.3 - Mobile bottom navigation bar -->
-{% include 'dashboard/components/mobile_nav.html' %}
 {% endblock %}
-

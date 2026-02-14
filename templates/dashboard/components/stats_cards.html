@@ -11,8 +11,7 @@
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-gray-400 text-sm font-medium" id="tournaments-label">Total Tournaments</p>
-                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="tournaments-label">{{
-                    stats.total_tournaments|default:0 }}</p>
+                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="tournaments-label">{{ stats.total_tournaments|default:0 }}</p>
                 <p class="text-gray-500 text-xs mt-1">Participated</p>
             </div>
             <div class="bg-primary/20 p-3 rounded-lg">
@@ -27,8 +26,7 @@
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-gray-400 text-sm font-medium" id="winrate-label">Win Rate</p>
-                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="winrate-label">{{
-                    stats.win_rate|floatformat:1|default:"0.0" }}%</p>
+                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="winrate-label">{{ stats.win_rate|floatformat:1|default:"0.0" }}%</p>
                 <p class="text-gray-500 text-xs mt-1">Overall Performance</p>
             </div>
             <div class="bg-green-500/20 p-3 rounded-lg">
@@ -43,8 +41,7 @@
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-gray-400 text-sm font-medium" id="teams-label">Current Teams</p>
-                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="teams-label">{{
-                    stats.current_teams|default:0 }}</p>
+                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="teams-label">{{ stats.current_teams|default:0 }}</p>
                 <p class="text-gray-500 text-xs mt-1">Active Memberships</p>
             </div>
             <div class="bg-gray-500/20 p-3 rounded-lg">
@@ -59,8 +56,7 @@
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <p class="text-gray-400 text-sm font-medium" id="notifications-label">Unread Notifications</p>
-                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="notifications-label">{{
-                    stats.unread_notifications|default:0 }}</p>
+                <p class="text-white text-3xl font-bold mt-2" aria-labelledby="notifications-label">{{ stats.unread_notifications|default:0 }}</p>
                 <p class="text-gray-500 text-xs mt-1">
                     <a href="{% url 'notifications:list' %}"
                         class="text-yellow-500 hover:text-yellow-400 transition-colors inline-block py-2"

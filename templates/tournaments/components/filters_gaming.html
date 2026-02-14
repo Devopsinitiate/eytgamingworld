@@ -1,0 +1,155 @@
+<!-- Gaming-Styled Tournament Filters -->
+<div class="card-gaming mb-6">
+    <div class="card-gaming-content p-6">
+        <form method="get" id="filter-form" class="space-y-4">
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" 
+                       name="search" 
+                       id="search-input" 
+                       value="{{ request.GET.search }}"
+                       placeholder="SEARCH TOURNAMENTS..."
+                       class="w-full bg-deep-black text-white border-2 border-electric-red/30 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-electric-red gaming-body placeholder:text-gray-600 placeholder:uppercase">
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-electric-red text-xl">search</span>
+            </div>
+
+            <!-- Filter Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Game Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">GAME</label>
+                    <select name="game" 
+                            id="game-filter"
+                            class="gaming-select w-full">
+                        <option value="">All Games</option>
+                        {% for game in available_games %}
+                        <option value="{{ game.slug }}" {% if request.GET.game|default:'' == game.slug %}selected{% endif %}>
+                            {{ game.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">STATUS</label>
+                    <select name="status" 
+                            id="status-filter"
+                            class="gaming-select w-full">
+                        <option value="">All Status</option>
+                        <option value="registration" {% if request.GET.status|default:'' == 'registration' %}selected{% endif %}>
+                            Open for Registration
+                        </option>
+                        <option value="check_in" {% if request.GET.status|default:'' == 'check_in' %}selected{% endif %}>
+                            Check-in Phase
+                        </option>
+                        <option value="in_progress" {% if request.GET.status|default:'' == 'in_progress' %}selected{% endif %}>
+                            In Progress
+                        </option>
+                        <option value="completed" {% if request.GET.status|default:'' == 'completed' %}selected{% endif %}>
+                            Completed
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Format Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">FORMAT</label>
+                    <select name="format" 
+                            id="format-filter"
+                            class="gaming-select w-full">
+                        <option value="">All Formats</option>
+                        <option value="single_elim" {% if request.GET.format|default:'' == 'single_elim' %}selected{% endif %}>
+                            Single Elimination
+                        </option>
+                        <option value="double_elim" {% if request.GET.format|default:'' == 'double_elim' %}selected{% endif %}>
+                            Double Elimination
+                        </option>
+                        <option value="swiss" {% if request.GET.format|default:'' == 'swiss' %}selected{% endif %}>
+                            Swiss
+                        </option>
+                        <option value="round_robin" {% if request.GET.format|default:'' == 'round_robin' %}selected{% endif %}>
+                            Round Robin
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Prize Pool Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">PRIZE POOL</label>
+                    <select name="prize" 
+                            id="prize-filter"
+                            class="gaming-select w-full">
+                        <option value="">Any Prize</option>
+                        <option value="free" {% if request.GET.prize|default:'' == 'free' %}selected{% endif %}>
+                            Free Tournaments
+                        </option>
+                        <option value="paid" {% if request.GET.prize|default:'' == 'paid' %}selected{% endif %}>
+                            Prize Pool
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3">
+                <button type="submit" class="btn-gaming-primary">
+                    <span class="btn-gaming-text">APPLY FILTERS</span>
+                </button>
+
+                <button type="button" 
+                        id="clear-filters"
+                        class="btn-gaming-secondary">
+                    <span class="btn-gaming-text">CLEAR ALL</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.gaming-select {
+    background: #0A0A0A;
+    color: white;
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gaming-select:hover {
+    border-color: #DC2626;
+}
+
+.gaming-select:focus {
+    outline: none;
+    border-color: #DC2626;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-select option {
+    background: #0A0A0A;
+    color: white;
+    padding: 0.5rem;
+}
+</style>
+
+<script>
+document.getElementById('clear-filters')?.addEventListener('click', function() {
+    const form = document.getElementById('filter-form');
+    form.reset();
+    window.location.href = window.location.pathname;
+});
+
+// Auto-submit on filter change
+document.querySelectorAll('.gaming-select').forEach(select => {
+    select.addEventListener('change', function() {
+        document.getElementById('filter-form').submit();
+    });
+});
+</script>

@@ -350,3 +350,48 @@ def render_with_fallback(value, fallback="Content unavailable"):
     except Exception as e:
         logger.warning(f"Template value rendering error: {e}")
         return escape(fallback)
+
+
+@register.filter(name='safe_timesince')
+def safe_timesince(value, fallback="Recently"):
+    """
+    Template filter to safely apply timesince with fallback for invalid datetime values.
+    Usage: {{ match.completed_at|safe_timesince:"Recently completed" }}
+    Handles both datetime objects and string values that might cause AttributeError.
+    """
+    if not value:
+        return fallback
+    
+    try:
+        from django.utils.timesince import timesince
+        from datetime import datetime
+        from django.utils import timezone
+        
+        # If it's already a datetime object, use it directly
+        if hasattr(value, 'year'):
+            return f"{timesince(value)} ago"
+        
+        # If it's a string, try to parse it
+        if isinstance(value, str):
+            try:
+                # Handle ISO format strings
+                if 'T' in value:
+                    if value.endswith('Z'):
+                        value = value[:-1] + '+00:00'
+                    elif '+' not in value:
+                        value += '+00:00'
+                    
+                    parsed_datetime = datetime.fromisoformat(value)
+                    if parsed_datetime.tzinfo is None:
+                        parsed_datetime = timezone.make_aware(parsed_datetime)
+                    
+                    return f"{timesince(parsed_datetime)} ago"
+            except (ValueError, AttributeError):
+                pass
+        
+        # If we can't parse it, return fallback
+        return fallback
+        
+    except Exception as e:
+        logger.warning(f"Safe timesince filter error: {e}")
+        return fallback

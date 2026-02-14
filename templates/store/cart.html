@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart - EYTGaming Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Use Space Grotesk font for store pages */
+    body {
+        font-family: 'Space Grotesk', 'Spline Sans', sans-serif;
+    }
+
+    /* Cart-specific styles matching EYTGaming design aesthetic */
+    .cart-item-card {
+        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+        border: 1px solid rgba(236, 19, 19, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .cart-item-card:hover {
+        border-color: rgba(236, 19, 19, 0.6);
+        box-shadow: 0 0 25px rgba(236, 19, 19, 0.3),
+                    0 0 50px rgba(236, 19, 19, 0.15);
+    }
+    
+    .quantity-input {
+        background: #0a0a0a;
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-input:focus {
+        outline: none;
+        border-color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.4);
+    }
+    
+    .btn-quantity {
+        background: #1f1f1f;
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-quantity:hover:not(:disabled) {
+        background: #ec1313;
+        border-color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.5);
+        transform: scale(1.05);
+    }
+    
+    .btn-remove {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-remove:hover {
+        color: #ec1313;
+        transform: scale(1.15);
+        text-shadow: 0 0 10px rgba(236, 19, 19, 0.6);
+    }
+    
+    .cart-summary {
+        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        position: sticky;
+        top: 20px;
+        box-shadow: 0 0 20px rgba(236, 19, 19, 0.1);
+    }
+    
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .loading-overlay.active {
+        display: flex;
+    }
+    
+    .spinner {
+        border: 3px solid rgba(236, 19, 19, 0.3);
+        border-top: 3px solid #ec1313;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 20px rgba(236, 19, 19, 0.4);
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .alert {
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-background-dark py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Shopping Cart</h1>
+            <p class="text-gray-400">
+                {% if cart.item_count > 0 %}
+                    {{ cart.item_count }} item{{ cart.item_count|pluralize }} in your cart
+                {% else %}
+                    Your cart is empty
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alert-container" class="mb-6"></div>
+
+        {% if cart.is_empty %}
+            <!-- Empty Cart State -->
+            <div class="text-center py-16">
+                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">
+                    shopping_cart
+                </span>
+                <h2 class="text-2xl font-bold text-white mb-4">Your cart is empty</h2>
+                <p class="text-gray-400 mb-8">Add some items to get started!</p>
+                <a href="{% url 'home' %}" 
+                   class="inline-block bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all">
+                    Continue Shopping
+                </a>
+            </div>
+        {% else %}
+            <!-- Cart Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Cart Items -->
+                <div class="lg:col-span-2 space-y-4">
+                    {% if unavailable_items %}
+                        <!-- Unavailable Items Warning -->
+                        <div class="bg-red-900/20 border border-red-500/50 rounded-lg p-4 mb-4">
+                            <div class="flex items-start">
+                                <span class="material-symbols-outlined text-red-500 mr-3">
+                                    warning
+                                </span>
+                                <div>
+                                    <h3 class="text-red-500 font-semibold mb-2">Some items are unavailable</h3>
+                                    <p class="text-gray-300 text-sm">
+                                        The following items are out of stock or no longer available. 
+                                        Please remove them to proceed with checkout.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% for item in cart_items %}
+                        <div class="cart-item-card rounded-lg p-6" data-item-id="{{ item.id }}">
+                            <div class="flex flex-col sm:flex-row gap-6">
+                                <!-- Product Image -->
+                                <div class="flex-shrink-0">
+                                    {% if item.product.images.all %}
+                                        <img src="{{ item.product.images.first.image.url }}" 
+                                             alt="{{ item.product.images.first.alt_text }}"
+                                             class="w-32 h-32 object-cover rounded-lg"
+                                             loading="lazy">
+                                    {% else %}
+                                        <div class="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-gray-600 text-4xl">
+                                                image
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Product Details -->
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="text-xl font-bold text-white mb-1">
+                                                {{ item.product.name }}
+                                            </h3>
+                                            {% if item.variant %}
+                                                <p class="text-gray-400 text-sm">
+                                                    {{ item.variant.name }}
+                                                </p>
+                                            {% endif %}
+                                            <p class="text-gray-500 text-sm mt-1">
+                                                {{ item.product.category.name }}
+                                            </p>
+                                        </div>
+                                        <button type="button" 
+                                                class="btn-remove text-gray-400 hover:text-red-500"
+                                                onclick="removeFromCart('{{ item.id }}')"
+                                                aria-label="Remove item">
+                                            <span class="material-symbols-outlined">
+                                                delete
+                                            </span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Availability Status -->
+                                    {% if not item.is_available %}
+                                        <div class="bg-red-900/30 border border-red-500/50 rounded px-3 py-1 inline-block mb-3">
+                                            <span class="text-red-500 text-sm font-semibold">Unavailable</span>
+                                        </div>
+                                    {% elif not item.has_sufficient_stock %}
+                                        <div class="bg-yellow-900/30 border border-yellow-500/50 rounded px-3 py-1 inline-block mb-3">
+                                            <span class="text-yellow-500 text-sm font-semibold">Insufficient Stock</span>
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Quantity and Price -->
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
+                                        <!-- Quantity Controls -->
+                                        <div class="flex items-center gap-2">
+                                            <label class="text-gray-400 text-sm mr-2">Quantity:</label>
+                                            <button type="button" 
+                                                    class="btn-quantity w-8 h-8 rounded flex items-center justify-center"
+                                                    onclick="updateQuantity('{{ item.id }}', {{ item.quantity }} - 1)"
+                                                    {% if item.quantity <= 1 %}disabled{% endif %}>
+                                                <span class="material-symbols-outlined text-sm">remove</span>
+                                            </button>
+                                            <input type="number" 
+                                                   class="quantity-input w-16 h-8 text-center rounded"
+                                                   value="{{ item.quantity }}"
+                                                   min="1"
+                                                   max="100"
+                                                   data-item-id="{{ item.id }}"
+                                                   onchange="updateQuantity('{{ item.id }}', this.value)"
+                                                   aria-label="Quantity">
+                                            <button type="button" 
+                                                    class="btn-quantity w-8 h-8 rounded flex items-center justify-center"
+                                                    onclick="updateQuantity('{{ item.id }}', {{ item.quantity }} + 1)"
+                                                    {% if item.quantity >= 100 %}disabled{% endif %}>
+                                                <span class="material-symbols-outlined text-sm">add</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div class="text-right">
+                                            <p class="text-gray-400 text-sm">
+                                                ${{ item.unit_price }} each
+                                            </p>
+                                            <p class="text-2xl font-bold text-primary" data-item-total="{{ item.id }}">
+                                                ${{ item.total_price }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="lg:col-span-1">
+                    <div class="cart-summary rounded-lg p-6">
+                        <h2 class="text-2xl font-bold text-white mb-6">Order Summary</h2>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between text-gray-300">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal" class="font-semibold">${{ subtotal }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300">
+                                <span>Shipping</span>
+                                <span class="text-sm">Calculated at checkout</span>
+                            </div>
+                            <div class="border-t border-gray-700 pt-4">
+                                <div class="flex justify-between text-white text-xl font-bold">
+                                    <span>Total</span>
+                                    <span id="cart-total">${{ subtotal }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if unavailable_items %}
+                            <button type="button" 
+                                    class="w-full bg-gray-600 text-white py-3 rounded-lg font-semibold cursor-not-allowed"
+                                    disabled>
+                                Remove Unavailable Items First
+                            </button>
+                        {% else %}
+                            <a href="#" 
+                               class="block w-full bg-primary text-white py-3 rounded-lg font-semibold text-center hover:bg-primary-dark transition-all">
+                                Proceed to Checkout
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'home' %}" 
+                           class="block w-full text-center text-gray-400 hover:text-white py-3 mt-4 transition-colors">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Show alert message
+    function showAlert(message, type = 'success') {
+        const alertContainer = document.getElementById('alert-container');
+        const alertClass = type === 'success' ? 'bg-green-900/30 border-green-500/50 text-green-500' : 'bg-red-900/30 border-red-500/50 text-red-500';
+        
+        const alert = document.createElement('div');
+        alert.className = `alert ${alertClass} border rounded-lg p-4 flex items-center justify-between`;
+        alert.innerHTML = `
+            <div class="flex items-center">
+                <span class="material-symbols-outlined mr-3">
+                    ${type === 'success' ? 'check_circle' : 'error'}
+                </span>
+                <span>${message}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        `;
+        
+        alertContainer.appendChild(alert);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+    }
+
+    // Show/hide loading overlay
+    function setLoading(isLoading) {
+        const overlay = document.getElementById('loading-overlay');
+        if (isLoading) {
+            overlay.classList.add('active');
+        } else {
+            overlay.classList.remove('active');
+        }
+    }
+
+    // Update cart summary
+    function updateCartSummary(data) {
+        if (data.cart_summary) {
+            document.getElementById('cart-subtotal').textContent = '$' + data.cart_summary.subtotal;
+            document.getElementById('cart-total').textContent = '$' + data.cart_summary.subtotal;
+        }
+    }
+
+    // Update quantity
+    async function updateQuantity(itemId, newQuantity) {
+        newQuantity = parseInt(newQuantity);
+        
+        if (isNaN(newQuantity) || newQuantity < 1 || newQuantity > 100) {
+            showAlert('Quantity must be between 1 and 100', 'error');
+            return;
+        }
+        
+        setLoading(true);
+        
+        try {
+            const response = await fetch('{% url "store:update_cart_quantity" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    cart_item_id: itemId,
+                    quantity: newQuantity
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update item total
+                const itemTotal = document.querySelector(`[data-item-total="${itemId}"]`);
+                if (itemTotal) {
+                    itemTotal.textContent = '$' + data.cart_item.total_price;
+                }
+                
+                // Update quantity input
+                const quantityInput = document.querySelector(`input[data-item-id="${itemId}"]`);
+                if (quantityInput) {
+                    quantityInput.value = data.cart_item.quantity;
+                }
+                
+                // Update cart summary
+                updateCartSummary(data);
+                
+                showAlert('Quantity updated', 'success');
+            } else {
+                showAlert(data.error || 'Failed to update quantity', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('An error occurred. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Remove from cart
+    async function removeFromCart(itemId) {
+        if (!confirm('Are you sure you want to remove this item?')) {
+            return;
+        }
+        
+        setLoading(true);
+        
+        try {
+            const response = await fetch('{% url "store:remove_from_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    cart_item_id: itemId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Remove item from DOM
+                const itemCard = document.querySelector(`[data-item-id="${itemId}"]`);
+                if (itemCard) {
+                    itemCard.style.opacity = '0';
+                    itemCard.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        itemCard.remove();
+                        
+                        // Check if cart is empty
+                        if (data.cart_summary.item_count === 0) {
+                            location.reload();
+                        }
+                    }, 300);
+                }
+                
+                // Update cart summary
+                updateCartSummary(data);
+                
+                showAlert('Item removed from cart', 'success');
+            } else {
+                showAlert(data.error || 'Failed to remove item', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('An error occurred. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }
+</script>
+{% endblock %}

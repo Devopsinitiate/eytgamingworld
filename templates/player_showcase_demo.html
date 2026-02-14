@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Player Showcase Demo - EYTGaming{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/landing-page.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-black">
+    {% include "partials/player_showcase.html" %}
+</div>
+{% endblock %}

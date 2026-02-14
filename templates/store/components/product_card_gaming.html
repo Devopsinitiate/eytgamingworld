@@ -1,0 +1,106 @@
+{% load static %}
+
+<!-- Gaming-Styled Product Card -->
+<div class="card-gaming group hover:scale-105 transition-transform duration-300">
+    <a href="{% url 'store:product_detail' product.slug %}" class="block">
+        <!-- Product Image -->
+        <div class="relative aspect-square overflow-hidden">
+            {% if product.images.first %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-electric-red/20 via-deep-black to-neon-cyan/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-600">shopping_bag</span>
+                </div>
+            {% endif %}
+            
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-black via-transparent to-transparent opacity-60"></div>
+            
+            <!-- Badges -->
+            <div class="absolute top-4 left-4 flex flex-col gap-2">
+                {% if product.is_new %}
+                <span class="px-3 py-1 bg-neon-cyan text-deep-black text-xs gaming-subheader rounded backdrop-blur-sm">
+                    NEW
+                </span>
+                {% endif %}
+                {% if product.is_on_sale %}
+                <span class="px-3 py-1 bg-electric-red text-white text-xs gaming-subheader rounded backdrop-blur-sm">
+                    -{{ product.discount_percentage }}%
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Stock Badge -->
+            {% if not product.in_stock %}
+            <div class="absolute inset-0 bg-deep-black/80 flex items-center justify-center">
+                <span class="px-4 py-2 bg-gray-700 text-gray-300 gaming-subheader text-sm rounded border border-gray-600">
+                    OUT OF STOCK
+                </span>
+            </div>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button type="button" 
+                        class="w-10 h-10 rounded-full bg-electric-red text-white flex items-center justify-center hover:bg-neon-cyan hover:text-deep-black transition-colors"
+                        onclick="event.preventDefault(); addToWishlist({{ product.id }});">
+                    <span class="material-symbols-outlined text-lg">favorite</span>
+                </button>
+                {% if product.in_stock %}
+                <button type="button" 
+                        class="w-10 h-10 rounded-full bg-neon-cyan text-deep-black flex items-center justify-center hover:bg-electric-red hover:text-white transition-colors"
+                        onclick="event.preventDefault(); quickAddToCart({{ product.id }});">
+                    <span class="material-symbols-outlined text-lg">shopping_cart</span>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-gaming-content p-5">
+            <!-- Category -->
+            <p class="stat-label text-xs mb-2">{{ product.category.name|upper }}</p>
+            
+            <!-- Product Name -->
+            <h3 class="gaming-header text-lg text-white mb-2 group-hover:text-electric-red transition-colors line-clamp-2">
+                {{ product.name|upper }}
+            </h3>
+            
+            <!-- Rating -->
+            {% if product.average_rating %}
+            <div class="flex items-center gap-2 mb-3">
+                <div class="flex items-center text-yellow-500">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= product.average_rating %}
+                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                        {% else %}
+                        <span class="material-symbols-outlined text-sm">star</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="text-gray-400 text-xs">({{ product.review_count }})</span>
+            </div>
+            {% endif %}
+            
+            <!-- Price -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    {% if product.is_on_sale %}
+                    <span class="gaming-header text-xl text-electric-red">${{ product.sale_price }}</span>
+                    <span class="text-gray-500 line-through text-sm">${{ product.price }}</span>
+                    {% else %}
+                    <span class="gaming-header text-xl text-electric-red">${{ product.price }}</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Stock Indicator -->
+                {% if product.in_stock %}
+                <span class="flex items-center gap-1 text-green-400 text-xs">
+                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                    IN STOCK
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>

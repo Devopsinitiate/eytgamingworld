@@ -1,0 +1,79 @@
+{% extends "store/emails/base_email.html" %}
+
+{% block title %}Your Order Has Shipped - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<h1>Your Order is On Its Way! 📦</h1>
+
+<p>Hi {{ order.user.username }},</p>
+
+<p>Great news! Your order has been shipped and is on its way to you.</p>
+
+<div class="info-box">
+    <p style="margin: 0; font-size: 18px; font-weight: 600; color: #ffffff;">
+        Order Number: <span style="color: #ec1313;">{{ order.order_number }}</span>
+    </p>
+    <p style="margin: 10px 0 0 0; color: #999999;">
+        Shipped Date: {{ order.updated_at|date:"F d, Y" }}
+    </p>
+    {% if order.tracking_number %}
+    <p style="margin: 10px 0 0 0; font-size: 16px;">
+        Tracking Number: <strong style="color: #ec1313;">{{ order.tracking_number }}</strong>
+    </p>
+    {% endif %}
+</div>
+
+<h2>Shipping Details</h2>
+
+<div class="info-box">
+    <p style="margin: 0;"><strong>Shipping To:</strong></p>
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_name }}</p>
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_address_line1 }}</p>
+    {% if order.shipping_address_line2 %}
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_address_line2 }}</p>
+    {% endif %}
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}</p>
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_country }}</p>
+</div>
+
+<h2>Order Contents</h2>
+
+<table class="details-table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items.all %}
+        <tr>
+            <td>
+                {{ item.product_name }}
+                {% if item.variant_name %}
+                <br><span style="color: #999999; font-size: 14px;">{{ item.variant_name }}</span>
+                {% endif %}
+            </td>
+            <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if order.tracking_number %}
+<h2>Track Your Package</h2>
+
+<p>You can track your shipment using the tracking number above. Delivery typically takes 3-7 business days depending on your location.</p>
+
+<center>
+    <a href="{{ site_url }}/dashboard/orders/" class="button">Track Your Order</a>
+</center>
+{% endif %}
+
+<p style="margin-top: 30px;">We'll send you another email when your order is delivered. If you have any questions, please contact our support team.</p>
+
+<p style="margin-top: 30px;">
+    Thanks for your patience!<br>
+    <strong style="color: #ec1313;">The EYTGaming Team</strong>
+</p>
+{% endblock %}

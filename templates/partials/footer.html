@@ -1,0 +1,227 @@
+{% load static %}
+
+{# Footer Component - Social Links and Legal Information #}
+<footer class="footer py-12 bg-gradient-to-t from-black to-gray-900 border-t-2 border-red-600/30">
+  <div class="container mx-auto px-4">
+    
+    {# Newsletter Signup Section #}
+    <div class="newsletter-section mb-12 max-w-2xl mx-auto">
+      <div class="text-center mb-6">
+        <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Space Grotesk', sans-serif;">
+          Stay Updated
+        </h3>
+        <p class="text-gray-400 text-sm">
+          Subscribe to our newsletter for exclusive deals, new products, and esports updates
+        </p>
+      </div>
+      
+      {# Newsletter Form #}
+      <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3">
+        {% csrf_token %}
+        <div class="flex-1">
+          <input 
+            type="email" 
+            id="newsletter-email" 
+            name="email" 
+            placeholder="Enter your email address"
+            required
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors"
+            aria-label="Email address for newsletter"
+          >
+        </div>
+        <button 
+          type="submit" 
+          class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_rgba(236,19,19,0.5)] uppercase tracking-wide"
+          style="font-family: 'Space Grotesk', sans-serif;"
+        >
+          Subscribe
+        </button>
+      </form>
+      
+      {# Success/Error Messages #}
+      <div id="newsletter-message" class="mt-4 text-center hidden">
+        <p class="text-sm"></p>
+      </div>
+    </div>
+    
+    {# Divider Line #}
+    <div class="footer-divider h-px bg-gradient-to-r from-transparent via-red-600/50 to-transparent mb-8"></div>
+    
+    {# Social Icons Row #}
+    <div class="social-icons flex justify-center gap-8 mb-8">
+      {# Discord #}
+      <a 
+        href="{{ discord_url|default:'#' }}" 
+        class="social-icon text-gray-400 hover:text-indigo-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Join our Discord server"
+      >
+        <span class="material-symbols-outlined text-4xl">forum</span>
+      </a>
+      
+      {# X (Twitter) #}
+      <a 
+        href="{{ twitter_url|default:'#' }}" 
+        class="social-icon text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Follow us on X (Twitter)"
+      >
+        <span class="material-symbols-outlined text-4xl">tag</span>
+      </a>
+      
+      {# Twitch #}
+      <a 
+        href="{{ twitch_url|default:'#' }}" 
+        class="social-icon text-gray-400 hover:text-purple-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Watch us on Twitch"
+      >
+        <span class="material-symbols-outlined text-4xl">live_tv</span>
+      </a>
+      
+      {# YouTube #}
+      <a 
+        href="{{ youtube_url|default:'#' }}" 
+        class="social-icon text-gray-400 hover:text-red-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Subscribe on YouTube"
+      >
+        <span class="material-symbols-outlined text-4xl">play_circle</span>
+      </a>
+    </div>
+    
+    {# Divider Line #}
+    <div class="footer-divider h-px bg-gradient-to-r from-transparent via-red-600/50 to-transparent mb-8"></div>
+    
+    {# Legal & Copyright Section #}
+    <div class="footer-legal text-center">
+      {# Copyright Text #}
+      <p class="text-gray-400 text-sm mb-3">
+        © {{ current_year|default:"2024" }} EYTGaming. All rights reserved.
+      </p>
+      
+      {# Legal Links #}
+      <div class="legal-links flex justify-center items-center gap-4 text-sm">
+        <a 
+          href="#" 
+          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
+        >
+          Privacy Policy
+        </a>
+        
+        <span class="separator text-gray-600">•</span>
+        
+        <a 
+          href="#" 
+          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
+        >
+          Terms of Service
+        </a>
+        
+        <span class="separator text-gray-600">•</span>
+        
+        <a 
+          href="#" 
+          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
+        >
+          Contact
+        </a>
+      </div>
+    </div>
+    
+    {# Back to Top Button (Optional Enhancement) #}
+    <div class="text-center mt-8">
+      <button 
+        id="back-to-top" 
+        class="inline-flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group"
+        aria-label="Back to top"
+      >
+        <span class="text-xs uppercase tracking-widest">Back to Top</span>
+        <span class="material-symbols-outlined text-2xl transform group-hover:-translate-y-1 transition-transform">
+          keyboard_arrow_up
+        </span>
+      </button>
+    </div>
+    
+  </div>
+</footer>
+
+{# Back to Top JavaScript #}
+<script>
+  (function() {
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    if (backToTopBtn) {
+      backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+    
+    // Newsletter Form Submission
+    const newsletterForm = document.getElementById('newsletter-form');
+    const newsletterMessage = document.getElementById('newsletter-message');
+    
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const emailInput = document.getElementById('newsletter-email');
+        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+        const email = emailInput.value.trim();
+        
+        // Disable form during submission
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Subscribing...';
+        newsletterMessage.classList.add('hidden');
+        
+        try {
+          // Get CSRF token
+          const csrfToken = newsletterForm.querySelector('[name="csrfmiddlewaretoken"]').value;
+          
+          // Send AJAX request
+          const response = await fetch('/store/newsletter/subscribe/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ email: email })
+          });
+          
+          const data = await response.json();
+          
+          // Show message
+          const messageP = newsletterMessage.querySelector('p');
+          newsletterMessage.classList.remove('hidden');
+          
+          if (data.success) {
+            messageP.textContent = data.message;
+            messageP.className = 'text-sm text-green-400';
+            emailInput.value = ''; // Clear input on success
+          } else {
+            messageP.textContent = data.error || 'An error occurred. Please try again.';
+            messageP.className = 'text-sm text-red-400';
+          }
+          
+        } catch (error) {
+          console.error('Newsletter subscription error:', error);
+          const messageP = newsletterMessage.querySelector('p');
+          messageP.textContent = 'An error occurred. Please try again.';
+          messageP.className = 'text-sm text-red-400';
+          newsletterMessage.classList.remove('hidden');
+        } finally {
+          // Re-enable form
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Subscribe';
+        }
+      });
+    }
+  })();
+</script>

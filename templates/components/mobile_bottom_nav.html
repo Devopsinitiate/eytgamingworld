@@ -1,0 +1,196 @@
+{% load static %}
+
+<!-- Mobile Bottom Navigation - For pages extending base.html -->
+<nav class="mobile-bottom-nav md:hidden" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-nav-grid">
+        <a href="{% url 'dashboard:home' %}"
+            class="mobile-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+            aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">dashboard</span>
+            <span>Home</span>
+        </a>
+
+        <a href="{% url 'tournaments:list' %}"
+            class="mobile-nav-item {% if 'tournaments' in request.path %}active{% endif %}"
+            aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">emoji_events</span>
+            <span>Tournaments</span>
+        </a>
+
+        <a href="{% url 'teams:list' %}" class="mobile-nav-item {% if 'teams' in request.path %}active{% endif %}"
+            aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">groups</span>
+            <span>Teams</span>
+        </a>
+
+        <a href="{% url 'notifications:list' %}"
+            class="mobile-nav-item {% if 'notifications' in request.path %}active{% endif %}"
+            aria-label="Notifications{% if 'notifications' in request.path %}, current page{% endif %}" {% if 'notifications' in request.path %}aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">notifications</span>
+            <span>Alerts</span>
+        </a>
+
+        <button onclick="toggleMobileMenu()" class="mobile-nav-item" aria-label="Open menu" aria-expanded="false"
+            aria-controls="mobile-menu">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">menu</span>
+            <span>Menu</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Slide-out Menu -->
+<div id="mobile-menu" class="fixed inset-0 z-[10001] hidden" role="dialog" aria-modal="true"
+    aria-label="Navigation menu">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
+
+    <!-- Menu Panel -->
+    <div class="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-[#0A0A0A] border-l-2 border-[#DC2626]/30 shadow-2xl transform transition-transform duration-300 translate-x-0 flex flex-col"
+        style="height: 100%;">
+        <!-- Menu Header -->
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-10 w-auto rounded neon-red-glow">
+                <span class="gaming-header text-lg text-white">MENU</span>
+            </div>
+            <button onclick="toggleMobileMenu()"
+                class="w-10 h-10 rounded-lg bg-[#1F1F1F] text-white flex items-center justify-center hover:bg-[#DC2626] transition-colors"
+                aria-label="Close menu">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Menu Content -->
+        <div class="p-4 flex-1 min-h-0 overflow-y-auto"
+            style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
+            <!-- Primary Navigation -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">PRIMARY</h3>
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="{% url 'dashboard:home' %}"
+                        class="nav-item-gaming {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">dashboard</span>
+                        </span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Competition -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">COMPETITION</h3>
+                <div class="nav-group" role="group" aria-label="Competition navigation">
+                    <a href="{% url 'tournaments:list' %}"
+                        class="nav-item-gaming {% if 'tournaments' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">emoji_events</span>
+                        </span>
+                        <span class="nav-label">Tournaments</span>
+                    </a>
+                    <a href="{% url 'teams:list' %}"
+                        class="nav-item-gaming {% if 'teams' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">groups</span>
+                        </span>
+                        <span class="nav-label">Teams</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Training -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">TRAINING</h3>
+                <div class="nav-group" role="group" aria-label="Training navigation">
+                    <a href="{% url 'coaching:coach_list' %}"
+                        class="nav-item-gaming {% if 'coaching' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">sports_esports</span>
+                        </span>
+                        <span class="nav-label">Coaching</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Marketplace -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">MARKETPLACE</h3>
+                <div class="nav-group" role="group" aria-label="Marketplace navigation">
+                    <a href="{% url 'store:product_list' %}"
+                        class="nav-item-gaming {% if 'store' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">shopping_bag</span>
+                        </span>
+                        <span class="nav-label">Store</span>
+                    </a>
+                    <a href="{% url 'venues:list' %}"
+                        class="nav-item-gaming {% if 'venues' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">location_on</span>
+                        </span>
+                        <span class="nav-label">Venues</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Personal -->
+            {% if user.is_authenticated %}
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">PERSONAL</h3>
+                <div class="nav-group" role="group" aria-label="Personal navigation">
+                    <a href="{% url 'dashboard:profile_view' username=request.user.username %}"
+                        class="nav-item-gaming {% if 'profile' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">person</span>
+                        </span>
+                        <span class="nav-label">Profile</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- System -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">SYSTEM</h3>
+                <div class="nav-group" role="group" aria-label="System navigation">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'payments:payment_methods' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">payment</span>
+                        </span>
+                        <span class="nav-label">Payments</span>
+                    </a>
+                    <a href="{% url 'notifications:preferences' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">settings</span>
+                        </span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                    <a href="{% url 'account_logout' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">logout</span>
+                        </span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">login</span>
+                        </span>
+                        <span class="nav-label">Login</span>
+                    </a>
+                    <a href="{% url 'account_signup' %}" class="nav-item-gaming">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">person_add</span>
+                        </span>
+                        <span class="nav-label">Sign Up</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spacer for fixed bottom nav -->
+<div class="h-16 md:hidden"></div>

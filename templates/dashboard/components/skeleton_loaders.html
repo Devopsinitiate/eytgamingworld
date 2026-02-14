@@ -1,0 +1,150 @@
+<!-- Skeleton Loading States for Dashboard -->
+
+<!-- Skeleton: Stats Cards -->
+<div class="skeleton-loader" id="skeleton-stats">
+    <div class="mobile-stat-grid md:grid-cols-4 md:gap-6">
+        {% for i in "1234" %}
+        <div class="skeleton-card">
+            <div class="skeleton-card-content">
+                <div class="flex flex-col items-center justify-center text-center gap-3">
+                    <div class="skeleton-stat"></div>
+                    <div class="skeleton-text skeleton-text-short"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Skeleton: Activity Feed -->
+<div class="skeleton-loader" id="skeleton-activity">
+    <div class="card-gaming">
+        <div class="card-gaming-content p-6">
+            <div class="skeleton-text skeleton-text-short mb-4" style="height: 1.5rem;"></div>
+            <div class="space-y-4">
+                {% for i in "12345" %}
+                <div class="flex items-center gap-4">
+                    <div class="skeleton-avatar"></div>
+                    <div class="flex-1">
+                        <div class="skeleton-text skeleton-text-long"></div>
+                        <div class="skeleton-text skeleton-text-short" style="height: 0.75rem;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skeleton: Quick Actions -->
+<div class="skeleton-loader" id="skeleton-actions">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {% for i in "1234" %}
+        <div class="skeleton-button h-24 w-full"></div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Skeleton: Tournament Cards -->
+<div class="skeleton-loader" id="skeleton-tournaments">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for i in "123" %}
+        <div class="skeleton-card">
+            <div class="skeleton-card-content">
+                <div class="skeleton-text skeleton-text-long mb-4" style="height: 10rem;"></div>
+                <div class="skeleton-text skeleton-text-long mb-2"></div>
+                <div class="skeleton-text skeleton-text-short mb-4"></div>
+                <div class="flex justify-between">
+                    <div class="skeleton-text skeleton-text-short" style="width: 30%;"></div>
+                    <div class="skeleton-text skeleton-text-short" style="width: 30%;"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Skeleton: Profile Header -->
+<div class="skeleton-loader" id="skeleton-profile">
+    <div class="card-gaming-highlight overflow-hidden">
+        <div class="relative h-48 md:h-64 skeleton-gaming"></div>
+        <div class="card-gaming-content p-6">
+            <div class="flex flex-col md:flex-row md:items-end gap-6 -mt-20 md:-mt-16">
+                <div class="skeleton-avatar" style="width: 8rem; height: 8rem; flex-shrink: 0;"></div>
+                <div class="flex-1">
+                    <div class="skeleton-text skeleton-text-long mb-2" style="height: 2rem;"></div>
+                    <div class="skeleton-text skeleton-text-long mb-4"></div>
+                    <div class="flex gap-4">
+                        <div class="skeleton-button"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skeleton: Team Cards -->
+<div class="skeleton-loader" id="skeleton-teams">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for i in "123" %}
+        <div class="skeleton-card">
+            <div class="skeleton-card-content">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="skeleton-avatar"></div>
+                    <div class="flex-1">
+                        <div class="skeleton-text skeleton-text-long"></div>
+                        <div class="skeleton-text skeleton-text-short"></div>
+                    </div>
+                </div>
+                <div class="skeleton-text skeleton-text-long mb-2"></div>
+                <div class="flex justify-between mt-4">
+                    <div class="skeleton-text skeleton-text-short" style="width: 40%;"></div>
+                    <div class="skeleton-button" style="width: 40%;"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Skeleton Utility Script -->
+<script>
+    // Helper functions to show/hide skeleton loaders
+    function showSkeleton(skeletonId) {
+        const skeleton = document.getElementById(skeletonId);
+        if (skeleton) {
+            skeleton.style.display = 'block';
+        }
+    }
+
+    function hideSkeleton(skeletonId) {
+        const skeleton = document.getElementById(skeletonId);
+        if (skeleton) {
+            skeleton.style.display = 'none';
+        }
+    }
+
+    function showAllSkeletons() {
+        document.querySelectorAll('.skeleton-loader').forEach(el => {
+            el.style.display = 'block';
+        });
+        document.querySelectorAll('.content-loaded').forEach(el => {
+            el.style.display = 'none';
+        });
+    }
+
+    function hideAllSkeletons() {
+        document.querySelectorAll('.skeleton-loader').forEach(el => {
+            el.style.display = 'none';
+        });
+        document.querySelectorAll('.content-loaded').forEach(el => {
+            el.style.display = 'block';
+        });
+    }
+
+    // Auto-hide skeletons when page is fully loaded
+    window.addEventListener('load', () => {
+        setTimeout(hideAllSkeletons, 500);
+    });
+</script>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Team Selection</title>
+    <style>
+        :root {
+            --eyt-primary: #b91c1c;
+            --eyt-primary-alpha-20: rgba(185, 28, 28, 0.2);
+        }
+        
+        body {
+            background-color: #111827;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        
+        .team-option-card {
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #111827;
+        }
+        
+        .team-option-card:hover {
+            border-color: var(--eyt-primary);
+            background-color: #1f1f1f;
+        }
+        
+        .team-option-card.selected {
+            border-color: var(--eyt-primary);
+            background-color: #1f1f1f;
+            box-shadow: 0 0 10px var(--eyt-primary-alpha-20);
+        }
+        
+        .radio-indicator {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #6b7280;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .radio-indicator.border-primary {
+            border-color: var(--eyt-primary);
+        }
+        
+        .dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: var(--eyt-primary);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.2s;
+        }
+        
+        .dot.scale-100 {
+            transform: scale(1);
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .gap-4 {
+            gap: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .test-results {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Team Selection Test</h1>
+    
+    <div class="form-group">
+        <label class="text-lg font-semibold text-white mb-3 block">Select Your Team</label>
+        <div class="grid grid-cols-1 gap-3">
+            <!-- Team 1 -->
+            <div class="team-option-card group" onclick="selectTeam('team1')">
+                <input type="radio" name="team" value="team1" id="team_team1" class="hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary font-bold text-xl overflow-hidden">
+                            T1
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-primary transition-colors">Test Team 1</h4>
+                            <p class="text-xs text-gray-500">4 Members</p>
+                        </div>
+                    </div>
+                    <div class="radio-indicator border-gray-600">
+                        <div class="dot"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team 2 -->
+            <div class="team-option-card group" onclick="selectTeam('team2')">
+                <input type="radio" name="team" value="team2" id="team_team2" class="hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary font-bold text-xl overflow-hidden">
+                            T2
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white group-hover:text-primary transition-colors">Test Team 2</h4>
+                            <p class="text-xs text-gray-500">3 Members</p>
+                        </div>
+                    </div>
+                    <div class="radio-indicator border-gray-600">
+                        <div class="dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-results">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+        <button onclick="testSelection()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--eyt-primary); color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
+            Test Selection
+        </button>
+    </div>
+
+    <script>
+        function selectTeam(teamId) {
+            console.log('selectTeam called with:', teamId);
+            
+            // Remove selection from all team options
+            document.querySelectorAll('.team-option-card').forEach(option => {
+                option.classList.remove('selected');
+                const indicator = option.querySelector('.radio-indicator');
+                const dot = option.querySelector('.dot');
+                if (indicator) {
+                    indicator.classList.remove('border-primary');
+                    indicator.classList.add('border-gray-600');
+                    if (dot) {
+                        dot.classList.remove('scale-100');
+                        dot.classList.add('scale-0');
+                    }
+                }
+            });
+
+            // Select the clicked team
+            const selectedOption = document.querySelector(`#team_${teamId}`).closest('.team-option-card');
+            console.log('Selected option:', selectedOption);
+            
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+                const indicator = selectedOption.querySelector('.radio-indicator');
+                const dot = selectedOption.querySelector('.dot');
+                if (indicator) {
+                    indicator.classList.remove('border-gray-600');
+                    indicator.classList.add('border-primary');
+                    if (dot) {
+                        dot.classList.remove('scale-0');
+                        dot.classList.add('scale-100');
+                    }
+                }
+
+                // Check the radio button
+                const radioButton = document.getElementById(`team_${teamId}`);
+                if (radioButton) {
+                    radioButton.checked = true;
+                    console.log('Radio button checked:', radioButton.checked);
+                }
+            }
+            
+            updateResults();
+        }
+        
+        function updateResults() {
+            const selectedRadio = document.querySelector('input[name="team"]:checked');
+            const results = document.getElementById('results');
+            if (selectedRadio) {
+                results.innerHTML = `<p style="color: #10b981;">✅ Selected team: ${selectedRadio.value}</p>`;
+            } else {
+                results.innerHTML = `<p style="color: #ef4444;">❌ No team selected</p>`;
+            }
+        }
+        
+        function testSelection() {
+            console.log('Testing automatic selection...');
+            selectTeam('team1');
+            setTimeout(() => {
+                selectTeam('team2');
+            }, 1000);
+        }
+        
+        // Initial update
+        updateResults();
+        
+        // Add click event listeners as backup
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, adding event listeners...');
+            document.querySelectorAll('.team-option-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    console.log('Card clicked:', this);
+                    const input = this.querySelector('input[type="radio"]');
+                    if (input) {
+                        const teamId = input.value;
+                        console.log('Calling selectTeam with:', teamId);
+                        selectTeam(teamId);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+/* Test CSS for product detail page */
+/* Simple, high-specificity styles to ensure visibility */
+
+body.store-product-detail {
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    font-family: Arial, sans-serif !important;
+}
+
+.product-detail-container {
+    background: #1a1a1a !important;
+    border: 2px solid #dc2626 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin: 20px 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.product-title {
+    color: #ffffff !important;
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1rem !important;
+    display: block !important;
+}
+
+.product-price {
+    color: #dc2626 !important;
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1rem !important;
+    display: block !important;
+}
+
+.product-description {
+    color: #cccccc !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1rem !important;
+    display: block !important;
+}
+
+.btn-add-to-cart {
+    background: #dc2626 !important;
+    color: white !important;
+    padding: 12px 24px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    margin: 10px 5px !important;
+}
+
+.btn-back {
+    background: #333333 !important;
+    color: white !important;
+    padding: 12px 24px !important;
+    border: 2px solid #dc2626 !important;
+    border-radius: 4px !important;
+    font-size: 1rem !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    margin: 10px 5px !important;
+}
+
+/* Ensure all elements are visible */
+* {
+    visibility: visible !important;
+    display: block !important;
+}

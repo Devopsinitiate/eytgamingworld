@@ -4,131 +4,34 @@
 {% block title %}Tournaments - EYTGaming{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl">
-    <!-- Header -->
-    <div class="mb-8 flex items-center justify-between">
+<!-- Include Skeleton Loaders -->
+{% include "dashboard/components/skeleton_loaders.html" %}
+
+<div class="max-w-7xl content-loaded">
+    <!-- Gaming Header -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-            <h1 class="text-white text-3xl font-bold mb-2">Tournaments</h1>
-            <p class="text-gray-400">Browse and join competitive gaming tournaments</p>
+            <h1 class="gaming-header text-3xl md:text-4xl text-electric-red mb-2">TOURNAMENTS</h1>
+            <p class="gaming-body text-gray-400">Browse and join competitive gaming tournaments</p>
         </div>
         {% if user.can_organize_tournaments %}
-        <a href="{% url 'tournaments:create' %}"
-            class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined">add</span>
-            Create Tournament
+        <a href="{% url 'tournaments:create' %}" class="btn-gaming-primary">
+            <span class="material-symbols-outlined mr-2">add</span>
+            <span class="btn-gaming-text">CREATE TOURNAMENT</span>
         </a>
         {% endif %}
     </div>
 
-    <!-- Filters -->
-    <div class="mb-6 bg-card-dark border border-card-border-dark rounded-lg p-4">
-        <form method="get" id="filter-form" class="flex flex-wrap gap-4">
-            <!-- Search -->
-            <div class="flex-1 min-w-[200px]">
-                <div class="relative">
-                    <input type="text" name="search" id="search-input" value="{{ request.GET.search }}"
-                        placeholder="Search tournaments..."
-                        class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                    <span
-                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl">search</span>
-                </div>
-            </div>
-
-            <!-- Game Filter -->
-            <select name="game" id="game-filter"
-                class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                <option value="">All Games</option>
-                {% for game in available_games %}
-                <option value="{{ game.slug }}" {% if request.GET.game==game.slug %}selected{% endif %}>{{ game.name }}
-                </option>
-                {% endfor %}
-            </select>
-
-            <!-- Status Filter -->
-            <select name="status" id="status-filter"
-                class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                <option value="">All Status</option>
-                <option value="registration" {% if request.GET.status=='registration' %}selected{% endif %}>Registration
-                    Open</option>
-                <option value="check_in" {% if request.GET.status=='check_in' %}selected{% endif %}>Check-in</option>
-                <option value="in_progress" {% if request.GET.status=='in_progress' %}selected{% endif %}>In Progress
-                </option>
-                <option value="completed" {% if request.GET.status=='completed' %}selected{% endif %}>Completed</option>
-            </select>
-
-            <!-- Format Filter -->
-            <select name="format" id="format-filter"
-                class="bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                <option value="">All Formats</option>
-                <option value="single_elim" {% if request.GET.format=='single_elim' %}selected{% endif %}>Single
-                    Elimination</option>
-                <option value="double_elim" {% if request.GET.format=='double_elim' %}selected{% endif %}>Double
-                    Elimination</option>
-                <option value="swiss" {% if request.GET.format=='swiss' %}selected{% endif %}>Swiss</option>
-                <option value="round_robin" {% if request.GET.format=='round_robin' %}selected{% endif %}>Round Robin
-                </option>
-            </select>
-
-            <button type="submit"
-                class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-                Filter
-            </button>
-
-            <!-- Clear Filters Button -->
-            <button type="button" id="clear-filters"
-                class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
-                Clear
-            </button>
-        </form>
-    </div>
+    <!-- Gaming Filters -->
+    {% include "tournaments/components/filters_gaming.html" %}
 
     <!-- Featured Tournaments -->
     {% if featured_tournaments %}
     <div class="mb-8">
-        <h2 class="text-white text-xl font-bold mb-4">Featured Tournaments</h2>
+        <h2 class="gaming-subheader text-xl text-electric-red mb-4">⚡ FEATURED TOURNAMENTS</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {% for tournament in featured_tournaments %}
-            <a href="{% url 'tournaments:detail' slug=tournament.slug %}"
-                class="bg-card-dark border border-card-border-dark rounded-lg overflow-hidden hover:border-primary transition-colors">
-                <div class="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                    {% if tournament.banner %}
-                    <img src="{{ tournament.banner.url }}" alt="{{ tournament.name }}"
-                        class="w-full h-full object-cover">
-                    {% else %}
-                    <span class="material-symbols-outlined text-primary text-6xl">emoji_events</span>
-                    {% endif %}
-                </div>
-                <div class="p-6">
-                    <div class="flex items-center gap-2 mb-2">
-                        {% if tournament.status == 'registration' %}
-                        <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Registration
-                            Open</span>
-                        {% elif tournament.status == 'in_progress' %}
-                        <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">In Progress</span>
-                        {% elif tournament.status == 'completed' %}
-                        <span class="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">Completed</span>
-                        {% endif %}
-                        {% if tournament.prize_pool > 0 %}
-                        <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">${{
-                            tournament.prize_pool }}</span>
-                        {% endif %}
-                    </div>
-                    <h3 class="text-white text-lg font-bold mb-2">{{ tournament.name }}</h3>
-                    <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ tournament.description|truncatewords:15 }}</p>
-                    <div class="flex items-center justify-between text-sm">
-                        <div class="text-gray-400">
-                            <span class="material-symbols-outlined text-xs align-middle">people</span>
-                            <span class="ml-1">{{ tournament.total_registered }}/{{ tournament.max_participants
-                                }}</span>
-                        </div>
-                        <div class="text-gray-400">
-                            <span class="material-symbols-outlined text-xs align-middle">calendar_today</span>
-                            <span class="ml-1">{{ tournament.start_datetime|date:"M d" }}</span>
-                            <span class="hidden">{{ tournament.start_datetime|timezone:"UTC"|date:"M d, Y" }}</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
+                {% include "tournaments/components/tournament_card_gaming.html" with tournament=tournament %}
             {% endfor %}
         </div>
     </div>
@@ -136,101 +39,67 @@
 
     <!-- Tournament List -->
     <div class="mb-4">
-        <h2 class="text-white text-xl font-bold">All Tournaments</h2>
+        <h2 class="gaming-subheader text-xl text-electric-red">🏆 ALL TOURNAMENTS</h2>
+    </div>
+
+    <!-- Skeleton for tournaments -->
+    <div class="skeleton-loader" id="skeleton-tournaments">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for i in "123456" %}
+            <div class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="skeleton-text skeleton-text-long mb-4" style="height: 10rem;"></div>
+                    <div class="skeleton-text skeleton-text-long mb-2"></div>
+                    <div class="skeleton-text skeleton-text-short mb-4"></div>
+                    <div class="flex justify-between">
+                        <div class="skeleton-text skeleton-text-short" style="width: 30%;"></div>
+                        <div class="skeleton-text skeleton-text-short" style="width: 30%;"></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
     {% if tournaments %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 content-loaded">
         {% for tournament in tournaments %}
-        <a href="{% url 'tournaments:detail' slug=tournament.slug %}"
-            class="bg-card-dark border border-card-border-dark rounded-lg overflow-hidden hover:border-primary transition-colors">
-            <div class="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                {% if tournament.thumbnail %}
-                <img src="{{ tournament.thumbnail.url }}" alt="{{ tournament.name }}"
-                    class="w-full h-full object-cover">
-                {% else %}
-                <span class="material-symbols-outlined text-primary text-6xl">emoji_events</span>
-                {% endif %}
-            </div>
-            <div class="p-6">
-                <div class="flex items-center gap-2 mb-2 flex-wrap">
-                    {% if tournament.status == 'registration' %}
-                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">Registration Open</span>
-                    {% elif tournament.status == 'check_in' %}
-                    <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">Check-in</span>
-                    {% elif tournament.status == 'in_progress' %}
-                    <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">In Progress</span>
-                    {% elif tournament.status == 'completed' %}
-                    <span class="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">Completed</span>
-                    {% endif %}
-
-                    <span class="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">{{
-                        tournament.game.name }}</span>
-
-                    {% if tournament.prize_pool > 0 %}
-                    <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">${{ tournament.prize_pool
-                        }}</span>
-                    {% endif %}
-                </div>
-                <h3 class="text-white text-lg font-bold mb-2">{{ tournament.name }}</h3>
-                <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ tournament.description|truncatewords:15 }}</p>
-                <div class="flex items-center justify-between text-sm mb-2">
-                    <div class="text-gray-400">
-                        <span class="material-symbols-outlined text-xs align-middle">people</span>
-                        <span class="ml-1">{{ tournament.total_registered }}/{{ tournament.max_participants }}</span>
-                    </div>
-                    <div class="text-gray-400">
-                        <span class="material-symbols-outlined text-xs align-middle">calendar_today</span>
-                        <span class="ml-1">{{ tournament.start_datetime|date:"M d, Y" }}</span>
-                        <span class="hidden">{{ tournament.start_datetime|timezone:"UTC"|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-                {% if tournament.is_registration_open %}
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ tournament.registration_progress }}%">
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </a>
+            {% include "tournaments/components/tournament_card_gaming.html" with tournament=tournament %}
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <div class="mt-8 flex justify-center gap-2 pagination">
+    <div class="mt-8 flex justify-center gap-2 pagination content-loaded">
         {% if page_obj.has_previous %}
         <a href="?page=1{% if filter_params.status %}&status={{ filter_params.status }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.format %}&format={{ filter_params.format }}{% endif %}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}"
-            class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">First</a>
+            class="btn-gaming-secondary">FIRST</a>
         <a href="?page={{ page_obj.previous_page_number }}{% if filter_params.status %}&status={{ filter_params.status }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.format %}&format={{ filter_params.format }}{% endif %}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}"
-            class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Previous</a>
+            class="btn-gaming-secondary">PREVIOUS</a>
         {% endif %}
 
-        <span class="px-4 py-2 bg-primary text-white rounded-lg">Page {{ page_obj.number }} of {{
-            page_obj.paginator.num_pages }}</span>
+        <span class="px-4 py-2 bg-electric-red text-white rounded gaming-subheader">PAGE {{ page_obj.number }} OF {{ page_obj.paginator.num_pages }}</span>
 
         {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if filter_params.status %}&status={{ filter_params.status }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.format %}&format={{ filter_params.format }}{% endif %}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}"
-            class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Next</a>
+            class="btn-gaming-secondary">NEXT</a>
         <a href="?page={{ page_obj.paginator.num_pages }}{% if filter_params.status %}&status={{ filter_params.status }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.format %}&format={{ filter_params.format }}{% endif %}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}"
-            class="px-4 py-2 bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors">Last</a>
+            class="btn-gaming-secondary">LAST</a>
         {% endif %}
     </div>
     {% endif %}
 
     {% else %}
     <!-- No Tournaments -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
+    <div class="card-gaming p-12 text-center content-loaded">
         <div class="mb-6">
-            <span class="material-symbols-outlined text-gray-500 text-6xl">emoji_events</span>
+            <span class="material-symbols-outlined text-electric-red text-6xl neon-red-glow">emoji_events</span>
         </div>
-        <h2 class="text-white text-2xl font-bold mb-4">No Tournaments Found</h2>
-        <p class="text-gray-400 mb-6">There are no tournaments matching your criteria. Try adjusting your filters or
-            check back later!</p>
+        <h2 class="gaming-header text-2xl text-electric-red mb-4">NO TOURNAMENTS FOUND</h2>
+        <p class="gaming-body text-gray-400 mb-6">There are no tournaments matching your criteria. Try adjusting your filters or check back later!</p>
         {% if user.can_organize_tournaments %}
-        <a href="{% url 'tournaments:create' %}"
-            class="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-            Create First Tournament
+        <a href="{% url 'tournaments:create' %}" class="btn-gaming-primary">
+            <span class="btn-gaming-text">CREATE FIRST TOURNAMENT</span>
         </a>
         {% endif %}
     </div>

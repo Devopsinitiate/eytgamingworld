@@ -5,10 +5,42 @@
 
 {% block extra_css %}
 {{ block.super }}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Force dark theme overrides for settings pages */
+    .bg-white,
+    .bg-gray-50 {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+    
+    .text-gray-900 {
+        color: #ffffff !important;
+    }
+    
+    .text-gray-600 {
+        color: #9ca3af !important;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+    
+    /* Settings form styling */
+    .settings-form {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+    
+    /* Settings sections styling */
+    .settings-section {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
     }
 </style>
 {% endblock %}

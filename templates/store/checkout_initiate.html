@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout - EYTGaming Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Use Space Grotesk font for store pages */
+    body {
+        font-family: 'Space Grotesk', 'Spline Sans', sans-serif;
+    }
+
+    /* Checkout-specific styles matching EYTGaming design aesthetic */
+    .checkout-card {
+        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+        border: 1px solid rgba(236, 19, 19, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .checkout-card:hover {
+        border-color: rgba(236, 19, 19, 0.4);
+        box-shadow: 0 0 20px rgba(236, 19, 19, 0.2);
+    }
+    
+    .checkout-summary {
+        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        position: sticky;
+        top: 20px;
+        box-shadow: 0 0 20px rgba(236, 19, 19, 0.1);
+    }
+    
+    .checkout-step {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background: rgba(236, 19, 19, 0.1);
+        border: 1px solid rgba(236, 19, 19, 0.3);
+    }
+    
+    .checkout-step.active {
+        background: rgba(236, 19, 19, 0.2);
+        border-color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-background-dark py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Checkout</h1>
+            <p class="text-gray-400">Review your order and proceed to shipping</p>
+        </div>
+
+        <!-- Checkout Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="checkout-step active">
+                <span class="material-symbols-outlined text-primary mr-3 text-3xl">
+                    shopping_cart
+                </span>
+                <div>
+                    <h3 class="text-white font-semibold">Review Cart</h3>
+                    <p class="text-gray-400 text-sm">Current step</p>
+                </div>
+            </div>
+            <div class="checkout-step">
+                <span class="material-symbols-outlined text-gray-600 mr-3 text-3xl">
+                    local_shipping
+                </span>
+                <div>
+                    <h3 class="text-gray-400 font-semibold">Shipping Info</h3>
+                    <p class="text-gray-500 text-sm">Next step</p>
+                </div>
+            </div>
+            <div class="checkout-step">
+                <span class="material-symbols-outlined text-gray-600 mr-3 text-3xl">
+                    payment
+                </span>
+                <div>
+                    <h3 class="text-gray-400 font-semibold">Payment</h3>
+                    <p class="text-gray-500 text-sm">Final step</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-2 space-y-4">
+                <h2 class="text-2xl font-bold text-white mb-4">Order Items</h2>
+                
+                {% for item in cart_items %}
+                    <div class="checkout-card rounded-lg p-6">
+                        <div class="flex flex-col sm:flex-row gap-6">
+                            <!-- Product Image -->
+                            <div class="flex-shrink-0">
+                                {% if item.product.images.all %}
+                                    <img src="{{ item.product.images.first.image.url }}" 
+                                         alt="{{ item.product.images.first.alt_text }}"
+                                         class="w-24 h-24 object-cover rounded-lg">
+                                {% else %}
+                                    <div class="w-24 h-24 bg-gray-800 rounded-lg flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-gray-600 text-3xl">
+                                            image
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="flex-grow">
+                                <h3 class="text-lg font-bold text-white mb-1">
+                                    {{ item.product.name }}
+                                </h3>
+                                {% if item.variant %}
+                                    <p class="text-gray-400 text-sm">
+                                        {{ item.variant.name }}
+                                    </p>
+                                {% endif %}
+                                <p class="text-gray-500 text-sm mt-1">
+                                    {{ item.product.category.name }}
+                                </p>
+
+                                <!-- Quantity and Price -->
+                                <div class="flex items-center justify-between mt-4">
+                                    <p class="text-gray-400">
+                                        Quantity: <span class="text-white font-semibold">{{ item.quantity }}</span>
+                                    </p>
+                                    <div class="text-right">
+                                        <p class="text-gray-400 text-sm">
+                                            ${{ item.unit_price }} each
+                                        </p>
+                                        <p class="text-xl font-bold text-primary">
+                                            ${{ item.total_price }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Back to Cart Link -->
+                <div class="mt-6">
+                    <a href="{% url 'store:cart' %}" 
+                       class="inline-flex items-center text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined mr-2">arrow_back</span>
+                        Back to Cart
+                    </a>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="checkout-summary rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">Order Summary</h2>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between text-gray-300">
+                            <span>Items ({{ item_count }})</span>
+                            <span class="font-semibold">${{ subtotal }}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Shipping</span>
+                            <span class="text-sm">Calculated next</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Tax</span>
+                            <span class="text-sm">Calculated next</span>
+                        </div>
+                        <div class="border-t border-gray-700 pt-4">
+                            <div class="flex justify-between text-white text-xl font-bold">
+                                <span>Subtotal</span>
+                                <span>${{ subtotal }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'store:checkout_shipping' %}" 
+                       class="block w-full bg-primary text-white py-3 rounded-lg font-semibold text-center hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/50">
+                        Continue to Shipping
+                    </a>
+
+                    <!-- Security Badge -->
+                    <div class="mt-6 flex items-center justify-center text-gray-400 text-sm">
+                        <span class="material-symbols-outlined mr-2 text-green-500">
+                            lock
+                        </span>
+                        <span>Secure Checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

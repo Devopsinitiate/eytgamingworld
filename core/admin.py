@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from .models import User, Game, UserGameProfile, SiteSettings
+from .models import User, Game, UserGameProfile, SiteSettings, Player, Video, NewsArticle, Product
 
 
 @admin.register(User)
@@ -88,19 +88,20 @@ class UserAdmin(BaseUserAdmin):
 class GameAdmin(admin.ModelAdmin):
     """Game admin"""
     
-    list_display = ['name', 'genre', 'supports_teams', 'team_size_range', 
-                    'is_active', 'created_at']
+    list_display = ['name', 'genre', 'category', 'supports_teams', 'team_size_range', 
+                    'is_active', 'display_order', 'created_at']
     list_filter = ['genre', 'is_active', 'supports_teams']
     search_fields = ['name', 'developer', 'description']
     prepopulated_fields = {'slug': ('name',)}
-    ordering = ['name']
+    ordering = ['display_order', 'name']
+    list_editable = ['display_order']
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'slug', 'description', 'genre')
+            'fields': ('name', 'slug', 'description', 'genre', 'category')
         }),
         ('Media', {
-            'fields': ('logo', 'banner')
+            'fields': ('logo', 'banner', 'key_art')
         }),
         ('Game Details', {
             'fields': ('developer', 'release_date', 'official_website')
@@ -108,8 +109,8 @@ class GameAdmin(admin.ModelAdmin):
         ('Team Settings', {
             'fields': ('supports_teams', 'min_team_size', 'max_team_size')
         }),
-        ('Status', {
-            'fields': ('is_active',)
+        ('Display Settings', {
+            'fields': ('is_active', 'display_order')
         }),
     )
     
@@ -185,3 +186,178 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """Prevent deletion of settings"""
         return False
+
+
+
+@admin.register(Player)
+class PlayerAdmin(admin.ModelAdmin):
+    """Featured Player admin for landing page"""
+    
+    list_display = ['gamer_tag', 'game', 'role', 'country_flag', 'kd_ratio', 
+                    'rank', 'wins', 'is_featured', 'display_order']
+    list_filter = ['game', 'is_featured', 'created_at']
+    search_fields = ['gamer_tag', 'role', 'rank']
+    ordering = ['display_order', '-kd_ratio']
+    list_editable = ['is_featured', 'display_order']
+    
+    fieldsets = (
+        ('Player Information', {
+            'fields': ('gamer_tag', 'role', 'game', 'country_flag')
+        }),
+        ('Media', {
+            'fields': ('image',)
+        }),
+        ('Statistics', {
+            'fields': ('kd_ratio', 'rank', 'wins')
+        }),
+        ('Display Settings', {
+            'fields': ('is_featured', 'display_order')
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    actions = ['feature_players', 'unfeature_players']
+    
+    def feature_players(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} players featured on landing page.')
+    feature_players.short_description = 'Feature selected players'
+    
+    def unfeature_players(self, request, queryset):
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} players removed from landing page.')
+    unfeature_players.short_description = 'Remove from landing page'
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    """Video admin for landing page"""
+    
+    list_display = ['title', 'game', 'duration_formatted', 'views', 'published_date', 
+                    'is_featured', 'is_published', 'display_order']
+    list_filter = ['is_featured', 'is_published', 'game', 'published_date']
+    search_fields = ['title', 'video_url']
+    ordering = ['-published_date']
+    list_editable = ['is_featured', 'is_published', 'display_order']
+    date_hierarchy = 'published_date'
+    
+    fieldsets = (
+        ('Video Information', {
+            'fields': ('title', 'video_url', 'thumbnail', 'duration')
+        }),
+        ('Metadata', {
+            'fields': ('views', 'published_date', 'game')
+        }),
+        ('Display Settings', {
+            'fields': ('is_featured', 'is_published', 'display_order')
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    actions = ['feature_videos', 'publish_videos', 'unpublish_videos']
+    
+    def feature_videos(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} videos featured on landing page.')
+    feature_videos.short_description = 'Feature selected videos'
+    
+    def publish_videos(self, request, queryset):
+        updated = queryset.update(is_published=True)
+        self.message_user(request, f'{updated} videos published.')
+    publish_videos.short_description = 'Publish selected videos'
+    
+    def unpublish_videos(self, request, queryset):
+        updated = queryset.update(is_published=False)
+        self.message_user(request, f'{updated} videos unpublished.')
+    unpublish_videos.short_description = 'Unpublish selected videos'
+
+
+@admin.register(NewsArticle)
+class NewsArticleAdmin(admin.ModelAdmin):
+    """News Article admin for landing page"""
+    
+    list_display = ['title', 'category', 'author', 'published_date', 'is_published']
+    list_filter = ['category', 'is_published', 'published_date', 'author']
+    search_fields = ['title', 'excerpt', 'content']
+    prepopulated_fields = {'slug': ('title',)}
+    ordering = ['-published_date']
+    list_editable = ['is_published']
+    date_hierarchy = 'published_date'
+    raw_id_fields = ['author']
+    
+    fieldsets = (
+        ('Article Content', {
+            'fields': ('title', 'slug', 'excerpt', 'content')
+        }),
+        ('Media', {
+            'fields': ('image',)
+        }),
+        ('Categorization', {
+            'fields': ('category', 'author')
+        }),
+        ('Publishing', {
+            'fields': ('published_date', 'is_published')
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    actions = ['publish_articles', 'unpublish_articles']
+    
+    def publish_articles(self, request, queryset):
+        updated = queryset.update(is_published=True)
+        self.message_user(request, f'{updated} articles published.')
+    publish_articles.short_description = 'Publish selected articles'
+    
+    def unpublish_articles(self, request, queryset):
+        updated = queryset.update(is_published=False)
+        self.message_user(request, f'{updated} articles unpublished.')
+    unpublish_articles.short_description = 'Unpublish selected articles'
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    """Product admin for landing page"""
+    
+    list_display = ['name', 'price', 'is_featured', 'is_available', 'display_order']
+    list_filter = ['is_featured', 'is_available', 'created_at']
+    search_fields = ['name', 'description']
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ['display_order', 'name']
+    list_editable = ['is_featured', 'is_available', 'display_order']
+    
+    fieldsets = (
+        ('Product Information', {
+            'fields': ('name', 'slug', 'description')
+        }),
+        ('Media', {
+            'fields': ('image',)
+        }),
+        ('Pricing', {
+            'fields': ('price',)
+        }),
+        ('Display Settings', {
+            'fields': ('is_featured', 'is_available', 'display_order')
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    actions = ['feature_products', 'mark_available', 'mark_unavailable']
+    
+    def feature_products(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} products featured on landing page.')
+    feature_products.short_description = 'Feature selected products'
+    
+    def mark_available(self, request, queryset):
+        updated = queryset.update(is_available=True)
+        self.message_user(request, f'{updated} products marked as available.')
+    mark_available.short_description = 'Mark as available'
+    
+    def mark_unavailable(self, request, queryset):
+        updated = queryset.update(is_available=False)
+        self.message_user(request, f'{updated} products marked as unavailable.')
+    mark_unavailable.short_description = 'Mark as unavailable'

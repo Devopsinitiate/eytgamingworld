@@ -393,7 +393,7 @@ class TeamUserSearchView(LoginRequiredMixin, View):
             Q(last_name__icontains=query)
         ).exclude(
             id=request.user.id  # Exclude current user
-        )[:10]
+        )
         
         # Filter out existing team members if team is specified
         if team:
@@ -408,6 +408,9 @@ class TeamUserSearchView(LoginRequiredMixin, View):
                 expires_at__gt=timezone.now()
             ).values_list('invited_user_id', flat=True)
             users = users.exclude(id__in=pending_invite_user_ids)
+        
+        # Apply limit after all filtering is complete
+        users = users[:10]
         
         # Format response
         user_list = [{

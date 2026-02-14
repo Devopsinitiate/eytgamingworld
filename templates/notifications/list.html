@@ -4,174 +4,187 @@
 {% block title %}Notifications - EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+<link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
 <style>
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    body {
-        font-family: 'Spline Sans', sans-serif;
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-gray-900 py-6 lg:py-10">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Breadcrumbs -->
-        <div class="flex flex-wrap gap-2 mb-6">
-            <a href="/" class="text-gray-400 text-base font-medium hover:text-white transition">
-                Home
-            </a>
-            <span class="text-gray-400 text-base font-medium">/</span>
-            <span class="text-white text-base font-medium">Notifications</span>
-        </div>
+<div class="notifications-page">
+    <!-- Animated Grid Background -->
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <div class="notifications-content max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+
+        <!-- Gaming Breadcrumb -->
+        <nav class="notif-breadcrumb" aria-label="Breadcrumb">
+            <div class="flex items-center">
+                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-1">
+                    <span class="material-symbols-outlined" style="font-size: 1rem;" aria-hidden="true">home</span>
+                    HOME
+                </a>
+                <span class="breadcrumb-separator material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                <span class="breadcrumb-current">Notifications</span>
+            </div>
+        </nav>
 
         <!-- Page Header -->
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <div class="flex min-w-72 flex-col gap-2">
-                <h1 class="text-white text-4xl font-black leading-tight tracking-tight">
-                    Notifications
-                </h1>
-                <p class="text-gray-400 text-base font-normal leading-normal">
-                    Stay updated with your tournaments, matches, and activities.
-                </p>
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+            <div>
+                <h1 class="notif-header-title">COMMAND CENTER</h1>
+                <p class="notif-header-subtitle">Incoming Transmissions & Activity Feed</p>
             </div>
-            
-            <!-- Stats -->
-            <div class="flex items-center gap-4">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-white">{{ notifications|length }}</div>
-                    <div class="text-sm text-gray-400">Total</div>
+
+            <!-- Stat Cards -->
+            <div class="flex items-center gap-3">
+                <div class="notif-stat-card">
+                    <div class="notif-stat-value">{{ notifications|length }}</div>
+                    <div class="notif-stat-label">Total</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-red-400">{{ unread_count }}</div>
-                    <div class="text-sm text-gray-400">Unread</div>
+                <div class="notif-stat-card">
+                    <div class="notif-stat-value highlight">{{ unread_count }}</div>
+                    <div class="notif-stat-label">Unread</div>
                 </div>
             </div>
         </div>
 
+        <!-- Divider -->
+        <div class="notif-divider"></div>
+
         <!-- Filters and Actions -->
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
             <!-- Filter Tabs -->
-            <div class="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
-                <a href="?filter=all" class="px-4 py-2 rounded-md text-sm font-medium transition {% if filter_type == 'all' %}bg-red-600 text-white{% else %}text-gray-400 hover:text-white{% endif %}">
+            <div class="notif-filters">
+                <a href="?filter=all" class="notif-filter-tab {% if filter_type == 'all' %}active{% endif %}">
                     All
                 </a>
-                <a href="?filter=unread" class="px-4 py-2 rounded-md text-sm font-medium transition {% if filter_type == 'unread' %}bg-red-600 text-white{% else %}text-gray-400 hover:text-white{% endif %}">
+                <a href="?filter=unread" class="notif-filter-tab {% if filter_type == 'unread' %}active{% endif %}">
                     Unread
                 </a>
-                <a href="?filter=read" class="px-4 py-2 rounded-md text-sm font-medium transition {% if filter_type == 'read' %}bg-red-600 text-white{% else %}text-gray-400 hover:text-white{% endif %}">
+                <a href="?filter=read" class="notif-filter-tab {% if filter_type == 'read' %}active{% endif %}">
                     Read
                 </a>
             </div>
-            
+
             <!-- Actions -->
             <div class="flex items-center gap-2">
-                <button onclick="markAllAsRead()" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-gray-800 text-white px-4 text-sm font-medium hover:bg-gray-700 transition">
-                    <span class="material-symbols-outlined text-base">done_all</span>
+                <button onclick="markAllAsRead()" class="notif-action-btn">
+                    <span class="material-symbols-outlined">done_all</span>
                     <span>Mark all read</span>
                 </button>
-                <a href="{% url 'notifications:preferences' %}" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-gray-800 text-white px-4 text-sm font-medium hover:bg-gray-700 transition">
-                    <span class="material-symbols-outlined text-base">settings</span>
+                <a href="{% url 'notifications:preferences' %}" class="notif-action-btn">
+                    <span class="material-symbols-outlined">tune</span>
                     <span>Preferences</span>
                 </a>
             </div>
         </div>
 
         <!-- Notifications List -->
-        <div class="space-y-2">
+        <div class="space-y-3">
             {% for notification in notifications %}
-            <div class="bg-gray-800/50 rounded-xl border border-gray-700 hover:border-gray-600 transition overflow-hidden {% if not notification.read %}border-l-4 border-l-red-600{% endif %}">
-                <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}{% url 'notifications:detail' notification.id %}{% endif %}" 
-                   class="block p-4 hover:bg-white/5 transition"
-                   onclick="markAsRead('{{ notification.id }}')">
+            <div class="notif-card {% if not notification.read %}unread{% endif %}" id="notif-{{ notification.id }}">
+                <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}{% url 'notifications:detail' notification.id %}{% endif %}"
+                    class="notif-card-link" onclick="markAsRead('{{ notification.id }}')">
                     <div class="flex items-start gap-4">
-                        <!-- Icon -->
-                        <div class="flex-shrink-0 mt-1">
+                        <!-- Type Icon -->
+                        <div
+                            class="notif-icon-wrapper {% if notification.notification_type == 'tournament' %}type-tournament{% elif notification.notification_type == 'coaching' %}type-coaching{% elif notification.notification_type == 'team' %}type-team{% elif notification.notification_type == 'payment' %}type-payment{% elif notification.notification_type == 'match' %}type-match{% elif notification.notification_type == 'security' %}type-security{% elif notification.notification_type == 'achievement' %}type-achievement{% else %}type-default{% endif %}">
                             {% if notification.notification_type == 'tournament' %}
-                                <span class="material-symbols-outlined text-blue-500 text-2xl">emoji_events</span>
+                            <span class="material-symbols-outlined">emoji_events</span>
                             {% elif notification.notification_type == 'coaching' %}
-                                <span class="material-symbols-outlined text-green-500 text-2xl">school</span>
+                            <span class="material-symbols-outlined">school</span>
                             {% elif notification.notification_type == 'team' %}
-                                <span class="material-symbols-outlined text-purple-500 text-2xl">group</span>
+                            <span class="material-symbols-outlined">group</span>
                             {% elif notification.notification_type == 'payment' %}
-                                <span class="material-symbols-outlined text-yellow-500 text-2xl">payment</span>
+                            <span class="material-symbols-outlined">payment</span>
                             {% elif notification.notification_type == 'match' %}
-                                <span class="material-symbols-outlined text-orange-500 text-2xl">sports_esports</span>
+                            <span class="material-symbols-outlined">sports_esports</span>
                             {% elif notification.notification_type == 'security' %}
-                                <span class="material-symbols-outlined text-red-500 text-2xl">security</span>
+                            <span class="material-symbols-outlined">security</span>
                             {% elif notification.notification_type == 'achievement' %}
-                                <span class="material-symbols-outlined text-amber-500 text-2xl">military_tech</span>
+                            <span class="material-symbols-outlined">military_tech</span>
                             {% else %}
-                                <span class="material-symbols-outlined text-gray-500 text-2xl">notifications</span>
+                            <span class="material-symbols-outlined">notifications</span>
                             {% endif %}
                         </div>
-                        
+
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2 mb-1">
-                                <h3 class="text-base font-semibold text-white">{{ notification.title }}</h3>
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="notif-title">{{ notification.title }}</h3>
                                 {% if not notification.read %}
-                                <div class="flex-shrink-0 w-2 h-2 bg-red-600 rounded-full mt-2"></div>
+                                <div class="notif-unread-dot mt-1.5"></div>
                                 {% endif %}
                             </div>
-                            <p class="text-sm text-gray-400 mb-2">{{ notification.message }}</p>
-                            <div class="flex items-center gap-4 text-xs text-gray-500">
-                                <span class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                            <p class="notif-message">{{ notification.message }}</p>
+                            <div class="notif-meta">
+                                <span class="notif-time">
+                                    <span class="material-symbols-outlined">schedule</span>
                                     {{ notification.created_at|timesince }} ago
                                 </span>
-                                <span class="px-2 py-0.5 bg-gray-700 rounded-full">
+                                <span class="notif-type-badge">
                                     {{ notification.get_notification_type_display }}
                                 </span>
                                 {% if notification.priority == 'urgent' %}
-                                <span class="px-2 py-0.5 bg-red-600/20 text-red-400 rounded-full">
+                                <span class="notif-priority-badge urgent">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size: 0.75rem; margin-right: 0.125rem;">warning</span>
                                     Urgent
                                 </span>
                                 {% elif notification.priority == 'high' %}
-                                <span class="px-2 py-0.5 bg-orange-600/20 text-orange-400 rounded-full">
+                                <span class="notif-priority-badge high">
                                     High Priority
                                 </span>
                                 {% endif %}
                             </div>
                         </div>
-                        
-                        <!-- Actions -->
-                        <div class="flex-shrink-0 flex items-center gap-2">
+
+                        <!-- Card Actions -->
+                        <div class="notif-card-actions">
                             {% if not notification.read %}
-                            <button 
+                            <button
                                 onclick="event.preventDefault(); event.stopPropagation(); markAsRead('{{ notification.id }}');"
-                                class="p-2 rounded-lg hover:bg-gray-700 transition"
-                                title="Mark as read"
-                            >
-                                <span class="material-symbols-outlined text-gray-400 hover:text-white text-xl">done</span>
+                                class="notif-card-action-btn" title="Mark as read">
+                                <span class="material-symbols-outlined">done</span>
                             </button>
                             {% endif %}
-                            <button 
+                            <button
                                 onclick="event.preventDefault(); event.stopPropagation(); deleteNotification('{{ notification.id }}');"
-                                class="p-2 rounded-lg hover:bg-gray-700 transition"
-                                title="Delete"
-                            >
-                                <span class="material-symbols-outlined text-gray-400 hover:text-red-500 text-xl">delete</span>
+                                class="notif-card-action-btn delete" title="Delete notification">
+                                <span class="material-symbols-outlined">delete</span>
                             </button>
                         </div>
                     </div>
                 </a>
             </div>
             {% empty %}
-            <div class="flex flex-col items-center justify-center py-16 px-4">
-                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">notifications_off</span>
-                <h3 class="text-lg font-medium text-white mb-2">No notifications</h3>
-                <p class="text-sm text-gray-400 text-center max-w-md">
+            <div class="notif-empty-state">
+                <span class="material-symbols-outlined notif-empty-icon" aria-hidden="true">notifications_off</span>
+                <h3 class="notif-empty-title">
                     {% if filter_type == 'unread' %}
-                        You're all caught up! No unread notifications.
+                    All Clear, Soldier
                     {% elif filter_type == 'read' %}
-                        No read notifications yet.
+                    No Read Intel
                     {% else %}
-                        You don't have any notifications yet. They'll appear here when you receive them.
+                    No Transmissions
+                    {% endif %}
+                </h3>
+                <p class="notif-empty-text">
+                    {% if filter_type == 'unread' %}
+                    You're all caught up! No unread notifications.
+                    {% elif filter_type == 'read' %}
+                    No read notifications yet.
+                    {% else %}
+                    You don't have any notifications yet. They'll appear here when you receive them.
                     {% endif %}
                 </p>
             </div>
@@ -182,60 +195,68 @@
 </div>
 
 <script>
-function markAsRead(notificationId) {
-    fetch(`/notifications/${notificationId}/read/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Reload page to update UI
-            window.location.reload();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+    function markAsRead(notificationId) {
+        fetch(`/notifications/${notificationId}/read/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 
-function markAllAsRead() {
-    if (!confirm('Mark all notifications as read?')) return;
-    
-    fetch('{% url "notifications:mark_all_as_read" %}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+    function markAllAsRead() {
+        if (!confirm('Mark all notifications as read?')) return;
 
-function deleteNotification(notificationId) {
-    if (!confirm('Delete this notification?')) return;
-    
-    fetch(`/notifications/${notificationId}/delete/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
+        fetch('{% url "notifications:mark_all_as_read" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function deleteNotification(notificationId) {
+        if (!confirm('Delete this notification?')) return;
+
+        fetch(`/notifications/${notificationId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove card with fade animation
+                    const card = document.getElementById(`notif-${notificationId}`);
+                    if (card) {
+                        card.style.transition = 'opacity 0.3s, transform 0.3s';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateX(20px)';
+                        setTimeout(() => card.remove(), 300);
+                    } else {
+                        window.location.reload();
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 </script>
 {% endblock %}

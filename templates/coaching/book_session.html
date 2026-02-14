@@ -217,31 +217,48 @@
                         <!-- Game Selection -->
                         <div>
                             <label class="block text-white font-medium mb-2">Game</label>
-                            {{ form.game }}
+                            <select name="game" id="id_game" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                                <option value="">Select a game</option>
+                                {% for game in form.game.field.queryset %}
+                                <option value="{{ game.id }}">{{ game.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         
                         <!-- Duration -->
                         <div>
                             <label class="block text-white font-medium mb-2">Duration</label>
-                            {{ form.duration_minutes }}
+                            <select name="duration_minutes" id="id_duration_minutes" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                                <option value="">Select duration</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                                <option value="180">3 hours</option>
+                            </select>
                         </div>
                         
                         <!-- Session Type -->
                         <div>
                             <label class="block text-white font-medium mb-2">Session Type</label>
-                            {{ form.session_type }}
+                            <select name="session_type" id="id_session_type" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                                <option value="individual">Individual (1-on-1)</option>
+                                {% if coach.offers_group %}
+                                <option value="group">Group Session</option>
+                                {% endif %}
+                            </select>
                         </div>
                         
-                        <!-- Goals -->
+                        <!-- Goals/Topics -->
                         <div>
                             <label class="block text-white font-medium mb-2">What would you like to work on?</label>
-                            {{ form.goals }}
+                            <textarea name="student_notes" id="id_student_notes" rows="4" required placeholder="Describe your goals for this session..." class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors resize-none"></textarea>
                         </div>
                         
                         <!-- Special Requests -->
                         <div>
                             <label class="block text-white font-medium mb-2">Special Requests (Optional)</label>
-                            {{ form.special_requests }}
+                            <textarea name="topics" id="id_topics" rows="3" placeholder='e.g., ["Positioning", "Combos", "Match-ups"]' class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors resize-none"></textarea>
+                            <p class="text-gray-400 text-sm mt-1">Optional: Specific topics or areas you want to focus on</p>
                         </div>
                     </div>
                 </div>
@@ -455,13 +472,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeSlotsContainer = document.getElementById('time-slots');
         timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">Loading available times...</div>';
         
-        // Fetch available times from server
-        fetch(`/coaching/coach/{{ coach.pk }}/available-slots/?date=${date.toISOString().split('T')[0]}`)
-            .then(response => response.json())
+        // Fetch available times from server (fixed URL)
+        fetch(`/coaching/api/coach/{{ coach.pk }}/slots/?date=${date.toISOString().split('T')[0]}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 timeSlotsContainer.innerHTML = '';
                 
-                if (data.slots && data.slots.length > 0) {
+                if (data.error) {
+                    timeSlotsContainer.innerHTML = `<div class="col-span-full text-center text-red-400">${data.error}</div>`;
+                } else if (data.slots && data.slots.length > 0) {
                     data.slots.forEach(slot => {
                         const timeSlot = document.createElement('div');
                         timeSlot.className = 'time-slot';
@@ -471,12 +495,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         timeSlotsContainer.appendChild(timeSlot);
                     });
                 } else {
-                    timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">No available times for this date</div>';
+                    timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">No available times for this date. Coach may not have availability set for this day.</div>';
                 }
             })
             .catch(error => {
                 console.error('Error loading times:', error);
-                timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-red-400">Error loading available times</div>';
+                timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-red-400">Error loading available times. Please try again or contact support.</div>';
             });
     }
     

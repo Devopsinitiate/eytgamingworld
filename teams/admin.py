@@ -67,11 +67,19 @@ class TeamAdmin(admin.ModelAdmin):
     status_badge.short_description = 'Status'
     
     def win_rate_display(self, obj):
-        win_rate = obj.win_rate
-        color = 'green' if win_rate >= 50 else 'orange' if win_rate >= 30 else 'red'
+        win_rate = float(obj.win_rate)  # Ensure it's a float
+        
+        if win_rate >= 50:
+            color = 'green'
+        elif win_rate >= 30:
+            color = 'orange'
+        else:
+            color = 'red'
+        
+        # Use string formatting instead of f-string in format_html
         return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>',
-            color, win_rate
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, f'{win_rate:.1f}%'
         )
     win_rate_display.short_description = 'Win Rate'
     

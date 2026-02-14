@@ -1,0 +1,93 @@
+{% extends "store/emails/base_email.html" %}
+
+{% block title %}Order Confirmation - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<h1>Order Confirmed! 🎉</h1>
+
+<p>Hi {{ order.user.username }},</p>
+
+<p>Thank you for your order! We've received your payment and are preparing your items for shipment.</p>
+
+<div class="info-box">
+    <p style="margin: 0; font-size: 18px; font-weight: 600; color: #ffffff;">
+        Order Number: <span style="color: #ec1313;">{{ order.order_number }}</span>
+    </p>
+    <p style="margin: 10px 0 0 0; color: #999999;">
+        Order Date: {{ order.created_at|date:"F d, Y" }}
+    </p>
+</div>
+
+<h2>Order Summary</h2>
+
+<table class="details-table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items.all %}
+        <tr>
+            <td>
+                {{ item.product_name }}
+                {% if item.variant_name %}
+                <br><span style="color: #999999; font-size: 14px;">{{ item.variant_name }}</span>
+                {% endif %}
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.total_price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="details-table" style="margin-top: 0;">
+    <tr>
+        <td style="border: none;"><strong>Subtotal:</strong></td>
+        <td style="border: none; text-align: right;">${{ order.subtotal }}</td>
+    </tr>
+    <tr>
+        <td style="border: none;"><strong>Shipping:</strong></td>
+        <td style="border: none; text-align: right;">${{ order.shipping_cost }}</td>
+    </tr>
+    <tr>
+        <td style="border: none;"><strong>Tax:</strong></td>
+        <td style="border: none; text-align: right;">${{ order.tax }}</td>
+    </tr>
+    <tr>
+        <td style="border: none; color: #ec1313;"><strong>Total:</strong></td>
+        <td style="border: none; text-align: right; color: #ec1313; font-size: 18px;"><strong>${{ order.total }}</strong></td>
+    </tr>
+</table>
+
+<h2>Shipping Address</h2>
+
+<div class="info-box">
+    <p style="margin: 0;">{{ order.shipping_name }}</p>
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_address_line1 }}</p>
+    {% if order.shipping_address_line2 %}
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_address_line2 }}</p>
+    {% endif %}
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}</p>
+    <p style="margin: 5px 0 0 0;">{{ order.shipping_country }}</p>
+    <p style="margin: 10px 0 0 0; color: #999999;">Phone: {{ order.shipping_phone }}</p>
+</div>
+
+<h2>What's Next?</h2>
+
+<p>We'll send you another email when your order ships with tracking information. You can also track your order status anytime:</p>
+
+<center>
+    <a href="{{ site_url }}/dashboard/orders/" class="button">View Order Status</a>
+</center>
+
+<p style="margin-top: 30px;">If you have any questions about your order, please don't hesitate to contact our support team.</p>
+
+<p style="margin-top: 30px;">
+    Thanks for shopping with EYTGaming!<br>
+    <strong style="color: #ec1313;">The EYTGaming Team</strong>
+</p>
+{% endblock %}

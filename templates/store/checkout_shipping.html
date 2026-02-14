@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shipping Information - EYTGaming Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Use Space Grotesk font for store pages */
+    body {
+        font-family: 'Space Grotesk', 'Spline Sans', sans-serif;
+    }
+
+    /* Form styles matching EYTGaming design aesthetic */
+    .form-input {
+        background: #0a0a0a;
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.4);
+    }
+    
+    .form-input.error {
+        border-color: #ef4444;
+    }
+    
+    .form-label {
+        color: #d1d5db;
+        font-weight: 500;
+    }
+    
+    .form-label.required::after {
+        content: ' *';
+        color: #ec1313;
+    }
+    
+    .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .checkout-step {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background: rgba(236, 19, 19, 0.1);
+        border: 1px solid rgba(236, 19, 19, 0.3);
+    }
+    
+    .checkout-step.active {
+        background: rgba(236, 19, 19, 0.2);
+        border-color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.3);
+    }
+    
+    .checkout-step.completed {
+        background: rgba(34, 197, 94, 0.1);
+        border-color: rgba(34, 197, 94, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-background-dark py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Shipping Information</h1>
+            <p class="text-gray-400">Enter your delivery address</p>
+        </div>
+
+        <!-- Checkout Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="checkout-step completed">
+                <span class="material-symbols-outlined text-green-500 mr-3 text-3xl">
+                    check_circle
+                </span>
+                <div>
+                    <h3 class="text-white font-semibold">Review Cart</h3>
+                    <p class="text-gray-400 text-sm">Completed</p>
+                </div>
+            </div>
+            <div class="checkout-step active">
+                <span class="material-symbols-outlined text-primary mr-3 text-3xl">
+                    local_shipping
+                </span>
+                <div>
+                    <h3 class="text-white font-semibold">Shipping Info</h3>
+                    <p class="text-gray-400 text-sm">Current step</p>
+                </div>
+            </div>
+            <div class="checkout-step">
+                <span class="material-symbols-outlined text-gray-600 mr-3 text-3xl">
+                    payment
+                </span>
+                <div>
+                    <h3 class="text-gray-400 font-semibold">Payment</h3>
+                    <p class="text-gray-500 text-sm">Next step</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Form -->
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-lg p-8">
+            <form method="post" action="{% url 'store:checkout_shipping' %}">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    <!-- Full Name -->
+                    <div>
+                        <label for="shipping_name" class="form-label required block mb-2">
+                            Full Name
+                        </label>
+                        <input type="text" 
+                               id="shipping_name" 
+                               name="shipping_name" 
+                               value="{{ shipping_info.shipping_name|default:'' }}"
+                               class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_name %}error{% endif %}"
+                               required>
+                        {% if errors.shipping_name %}
+                            <p class="error-message">{{ errors.shipping_name }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address Line 1 -->
+                    <div>
+                        <label for="shipping_address_line1" class="form-label required block mb-2">
+                            Address Line 1
+                        </label>
+                        <input type="text" 
+                               id="shipping_address_line1" 
+                               name="shipping_address_line1" 
+                               value="{{ shipping_info.shipping_address_line1|default:'' }}"
+                               class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_address_line1 %}error{% endif %}"
+                               placeholder="Street address, P.O. box"
+                               required>
+                        {% if errors.shipping_address_line1 %}
+                            <p class="error-message">{{ errors.shipping_address_line1 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address Line 2 -->
+                    <div>
+                        <label for="shipping_address_line2" class="form-label block mb-2">
+                            Address Line 2 (Optional)
+                        </label>
+                        <input type="text" 
+                               id="shipping_address_line2" 
+                               name="shipping_address_line2" 
+                               value="{{ shipping_info.shipping_address_line2|default:'' }}"
+                               class="form-input w-full px-4 py-3 rounded-lg"
+                               placeholder="Apartment, suite, unit, building, floor, etc.">
+                    </div>
+
+                    <!-- City and State -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="shipping_city" class="form-label required block mb-2">
+                                City
+                            </label>
+                            <input type="text" 
+                                   id="shipping_city" 
+                                   name="shipping_city" 
+                                   value="{{ shipping_info.shipping_city|default:'' }}"
+                                   class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_city %}error{% endif %}"
+                                   required>
+                            {% if errors.shipping_city %}
+                                <p class="error-message">{{ errors.shipping_city }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="shipping_state" class="form-label required block mb-2">
+                                State / Province
+                            </label>
+                            <input type="text" 
+                                   id="shipping_state" 
+                                   name="shipping_state" 
+                                   value="{{ shipping_info.shipping_state|default:'' }}"
+                                   class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_state %}error{% endif %}"
+                                   required>
+                            {% if errors.shipping_state %}
+                                <p class="error-message">{{ errors.shipping_state }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Postal Code and Country -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="shipping_postal_code" class="form-label required block mb-2">
+                                Postal Code
+                            </label>
+                            <input type="text" 
+                                   id="shipping_postal_code" 
+                                   name="shipping_postal_code" 
+                                   value="{{ shipping_info.shipping_postal_code|default:'' }}"
+                                   class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_postal_code %}error{% endif %}"
+                                   required>
+                            {% if errors.shipping_postal_code %}
+                                <p class="error-message">{{ errors.shipping_postal_code }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="shipping_country" class="form-label required block mb-2">
+                                Country
+                            </label>
+                            <select id="shipping_country" 
+                                    name="shipping_country" 
+                                    class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_country %}error{% endif %}"
+                                    required>
+                                <option value="">Select Country</option>
+                                <option value="Nigeria" {% if shipping_info.shipping_country == 'Nigeria' %}selected{% endif %}>Nigeria</option>
+                                <option value="Ghana" {% if shipping_info.shipping_country == 'Ghana' %}selected{% endif %}>Ghana</option>
+                                <option value="Kenya" {% if shipping_info.shipping_country == 'Kenya' %}selected{% endif %}>Kenya</option>
+                                <option value="South Africa" {% if shipping_info.shipping_country == 'South Africa' %}selected{% endif %}>South Africa</option>
+                                <option value="United States" {% if shipping_info.shipping_country == 'United States' %}selected{% endif %}>United States</option>
+                                <option value="United Kingdom" {% if shipping_info.shipping_country == 'United Kingdom' %}selected{% endif %}>United Kingdom</option>
+                                <option value="Canada" {% if shipping_info.shipping_country == 'Canada' %}selected{% endif %}>Canada</option>
+                                <option value="Other" {% if shipping_info.shipping_country == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                            {% if errors.shipping_country %}
+                                <p class="error-message">{{ errors.shipping_country }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="shipping_phone" class="form-label required block mb-2">
+                            Phone Number
+                        </label>
+                        <input type="tel" 
+                               id="shipping_phone" 
+                               name="shipping_phone" 
+                               value="{{ shipping_info.shipping_phone|default:'' }}"
+                               class="form-input w-full px-4 py-3 rounded-lg {% if errors.shipping_phone %}error{% endif %}"
+                               placeholder="+234 XXX XXX XXXX"
+                               required>
+                        {% if errors.shipping_phone %}
+                            <p class="error-message">{{ errors.shipping_phone }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 text-sm mt-1">
+                            We'll use this to contact you about delivery
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                    <a href="{% url 'store:checkout_initiate' %}" 
+                       class="flex-1 text-center px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-all">
+                        Back
+                    </a>
+                    <button type="submit" 
+                            class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/50">
+                        Continue to Payment
+                    </button>
+                </div>
+
+                <!-- Security Badge -->
+                <div class="mt-6 flex items-center justify-center text-gray-400 text-sm">
+                    <span class="material-symbols-outlined mr-2 text-green-500">
+                        lock
+                    </span>
+                    <span>Your information is secure and encrypted</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

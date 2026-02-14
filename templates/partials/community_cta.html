@@ -1,0 +1,102 @@
+{% load static %}
+
+{# Community CTA Section - High-Energy Call to Action #}
+<section id="community" class="community-cta py-24 relative overflow-hidden">
+  {# Animated Gradient Background #}
+  <div class="animated-gradient-bg" aria-hidden="true"></div>
+  
+  {# Glitch Accent Effect #}
+  <div class="glitch-accent absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
+    <div class="absolute top-1/4 left-0 w-full h-px bg-red-600 animate-pulse"></div>
+    <div class="absolute top-2/4 left-0 w-full h-px bg-cyan-500 animate-pulse" style="animation-delay: 0.5s;"></div>
+    <div class="absolute top-3/4 left-0 w-full h-px bg-red-600 animate-pulse" style="animation-delay: 1s;"></div>
+  </div>
+  
+  <div class="container mx-auto px-4 relative z-10 text-center">
+    {# Main Headline with Gradient Effect #}
+    <h2 class="cta-headline text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black uppercase tracking-tighter mb-6 gradient-text-red leading-none">
+      JOIN THE EYT GAMER ARMY
+    </h2>
+    
+    {# Subtext #}
+    <p class="cta-subtext text-xl md:text-2xl text-gray-300 mb-12 font-light tracking-wide">
+      Connect. Compete. Conquer.
+    </p>
+    
+    {# CTA Buttons - Social and Registration #}
+    <div class="cta-buttons flex flex-wrap justify-center gap-4 md:gap-6">
+      {# Discord Button #}
+      <a 
+        href="{{ discord_url|default:'#' }}" 
+        class="social-cta discord ripple-effect inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold uppercase tracking-wide rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="material-symbols-outlined text-2xl">forum</span>
+        <span>Join Discord</span>
+      </a>
+      
+      {# Register Button #}
+      <a 
+        href="{% url 'account_signup' %}" 
+        class="social-cta register ripple-effect inline-flex items-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+      >
+        <span class="material-symbols-outlined text-2xl">person_add</span>
+        <span>Register Now</span>
+      </a>
+      
+      {# Twitter/X Button #}
+      <a 
+        href="{{ twitter_url|default:'#' }}" 
+        class="social-cta twitter ripple-effect inline-flex items-center gap-3 px-8 py-4 bg-gray-900 hover:bg-black text-white font-bold uppercase tracking-wide rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-2xl border-2 border-gray-700 hover:border-white"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="material-symbols-outlined text-2xl">tag</span>
+        <span>Follow on X</span>
+      </a>
+    </div>
+    
+    {# Additional Social Links (Optional) #}
+    <div class="mt-12 flex justify-center gap-6">
+      {# Twitch #}
+      {% if twitch_url %}
+      <a 
+        href="{{ twitch_url }}" 
+        class="text-gray-400 hover:text-purple-500 transition-colors"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Follow us on Twitch"
+      >
+        <span class="material-symbols-outlined text-4xl">live_tv</span>
+      </a>
+      {% endif %}
+      
+      {# YouTube #}
+      {% if youtube_url %}
+      <a 
+        href="{{ youtube_url }}" 
+        class="text-gray-400 hover:text-red-500 transition-colors"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Subscribe on YouTube"
+      >
+        <span class="material-symbols-outlined text-4xl">play_circle</span>
+      </a>
+      {% endif %}
+      
+      {# Instagram (if available) #}
+      {% if instagram_url %}
+      <a 
+        href="{{ instagram_url }}" 
+        class="text-gray-400 hover:text-pink-500 transition-colors"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Follow us on Instagram"
+      >
+        <span class="material-symbols-outlined text-4xl">photo_camera</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>

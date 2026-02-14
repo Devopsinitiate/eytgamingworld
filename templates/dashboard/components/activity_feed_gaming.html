@@ -1,0 +1,81 @@
+{% load static %}
+
+<!-- Gaming Activity Feed Component -->
+<!-- Requirements: 1.3 - Display recent activity feed -->
+
+<div class="card-gaming">
+    <div class="card-gaming-content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="gaming-subheader text-2xl text-white">RECENT ACTIVITY</h2>
+            <a href="{% url 'dashboard:activity' %}" 
+               class="btn-gaming-ghost px-4 py-2 text-sm" 
+               aria-label="View all activity">
+                VIEW ALL →
+            </a>
+        </div>
+        
+        {% if recent_activities %}
+            <!-- Desktop List -->
+            <div class="hidden md:block space-y-3" role="list" aria-label="Recent activities">
+                {% for activity in recent_activities|slice:":5" %}
+                    <div class="mobile-list-item card-gaming-flat" role="listitem">
+                        <div class="flex items-start gap-4">
+                            <!-- Icon -->
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+                                {% if activity.type == 'tournament' %}bg-electric-red/20{% elif activity.type == 'team' %}bg-neon-cyan/20{% elif activity.type == 'payment' %}bg-green-500/20{% else %}bg-gray-500/20{% endif %}">
+                                <span class="material-symbols-outlined
+                                    {% if activity.type == 'tournament' %}text-electric-red{% elif activity.type == 'team' %}text-neon-cyan{% elif activity.type == 'payment' %}text-green-500{% else %}text-gray-400{% endif %}"
+                                    aria-hidden="true">
+                                    {% if activity.type == 'tournament' %}emoji_events{% elif activity.type == 'team' %}groups{% elif activity.type == 'payment' %}payments{% else %}notifications{% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-medium text-sm">{{ activity.title }}</p>
+                                <p class="text-gray-400 text-xs mt-1">{{ activity.description|truncatewords:15 }}</p>
+                                <p class="text-gray-500 text-xs mt-1">
+                                    <time datetime="{{ activity.created_at|date:'c' }}">
+                                        {{ activity.created_at|timesince }} ago
+                                    </time>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Mobile Compact List -->
+            <div class="mobile-list md:hidden">
+                {% for activity in recent_activities|slice:":3" %}
+                    <div class="mobile-list-item" role="listitem">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center
+                                {% if activity.type == 'tournament' %}bg-electric-red/20{% elif activity.type == 'team' %}bg-neon-cyan/20{% elif activity.type == 'payment' %}bg-green-500/20{% else %}bg-gray-500/20{% endif %}">
+                                <span class="material-symbols-outlined text-sm
+                                    {% if activity.type == 'tournament' %}text-electric-red{% elif activity.type == 'team' %}text-neon-cyan{% elif activity.type == 'payment' %}text-green-500{% else %}text-gray-400{% endif %}"
+                                    aria-hidden="true">
+                                    {% if activity.type == 'tournament' %}emoji_events{% elif activity.type == 'team' %}groups{% elif activity.type == 'payment' %}payments{% else %}notifications{% endif %}
+                                </span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-sm font-medium truncate">{{ activity.title }}</p>
+                                <p class="text-gray-500 text-xs">
+                                    <time datetime="{{ activity.created_at|date:'c' }}">
+                                        {{ activity.created_at|timesince }} ago
+                                    </time>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <span class="material-symbols-outlined text-gray-600 text-6xl" aria-hidden="true">history</span>
+                <p class="text-gray-400 mt-4">No recent activity</p>
+                <p class="text-gray-500 text-sm mt-2">Start competing to see your activity here!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

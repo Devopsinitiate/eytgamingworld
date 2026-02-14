@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Unsubscribe - EYTGaming Store</title>
+    
+    {# Tailwind CSS #}
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    {# Google Fonts - Space Grotesk #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    {# Material Symbols Icons #}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #050505 0%, #121212 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white">
+    
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full">
+            
+            {# Logo/Brand #}
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-red-600 mb-2">EYTGaming</h1>
+                <p class="text-gray-400 text-sm uppercase tracking-widest">Store</p>
+            </div>
+            
+            {# Message Card #}
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-8 shadow-xl">
+                
+                {# Icon #}
+                <div class="text-center mb-6">
+                    {% if success %}
+                        <span class="material-symbols-outlined text-6xl text-green-500">
+                            check_circle
+                        </span>
+                    {% elif already_unsubscribed %}
+                        <span class="material-symbols-outlined text-6xl text-yellow-500">
+                            info
+                        </span>
+                    {% elif error %}
+                        <span class="material-symbols-outlined text-6xl text-red-500">
+                            error
+                        </span>
+                    {% endif %}
+                </div>
+                
+                {# Title #}
+                <h2 class="text-2xl font-bold text-center mb-4">
+                    {% if success %}
+                        Unsubscribed Successfully
+                    {% elif already_unsubscribed %}
+                        Already Unsubscribed
+                    {% elif error %}
+                        Unsubscribe Error
+                    {% else %}
+                        Newsletter Unsubscribe
+                    {% endif %}
+                </h2>
+                
+                {# Message #}
+                <p class="text-gray-300 text-center mb-6">
+                    {{ message }}
+                </p>
+                
+                {# Email Display #}
+                {% if email %}
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-gray-400 mb-1">Email Address:</p>
+                    <p class="text-white font-semibold">{{ email }}</p>
+                </div>
+                {% endif %}
+                
+                {# Additional Info #}
+                {% if success %}
+                <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-gray-400">
+                        You will no longer receive promotional emails from EYTGaming Store. 
+                        You may still receive transactional emails related to your orders.
+                    </p>
+                </div>
+                {% endif %}
+                
+                {# Action Buttons #}
+                <div class="flex flex-col gap-3">
+                    <a 
+                        href="{% url 'store:product_list' %}" 
+                        class="block w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-center font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_rgba(236,19,19,0.5)] uppercase tracking-wide"
+                    >
+                        Continue Shopping
+                    </a>
+                    
+                    <a 
+                        href="/" 
+                        class="block w-full px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white text-center font-semibold rounded-lg transition-colors border border-gray-700 uppercase tracking-wide"
+                    >
+                        Back to Home
+                    </a>
+                </div>
+                
+            </div>
+            
+            {# Footer Note #}
+            <div class="text-center mt-8">
+                <p class="text-gray-500 text-xs">
+                    If you unsubscribed by mistake, you can resubscribe anytime from our website footer.
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    
+</body>
+</html>

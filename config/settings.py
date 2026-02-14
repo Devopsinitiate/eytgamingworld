@@ -37,7 +37,11 @@ if DEBUG:
         'django_ratelimit.W001',  # Cache backend not officially supported
     ]
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,7c892649947e.ngrok-free.app', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,8da9-102-89-32-49.ngrok-free.app', cast=Csv())
+
+# Site URL for email notifications and absolute URLs
+# In production, set this in your .env file: SITE_URL=https://yourdomain.com
+SITE_URL = config('SITE_URL', default='http://127.0.0.1:8000' if DEBUG else '')
 
 # Add ngrok support for testing
 if DEBUG:
@@ -93,6 +97,7 @@ INSTALLED_APPS = [
     'payments.apps.PaymentsConfig',
     'notifications.apps.NotificationsConfig',
     'dashboard.apps.DashboardConfig',
+    'store.apps.StoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -109,6 +114,8 @@ MIDDLEWARE = [
     # Custom security middleware
     'security.middleware.SecurityHeadersMiddleware',
     'security.middleware.AuditLogMiddleware',
+    # Store rate limiting middleware
+    'store.middleware.RateLimitMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -117,7 +124,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -126,6 +132,10 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'core.context_processors.site_settings',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
             ],
         },
     },
@@ -329,21 +339,32 @@ if DEBUG:
 
 # Security Settings (Production)
 if not DEBUG:
+    # HTTPS enforcement
     SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Secure cookies
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    # XSS and content type protection
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000
+    
+    # HSTS (HTTP Strict Transport Security)
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    
+    # X-Frame-Options
+    X_FRAME_OPTIONS = 'DENY'
 else:
     # Development: keep defaults but still enable basic security flags
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     
-    # Sentry - only initialize if DSN is provided and not a placeholder
+# Sentry - only initialize if DSN is provided and not a placeholder
     sentry_dsn = config('SENTRY_DSN', default=None)
     if sentry_dsn and sentry_dsn != 'your_sentry_dsn' and sentry_dsn.startswith('https://'):
         import sentry_sdk
@@ -355,44 +376,6 @@ else:
             traces_sample_rate=0.1,
             send_default_pii=False,
         )
-
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs/django.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10 MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
 
 # Django Debug Toolbar (Development only)
 if DEBUG:
@@ -411,6 +394,15 @@ MIN_TOURNAMENT_PARTICIPANTS = 4
 COACHING_SESSION_DURATION = 60  # minutes
 POINTS_PER_WIN = 100
 POINTS_PER_LOSS = 25
+
+# ==============================================================================
+# SOCIAL MEDIA URLS (for landing page)
+# ==============================================================================
+
+DISCORD_URL = config('DISCORD_URL', default='https://discord.gg/eytgaming')
+TWITTER_URL = config('TWITTER_URL', default='https://twitter.com/eytgaming')
+TWITCH_URL = config('TWITCH_URL', default='https://twitch.tv/eytgaming')
+YOUTUBE_URL = config('YOUTUBE_URL', default='https://youtube.com/@eytgaming')
 
 
 # ==============================================================================
@@ -494,6 +486,51 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 # LOGGING CONFIGURATION
 # ==============================================================================
 
+import sys
+
+# Determine if we're on Windows
+IS_WINDOWS = sys.platform.startswith('win')
+
+# Build handler configurations based on platform
+if IS_WINDOWS:
+    # Windows: Use RotatingFileHandler (size-based rotation)
+    file_handler_config = {
+        'level': 'INFO',
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': BASE_DIR / 'logs' / 'django.log',
+        'maxBytes': 10485760,  # 10MB
+        'backupCount': 10,
+        'formatter': 'verbose',
+    }
+    security_handler_config = {
+        'level': 'INFO',
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': BASE_DIR / 'logs' / 'security.log',
+        'maxBytes': 10485760,  # 10MB
+        'backupCount': 10,
+        'formatter': 'security',
+    }
+else:
+    # Unix/Linux: Use TimedRotatingFileHandler (time-based rotation)
+    file_handler_config = {
+        'level': 'INFO',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': BASE_DIR / 'logs' / 'django.log',
+        'when': 'midnight',
+        'interval': 1,
+        'backupCount': 10,
+        'formatter': 'verbose',
+    }
+    security_handler_config = {
+        'level': 'INFO',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': BASE_DIR / 'logs' / 'security.log',
+        'when': 'midnight',
+        'interval': 1,
+        'backupCount': 10,
+        'formatter': 'security',
+    }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -504,6 +541,10 @@ LOGGING = {
         },
         'simple': {
             'format': '{levelname} {message}',
+            'style': '{',
+        },
+        'security': {
+            'format': '{asctime} [{levelname}] {module} - {message}',
             'style': '{',
         },
     },
@@ -518,18 +559,8 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'formatter': 'verbose',
-        },
-        'security_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'security.log',
-            'formatter': 'verbose',
-        },
+        'file': file_handler_config,
+        'security_file': security_handler_config,
     },
     'loggers': {
         'django': {
@@ -568,3 +599,66 @@ RATELIMIT_USE_CACHE = 'default'  # Use default cache for rate limiting
 RATELIMIT_VIEW = 'payments.views.rate_limit_exceeded'
 
 # Rate limiting uses the default cache backend
+
+
+# ==============================================================================
+# STORE SECURITY CONFIGURATION
+# ==============================================================================
+
+# Store-specific security settings
+STORE_RATE_LIMIT_ENABLED = config('STORE_RATE_LIMIT_ENABLED', default=True, cast=bool)
+
+# Session security for store checkout
+# Ensure sessions are secure and HTTPOnly
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# CSRF protection for store forms
+# Note: CSRF_COOKIE_HTTPONLY should be False to allow JavaScript access for AJAX requests
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token for AJAX
+CSRF_COOKIE_SAMESITE = 'Lax'  # Prevent CSRF attacks via cross-site requests
+CSRF_USE_SESSIONS = False  # Use cookie-based CSRF tokens for better performance
+CSRF_COOKIE_NAME = 'csrftoken'  # Standard cookie name
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Header name for AJAX requests
+CSRF_FAILURE_VIEW = 'store.views.csrf_failure'  # Custom CSRF failure view
+
+# HTTPS enforcement in production
+if not DEBUG:
+    # Force HTTPS for all store pages
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # HSTS (HTTP Strict Transport Security)
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Additional security headers
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
+# Store logging configuration
+LOGGING['loggers']['store'] = {
+    'handlers': ['console', 'security_file'],
+    'level': 'INFO',
+    'propagate': False,
+}
+
+# ==============================================================================
+# STORE BUSINESS CONFIGURATION
+# ==============================================================================
+
+# Cart settings
+CART_SESSION_ID = 'cart'
+CART_EXPIRY_DAYS = 30  # Days to keep cart for authenticated users
+
+# Order settings
+ORDER_NUMBER_PREFIX = 'EYT'
+
+# Inventory settings
+LOW_STOCK_THRESHOLD = 10  # Show warning when stock is below this
+
+# Payment settings (Stripe and Paystack already configured above)
+# Additional store-specific payment settings can be added here

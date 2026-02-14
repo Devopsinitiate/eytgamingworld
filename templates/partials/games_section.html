@@ -1,0 +1,70 @@
+{% load static %}
+
+{# Games Section - Showcase Supported Games and Divisions #}
+<section id="games" class="games-section py-20 bg-black relative overflow-hidden">
+  {# Animated Grid Background #}
+  <div class="grid-pattern-animated absolute inset-0 opacity-20" aria-hidden="true"></div>
+  
+  <div class="container mx-auto px-4 relative z-10">
+    {# Section Title #}
+    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+      BATTLEGROUNDS
+    </h2>
+    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+      Our Competitive Divisions
+    </p>
+    
+    {# Games Grid - Responsive: 1 col mobile, 2 col tablet, 4 col desktop #}
+    <div class="games-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for game in games %}
+      <div class="game-card group">
+        {# Game Icon/Art Wrapper #}
+        <div class="game-icon-wrapper mb-4 relative overflow-hidden rounded-lg">
+          {% if game.key_art %}
+          <img 
+            src="{{ game.key_art.url }}" 
+            alt="{{ game.name }} - {{ game.category }}" 
+            class="game-icon w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+          >
+          {% else %}
+          <div class="w-full h-48 bg-gray-800 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-600 text-6xl">sports_esports</span>
+          </div>
+          {% endif %}
+          {# Dark overlay that fades on hover #}
+          <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300"></div>
+        </div>
+        
+        {# Game Info #}
+        <h3 class="game-title text-2xl font-bold uppercase tracking-tight text-white mb-2">
+          {{ game.name }}
+        </h3>
+        <p class="game-category text-sm text-red-500 uppercase tracking-wide font-bold mb-3">
+          {{ game.category }}
+        </p>
+        
+        {# Hover Description - Fades in from bottom #}
+        <div class="game-description opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-h-0 group-hover:max-h-40 overflow-hidden">
+          <p class="text-gray-400 text-sm leading-relaxed">
+            {{ game.description|truncatewords:20 }}
+          </p>
+        </div>
+        
+        {# Animated Border Effect #}
+        <div class="animated-border"></div>
+      </div>
+      {% empty %}
+      {# Empty State - No Games #}
+      <div class="col-span-full text-center py-12">
+        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
+          sports_esports
+        </span>
+        <p class="text-gray-500 text-xl">
+          No games available yet. Check back soon!
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

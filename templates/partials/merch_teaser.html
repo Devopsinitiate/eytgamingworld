@@ -1,0 +1,78 @@
+{% load static %}
+
+{# Merch Teaser Section - Featured Products with Spotlight Effect #}
+<section id="merch" class="merch-teaser py-20 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
+  {# Spotlight Effect Background #}
+  <div class="spotlight-effect" aria-hidden="true"></div>
+  
+  <div class="container mx-auto px-4 relative z-10">
+    {# Section Title #}
+    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+      GEAR UP
+    </h2>
+    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+      Represent the EYT Army
+    </p>
+    
+    {# Products Grid - Responsive: 1 col mobile, 2 col tablet, 4 col desktop #}
+    <div class="merch-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      {% for product in featured_products %}
+      <div class="merch-card group bg-gray-900 rounded-lg overflow-hidden border border-gray-800 hover:border-red-600 transition-all duration-300">
+        {# Product Image Wrapper #}
+        <div class="merch-image-wrapper relative overflow-hidden bg-gray-800">
+          {% if product.image %}
+          <img 
+            src="{{ product.image.url }}" 
+            alt="{{ product.name }}" 
+            class="merch-image w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+          >
+          {% else %}
+          <div class="merch-image w-full h-64 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-600 text-6xl">shopping_bag</span>
+          </div>
+          {% endif %}
+          
+          {# Hover Overlay #}
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+        </div>
+        
+        {# Product Info #}
+        <div class="p-4">
+          <h3 class="merch-name text-lg font-bold uppercase tracking-tight text-white mb-2 group-hover:text-red-500 transition-colors">
+            {{ product.name }}
+          </h3>
+          <p class="merch-price text-2xl font-bold text-red-500">
+            ${{ product.price }}
+          </p>
+        </div>
+      </div>
+      {% empty %}
+      {# Empty State - No Products #}
+      <div class="col-span-full text-center py-12">
+        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
+          shopping_bag
+        </span>
+        <p class="text-gray-500 text-xl">
+          No featured products available yet. Check back soon!
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {# Shop CTA Button #}
+    {% if featured_products %}
+    <div class="text-center">
+      <a 
+        href="#store" 
+        class="cta-primary inline-flex items-center gap-2 rounded-md transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
+      >
+        <span class="skew-x-[12deg] inline-flex items-center gap-2">
+          <span class="material-symbols-outlined">shopping_cart</span>
+          Shop the Gear
+        </span>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

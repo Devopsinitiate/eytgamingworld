@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Security Check Failed - EYTGaming Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Use Space Grotesk font for store pages */
+    body {
+        font-family: 'Space Grotesk', 'Spline Sans', sans-serif;
+    }
+
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .error-card {
+        background: linear-gradient(135deg, rgba(18, 18, 18, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%);
+        border: 1px solid rgba(236, 19, 19, 0.3);
+        border-radius: 12px;
+        padding: 3rem;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(236, 19, 19, 0.2);
+    }
+
+    .error-icon {
+        font-size: 4rem;
+        color: #ec1313;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 0 20px rgba(236, 19, 19, 0.5);
+    }
+
+    .error-title {
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        color: #ccc;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        background: #ec1313;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: #d01111;
+        box-shadow: 0 0 25px rgba(236, 19, 19, 0.6),
+                    0 0 50px rgba(236, 19, 19, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: rgba(18, 18, 18, 0.95);
+        color: white;
+        border: 2px solid rgba(236, 19, 19, 0.3);
+        border-radius: 8px;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        border-color: #ec1313;
+        color: #ec1313;
+        box-shadow: 0 0 15px rgba(236, 19, 19, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .error-details {
+        background: rgba(10, 10, 10, 0.5);
+        border: 1px solid rgba(236, 19, 19, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 2rem;
+        font-size: 0.875rem;
+        color: #999;
+    }
+
+    @media (max-width: 768px) {
+        .error-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="error-container">
+    <div class="error-card">
+        <span class="material-symbols-outlined error-icon">
+            shield_lock
+        </span>
+        
+        <h1 class="error-title">Security Check Failed</h1>
+        
+        <p class="error-message">
+            {{ message }}
+        </p>
+
+        <div class="error-actions">
+            <button onclick="window.location.reload()" class="btn-primary">
+                <span class="material-symbols-outlined">refresh</span>
+                Refresh Page
+            </button>
+            
+            <a href="{% url 'store:product_list' %}" class="btn-secondary">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Back to Store
+            </a>
+        </div>
+
+        <div class="error-details">
+            <strong>Common Solutions:</strong>
+            <ul style="text-align: left; margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li>Refresh the page and try again</li>
+                <li>Enable cookies in your browser</li>
+                <li>Clear your browser cache and cookies</li>
+                <li>Make sure you're not using private/incognito mode</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

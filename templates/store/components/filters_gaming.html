@@ -1,0 +1,106 @@
+<!-- Gaming-Styled Store Filters -->
+<div class="card-gaming mb-8">
+    <div class="card-gaming-content p-6">
+        <form method="get" id="store-filter-form" class="space-y-4">
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" 
+                       name="q" 
+                       id="store-search-input"
+                       value="{{ request.GET.q }}"
+                       placeholder="SEARCH PRODUCTS..."
+                       class="w-full bg-deep-black text-white border-2 border-electric-red/30 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-electric-red gaming-body placeholder:text-gray-600 placeholder:uppercase">
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-electric-red text-xl">search</span>
+            </div>
+
+            <!-- Filter Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- Category Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">CATEGORY</label>
+                    <select name="category" id="category-filter" class="gaming-select w-full">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.slug }}" {% if request.GET.category == category.slug %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Price Range -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">PRICE RANGE</label>
+                    <select name="price" id="price-filter" class="gaming-select w-full">
+                        <option value="">Any Price</option>
+                        <option value="0-25" {% if request.GET.price == '0-25' %}selected{% endif %}>$0 - $25</option>
+                        <option value="25-50" {% if request.GET.price == '25-50' %}selected{% endif %}>$25 - $50</option>
+                        <option value="50-100" {% if request.GET.price == '50-100' %}selected{% endif %}>$50 - $100</option>
+                        <option value="100+" {% if request.GET.price == '100+' %}selected{% endif %}>$100+</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">SORT BY</label>
+                    <select name="sort" id="sort-filter" class="gaming-select w-full">
+                        <option value="-created_at" {% if request.GET.sort == '-created_at' %}selected{% endif %}>Newest</option>
+                        <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="-average_rating" {% if request.GET.sort == '-average_rating' %}selected{% endif %}>Highest Rated</option>
+                        <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name A-Z</option>
+                    </select>
+                </div>
+
+                <!-- Stock Filter -->
+                <div class="gaming-select-wrapper">
+                    <label class="stat-label text-xs mb-2 block">AVAILABILITY</label>
+                    <select name="stock" id="stock-filter" class="gaming-select w-full">
+                        <option value="">All Items</option>
+                        <option value="in_stock" {% if request.GET.stock == 'in_stock' %}selected{% endif %}>In Stock</option>
+                        <option value="on_sale" {% if request.GET.stock == 'on_sale' %}selected{% endif %}>On Sale</option>
+                    </select>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex items-end">
+                    <button type="submit" class="btn-gaming-primary w-full">
+                        <span class="btn-gaming-text">APPLY FILTERS</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.gaming-select {
+    background: #0A0A0A;
+    color: white;
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gaming-select:hover {
+    border-color: #DC2626;
+}
+
+.gaming-select:focus {
+    outline: none;
+    border-color: #DC2626;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-select option {
+    background: #0A0A0A;
+    color: white;
+    padding: 0.5rem;
+}
+</style>

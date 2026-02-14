@@ -293,6 +293,14 @@ class Game(models.Model):
     description = models.TextField(blank=True)
     genre = models.CharField(max_length=20, choices=GENRE_CHOICES)
     
+    # Landing page fields
+    category = models.CharField(max_length=50, blank=True, 
+                                help_text='Game category (Fighting, FPS, Sports, Mobile)')
+    key_art = models.ImageField(upload_to='games/key_art/', null=True, blank=True,
+                                help_text='Key art for landing page display')
+    display_order = models.IntegerField(default=0, 
+                                        help_text='Order in landing page display')
+    
     # Media
     logo = models.ImageField(upload_to='games/logos/', null=True, blank=True)
     banner = models.ImageField(upload_to='games/banners/', null=True, blank=True)
@@ -464,3 +472,211 @@ class SiteSettings(models.Model):
         """Load or create site settings"""
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+
+
+# ==============================================================================
+# LANDING PAGE MODELS
+# ==============================================================================
+
+class Player(models.Model):
+    """Elite player/gamer profiles for showcase on landing page"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Player information
+    gamer_tag = models.CharField(max_length=100, unique=True, help_text="Player's gaming name")
+    role = models.CharField(max_length=100, help_text="Player role (e.g., 'Mid Laner', 'Entry Fragger')")
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='featured_players')
+    
+    # Location
+    country_flag = models.CharField(max_length=10, help_text="Country flag emoji or code (e.g., '🇺🇸' or 'US')")
+    
+    # Media
+    image = models.ImageField(upload_to='players/', help_text="Player profile image")
+    
+    # Statistics
+    kd_ratio = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, 
+                                    help_text="Kill/Death ratio")
+    rank = models.CharField(max_length=50, help_text="Player rank (e.g., 'Radiant', 'Global Elite')")
+    wins = models.IntegerField(default=0, validators=[MinValueValidator(0)], 
+                               help_text="Total wins")
+    
+    # Showcase settings
+    is_featured = models.BooleanField(default=False, 
+                                      help_text="Display on landing page")
+    display_order = models.IntegerField(default=0, 
+                                        help_text="Order in showcase (lower = first)")
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'landing_players'
+        ordering = ['display_order', '-kd_ratio']
+        verbose_name = 'Featured Player'
+        verbose_name_plural = 'Featured Players'
+        indexes = [
+            models.Index(fields=['is_featured', 'display_order']),
+            models.Index(fields=['game', 'is_featured']),
+        ]
+    
+    def __str__(self):
+        return f"{self.gamer_tag} - {self.game.name}"
+
+
+class Video(models.Model):
+    """Video highlights and content for landing page"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Video information
+    title = models.CharField(max_length=200)
+    thumbnail = models.ImageField(upload_to='videos/thumbnails/', 
+                                  help_text="Video thumbnail image")
+    video_url = models.URLField(help_text="YouTube, Twitch, or direct video URL")
+    
+    # Metadata
+    duration = models.DurationField(help_text="Video duration")
+    views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    published_date = models.DateTimeField(default=timezone.now)
+    
+    # Display settings
+    is_featured = models.BooleanField(default=False, 
+                                      help_text="Show as featured video")
+    is_published = models.BooleanField(default=True, 
+                                       help_text="Make visible on site")
+    display_order = models.IntegerField(default=0, 
+                                        help_text="Order in list (lower = first)")
+    
+    # Optional categorization
+    game = models.ForeignKey(Game, on_delete=models.SET_NULL, null=True, blank=True,
+                            related_name='videos')
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'landing_videos'
+        ordering = ['-published_date']
+        verbose_name = 'Video'
+        verbose_name_plural = 'Videos'
+        indexes = [
+            models.Index(fields=['is_published', 'is_featured']),
+            models.Index(fields=['-published_date']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def duration_formatted(self):
+        """Return duration in MM:SS format"""
+        total_seconds = int(self.duration.total_seconds())
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        return f"{minutes}:{seconds:02d}"
+
+
+class NewsArticle(models.Model):
+    """News articles and updates for landing page"""
+    
+    CATEGORY_CHOICES = [
+        ('tournament', 'Tournament'),
+        ('announcement', 'Announcement'),
+        ('update', 'Update'),
+        ('community', 'Community'),
+        ('esports', 'Esports'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Article content
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    excerpt = models.TextField(max_length=300, help_text="Short summary for cards")
+    content = models.TextField(help_text="Full article content")
+    
+    # Media
+    image = models.ImageField(upload_to='news/', help_text="Featured image")
+    
+    # Categorization
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='announcement')
+    
+    # Publishing
+    published_date = models.DateTimeField(default=timezone.now)
+    is_published = models.BooleanField(default=True)
+    
+    # Author
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                               related_name='news_articles')
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'landing_news_articles'
+        ordering = ['-published_date']
+        verbose_name = 'News Article'
+        verbose_name_plural = 'News Articles'
+        indexes = [
+            models.Index(fields=['is_published', '-published_date']),
+            models.Index(fields=['category', '-published_date']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('news:detail', kwargs={'slug': self.slug})
+
+
+class Product(models.Model):
+    """Merchandise products for landing page showcase"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Product information
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    description = models.TextField(blank=True)
+    
+    # Media
+    image = models.ImageField(upload_to='products/', help_text="Product image")
+    
+    # Pricing
+    price = models.DecimalField(max_digits=10, decimal_places=2, 
+                                validators=[MinValueValidator(0)])
+    
+    # Display settings
+    is_featured = models.BooleanField(default=False, 
+                                      help_text="Show on landing page")
+    display_order = models.IntegerField(default=0, 
+                                        help_text="Order in showcase (lower = first)")
+    is_available = models.BooleanField(default=True, 
+                                       help_text="Product is in stock")
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'landing_products'
+        ordering = ['display_order', 'name']
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
+        indexes = [
+            models.Index(fields=['is_featured', 'display_order']),
+            models.Index(fields=['is_available']),
+        ]
+    
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('store:product', kwargs={'slug': self.slug})

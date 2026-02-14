@@ -1,0 +1,147 @@
+{% load tz %}
+
+<!-- Gaming-Styled Tournament Card -->
+<div class="card-gaming group hover:scale-105 transition-transform duration-300">
+    <a href="{% url 'tournaments:detail' tournament.slug %}" class="block">
+        <!-- Tournament Banner -->
+        <div class="relative h-48 overflow-hidden rounded-t-lg">
+            {% if tournament.banner_image %}
+                <img src="{{ tournament.banner_image.url }}" alt="{{ tournament.name }}" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-electric-red via-deep-black to-neon-cyan"></div>
+            {% endif %}
+            
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-black via-deep-black/50 to-transparent"></div>
+            
+            <!-- Status Badge -->
+            <div class="absolute top-4 right-4">
+                {% if tournament.status == 'registration' %}
+                    <span class="px-3 py-1 bg-neon-cyan/90 text-deep-black text-xs gaming-subheader rounded backdrop-blur-sm">
+                        OPEN
+                    </span>
+                {% elif tournament.status == 'check_in' %}
+                    <span class="px-3 py-1 bg-yellow-500/90 text-deep-black text-xs gaming-subheader rounded backdrop-blur-sm">
+                        CHECK-IN
+                    </span>
+                {% elif tournament.status == 'in_progress' %}
+                    <span class="px-3 py-1 bg-electric-red/90 text-white text-xs gaming-subheader rounded backdrop-blur-sm">
+                        LIVE
+                    </span>
+                {% elif tournament.status == 'completed' %}
+                    <span class="px-3 py-1 bg-gray-600/90 text-white text-xs gaming-subheader rounded backdrop-blur-sm">
+                        ENDED
+                    </span>
+                {% endif %}
+            </div>
+            
+            <!-- Game Icon -->
+            <div class="absolute bottom-4 left-4">
+                <div class="w-12 h-12 bg-deep-black/80 rounded-lg flex items-center justify-center backdrop-blur-sm neon-red-glow">
+                    <span class="material-symbols-outlined text-electric-red text-2xl">sports_esports</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-gaming-content p-6">
+            <!-- Tournament Name -->
+            <h3 class="gaming-header text-xl text-electric-red mb-2 line-clamp-2 group-hover:text-neon-cyan transition-colors">
+                {{ tournament.name|upper }}
+            </h3>
+            
+            <!-- Game Name -->
+            <p class="gaming-body text-gray-400 text-sm mb-4">
+                {{ tournament.game.name }}
+            </p>
+
+            <!-- Tournament Info Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <!-- Prize Pool -->
+                <div class="stat-card-mini">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-neon-cyan text-lg">emoji_events</span>
+                        <div>
+                            <p class="stat-label text-xs">PRIZE POOL</p>
+                            <p class="stat-value text-sm">
+                                {% if tournament.prize_pool %}
+                                    {{ tournament.currency_symbol }}{{ tournament.prize_pool|floatformat:0 }}
+                                {% else %}
+                                    FREE
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Participants -->
+                <div class="stat-card-mini">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-electric-red text-lg">groups</span>
+                        <div>
+                            <p class="stat-label text-xs">PLAYERS</p>
+                            <p class="stat-value text-sm">
+                                {{ tournament.participants_count }}/{{ tournament.max_participants }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="progress-gaming h-2">
+                    <div class="progress-gaming-bar" 
+                         style="width: {% widthratio tournament.participants_count tournament.max_participants 100 %}%;"></div>
+                </div>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+                <span class="material-symbols-outlined text-sm">schedule</span>
+                <span class="gaming-body">
+                    {{ tournament.start_date|date:"M d, Y" }} • {{ tournament.start_date|time:"h:i A" }}
+                </span>
+            </div>
+
+            <!-- Entry Fee & Format -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-800">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm text-gray-500">confirmation_number</span>
+                    <span class="stat-label text-xs">
+                        {% if tournament.entry_fee > 0 %}
+                            {{ tournament.currency_symbol }}{{ tournament.entry_fee|floatformat:0 }}
+                        {% else %}
+                            FREE ENTRY
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm text-gray-500">hub</span>
+                    <span class="stat-label text-xs">{{ tournament.get_format_display|upper }}</span>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            {% if tournament.status == 'registration' %}
+            <div class="mt-4">
+                <div class="btn-gaming-primary w-full text-center">
+                    <span class="btn-gaming-text">JOIN NOW</span>
+                </div>
+            </div>
+            {% elif tournament.status == 'in_progress' %}
+            <div class="mt-4">
+                <div class="btn-gaming-secondary w-full text-center">
+                    <span class="btn-gaming-text">WATCH LIVE</span>
+                </div>
+            </div>
+            {% elif tournament.status == 'completed' %}
+            <div class="mt-4">
+                <div class="btn-gaming-secondary w-full text-center">
+                    <span class="btn-gaming-text">VIEW RESULTS</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </a>
+</div>

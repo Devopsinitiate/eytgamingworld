@@ -6,8 +6,813 @@
 {% block title %}{{ tournament_display.name|safe_default:"Tournament" }} - EYTGaming{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/tournament-detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/mobile-responsive.css' %}">
+<link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
+<!-- Dashboard Gaming CSS for consistent styling -->
+<link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard-mobile.css' %}">
+
+<!-- Gaming Styling Overrides -->
+<style>
+/* Gaming Header Styles */
+.tournament-gaming-header {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #DC2626;
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+}
+
+/* Gaming Card Styles */
+.tournament-gaming-card {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.tournament-gaming-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.tournament-gaming-card:hover::before {
+    left: 100%;
+}
+
+.tournament-gaming-card:hover {
+    border-color: rgba(220, 38, 38, 0.6);
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Gaming Button Styles */
+.btn-gaming-tournament {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 0.375rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-gaming-tournament::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-gaming-tournament:hover::before {
+    left: 100%;
+}
+
+.btn-gaming-tournament:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+}
+
+/* Gaming Stats */
+.tournament-gaming-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.5rem;
+}
+
+.tournament-gaming-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #DC2626;
+}
+
+.tournament-gaming-stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6B7280;
+    margin-top: 0.25rem;
+}
+
+/* Ensure mobile navigation is clickable */
+/* Fix breadcrumb clickability */
+nav[aria-label="Breadcrumb"] {
+    z-index: 50 !important;
+    position: relative;
+}
+
+nav[aria-label="Breadcrumb"] a {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 51 !important;
+}
+
+/* ==========================================
+   GAMING STYLING - Tournament Detail
+   ========================================== */
+
+/* Gaming Hero Section */
+.tournament-gaming-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.tournament-gaming-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, transparent 50%, rgba(6, 182, 212, 0.1) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Gaming Title */
+.tournament-gaming-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #FFFFFF 0%, #DC2626 50%, #FFFFFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+}
+
+/* Gaming Badges */
+.gaming-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border: 1px solid rgba(220, 38, 38, 0.5);
+    border-radius: 0.5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    color: #DC2626;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+}
+
+.gaming-status-badge.active {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.5); }
+}
+
+/* Gaming Featured Badge */
+.gaming-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0.1) 100%);
+    border: 1px solid rgba(6, 182, 212, 0.5);
+    border-radius: 0.5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    color: #06B6D4;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+/* Gaming Stats Cards */
+.gaming-stat-card {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.gaming-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.gaming-stat-card:hover::before {
+    left: 100%;
+}
+
+.gaming-stat-card:hover {
+    border-color: rgba(220, 38, 38, 0.6);
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.2);
+    transform: translateY(-4px);
+}
+
+.gaming-stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #DC2626;
+    text-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6B7280;
+    margin-top: 0.5rem;
+}
+
+/* Gaming Progress Bar */
+.gaming-progress-bar {
+    height: 4px;
+    background: rgba(220, 38, 38, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.75rem;
+}
+
+.gaming-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #DC2626 0%, #06B6D4 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    transition: width 0.5s ease;
+}
+
+/* Gaming Timeline */
+.gaming-timeline {
+    position: relative;
+}
+
+.gaming-timeline-line {
+    height: 4px;
+    background: linear-gradient(90deg, #DC2626 0%, #06B6D4 50%, #DC2626 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-phase-indicator {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    border: 3px solid #0A0A0A;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gaming-phase-indicator.completed {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 0 20px rgba(5, 150, 105, 0.5);
+}
+
+.gaming-phase-indicator.pending {
+    background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
+    box-shadow: 0 0 10px rgba(55, 65, 81, 0.3);
+}
+
+/* Gaming Info Cards */
+.gaming-info-card {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.gaming-info-card:hover {
+    border-color: rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.15);
+}
+
+.gaming-info-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #DC2626;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Gaming Buttons */
+.btn-gaming-tournament {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+}
+
+.btn-gaming-tournament::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-gaming-tournament:hover::before {
+    left: 100%;
+}
+
+.btn-gaming-tournament:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+}
+
+.btn-gaming-tournament-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: transparent;
+    color: #DC2626;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid #DC2626;
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-gaming-tournament-outline:hover {
+    background: rgba(220, 38, 38, 0.1);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+/* Gaming Meta Items */
+.gaming-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.gaming-meta-item:hover {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: rgba(220, 38, 38, 0.4);
+}
+
+.gaming-meta-icon {
+    color: #DC2626;
+    font-size: 1.25rem;
+}
+
+.gaming-meta-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6B7280;
+}
+
+.gaming-meta-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+/* Gaming Section Headers */
+.gaming-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #DC2626;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.gaming-section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, #DC2626 0%, transparent 100%);
+}
+
+/* Gaming Prize Display */
+.gaming-prize-display {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.gaming-prize-display::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.gaming-prize-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #DC2626 0%, #06B6D4 50%, #DC2626 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+/* Gaming Participant Cards */
+.gaming-participant-card {
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.gaming-participant-card:hover {
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+    transform: translateX(4px);
+}
+
+.gaming-participant-rank {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+}
+
+/* Gaming Tab Navigation */
+.gaming-tab-nav {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+    margin-bottom: 2rem;
+}
+
+.gaming-tab-item {
+    padding: 1rem 1.5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.gaming-tab-item:hover {
+    color: #DC2626;
+}
+
+.gaming-tab-item.active {
+    color: #DC2626;
+    border-bottom-color: #DC2626;
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+}
+
+/* Neon Glow Effects */
+.neon-red-glow-sm {
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+}
+
+.neon-red-glow-md {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.neon-cyan-glow {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+/* Gaming Stat Items */
+.gaming-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.gaming-stat-item:hover {
+    border-color: rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+    transform: translateY(-2px);
+}
+
+.gaming-stat-icon {
+    color: #DC2626;
+    font-size: 1.5rem;
+}
+
+.gaming-stat-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #DC2626;
+    text-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-stat-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+}
+
+/* Gaming Match Items */
+.gaming-match-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+    border: 2px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.gaming-match-item:hover {
+    border-color: rgba(220, 38, 38, 0.4);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+    transform: translateX(4px);
+}
+
+.gaming-participant-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gaming-participant-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.gaming-match-result {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.gaming-result-win {
+    color: #10B981;
+}
+
+.gaming-result-loss {
+    color: #EF4444;
+}
+
+/* Gaming Filter Buttons */
+.gaming-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(220, 38, 38, 0.1);
+    color: #DC2626;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.gaming-filter-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.gaming-filter-btn.active {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: white;
+    border-color: #DC2626;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .gaming-stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .gaming-prize-amount {
+        font-size: 2rem;
+    }
+    
+    .gaming-section-title {
+        font-size: 1.25rem;
+    }
+    
+    .gaming-stat-number {
+        font-size: 1.25rem;
+    }
+}
+</style>
+<style>
+/* Check-in Button Styling */
+.check-in-actions {
+    margin-top: 1rem;
+}
+
+.check-in-btn {
+    background: linear-gradient(135deg, var(--eyt-primary) 0%, var(--eyt-primary-dark) 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 0.875rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px var(--eyt-primary-alpha-30) !important;
+    text-decoration: none !important;
+    width: 100% !important;
+}
+
+.check-in-btn:hover {
+    background: linear-gradient(135deg, var(--eyt-primary-light) 0%, var(--eyt-primary) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px var(--eyt-primary-alpha-40) !important;
+    color: white !important;
+}
+
+.check-in-btn:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px var(--eyt-primary-alpha-30) !important;
+}
+
+.check-in-btn .material-symbols-outlined {
+    font-size: 1.25rem !important;
+}
+
+/* Checked-in Status Styling */
+.checked-in-status {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border: 1px solid #10b981;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.checked-in-status .status-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.checked-in-status .status-icon {
+    font-size: 1.5rem !important;
+    color: white !important;
+}
+
+.checked-in-status .status-content {
+    flex: 1;
+}
+
+.checked-in-status .status-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white;
+    margin-bottom: 0.25rem;
+}
+
+.checked-in-status .status-subtitle {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.25rem;
+}
+
+.checked-in-status .check-in-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+</style>
 {% endblock %}
 
 {% block extra_head %}
@@ -39,21 +844,24 @@
 
 {% block body %}
 <div class="min-h-screen bg-background-dark">
-    <!-- Breadcrumb Navigation -->
-    <nav class="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800" aria-label="Breadcrumb">
+    <!-- Gaming Breadcrumb Navigation -->
+    <nav class="bg-[#0A0A0A]/90 backdrop-blur-sm border-b border-[#DC2626]/30 relative z-[50]" aria-label="Breadcrumb" style="pointer-events: auto;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center space-x-2 py-3 text-sm">
-                <a href="{% url 'tournaments:list' %}" class="text-gray-400 hover:text-white transition-colors">
-                    Tournaments
+                <a href="{% url 'tournaments:list' %}" 
+                   class="text-gray-400 hover:text-[#DC2626] transition-colors flex items-center gap-1 min-h-[44px] min-w-[44px] px-2"
+                   style="pointer-events: auto; cursor: pointer; position: relative; z-index: 51;">
+                    <span class="material-symbols-outlined text-[#DC2626]" aria-hidden="true">emoji_events</span>
+                    <span class="gaming-subheader">TOURNAMENTS</span>
                 </a>
-                <span class="material-symbols-outlined text-gray-500 text-sm" aria-hidden="true">chevron_right</span>
-                <span class="text-white font-medium">{{ tournament_display.name|safe_default:"Tournament Name" }}</span>
+                <span class="material-symbols-outlined text-gray-600 text-sm" aria-hidden="true">chevron_right</span>
+                <span class="text-white font-medium gaming-body truncate max-w-[200px] sm:max-w-[400px]">{{ tournament_display.name|safe_default:"Tournament Name" }}</span>
             </div>
         </div>
     </nav>
 
-    <!-- Enhanced Hero Section -->
-    <section class="hero-section relative overflow-hidden" 
+    <!-- Enhanced Gaming Hero Section -->
+    <section class="hero-section tournament-gaming-hero relative overflow-hidden" 
              aria-labelledby="tournament-title"
              data-game-colors="{{ tournament.game.primary_color|default:'#b91c1c' }},{{ tournament.game.secondary_color|default:'#7f1d1d' }}"
              data-tournament-status="{{ tournament.status }}"
@@ -102,7 +910,7 @@
                     <!-- Enhanced Status and Featured Badges -->
                     <div class="flex items-center gap-3 mb-6" role="group" aria-label="Tournament status and badges">
                         <!-- Animated Tournament Status Badge -->
-                        <span class="tournament-status-badge {{ tournament.status|status_badge_class }}" 
+                        <span class="gaming-status-badge {% if tournament.status == 'registration' or tournament.status == 'in_progress' %}active{% endif %}" 
                               data-status="{{ tournament.status }}"
                               aria-label="Tournament status: {{ tournament_display.status_display }}">
                             {{ tournament.status|status_icon }}
@@ -114,7 +922,7 @@
                         
                         <!-- Enhanced Featured Tournament Badge -->
                         {% if tournament.is_featured %}
-                            <span class="featured-badge" 
+                            <span class="gaming-featured-badge" 
                                   aria-label="Featured tournament"
                                   data-featured="true">
                                 <span class="featured-icon material-symbols-outlined text-sm" aria-hidden="true">star</span>
@@ -136,7 +944,7 @@
                     <!-- Enhanced Tournament Title with Game Integration -->
                     <div class="tournament-title-section">
                         <h1 id="tournament-title" 
-                            class="tournament-title text-4xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                            class="tournament-title tournament-gaming-title text-4xl lg:text-6xl font-bold text-white mb-4 leading-tight">
                             {{ tournament_display.name|safe_default:"Tournament Name" }}
                         </h1>
                         
@@ -224,44 +1032,44 @@
                             <span class="material-symbols-outlined">sync</span>
                         </div>
                         
-                        <div class="stat-card" data-stat="participants" role="img" aria-label="Registered participants: {{ participant_display.registered_count }} out of {{ participant_display.max_participants }}">
-                            <div class="stat-value" data-value="{{ participant_display.registered_count }}">
+                        <div class="gaming-stat-card" data-stat="participants" role="img" aria-label="Registered participants: {{ participant_display.registered_count }} out of {{ participant_display.max_participants }}">
+                            <div class="gaming-stat-value" data-value="{{ participant_display.registered_count }}">
                                 {{ participant_display.registered_count|safe_default:"0" }}
                             </div>
-                            <div class="stat-label">Registered</div>
-                            <div class="stat-progress">
-                                <div class="stat-progress-fill" 
+                            <div class="gaming-stat-label">Registered</div>
+                            <div class="gaming-progress-bar">
+                                <div class="gaming-progress-fill" 
                                      style="width: {{ participant_display.percentage_full|format_percentage:0 }}"
                                      aria-label="Registration progress: {{ participant_display.percentage_full|format_percentage:0 }} full">
                                 </div>
                             </div>
                         </div>
                         {% if prize_display.has_prize %}
-                        <div class="stat-card" data-stat="prize-pool" role="img" aria-label="Prize pool: {{ prize_display.formatted_amount }}">
-                            <div class="stat-value" data-value="{{ tournament.prize_pool|safe_default:'0' }}">
+                        <div class="gaming-stat-card" data-stat="prize-pool" role="img" aria-label="Prize pool: {{ prize_display.formatted_amount }}">
+                            <div class="gaming-stat-value" data-value="{{ tournament.prize_pool|safe_default:'0' }}">
                                 {{ prize_display.formatted_amount }}
                             </div>
-                            <div class="stat-label">Prize Pool</div>
+                            <div class="gaming-stat-label">Prize Pool</div>
                         </div>
                         {% else %}
-                        <div class="stat-card" data-stat="prize-pool" role="img" aria-label="Prize pool: Free tournament">
-                            <div class="stat-value" data-value="0">
+                        <div class="gaming-stat-card" data-stat="prize-pool" role="img" aria-label="Prize pool: Free tournament">
+                            <div class="gaming-stat-value" data-value="0">
                                 Free
                             </div>
-                            <div class="stat-label">Tournament</div>
+                            <div class="gaming-stat-label">Tournament</div>
                         </div>
                         {% endif %}
-                        <div class="stat-card" data-stat="views" role="img" aria-label="Tournament views: {{ tournament_stats.engagement.views|safe_default:'0' }}">
-                            <div class="stat-value" data-value="{{ tournament_stats.engagement.views|safe_default:'0' }}">
+                        <div class="gaming-stat-card" data-stat="views" role="img" aria-label="Tournament views: {{ tournament_stats.engagement.views|safe_default:'0' }}">
+                            <div class="gaming-stat-value" data-value="{{ tournament_stats.engagement.views|safe_default:'0' }}">
                                 {{ tournament_stats.engagement.views|safe_default:"0" }}
                             </div>
-                            <div class="stat-label">Views</div>
+                            <div class="gaming-stat-label">Views</div>
                         </div>
-                        <div class="stat-card" data-stat="capacity" role="img" aria-label="Maximum participants: {{ participant_display.max_participants }}">
-                            <div class="stat-value" data-value="{{ participant_display.max_participants }}">
+                        <div class="gaming-stat-card" data-stat="capacity" role="img" aria-label="Maximum participants: {{ participant_display.max_participants }}">
+                            <div class="gaming-stat-value" data-value="{{ participant_display.max_participants }}">
                                 {{ participant_display.max_participants|safe_default:"∞" }}
                             </div>
-                            <div class="stat-label">Max Players</div>
+                            <div class="gaming-stat-label">Max Players</div>
                         </div>
                     </div>
                     
@@ -435,27 +1243,27 @@
             <div class="lg:col-span-2 space-y-8">
                 <!-- Enhanced Tab Navigation System -->
                 <div class="tab-navigation">
-                    <div class="tab-nav-list" role="tablist" aria-label="Tournament information tabs">
-                        <button id="details-tab-button" class="tab-nav-item active" data-tab="details" role="tab" aria-selected="true" tabindex="0">
+                    <div class="gaming-tab-nav" role="tablist" aria-label="Tournament information tabs">
+                        <button id="details-tab-button" class="gaming-tab-item active" data-tab="details" role="tab" aria-selected="true" tabindex="0">
                             <span class="material-symbols-outlined">info</span>
                             Details
                         </button>
-                        {% if tournament.status == 'in_progress' or tournament.status == 'completed' %}
-                        <button id="bracket-tab-button" class="tab-nav-item" data-tab="bracket" role="tab" aria-selected="false" tabindex="-1">
+                        {% if tournament.status == 'in_progress' or tournament.status == 'completed' or tournament.brackets.exists %}
+                        <button id="bracket-tab-button" class="gaming-tab-item" data-tab="bracket" role="tab" aria-selected="false" tabindex="-1">
                             <span class="material-symbols-outlined">account_tree</span>
                             Bracket
                         </button>
                         {% endif %}
-                        <button id="participants-tab-button" class="tab-nav-item" data-tab="participants" role="tab" aria-selected="false" tabindex="-1">
+                        <button id="participants-tab-button" class="gaming-tab-item" data-tab="participants" role="tab" aria-selected="false" tabindex="-1">
                             <span class="material-symbols-outlined">group</span>
                             Participants
                         </button>
-                        <button id="rules-tab-button" class="tab-nav-item" data-tab="rules" role="tab" aria-selected="false" tabindex="-1">
+                        <button id="rules-tab-button" class="gaming-tab-item" data-tab="rules" role="tab" aria-selected="false" tabindex="-1">
                             <span class="material-symbols-outlined">gavel</span>
                             Rules
                         </button>
                         {% if tournament.prize_pool > 0 %}
-                        <button id="prizes-tab-button" class="tab-nav-item" data-tab="prizes" role="tab" aria-selected="false" tabindex="-1">
+                        <button id="prizes-tab-button" class="gaming-tab-item" data-tab="prizes" role="tab" aria-selected="false" tabindex="-1">
                             <span class="material-symbols-outlined">emoji_events</span>
                             Prizes
                         </button>
@@ -468,51 +1276,57 @@
                     <!-- Details Tab -->
                     <div id="details-tab" class="tab-pane active" role="tabpanel" aria-labelledby="details-tab-button">
                         <!-- Tournament Description -->
-                        <div class="content-card">
-                            <h3 class="content-card-title">About This Tournament</h3>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">info</span>
+                                About This Tournament
+                            </h3>
                             <div class="prose prose-invert max-w-none">
                                 {{ tournament.description|linebreaks }}
                             </div>
                         </div>
 
                         <!-- Tournament Statistics -->
-                        <div class="content-card">
-                            <h3 class="content-card-title">Tournament Statistics</h3>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">analytics</span>
+                                Tournament Statistics
+                            </h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
+                                <div class="gaming-stat-item">
+                                    <div class="gaming-stat-icon">
                                         <span class="material-symbols-outlined">group</span>
                                     </div>
                                     <div>
-                                        <div class="stat-number">{{ tournament_stats.participants.registered }}</div>
-                                        <div class="stat-description">Registered</div>
+                                        <div class="gaming-stat-number">{{ tournament_stats.participants.registered }}</div>
+                                        <div class="gaming-stat-description">Registered</div>
                                     </div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-icon">
+                                <div class="gaming-stat-item">
+                                    <div class="gaming-stat-icon">
                                         <span class="material-symbols-outlined">check_circle</span>
                                     </div>
                                     <div>
-                                        <div class="stat-number">{{ tournament_stats.participants.checked_in }}</div>
-                                        <div class="stat-description">Checked In</div>
+                                        <div class="gaming-stat-number">{{ tournament_stats.participants.checked_in }}</div>
+                                        <div class="gaming-stat-description">Checked In</div>
                                     </div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-icon">
+                                <div class="gaming-stat-item">
+                                    <div class="gaming-stat-icon">
                                         <span class="material-symbols-outlined">sports_esports</span>
                                     </div>
                                     <div>
-                                        <div class="stat-number">{{ tournament_stats.matches.completed }}</div>
-                                        <div class="stat-description">Matches Played</div>
+                                        <div class="gaming-stat-number">{{ tournament_stats.matches.completed }}</div>
+                                        <div class="gaming-stat-description">Matches Played</div>
                                     </div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-icon">
+                                <div class="gaming-stat-item">
+                                    <div class="gaming-stat-icon">
                                         <span class="material-symbols-outlined">visibility</span>
                                     </div>
                                     <div>
-                                        <div class="stat-number">{{ tournament_stats.engagement.views }}</div>
-                                        <div class="stat-description">Views</div>
+                                        <div class="gaming-stat-number">{{ tournament_stats.engagement.views }}</div>
+                                        <div class="gaming-stat-description">Views</div>
                                     </div>
                                 </div>
                             </div>
@@ -520,8 +1334,11 @@
 
                         <!-- Recent Matches -->
                         {% if recent_matches %}
-                        <div class="content-card">
-                            <h3 class="content-card-title">Recent Matches</h3>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">sports_esports</span>
+                                Recent Matches
+                            </h3>
                             <div class="space-y-3">
                                 {% for match in recent_matches %}
                                 <div class="match-item">
@@ -538,7 +1355,7 @@
                                             </div>
                                         </div>
                                         <div class="match-meta">
-                                            <span class="text-sm text-gray-400">{{ match.completed_at|timesince }} ago</span>
+                                            <span class="text-sm text-gray-400">{{ match.completed_at|safe_timesince:"Recently completed" }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -549,18 +1366,165 @@
                     </div>
 
                     <!-- Bracket Tab -->
-                    {% if tournament.status == 'in_progress' or tournament.status == 'completed' %}
+                    {% if tournament.status == 'in_progress' or tournament.status == 'completed' or tournament.brackets.exists %}
                     <div id="bracket-tab" class="tab-pane" role="tabpanel" aria-labelledby="bracket-tab-button">
-                        <div class="content-card">
-                            <h3 class="content-card-title">Tournament Bracket</h3>
-                            {% if bracket_preview %}
-                                <div class="bracket-preview">
-                                    <!-- Bracket visualization will be loaded here -->
-                                    <div class="text-center py-8">
-                                        <span class="material-symbols-outlined text-4xl text-gray-500 mb-4">account_tree</span>
-                                        <p class="text-gray-400">Bracket visualization loading...</p>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">account_tree</span>
+                                Tournament Bracket
+                            </h3>
+                            {% if brackets %}
+                                <!-- Display actual bracket content -->
+                                {% for bracket in brackets %}
+                                <div class="mb-8">
+                                    <!-- Bracket Header -->
+                                    <div class="bg-gray-800/30 backdrop-blur-lg rounded-lg p-4 mb-6">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h4 class="text-xl font-bold text-white flex items-center">
+                                                    <span class="material-symbols-outlined text-[#b91c1c] mr-3">emoji_events</span>
+                                                    {{ bracket.name }}
+                                                </h4>
+                                                <p class="text-gray-300 mt-1">{{ bracket.total_rounds }} rounds • {{ bracket.matches.count }} matches</p>
+                                            </div>
+                                            
+                                            <!-- Bracket Stats -->
+                                            <div class="text-right">
+                                                <div class="text-sm text-gray-400">Matches Completed</div>
+                                                <div class="text-lg font-bold text-white">
+                                                    {{ bracket.completed_matches }}/{{ bracket.total_matches }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Bracket Container with Horizontal Scroll -->
+                                    <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
+                                        <div class="overflow-x-auto">
+                                            <div class="p-6 min-w-max">
+                                                <div class="flex space-x-8 relative">
+                                                    {% for round_num, matches in matches_by_bracket|get_item:bracket.id|dict_items %}
+                                                    <!-- Round Column -->
+                                                    <div class="flex flex-col space-y-4 min-w-[250px] relative">
+                                                        <!-- Round Header -->
+                                                        <div class="text-center mb-4">
+                                                            <div class="bg-gray-700/50 rounded-lg p-2">
+                                                                <h5 class="text-sm font-bold text-white">
+                                                                    {% if round_num == bracket.total_rounds %}
+                                                                        🏆 Finals
+                                                                    {% elif round_num == bracket.total_rounds|add:"-1" %}
+                                                                        🥈 Semi-Finals
+                                                                    {% elif round_num == bracket.total_rounds|add:"-2" %}
+                                                                        🥉 Quarter-Finals
+                                                                    {% else %}
+                                                                        Round {{ round_num }}
+                                                                    {% endif %}
+                                                                </h5>
+                                                                <p class="text-xs text-gray-300 mt-1">{{ matches|length }} match{{ matches|length|pluralize:"es" }}</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Matches in Round -->
+                                                        {% for match in matches %}
+                                                        <div class="gaming-match-item">
+                                                            <!-- Match Header -->
+                                                            <div class="flex items-center justify-between mb-3">
+                                                                <span class="text-xs font-medium text-gray-400">Match {{ match.match_number }}</span>
+                                                                
+                                                                <!-- Match Status Badge -->
+                                                                <div class="text-xs px-2 py-1 rounded-full
+                                                                    {% if match.status == 'completed' %}bg-green-500/20 text-green-400
+                                                                    {% elif match.status == 'in_progress' %}bg-yellow-500/20 text-yellow-400
+                                                                    {% elif match.status == 'ready' %}bg-blue-500/20 text-blue-400
+                                                                    {% else %}bg-gray-500/20 text-gray-400{% endif %}">
+                                                                    {% if match.status == 'completed' %}✓ Done
+                                                                    {% elif match.status == 'in_progress' %}● Live
+                                                                    {% elif match.status == 'ready' %}▶ Ready
+                                                                    {% else %}⏳ Pending{% endif %}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Participant 1 -->
+                                                            <div class="flex items-center justify-between p-2 rounded 
+                                                                {% if match.winner == match.participant1 %}bg-green-500/10 border border-green-500/30
+                                                                {% elif match.status == 'completed' %}bg-gray-600/20{% endif %} mb-1">
+                                                                <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                                    {% if match.participant1 %}
+                                                                    <div class="w-6 h-6 rounded-full bg-[#b91c1c] flex items-center justify-center text-white text-xs font-bold">
+                                                                        {{ match.participant1.display_name|first|upper }}
+                                                                    </div>
+                                                                    <span class="text-white text-sm truncate">{{ match.participant1.display_name }}</span>
+                                                                    {% if match.winner == match.participant1 %}
+                                                                    <span class="text-green-400 text-xs">👑</span>
+                                                                    {% endif %}
+                                                                    {% else %}
+                                                                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                                                                        <span class="text-gray-400 text-xs">?</span>
+                                                                    </div>
+                                                                    <span class="text-gray-400 text-sm italic">TBD</span>
+                                                                    {% endif %}
+                                                                </div>
+                                                                {% if match.status == 'completed' %}
+                                                                <div class="text-sm font-bold 
+                                                                    {% if match.winner == match.participant1 %}text-green-400
+                                                                    {% else %}text-gray-500{% endif %}">
+                                                                    {{ match.score_p1|default:"-" }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            
+                                                            <!-- VS Divider -->
+                                                            <div class="text-center py-1">
+                                                                <span class="text-xs text-gray-500">vs</span>
+                                                            </div>
+                                                            
+                                                            <!-- Participant 2 -->
+                                                            <div class="flex items-center justify-between p-2 rounded 
+                                                                {% if match.winner == match.participant2 %}bg-green-500/10 border border-green-500/30
+                                                                {% elif match.status == 'completed' %}bg-gray-600/20{% endif %}">
+                                                                <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                                    {% if match.participant2 %}
+                                                                    <div class="w-6 h-6 rounded-full bg-[#b91c1c] flex items-center justify-center text-white text-xs font-bold">
+                                                                        {{ match.participant2.display_name|first|upper }}
+                                                                    </div>
+                                                                    <span class="text-white text-sm truncate">{{ match.participant2.display_name }}</span>
+                                                                    {% if match.winner == match.participant2 %}
+                                                                    <span class="text-green-400 text-xs">👑</span>
+                                                                    {% endif %}
+                                                                    {% else %}
+                                                                    <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center">
+                                                                        <span class="text-gray-400 text-xs">?</span>
+                                                                    </div>
+                                                                    <span class="text-gray-400 text-sm italic">TBD</span>
+                                                                    {% endif %}
+                                                                </div>
+                                                                {% if match.status == 'completed' %}
+                                                                <div class="text-sm font-bold 
+                                                                    {% if match.winner == match.participant2 %}text-green-400
+                                                                    {% else %}text-gray-500{% endif %}">
+                                                                    {{ match.score_p2|default:"-" }}
+                                                                </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- View Full Bracket Link -->
+                                    <div class="text-center mt-4">
+                                        <a href="{% url 'tournaments:bracket' tournament.slug %}" 
+                                           class="inline-flex items-center px-4 py-2 bg-[#b91c1c] text-white rounded-lg hover:bg-[#b91c1c]/90 transition font-medium text-sm">
+                                            <span class="material-symbols-outlined text-sm mr-2">fullscreen</span>
+                                            View Full Bracket
+                                        </a>
                                     </div>
                                 </div>
+                                {% endfor %}
                             {% else %}
                                 <div class="text-center py-8">
                                     <span class="material-symbols-outlined text-4xl text-gray-500 mb-4">pending</span>
@@ -573,25 +1537,28 @@
 
                     <!-- Enhanced Participants Tab -->
                     <div id="participants-tab" class="tab-pane" role="tabpanel" aria-labelledby="participants-tab-button">
-                        <div class="content-card">
+                        <div class="gaming-info-card">
                             <div class="flex items-center justify-between mb-6">
-                                <h3 class="content-card-title">Participants ({{ tournament_stats.participants.registered }})</h3>
+                                <h3 class="gaming-section-title">
+                                    <span class="material-symbols-outlined">group</span>
+                                    Participants ({{ tournament_stats.participants.registered }})
+                                </h3>
                                 {% if participants %}
                                 <div class="participant-filters flex items-center gap-3">
-                                    <button class="filter-btn active" data-filter="all" aria-label="Show all participants">
+                                    <button class="gaming-filter-btn active" data-filter="all" aria-label="Show all participants">
                                         <span class="material-symbols-outlined text-sm">group</span>
                                         All
                                     </button>
-                                    <button class="filter-btn" data-filter="teams" aria-label="Show team participants only">
+                                    <button class="gaming-filter-btn" data-filter="teams" aria-label="Show team participants only">
                                         <span class="material-symbols-outlined text-sm">groups</span>
                                         Teams
                                     </button>
-                                    <button class="filter-btn" data-filter="individuals" aria-label="Show individual participants only">
+                                    <button class="gaming-filter-btn" data-filter="individuals" aria-label="Show individual participants only">
                                         <span class="material-symbols-outlined text-sm">person</span>
                                         Individuals
                                     </button>
                                     {% if tournament.status == 'check_in' or tournament.status == 'in_progress' %}
-                                    <button class="filter-btn" data-filter="checked-in" aria-label="Show checked-in participants only">
+                                    <button class="gaming-filter-btn" data-filter="checked-in" aria-label="Show checked-in participants only">
                                         <span class="material-symbols-outlined text-sm">check_circle</span>
                                         Checked In
                                     </button>
@@ -844,8 +1811,11 @@
 
                     <!-- Rules Tab -->
                     <div id="rules-tab" class="tab-pane" role="tabpanel" aria-labelledby="rules-tab-button">
-                        <div class="content-card">
-                            <h3 class="content-card-title">Tournament Rules</h3>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">gavel</span>
+                                Tournament Rules
+                            </h3>
                             {% if tournament.rules %}
                                 <div class="prose prose-invert max-w-none">
                                     {{ tournament.rules|linebreaks }}
@@ -863,8 +1833,11 @@
                     <!-- Enhanced Prizes Tab with Visual Prize Pool Breakdown -->
                     {% if tournament.prize_pool > 0 %}
                     <div id="prizes-tab" class="tab-pane" role="tabpanel" aria-labelledby="prizes-tab-button">
-                        <div class="content-card">
-                            <h3 class="content-card-title">Prize Distribution</h3>
+                        <div class="gaming-info-card">
+                            <h3 class="gaming-section-title">
+                                <span class="material-symbols-outlined">emoji_events</span>
+                                Prize Distribution
+                            </h3>
                             
                             <!-- Prize Pool Total Display -->
                             <div class="prize-pool-total">
@@ -1083,15 +2056,41 @@
                                         </a>
                                     </div>
                                 {% elif tournament.status == 'check_in' %}
-                                    <div class="check-in-reminder">
-                                        <div class="reminder-icon">
-                                            <span class="material-symbols-outlined text-warning" aria-hidden="true">schedule</span>
+                                    {% if user_participant %}
+                                        {% if not user_participant.checked_in %}
+                                            <div class="check-in-actions">
+                                                <a href="{% url 'tournaments:check_in' tournament.slug %}" 
+                                                   class="btn btn-primary w-full check-in-btn"
+                                                   aria-label="Check in for tournament">
+                                                    <span class="material-symbols-outlined text-sm" aria-hidden="true">check_circle</span>
+                                                    Check In Now
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            <div class="checked-in-status">
+                                                <div class="status-icon-container">
+                                                    <span class="material-symbols-outlined status-icon text-green-500" aria-hidden="true">check_circle</span>
+                                                </div>
+                                                <div class="status-content">
+                                                    <div class="status-title">Checked In!</div>
+                                                    <div class="status-subtitle">Ready for tournament</div>
+                                                    {% if user_participant.check_in_time %}
+                                                        <div class="check-in-time">{{ user_participant.check_in_time|date:"M d, g:i A" }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="check-in-reminder">
+                                            <div class="reminder-icon">
+                                                <span class="material-symbols-outlined text-warning" aria-hidden="true">schedule</span>
+                                            </div>
+                                            <div class="reminder-content">
+                                                <div class="reminder-title">Check-in Required</div>
+                                                <div class="reminder-subtitle">You must be registered to check in</div>
+                                            </div>
                                         </div>
-                                        <div class="reminder-content">
-                                            <div class="reminder-title">Check-in Required</div>
-                                            <div class="reminder-subtitle">Don't forget to check in before the tournament starts</div>
-                                        </div>
-                                    </div>
+                                    {% endif %}
                                 {% endif %}
                                 
                             {% else %}
@@ -1267,9 +2266,195 @@
                     </div>
                 </div>
 
+                <!-- Organizer Controls -->
+                {% if user == tournament.organizer %}
+                <div class="gaming-info-card organizer-controls">
+                    <h4 class="gaming-info-card-title">
+                        <span class="material-symbols-outlined text-primary mr-2">admin_panel_settings</span>
+                        Tournament Management
+                    </h4>
+                    <div class="organizer-actions-grid">
+                        
+                        <!-- Status Management Section -->
+                        {% if tournament.status == 'draft' %}
+                            <!-- Open Registration Button -->
+                            <form method="post" action="{% url 'tournaments:change_status' tournament.slug %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="new_status" value="registration">
+                                <button type="submit" 
+                                        class="organizer-action-btn success w-full"
+                                        onclick="return confirm('Open registration for this tournament? Players will be able to sign up immediately.')">
+                                    <span class="material-symbols-outlined">how_to_reg</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Open Registration</div>
+                                        <div class="action-subtitle">Allow players to sign up</div>
+                                    </div>
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if tournament.status == 'registration' %}
+                            <!-- Close Registration / Start Check-in Button -->
+                            {% if tournament.total_registered >= tournament.min_participants %}
+                                <form method="post" action="{% url 'tournaments:change_status' tournament.slug %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="new_status" value="check_in">
+                                    <button type="submit" 
+                                            class="organizer-action-btn primary w-full"
+                                            onclick="return confirm('Close registration and start check-in period? No more players will be able to register.')">
+                                        <span class="material-symbols-outlined">check_circle</span>
+                                        <div class="action-content">
+                                            <div class="action-title">Start Check-in</div>
+                                            <div class="action-subtitle">Close registration ({{ tournament.total_registered }} registered)</div>
+                                        </div>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <div class="organizer-action-btn disabled w-full">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Start Check-in</div>
+                                        <div class="action-subtitle">Need {{ tournament.min_participants }} participants ({{ tournament.total_registered }} registered)</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Generate Bracket Button -->
+                        {% if tournament.status == 'check_in' or tournament.status == 'in_progress' %}
+                            {% if not tournament.brackets.exists %}
+                                <a href="{% url 'tournaments:generate_bracket' tournament.slug %}" 
+                                   class="organizer-action-btn primary"
+                                   onclick="return confirm('Generate tournament bracket? This will create matches for all checked-in participants.')">
+                                    <span class="material-symbols-outlined">account_tree</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Generate Bracket</div>
+                                        <div class="action-subtitle">Create tournament bracket</div>
+                                    </div>
+                                </a>
+                            {% else %}
+                                <a href="{% url 'tournaments:generate_bracket' tournament.slug %}" 
+                                   class="organizer-action-btn secondary"
+                                   onclick="return confirm('Regenerate tournament bracket? This will delete existing matches and create new ones.')">
+                                    <span class="material-symbols-outlined">refresh</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Regenerate Bracket</div>
+                                        <div class="action-subtitle">Recreate tournament bracket</div>
+                                    </div>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Start Tournament Button -->
+                        {% if tournament.status == 'check_in' and tournament.total_checked_in >= tournament.min_participants %}
+                            <form method="post" action="{% url 'tournaments:change_status' tournament.slug %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="new_status" value="in_progress">
+                                <button type="submit" 
+                                        class="organizer-action-btn success w-full"
+                                        onclick="return confirm('Start the tournament? This will begin the competition phase.')">
+                                    <span class="material-symbols-outlined">play_arrow</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Start Tournament</div>
+                                        <div class="action-subtitle">Begin competition ({{ tournament.total_checked_in }} checked in)</div>
+                                    </div>
+                                </button>
+                            </form>
+                        {% elif tournament.status == 'check_in' %}
+                            <div class="organizer-action-btn disabled w-full">
+                                <span class="material-symbols-outlined">play_arrow</span>
+                                <div class="action-content">
+                                    <div class="action-title">Start Tournament</div>
+                                    <div class="action-subtitle">Need {{ tournament.min_participants }} check-ins ({{ tournament.total_checked_in }} checked in)</div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Complete Tournament Button -->
+                        {% if tournament.status == 'in_progress' %}
+                            <form method="post" action="{% url 'tournaments:change_status' tournament.slug %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="new_status" value="completed">
+                                <button type="submit" 
+                                        class="organizer-action-btn secondary w-full"
+                                        onclick="return confirm('Mark tournament as completed? This will finalize all results and distribute prizes if applicable.')">
+                                    <span class="material-symbols-outlined">emoji_events</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Complete Tournament</div>
+                                        <div class="action-subtitle">Finalize results</div>
+                                    </div>
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <!-- Cancel Tournament Button -->
+                        {% if tournament.status != 'completed' and tournament.status != 'cancelled' %}
+                            <form method="post" action="{% url 'tournaments:change_status' tournament.slug %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="new_status" value="cancelled">
+                                <button type="submit" 
+                                        class="organizer-action-btn danger w-full"
+                                        onclick="return confirm('Cancel this tournament? This action cannot be undone. All participants will be notified.')">
+                                    <span class="material-symbols-outlined">cancel</span>
+                                    <div class="action-content">
+                                        <div class="action-title">Cancel Tournament</div>
+                                        <div class="action-subtitle">Cancel and notify participants</div>
+                                    </div>
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <!-- View Participants Button -->
+                        <a href="{% url 'tournaments:participants' tournament.slug %}" 
+                           class="organizer-action-btn secondary">
+                            <span class="material-symbols-outlined">group</span>
+                            <div class="action-content">
+                                <div class="action-title">Manage Participants</div>
+                                <div class="action-subtitle">{{ tournament.total_registered }} registered, {{ tournament.total_checked_in }} checked in</div>
+                            </div>
+                        </a>
+
+                        <!-- Check-in Management Button (when check-in is open) -->
+                        {% if tournament.status == 'check_in' %}
+                            <a href="{% url 'tournaments:participants' tournament.slug %}?tab=checkin" 
+                               class="organizer-action-btn primary">
+                                <span class="material-symbols-outlined">how_to_reg</span>
+                                <div class="action-content">
+                                    <div class="action-title">Check-in Management</div>
+                                    <div class="action-subtitle">{{ tournament.total_checked_in }}/{{ tournament.total_registered }} checked in</div>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                        <!-- Edit Tournament Button -->
+                        <a href="{% url 'tournaments:edit' tournament.slug %}" 
+                           class="organizer-action-btn secondary">
+                            <span class="material-symbols-outlined">edit</span>
+                            <div class="action-content">
+                                <div class="action-title">Edit Tournament</div>
+                                <div class="action-subtitle">Modify tournament settings</div>
+                            </div>
+                        </a>
+
+                        <!-- View Bracket Button -->
+                        {% if tournament.brackets.exists %}
+                            <a href="{% url 'tournaments:bracket' tournament.slug %}" 
+                               class="organizer-action-btn primary">
+                                <span class="material-symbols-outlined">account_tree</span>
+                                <div class="action-content">
+                                    <div class="action-title">View Bracket</div>
+                                    <div class="action-subtitle">Tournament bracket & matches</div>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Tournament Info -->
-                <div class="info-card">
-                    <h4 class="info-card-title">
+                <div class="gaming-info-card">
+                    <h4 class="gaming-info-card-title">
                         {{ "info"|material_icon:"text-primary mr-2" }}
                         Tournament Information
                     </h4>
@@ -1324,8 +2509,8 @@
                 </div>
 
                 <!-- Organizer Info -->
-                <div class="info-card">
-                    <h4 class="info-card-title">
+                <div class="gaming-info-card">
+                    <h4 class="gaming-info-card-title">
                         {{ "person"|material_icon:"text-primary mr-2" }}
                         Organizer
                     </h4>
@@ -1350,8 +2535,8 @@
                 </div>
 
                 <!-- Enhanced Social Sharing -->
-                <div class="info-card">
-                    <h4 class="info-card-title">
+                <div class="gaming-info-card">
+                    <h4 class="gaming-info-card-title">
                         <span class="material-symbols-outlined text-primary mr-2">share</span>
                         Share Tournament
                     </h4>
@@ -1403,21 +2588,33 @@
 
 {% block extra_js %}
 <!-- Performance Optimization Scripts -->
-<script src="{% static 'js/performance-optimizer.js' %}" defer></script>
+<script src="{% static 'js/modules/performance-optimizer.js' %}" defer></script>
 
 <!-- Existing Scripts -->
-<script src="{% static 'js/error-handler.js' %}" defer></script>
+<script src="{% static 'js/modules/console-error-handler.js' %}" defer></script>
 <script src="{% static 'js/tournament-detail.js' %}" defer></script>
 <script src="{% static 'js/mobile-optimization.js' %}" defer></script>
 
 <!-- Performance Configuration -->
-{% performance_config 3000 5000 True True True %}
+<script>
+// Performance configuration settings
+window.performanceConfig = {
+    criticalLoadTime: 3000,
+    maxLoadTime: 5000,
+    enableProgressiveLoading: true,
+    enableImageOptimization: true,
+    enableCaching: true
+};
+</script>
 
 <!-- Performance Monitoring -->
 <script>
 // Initialize performance monitoring for tournament detail page
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.performanceOptimizer) {
+    // Initialize PerformanceOptimizer with configuration
+    if (typeof PerformanceOptimizer !== 'undefined') {
+        window.performanceOptimizer = new PerformanceOptimizer(window.performanceConfig);
+        
         // Mark critical content as high priority
         const criticalElements = document.querySelectorAll('.tournament-title, .tournament-status, .registration-button');
         criticalElements.forEach(el => el.setAttribute('data-critical', 'true'));
@@ -1432,24 +2629,30 @@ document.addEventListener('DOMContentLoaded', function() {
         // Optimize form submissions
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
-            window.performanceOptimizer.optimizeFormSubmission(form);
+            if (window.performanceOptimizer.optimizeFormSubmission) {
+                window.performanceOptimizer.optimizeFormSubmission(form);
+            }
         });
         
         // Measure page performance
-        window.performanceOptimizer.measurePerformance('tournament-detail-render', () => {
-            // Page rendering complete
-            document.body.classList.add('page-rendered');
-        });
+        if (window.performanceOptimizer.measurePerformance) {
+            window.performanceOptimizer.measurePerformance('tournament-detail-render', () => {
+                // Page rendering complete
+                document.body.classList.add('page-rendered');
+            });
+        }
+
+        // Performance budget check (development only)
+        {% if debug %}
+        if (window.performanceOptimizer && window.performanceOptimizer.checkPerformanceBudget) {
+            window.performanceOptimizer.checkPerformanceBudget('JavaScript', 150, 200);
+            window.performanceOptimizer.checkPerformanceBudget('CSS', 100, 150);
+        }
+        {% endif %}
     }
 });
-
-// Performance budget check (development only)
-{% if debug %}
-{% performance_budget_check 150 200 "JavaScript" %}
-{% performance_budget_check 100 150 "CSS" %}
-{% endif %}
 </script>
 
 <!-- Render time indicator -->
-{% render_time %}
+<!-- Debug: Page rendered at {{ now|date:"Y-m-d H:i:s" }} -->
 {% endblock %}

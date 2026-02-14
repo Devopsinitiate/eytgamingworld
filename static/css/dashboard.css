@@ -47,26 +47,38 @@
     --dashboard-card-radius: 0.5rem;
     --dashboard-transition: all 0.3s ease;
     --touch-target-min: 44px;
-    
+
     /* Color palette with WCAG AA compliant contrast ratios */
-    --primary-color: #b91c1c;         /* Official EYT Red */
-    --primary-dark: #991b1b;          /* Darker variant */
-    --primary-light: #dc2626;         /* Lighter variant */
-    --background-dark: #121212;
-    --card-dark: #151c2c;
-    --card-border-dark: #282e39;
-    
+    --primary-color: #b91c1c;
+    /* Official EYT Red */
+    --primary-dark: #991b1b;
+    /* Darker variant */
+    --primary-light: #dc2626;
+    /* Lighter variant */
+    --background-dark: #0a0a0a;
+    --surface-dark: #1f1f1f;
+    --card-dark: #1f1f1f;
+    --card-border-dark: rgba(255, 255, 255, 0.1);
+
     /* Text colors - all meet 4.5:1 minimum on dark backgrounds */
-    --text-white: #ffffff;        /* 15.3:1 on dark */
-    --text-gray-300: #d1d5db;     /* 10.2:1 on dark */
-    --text-gray-400: #9ca3af;     /* 6.8:1 on dark */
-    --text-gray-500: #6b7280;     /* 4.6:1 on dark */
-    
+    --text-white: #ffffff;
+    /* 15.3:1 on dark */
+    --text-gray-300: #d1d5db;
+    /* 10.2:1 on dark */
+    --text-gray-400: #9ca3af;
+    /* 6.8:1 on dark */
+    --text-gray-500: #6b7280;
+    /* 4.6:1 on dark */
+
     /* Interactive colors - all meet 4.5:1 minimum */
-    --color-success: #10b981;     /* 5.1:1 on dark */
-    --color-error: #ef4444;       /* 4.9:1 on dark */
-    --color-warning: #eab308;     /* 8.2:1 on dark */
-    --color-info: #3b82f6;        /* 4.7:1 on dark */
+    --color-success: #10b981;
+    /* 5.1:1 on dark */
+    --color-error: #ef4444;
+    /* 4.9:1 on dark */
+    --color-warning: #eab308;
+    /* 8.2:1 on dark */
+    --color-info: #3b82f6;
+    /* 4.7:1 on dark */
 }
 
 /* Skip to main content link for accessibility */
@@ -93,35 +105,36 @@
    ============================================ */
 
 @media (min-width: 1025px) {
+
     /* Multi-column grid layout */
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
         gap: var(--dashboard-spacing);
     }
-    
+
     .dashboard-main {
         grid-column: span 8;
     }
-    
+
     .dashboard-sidebar {
         grid-column: span 4;
     }
-    
+
     /* Statistics cards - 4 columns */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 1rem;
     }
-    
+
     /* Activity feed and content */
     .content-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: var(--dashboard-spacing);
     }
-    
+
     /* Profile layout */
     .profile-grid {
         display: grid;
@@ -135,34 +148,35 @@
    ============================================ */
 
 @media (min-width: 768px) and (max-width: 1024px) {
+
     /* Two-column layout */
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: var(--dashboard-spacing);
     }
-    
+
     /* Statistics cards - 2 columns */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
-    
+
     /* Content stacks in 2 columns */
     .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: var(--dashboard-spacing);
     }
-    
+
     /* Profile layout - 2 columns */
     .profile-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: var(--dashboard-spacing);
     }
-    
+
     /* Sidebar takes full width on tablet */
     .dashboard-sidebar {
         grid-column: span 2;
@@ -174,6 +188,7 @@
    ============================================ */
 
 @media (max-width: 767px) {
+
     /* Single-column stacked layout */
     .dashboard-grid,
     .stats-grid,
@@ -183,39 +198,40 @@
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     /* Full width cards */
     .dashboard-card,
     .stats-card,
     .content-card {
         width: 100%;
     }
-    
+
     /* Reduce padding on mobile */
     .dashboard-container {
         padding: 1rem;
     }
-    
+
     /* Stack profile header elements */
     .profile-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .profile-actions {
         width: 100%;
         margin-top: 1rem;
     }
-    
+
     .profile-actions button,
     .profile-actions a {
         width: 100%;
         justify-content: center;
     }
-    
+
     /* Mobile-specific spacing */
     .mobile-spacing {
-        padding-bottom: 5rem; /* Account for fixed bottom nav */
+        padding-bottom: 5rem;
+        /* Account for fixed bottom nav */
     }
 }
 
@@ -238,7 +254,7 @@
         grid-template-columns: repeat(4, 1fr);
         padding-bottom: env(safe-area-inset-bottom, 0);
     }
-    
+
     .mobile-nav-item {
         display: flex;
         flex-direction: column;
@@ -253,27 +269,27 @@
         min-width: var(--touch-target-min);
         padding: 0.5rem;
     }
-    
+
     .mobile-nav-item:hover,
     .mobile-nav-item:focus,
     .mobile-nav-item.active {
         color: var(--primary-color, #3b82f6);
     }
-    
+
     .mobile-nav-item:focus {
         outline: 2px solid var(--primary-color, #3b82f6);
         outline-offset: -2px;
     }
-    
+
     .mobile-nav-icon {
         font-size: 1.5rem;
     }
-    
+
     .mobile-nav-label {
         font-size: 0.75rem;
         font-weight: 500;
     }
-    
+
     .mobile-nav-badge {
         position: absolute;
         top: 0.25rem;
@@ -373,7 +389,8 @@ input[type="checkbox"],
 input[type="radio"] {
     min-height: 24px;
     min-width: 24px;
-    margin: 10px; /* Add margin to reach 44px total */
+    margin: 10px;
+    /* Add margin to reach 44px total */
 }
 
 /* ============================================
@@ -408,12 +425,12 @@ input[type="radio"] {
         font-size: 2rem;
         line-height: 2.5rem;
     }
-    
+
     .dashboard-subtitle {
         font-size: 1.25rem;
         line-height: 1.75rem;
     }
-    
+
     .dashboard-text {
         font-size: 1rem;
         line-height: 1.5rem;
@@ -426,12 +443,12 @@ input[type="radio"] {
         font-size: 1.75rem;
         line-height: 2.25rem;
     }
-    
+
     .dashboard-subtitle {
         font-size: 1.125rem;
         line-height: 1.625rem;
     }
-    
+
     .dashboard-text {
         font-size: 0.9375rem;
         line-height: 1.5rem;
@@ -444,12 +461,12 @@ input[type="radio"] {
         font-size: 1.5rem;
         line-height: 2rem;
     }
-    
+
     .dashboard-subtitle {
         font-size: 1rem;
         line-height: 1.5rem;
     }
-    
+
     .dashboard-text {
         font-size: 0.875rem;
         line-height: 1.375rem;
@@ -576,12 +593,12 @@ input[type="radio"] {
    SPACING UTILITIES
    ============================================ */
 
-.space-y-responsive > * + * {
+.space-y-responsive>*+* {
     margin-top: var(--dashboard-spacing);
 }
 
 @media (max-width: 767px) {
-    .space-y-responsive > * + * {
+    .space-y-responsive>*+* {
         margin-top: 1rem;
     }
 }
@@ -739,25 +756,27 @@ textarea:focus-visible,
     .fade-in {
         animation: fadeIn 0.3s ease-in;
     }
-    
+
     .slide-up {
         animation: slideUp 0.3s ease-out;
     }
-    
+
     @keyframes fadeIn {
         from {
             opacity: 0;
         }
+
         to {
             opacity: 1;
         }
     }
-    
+
     @keyframes slideUp {
         from {
             transform: translateY(20px);
             opacity: 0;
         }
+
         to {
             transform: translateY(0);
             opacity: 1;
@@ -767,6 +786,7 @@ textarea:focus-visible,
 
 /* Respect user's motion preferences */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -781,6 +801,7 @@ textarea:focus-visible,
    ============================================ */
 
 @media print {
+
     .mobile-nav,
     .sidebar,
     .skip-to-main,
@@ -788,12 +809,12 @@ textarea:focus-visible,
     .no-print {
         display: none !important;
     }
-    
+
     .dashboard-card {
         break-inside: avoid;
         page-break-inside: avoid;
     }
-    
+
     body {
         background: white;
         color: black;
@@ -808,7 +829,7 @@ textarea:focus-visible,
     .mobile-nav {
         padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
     }
-    
+
     .mobile-spacing {
         padding-bottom: calc(5rem + env(safe-area-inset-bottom));
     }
@@ -980,7 +1001,7 @@ textarea::placeholder {
         --text-gray-400: #d1d5db;
         --text-gray-500: #9ca3af;
     }
-    
+
     /* Increase border widths for better visibility */
     .dashboard-card,
     input,
@@ -989,7 +1010,7 @@ textarea::placeholder {
     button {
         border-width: 2px;
     }
-    
+
     /* Increase focus indicator visibility */
     *:focus-visible {
         outline-width: 3px;

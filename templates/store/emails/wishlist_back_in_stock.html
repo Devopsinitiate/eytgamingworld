@@ -1,0 +1,68 @@
+{% extends "store/emails/base_email.html" %}
+
+{% block title %}Item Back in Stock - {{ product.name }}{% endblock %}
+
+{% block content %}
+<h1>Good News! Item Back in Stock 🎉</h1>
+
+<p>Hi {{ user.username }},</p>
+
+<p>Great news! An item from your wishlist is back in stock and ready to order.</p>
+
+<div class="info-box">
+    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td style="padding: 0; width: 100px; vertical-align: top;">
+                {% if product.images.all %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(236, 19, 19, 0.3);">
+                {% endif %}
+            </td>
+            <td style="padding: 0 0 0 15px; vertical-align: top;">
+                <p style="margin: 0; font-size: 18px; font-weight: 600; color: #ffffff;">
+                    {{ product.name }}
+                </p>
+                <p style="margin: 10px 0 0 0; color: #999999;">
+                    {{ product.category.name }}
+                </p>
+                <p style="margin: 10px 0 0 0; font-size: 20px; font-weight: 700; color: #ec1313;">
+                    ${{ product.price }}
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<h2>Product Details</h2>
+
+<p>{{ product.description|truncatewords:50 }}</p>
+
+<div class="info-box">
+    <p style="margin: 0;">
+        <strong style="color: #4ade80;">✓ In Stock</strong>
+    </p>
+    {% if product.is_low_stock %}
+    <p style="margin: 10px 0 0 0; color: #fbbf24;">
+        ⚠️ Limited quantity available - Order soon!
+    </p>
+    {% endif %}
+</div>
+
+<center>
+    <a href="{{ site_url }}/store/product/{{ product.slug }}/" class="button">View Product</a>
+</center>
+
+<p style="margin-top: 30px; color: #999999; font-size: 14px;">
+    This item was in your wishlist. If you're no longer interested, you can remove it from your wishlist anytime.
+</p>
+
+<p style="margin-top: 30px;">
+    Happy shopping!<br>
+    <strong style="color: #ec1313;">The EYTGaming Team</strong>
+</p>
+{% endblock %}
+
+{% block unsubscribe %}
+<a href="{{ site_url }}/dashboard/settings/" style="color: #666666; text-decoration: none; font-size: 12px;">
+    Manage email preferences
+</a>
+{% endblock %}

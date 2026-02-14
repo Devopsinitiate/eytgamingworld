@@ -173,7 +173,21 @@ class TournamentForm(forms.ModelForm):
                     'Tournament start must be after check-in starts'
                 )
             
-            if registration_start < timezone.now():
+            # Fix timezone comparison issue
+            # datetime-local inputs are naive, but Django converts them to timezone-aware
+            # using the server's timezone. We need to compare with current time properly.
+            now = timezone.now()
+            
+            # If registration_start is naive (from datetime-local input), make it timezone-aware
+            if registration_start and timezone.is_naive(registration_start):
+                # Convert naive datetime to timezone-aware using current timezone
+                registration_start_aware = timezone.make_aware(registration_start)
+            else:
+                registration_start_aware = registration_start
+            
+            # Compare timezone-aware datetimes with a small buffer to account for form submission delays
+            buffer_time = timezone.timedelta(minutes=1)
+            if registration_start_aware and registration_start_aware < (now - buffer_time):
                 raise forms.ValidationError(
                     'Registration cannot start in the past'
                 )

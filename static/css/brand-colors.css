@@ -6,10 +6,14 @@
 
 :root {
     /* Official EYTGaming Brand Colors - Updated to match company branding */
-    --eyt-primary: #b91c1c;           /* Official EYT Red from logo */
-    --eyt-red: #b91c1c;              /* Main brand red */
-    --eyt-red-dark: #991b1b;         /* Darker variant */
-    --eyt-red-light: #dc2626;        /* Lighter variant for hover states */
+    --eyt-primary: #b91c1c;
+    /* Official EYT Red from logo */
+    --eyt-red: #b91c1c;
+    /* Main brand red */
+    --eyt-red-dark: #991b1b;
+    /* Darker variant */
+    --eyt-red-light: #dc2626;
+    /* Lighter variant for hover states */
 
     /* Primary color with alpha channels */
     --eyt-primary-alpha-5: rgba(185, 28, 28, 0.05);
@@ -20,10 +24,12 @@
     --eyt-primary-alpha-50: rgba(185, 28, 28, 0.5);
     --eyt-primary-alpha-90: rgba(185, 28, 28, 0.9);
 
-    /* Background colors - Deep dark from design */
-    --background-dark: #0a0e1a;
-    --card-dark: #151c2c;
-    --card-border-dark: #282e39;
+    /* Background colors - Pure dark from inspiration */
+    --background-dark: #0a0a0a;
+    --surface-dark: #1f1f1f;
+    --card-dark: #1f1f1f;
+    --card-border-dark: rgba(255, 255, 255, 0.1);
+    --background-light: #f6f6f8;
 }
 
 /* Utility Classes for Brand Colors */
@@ -130,10 +136,22 @@
     background-color: var(--background-dark);
 }
 
+.bg-surface-dark {
+    background-color: var(--surface-dark);
+}
+
 .bg-card-dark {
     background-color: var(--card-dark);
 }
 
+.bg-background-light {
+    background-color: var(--background-light);
+}
+
 .border-card-border-dark {
     border-color: var(--card-border-dark);
+}
+
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1);
 }

@@ -370,16 +370,40 @@ class TournamentContextMixin:
         
         user = self.request.user
         
-        # Check if user is registered
-        try:
-            participant = Participant.objects.select_related('team').get(
-                tournament=tournament,
-                user=user
-            )
-            is_registered = True
-        except Participant.DoesNotExist:
-            participant = None
-            is_registered = False
+        # Check if user is registered - handle both individual and team tournaments
+        participant = None
+        is_registered = False
+        
+        if tournament.is_team_based:
+            # For team tournaments, check if any of user's teams are registered
+            try:
+                from teams.models import Team
+                user_teams = Team.objects.filter(
+                    members__user=user,
+                    members__status='active',
+                    members__role__in=['captain', 'co_captain'],
+                    status='active',
+                    game=tournament.game
+                ).distinct()
+                
+                participant = Participant.objects.select_related('team').filter(
+                    tournament=tournament,
+                    team__in=user_teams
+                ).first()
+                
+                is_registered = participant is not None
+            except ImportError:
+                pass
+        else:
+            # For individual tournaments, check user registration
+            try:
+                participant = Participant.objects.select_related('team').get(
+                    tournament=tournament,
+                    user=user
+                )
+                is_registered = True
+            except Participant.DoesNotExist:
+                pass
         
         # Check if user can register
         can_register, registration_message = tournament.can_user_register(user) if hasattr(tournament, 'can_user_register') else (False, 'Registration not available')
@@ -660,20 +684,20 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         enhanced_context = self.get_tournament_context(tournament)
         context.update(enhanced_context)
         
-        # Legacy context data for backward compatibility
+        # Extract is_registered from user_registration_status for template compatibility
+        user_registration_status = context.get('user_registration_status', {})
+        context['is_registered'] = user_registration_status.get('is_registered', False)
+        context['user_participant'] = user_registration_status.get('participant', None)
+        
+        # Refresh participant data to ensure we have latest check-in status
+        if context['user_participant']:
+            context['user_participant'].refresh_from_db()
+        
+        # Check if user is the organizer (Requirement 10.1)
         if self.request.user.is_authenticated:
-            context['is_registered'] = Participant.objects.filter(
-                tournament=tournament,
-                user=self.request.user
-            ).exists()
-            
-            context['user_participant'] = Participant.objects.filter(
-                tournament=tournament,
-                user=self.request.user
-            ).select_related('team').first()
-            
-            # Check if user is the organizer (Requirement 10.1)
             context['is_organizer'] = self.request.user == tournament.organizer
+        else:
+            context['is_organizer'] = False
         
         # Get cached or generate tournament statistics (legacy)
         context['tournament_stats'] = self.get_cached_tournament_stats(tournament)
@@ -716,6 +740,25 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         # Organizer dashboard context (Requirements 10.1, 10.2, 10.3, 10.4, 10.5)
         if self.request.user.is_authenticated and self.request.user == tournament.organizer:
             context['organizer_dashboard'] = self.get_organizer_dashboard_context(tournament)
+        
+        # Add bracket data for bracket tab display
+        if tournament.brackets.exists():
+            context['brackets'] = tournament.brackets.all()
+            
+            # Get all matches organized by bracket and round (same as BracketView)
+            context['matches_by_bracket'] = {}
+            for bracket in context['brackets']:
+                matches = bracket.matches.select_related(
+                    'participant1', 'participant2', 'winner'
+                ).order_by('round_number', 'match_number')
+                
+                rounds = {}
+                for match in matches:
+                    if match.round_number not in rounds:
+                        rounds[match.round_number] = []
+                    rounds[match.round_number].append(match)
+                
+                context['matches_by_bracket'][bracket.id] = rounds
         
         return context
     
@@ -771,13 +814,17 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         }
         
         # Enhanced participant information with fallback values (Requirement 2.3)
+        # Use proper counting for team vs individual tournaments
+        registered_count = tournament.get_current_registrations()
+        spots_remaining = tournament.spots_remaining if tournament.spots_remaining != float('inf') else 0
+        
         context['participant_display'] = {
-            'registered_count': tournament.total_registered or 0,
+            'registered_count': registered_count,
             'max_participants': tournament.max_participants or 0,
-            'spots_remaining': max(0, (tournament.max_participants or 0) - (tournament.total_registered or 0)),
-            'percentage_full': ((tournament.total_registered or 0) / (tournament.max_participants or 1)) * 100,
-            'is_full': (tournament.total_registered or 0) >= (tournament.max_participants or 0) if tournament.max_participants else False,
-            'has_participants': (tournament.total_registered or 0) > 0,
+            'spots_remaining': spots_remaining,
+            'percentage_full': tournament.registration_progress,
+            'is_full': tournament.is_full,
+            'has_participants': registered_count > 0,
         }
         
         # Mobile detection for responsive features (Requirement 2.4)
@@ -807,12 +854,15 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         
         if cached_stats is None:
             # Generate fresh statistics
+            # Use proper counting for team vs individual tournaments
+            registered_count = tournament.get_current_registrations()
+            
             stats = {
                 'participants': {
-                    'registered': tournament.total_registered,
+                    'registered': registered_count,
                     'checked_in': tournament.total_checked_in,
                     'capacity': tournament.max_participants,
-                    'percentage_full': (tournament.total_registered / tournament.max_participants) * 100 if tournament.max_participants > 0 else 0
+                    'percentage_full': tournament.registration_progress
                 },
                 'engagement': {
                     'views': tournament.view_count,
@@ -892,18 +942,40 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
             # Convert ISO datetime strings back to datetime objects for template compatibility
             from datetime import datetime
             from django.utils import timezone
+            import pytz
             
             for match_data in cached_matches:
                 if match_data.get('completed_at'):
                     try:
-                        match_data['completed_at'] = datetime.fromisoformat(match_data['completed_at'].replace('Z', '+00:00'))
-                    except (ValueError, AttributeError):
+                        # Handle both ISO format with and without timezone
+                        completed_at_str = match_data['completed_at']
+                        if isinstance(completed_at_str, str):
+                            if completed_at_str.endswith('Z'):
+                                completed_at_str = completed_at_str[:-1] + '+00:00'
+                            elif '+' not in completed_at_str and 'T' in completed_at_str:
+                                completed_at_str += '+00:00'
+                            
+                            match_data['completed_at'] = datetime.fromisoformat(completed_at_str)
+                            # Ensure timezone awareness
+                            if match_data['completed_at'].tzinfo is None:
+                                match_data['completed_at'] = timezone.make_aware(match_data['completed_at'])
+                    except (ValueError, AttributeError, TypeError) as e:
                         match_data['completed_at'] = None
                 
                 if match_data.get('started_at'):
                     try:
-                        match_data['started_at'] = datetime.fromisoformat(match_data['started_at'].replace('Z', '+00:00'))
-                    except (ValueError, AttributeError):
+                        started_at_str = match_data['started_at']
+                        if isinstance(started_at_str, str):
+                            if started_at_str.endswith('Z'):
+                                started_at_str = started_at_str[:-1] + '+00:00'
+                            elif '+' not in started_at_str and 'T' in started_at_str:
+                                started_at_str += '+00:00'
+                            
+                            match_data['started_at'] = datetime.fromisoformat(started_at_str)
+                            # Ensure timezone awareness
+                            if match_data['started_at'].tzinfo is None:
+                                match_data['started_at'] = timezone.make_aware(match_data['started_at'])
+                    except (ValueError, AttributeError, TypeError) as e:
                         match_data['started_at'] = None
             
             return cached_matches
@@ -1635,18 +1707,33 @@ class TournamentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def tournament_register(request, slug):
-    """Register for tournament with enhanced context data"""
+    """Register for tournament with enhanced context data and better error handling"""
     tournament = get_object_or_404(Tournament, slug=slug)
+    
+    # Debug logging for registration attempts
+    logger.info(f"Registration attempt for tournament '{tournament.name}' (slug: {slug}) by user {request.user.username}")
+    logger.info(f"Tournament status: {tournament.status}, Public: {tournament.is_public}")
+    logger.info(f"Registration dates: {tournament.registration_start} to {tournament.registration_end}")
+    logger.info(f"Current time: {timezone.now()}")
+    logger.info(f"Max participants: {tournament.max_participants}, Registered: {tournament.total_registered}")
     
     # Check if can register
     can_register, message = tournament.can_user_register(request.user)
     
+    logger.info(f"Can register result: {can_register}, Message: {message}")
+    
     if not can_register:
+        logger.warning(f"Registration denied for user {request.user.username}: {message}")
+        # Provide detailed error message to user
         messages.error(request, message)
         return redirect('tournaments:detail', slug=slug)
     
+    logger.info(f"Registration check passed for user {request.user.username}")
+    
     # GET request - show registration form
     if request.method == 'GET':
+        logger.info(f"Showing registration form for tournament {slug}")
+        
         # Get user's teams if tournament is team-based
         user_teams = []
         if tournament.is_team_based:
@@ -1659,6 +1746,8 @@ def tournament_register(request, slug):
                 status='active',
                 game=tournament.game  # Only teams for the same game
             ).distinct()
+            
+            logger.info(f"Found {user_teams.count()} eligible teams for user {request.user.username}")
         
         # Create a temporary mixin instance to get enhanced context
         class TempMixin(TournamentContextMixin):
@@ -1817,18 +1906,63 @@ def tournament_check_in(request, slug):
     """Check in for tournament"""
     tournament = get_object_or_404(Tournament, slug=slug)
     
-    if not tournament.is_check_in_open:
-        messages.error(request, 'Check-in is not open')
-        return redirect('tournaments:detail', slug=slug)
-    
-    participant = get_object_or_404(
-        Participant,
-        tournament=tournament,
-        user=request.user
+    # Allow check-in if tournament is in check_in status OR if it's in_progress but not started yet
+    # This handles cases where tournament status was updated but participants still need to check in
+    can_check_in = (
+        tournament.status == 'check_in' or 
+        (tournament.status == 'in_progress' and tournament.total_checked_in < tournament.min_participants)
     )
     
-    if participant.check_in_participant():
-        messages.success(request, 'Successfully checked in!')
+    if not can_check_in:
+        messages.error(request, 'Check-in is not available for this tournament')
+        return redirect('tournaments:detail', slug=slug)
+    
+    participant = None
+    
+    if tournament.is_team_based:
+        # For team-based tournaments, find participant through user's team membership
+        from teams.models import TeamMember
+        
+        # Get user's active team memberships
+        team_memberships = TeamMember.objects.filter(
+            user=request.user,
+            status='active'
+        ).select_related('team')
+        
+        # Find which team is registered for this tournament
+        for membership in team_memberships:
+            team_participant = Participant.objects.filter(
+                tournament=tournament,
+                team=membership.team
+            ).first()
+            
+            if team_participant:
+                participant = team_participant
+                break
+        
+        if not participant:
+            messages.error(request, 'Your team is not registered for this tournament')
+            return redirect('tournaments:detail', slug=slug)
+            
+    else:
+        # For individual tournaments, look for user participant
+        participant = get_object_or_404(
+            Participant,
+            tournament=tournament,
+            user=request.user
+        )
+    
+    # Attempt check-in
+    if participant.check_in_participant(force=True):  # Force check-in even if period is closed
+        if tournament.is_team_based:
+            messages.success(request, f'Team {participant.team.name} successfully checked in!')
+        else:
+            messages.success(request, 'Successfully checked in!')
+            
+        # Update tournament checked-in count
+        tournament.total_checked_in = tournament.participants.filter(checked_in=True).count()
+        tournament.save(update_fields=['total_checked_in'])
+        
     else:
         messages.error(request, 'Unable to check in')
     
@@ -1837,100 +1971,97 @@ def tournament_check_in(request, slug):
 
 @login_required
 def tournament_change_status(request, slug):
-    """Change tournament status - organizer only (Requirements 10.2)"""
+    """Change tournament status (organizer only)"""
     tournament = get_object_or_404(Tournament, slug=slug)
     
-    # Check if user is organizer
-    if request.user != tournament.organizer:
-        return HttpResponseForbidden("Only the tournament organizer can change status")
+    # Check permissions
+    if not (tournament.organizer == request.user or request.user.role == 'admin'):
+        return HttpResponseForbidden()
     
     if request.method == 'POST':
-        new_status = request.POST.get('status')
+        new_status = request.POST.get('new_status') or request.POST.get('status')  # Support both parameter names
         
-        # Validate status transition
+        # Define valid transitions
         valid_transitions = {
             'draft': ['registration', 'cancelled'],
             'registration': ['check_in', 'cancelled'],
             'check_in': ['in_progress', 'cancelled'],
-            'in_progress': ['completed'],
+            'in_progress': ['completed', 'cancelled'],
+            'completed': [],
+            'cancelled': []
         }
         
+        # Validate transition
         current_status = tournament.status
-        if new_status not in valid_transitions.get(current_status, []):
-            messages.error(request, f'Cannot change status from {current_status} to {new_status}')
+        allowed_statuses = valid_transitions.get(current_status, [])
+        
+        if new_status not in allowed_statuses:
+            messages.error(
+                request, 
+                f'Cannot transition from {tournament.get_status_display()} to {new_status}. Invalid status transition.'
+            )
             return redirect('tournaments:detail', slug=slug)
         
-        # Perform status-specific validations and actions
+        # Perform status-specific validations
         if new_status == 'registration':
             # Opening registration
             if not tournament.registration_start or not tournament.registration_end:
                 messages.error(request, 'Registration dates must be set before opening registration')
                 return redirect('tournaments:detail', slug=slug)
-            
-            tournament.status = 'registration'
-            tournament.published_at = timezone.now()
-            messages.success(request, 'Registration is now open!')
         
         elif new_status == 'check_in':
-            # Starting check-in
             if tournament.total_registered < tournament.min_participants:
-                messages.warning(
-                    request, 
-                    f'Only {tournament.total_registered} participants registered. '
-                    f'Minimum is {tournament.min_participants}. Continue anyway?'
+                messages.error(
+                    request,
+                    f'Cannot close registration. Minimum {tournament.min_participants} participants required, '
+                    f'but only {tournament.total_registered} registered.'
                 )
-            
-            tournament.status = 'check_in'
-            messages.success(request, 'Check-in period has started!')
+                return redirect('tournaments:detail', slug=slug)
         
         elif new_status == 'in_progress':
-            # Starting tournament
             if tournament.total_checked_in < tournament.min_participants:
                 messages.error(
                     request,
-                    f'Not enough participants checked in. '
-                    f'Need at least {tournament.min_participants}, have {tournament.total_checked_in}'
+                    f'Cannot start tournament. Minimum {tournament.min_participants} participants must check in, '
+                    f'but only {tournament.total_checked_in} have checked in.'
                 )
                 return redirect('tournaments:detail', slug=slug)
-            
-            # Generate bracket if not exists
-            if not tournament.brackets.exists():
-                try:
-                    from .services.bracket import generate_bracket
-                    
-                    # Use the simple bracket generator
-                    participants = list(tournament.participants.filter(checked_in=True, status='confirmed'))
-                    participant_names = [p.display_name for p in participants]
-                    matches = generate_bracket(participant_names)
-                    
-                    messages.info(request, 'Tournament bracket generated automatically')
-                except Exception as e:
-                    messages.error(request, f'Failed to generate bracket: {str(e)}')
-                    return redirect('tournaments:detail', slug=slug)
-            
-            tournament.status = 'in_progress'
-            messages.success(request, 'Tournament has started!')
         
+        # Update status
+        old_status = tournament.status
+        tournament.status = new_status
+        
+        # Set timestamps based on status
+        if new_status == 'registration':
+            tournament.published_at = timezone.now()
         elif new_status == 'completed':
-            # Completing tournament
-            tournament.status = 'completed'
             tournament.actual_end = timezone.now()
             
-            # Handle team tournament completion if team-based
+            # Handle team tournament completion (Requirement 13.3, 13.4)
             if tournament.is_team_based:
                 _handle_team_tournament_completion(tournament)
-            
-            messages.success(request, 'Tournament completed!')
-        
-        elif new_status == 'cancelled':
-            # Cancelling tournament
-            tournament.status = 'cancelled'
-            messages.success(request, 'Tournament has been cancelled')
         
         tournament.save()
         
+        # Status-specific actions
+        status_messages = {
+            'registration': 'Registration is now open! Players can start signing up.',
+            'check_in': 'Registration closed. Check-in period has started.',
+            'in_progress': 'Tournament started! Bracket has been generated.',
+            'completed': 'Tournament marked as completed.',
+            'cancelled': 'Tournament has been cancelled. Participants will be notified.'
+        }
+        
+        messages.success(request, status_messages.get(new_status, 'Tournament status updated.'))
+        
+        # Send notifications to participants for status changes
+        from .notifications import send_tournament_status_change_notification
+        send_tournament_status_change_notification(tournament, old_status, new_status)
+        
         # Log the status change
-        logger.info(f'Tournament {tournament.slug} status changed from {current_status} to {new_status} by {request.user.username}')
+        logger.info(f'Tournament {tournament.slug} status changed from {old_status} to {new_status} by {request.user.username}')
+        
+        return redirect('tournaments:detail', slug=slug)
     
     return redirect('tournaments:detail', slug=slug)
 
@@ -2453,10 +2584,19 @@ def paystack_init(request, payment_id):
         reverse('tournaments:paystack_success')
     ) + f'?payment_id={payment.id}'
     
+    # Get email - use participant user email or team captain email
+    if participant.user:
+        email = participant.user.email
+    elif participant.team:
+        email = participant.team.captain.email
+    else:
+        messages.error(request, 'Unable to determine participant email for payment.')
+        return redirect('tournaments:payment', participant_id=payment.participant.id)
+    
     init_url = 'https://api.paystack.co/transaction/initialize'
     headers = {'Authorization': f'Bearer {paystack_key}', 'Content-Type': 'application/json'}
     data = {
-        'email': payment.participant.user.email if payment.participant.user else '',
+        'email': email,
         'amount': int(payment.amount * 100),
         'reference': str(payment.id),
         'callback_url': callback_url,
@@ -2594,14 +2734,48 @@ def generate_bracket(request, slug):
     if not (tournament.organizer == request.user or request.user.role == 'admin'):
         return HttpResponseForbidden()
     
-    # Delete existing brackets
-    tournament.brackets.all().delete()
-    
-    # Generate new bracket
-    tournament.create_bracket()
-    
-    messages.success(request, 'Bracket generated successfully!')
-    return redirect('tournaments:bracket', slug=slug)
+    try:
+        # Delete existing brackets
+        tournament.brackets.all().delete()
+        
+        # Generate new bracket
+        bracket = tournament.create_bracket()
+        
+        # Update tournament status to in_progress if it's not already
+        if tournament.status == 'check_in':
+            tournament.status = 'in_progress'
+            tournament.save()
+        
+        # Verify bracket was created
+        if tournament.brackets.exists():
+            bracket_count = tournament.brackets.count()
+            match_count = tournament.matches.count()
+            messages.success(
+                request, 
+                f'Bracket generated successfully! Created {bracket_count} bracket(s) with {match_count} matches.'
+            )
+            
+            # Clear any cached bracket data to force refresh
+            from .cache_utils import TournamentCache
+            TournamentCache.invalidate_tournament_cache(tournament.id)
+            
+        else:
+            messages.warning(request, 'Bracket generation completed but no brackets were found.')
+        
+        # Redirect to tournament detail page to show the bracket tab
+        return redirect('tournaments:detail', slug=slug)
+        
+    except ValueError as e:
+        # Handle validation errors gracefully
+        messages.error(request, f'Cannot generate bracket: {str(e)}')
+        return redirect('tournaments:detail', slug=slug)
+        
+    except Exception as e:
+        # Handle unexpected errors
+        logger.error(f'Bracket generation failed for tournament {slug}: {str(e)}')
+        messages.error(request, 'An error occurred while generating the bracket. Please try again.')
+        return redirect('tournaments:detail', slug=slug)
+        return redirect('tournaments:detail', slug=slug)
 
 
 class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -2628,13 +2802,16 @@ class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         # Calculate statistics
         participants = context['participants']
         checked_in_count = sum(1 for p in participants if p.checked_in)
+        total_participants = participants.count()
+        pending_checkin = total_participants - checked_in_count
         
         spots_remaining = "∞"
         if tournament.max_participants:
-            spots_remaining = tournament.max_participants - participants.count()
+            spots_remaining = tournament.max_participants - total_participants
         
         context['stats'] = {
             'checked_in': checked_in_count,
+            'pending_checkin': pending_checkin,
             'spots_remaining': spots_remaining,
         }
         
@@ -2648,8 +2825,52 @@ class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         if not (tournament.organizer == request.user or request.user.role == 'admin'):
             return HttpResponseForbidden()
 
+        action = request.POST.get('action')
         participant_id = request.POST.get('participant_id')
-        seed_value = request.POST.get('seed')
+        
+        if action == 'assign_seed':
+            seed_value = request.POST.get('seed')
+            if participant_id and seed_value:
+                try:
+                    participant = Participant.objects.get(id=participant_id, tournament=tournament)
+                    participant.seed = int(seed_value)
+                    participant.save()
+                    messages.success(request, f'Seed {seed_value} assigned to {participant.display_name}')
+                except (Participant.DoesNotExist, ValueError):
+                    messages.error(request, 'Invalid participant or seed value')
+        
+        elif action == 'check_in':
+            if participant_id:
+                try:
+                    participant = Participant.objects.get(id=participant_id, tournament=tournament)
+                    # Organizers can force check-in even outside check-in period
+                    if participant.check_in_participant(force=True):
+                        messages.success(request, f'{participant.display_name} has been checked in')
+                    else:
+                        messages.error(request, f'Unable to check in {participant.display_name}')
+                except Participant.DoesNotExist:
+                    messages.error(request, 'Participant not found')
+        
+        elif action == 'check_out':
+            if participant_id:
+                try:
+                    participant = Participant.objects.get(id=participant_id, tournament=tournament)
+                    if participant.checked_in:
+                        participant.checked_in = False
+                        participant.check_in_time = None
+                        participant.save()
+                        
+                        # Update tournament total with safety check
+                        tournament.total_checked_in = max(0, tournament.total_checked_in - 1)
+                        tournament.save()
+                        
+                        messages.success(request, f'{participant.display_name} has been checked out')
+                    else:
+                        messages.warning(request, f'{participant.display_name} was not checked in')
+                except Participant.DoesNotExist:
+                    messages.error(request, 'Participant not found')
+        
+        return redirect('tournaments:participants', slug=tournament.slug)
 
         try:
             seed = int(seed_value)
@@ -2694,93 +2915,6 @@ def upcoming_tournaments_api(request):
         'tournaments': tournaments
     })
 
-
-@login_required
-def tournament_change_status(request, slug):
-    """Change tournament status (organizer only)"""
-    tournament = get_object_or_404(Tournament, slug=slug)
-    
-    # Check permissions
-    if not (tournament.organizer == request.user or request.user.role == 'admin'):
-        return HttpResponseForbidden()
-    
-    if request.method == 'POST':
-        new_status = request.POST.get('new_status')
-        
-        # Define valid transitions
-        valid_transitions = {
-            'draft': ['registration', 'cancelled'],
-            'registration': ['check_in', 'cancelled'],
-            'check_in': ['in_progress', 'cancelled'],
-            'in_progress': ['completed', 'cancelled'],
-            'completed': [],
-            'cancelled': []
-        }
-        
-        # Validate transition
-        current_status = tournament.status
-        allowed_statuses = valid_transitions.get(current_status, [])
-        
-        if new_status not in allowed_statuses:
-            messages.error(
-                request, 
-                f'Cannot transition from {tournament.get_status_display()} to {new_status}. Invalid status transition.'
-            )
-            return redirect('tournaments:detail', slug=slug)
-        
-        # Perform status-specific validations
-        if new_status == 'check_in':
-            if tournament.total_registered < tournament.min_participants:
-                messages.error(
-                    request,
-                    f'Cannot close registration. Minimum {tournament.min_participants} participants required, '
-                    f'but only {tournament.total_registered} registered.'
-                )
-                return redirect('tournaments:detail', slug=slug)
-        
-        elif new_status == 'in_progress':
-            if tournament.total_checked_in < tournament.min_participants:
-                messages.error(
-                    request,
-                    f'Cannot start tournament. Minimum {tournament.min_participants} participants must check in, '
-                    f'but only {tournament.total_checked_in} have checked in.'
-                )
-                return redirect('tournaments:detail', slug=slug)
-        
-        # Update status
-        old_status = tournament.status
-        tournament.status = new_status
-        
-        # Set timestamps based on status
-        if new_status == 'registration':
-            tournament.published_at = timezone.now()
-        elif new_status == 'completed':
-            tournament.actual_end = timezone.now()
-            
-            # Handle team tournament completion (Requirement 13.3, 13.4)
-            if tournament.is_team_based:
-                _handle_team_tournament_completion(tournament)
-        
-        tournament.save()
-        
-        # Status-specific actions
-        status_messages = {
-            'registration': 'Registration is now open! Players can start signing up.',
-            'check_in': 'Registration closed. Check-in period has started.',
-            'in_progress': 'Tournament started! Bracket has been generated.',
-            'completed': 'Tournament marked as completed.',
-            'cancelled': 'Tournament has been cancelled. Participants will be notified.'
-        }
-        
-        messages.success(request, status_messages.get(new_status, 'Tournament status updated.'))
-        
-        # Send notifications to participants for status changes
-        from .notifications import send_tournament_status_change_notification
-        send_tournament_status_change_notification(tournament, old_status, new_status)
-        
-        return redirect('tournaments:detail', slug=slug)
-    
-    return redirect('tournaments:detail', slug=slug)
 
 
 

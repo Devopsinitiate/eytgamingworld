@@ -1,0 +1,121 @@
+{% load static %}
+
+<!-- Gaming Statistics Cards Component -->
+<!-- Mobile-First Responsive Grid -->
+
+<div class="mobile-stat-grid md:grid-cols-4 md:gap-6" role="region" aria-label="Dashboard statistics">
+    <!-- Tournaments Card -->
+    <div class="stat-card-gaming mobile-stat-card" 
+         role="article" 
+         aria-label="Total tournaments statistic" 
+         data-stat="total-tournaments">
+        <div class="stat-card-content">
+            <div class="flex flex-col items-center justify-center text-center">
+                <!-- Icon -->
+                <div class="w-12 h-12 bg-electric-red/20 rounded-full flex items-center justify-center neon-red-glow mb-3">
+                    <span class="material-symbols-outlined text-electric-red text-2xl" aria-hidden="true">emoji_events</span>
+                </div>
+                
+                <!-- Value -->
+                <p class="stat-value mobile-stat-value" aria-labelledby="tournaments-label">
+                    {{ stats.total_tournaments|default:0 }}
+                </p>
+                
+                <!-- Label -->
+                <p class="stat-label mobile-stat-label mt-2" id="tournaments-label">TOURNAMENTS</p>
+                <p class="text-gray-500 text-xs mt-1">Participated</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Rate Card -->
+    <div class="stat-card-gaming mobile-stat-card" 
+         role="article" 
+         aria-label="Win rate statistic" 
+         data-stat="win-rate">
+        <div class="stat-card-content">
+            <div class="flex flex-col items-center justify-center text-center">
+                <!-- Icon -->
+                <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-3" style="box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);">
+                    <span class="material-symbols-outlined text-green-500 text-2xl" aria-hidden="true">trending_up</span>
+                </div>
+                
+                <!-- Value -->
+                <p class="mobile-stat-value" style="color: #10B981;" aria-labelledby="winrate-label">
+                    {{ stats.win_rate|floatformat:1|default:"0.0" }}%
+                </p>
+                
+                <!-- Label -->
+                <p class="stat-label mobile-stat-label mt-2" id="winrate-label">WIN RATE</p>
+                <p class="text-gray-500 text-xs mt-1">Overall</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teams Card -->
+    <div class="stat-card-gaming mobile-stat-card" 
+         role="article" 
+         aria-label="Current teams statistic" 
+         data-stat="current-teams">
+        <div class="stat-card-content">
+            <div class="flex flex-col items-center justify-center text-center">
+                <!-- Icon -->
+                <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background: rgba(6, 182, 212, 0.2); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);">
+                    <span class="material-symbols-outlined text-2xl" style="color: #06B6D4;" aria-hidden="true">groups</span>
+                </div>
+                
+                <!-- Value -->
+                <p class="mobile-stat-value" style="color: #06B6D4;" aria-labelledby="teams-label">
+                    {{ stats.current_teams|default:0 }}
+                </p>
+                
+                <!-- Label -->
+                <p class="stat-label mobile-stat-label mt-2" id="teams-label">TEAMS</p>
+                <p class="text-gray-500 text-xs mt-1">Active</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Card -->
+    <div class="stat-card-gaming mobile-stat-card" 
+         role="article" 
+         aria-label="Unread notifications statistic" 
+         data-stat="unread-notifications">
+        <div class="stat-card-content">
+            <div class="flex flex-col items-center justify-center text-center">
+                <!-- Icon -->
+                <div class="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mb-3 animate-glow-pulse">
+                    <span class="material-symbols-outlined text-yellow-500 text-2xl" aria-hidden="true">notifications</span>
+                </div>
+                
+                <!-- Value -->
+                <p class="mobile-stat-value" style="color: #EAB308;" aria-labelledby="notifications-label">
+                    {{ stats.unread_notifications|default:0 }}
+                </p>
+                
+                <!-- Label -->
+                <p class="stat-label mobile-stat-label mt-2" id="notifications-label">ALERTS</p>
+                
+                <!-- View Link -->
+                {% if stats.unread_notifications %}
+                <a href="{% url 'notifications:list' %}"
+                   class="text-yellow-500 hover:text-yellow-400 transition-colors text-xs mt-2 touch-target inline-flex items-center justify-center"
+                   aria-label="View all notifications">
+                    <span>VIEW →</span>
+                </a>
+                {% else %}
+                <p class="text-gray-500 text-xs mt-1">None</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mobile-specific overrides */
+@media (max-width: 767px) {
+    .stat-card-gaming:active {
+        transform: skewY(0deg) scale(0.98);
+    }
+}
+</style>

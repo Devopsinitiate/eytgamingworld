@@ -1,0 +1,71 @@
+{% extends "store/emails/base_email.html" %}
+
+{% block title %}Your Order Has Been Delivered - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<h1>Your Order Has Been Delivered! ✅</h1>
+
+<p>Hi {{ order.user.username }},</p>
+
+<p>Your order has been successfully delivered! We hope you love your new items.</p>
+
+<div class="info-box">
+    <p style="margin: 0; font-size: 18px; font-weight: 600; color: #ffffff;">
+        Order Number: <span style="color: #ec1313;">{{ order.order_number }}</span>
+    </p>
+    <p style="margin: 10px 0 0 0; color: #999999;">
+        Delivered Date: {{ order.updated_at|date:"F d, Y" }}
+    </p>
+</div>
+
+<h2>Order Summary</h2>
+
+<table class="details-table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items.all %}
+        <tr>
+            <td>
+                {{ item.product_name }}
+                {% if item.variant_name %}
+                <br><span style="color: #999999; font-size: 14px;">{{ item.variant_name }}</span>
+                {% endif %}
+            </td>
+            <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Share Your Experience</h2>
+
+<p>We'd love to hear what you think! Your feedback helps us improve and helps other customers make informed decisions.</p>
+
+<center>
+    <a href="{{ site_url }}/store/" class="button">Leave a Review</a>
+</center>
+
+<h2>Need Help?</h2>
+
+<p>If you have any issues with your order or need assistance, our support team is here to help:</p>
+
+<div class="info-box">
+    <p style="margin: 0;"><strong>Contact Support:</strong></p>
+    <p style="margin: 10px 0 0 0;">
+        <a href="{{ site_url }}/support/" style="color: #ec1313; text-decoration: none;">Visit Support Center</a>
+    </p>
+    <p style="margin: 10px 0 0 0; color: #999999;">
+        Response time: Within 24 hours
+    </p>
+</div>
+
+<p style="margin-top: 30px;">
+    Thank you for shopping with EYTGaming! We appreciate your business and look forward to serving you again.<br><br>
+    <strong style="color: #ec1313;">The EYTGaming Team</strong>
+</p>
+{% endblock %}

@@ -146,7 +146,20 @@ class Tournament(models.Model):
     
     @property
     def is_full(self):
-        return self.total_registered >= self.max_participants
+        """Check if tournament is full based on tournament type"""
+        if not self.max_participants:
+            return False
+        
+        if self.is_team_based:
+            # For team tournaments, count unique teams
+            team_count = self.participants.filter(
+                team__isnull=False,
+                status__in=['confirmed', 'pending_payment']
+            ).count()
+            return team_count >= self.max_participants
+        else:
+            # For individual tournaments, count users
+            return self.total_registered >= self.max_participants
     
     @property
     def is_check_in_open(self):
@@ -155,40 +168,132 @@ class Tournament(models.Model):
     
     @property
     def spots_remaining(self):
-        return max(0, self.max_participants - self.total_registered)
+        """Get remaining spots based on tournament type"""
+        if not self.max_participants:
+            return float('inf')  # Unlimited
+        
+        if self.is_team_based:
+            # For team tournaments, count unique teams
+            team_count = self.participants.filter(
+                team__isnull=False,
+                status__in=['confirmed', 'pending_payment']
+            ).count()
+            return max(0, self.max_participants - team_count)
+        else:
+            # For individual tournaments
+            return max(0, self.max_participants - self.total_registered)
     
     @property
     def registration_progress(self):
-        if self.max_participants == 0:
+        """Get registration progress percentage based on tournament type"""
+        if not self.max_participants or self.max_participants == 0:
             return 0
-        return min(100, (self.total_registered / self.max_participants) * 100)
+        
+        if self.is_team_based:
+            # For team tournaments, count unique teams
+            team_count = self.participants.filter(
+                team__isnull=False,
+                status__in=['confirmed', 'pending_payment']
+            ).count()
+            return min(100, (team_count / self.max_participants) * 100)
+        else:
+            # For individual tournaments
+            return min(100, (self.total_registered / self.max_participants) * 100)
+    
+    def get_current_registrations(self):
+        """Get actual registration count based on tournament type"""
+        if self.is_team_based:
+            # For team tournaments, count teams
+            return self.participants.filter(
+                team__isnull=False,
+                status__in=['confirmed', 'pending_payment']
+            ).count()
+        else:
+            # For individual tournaments, use total_registered
+            return self.total_registered
     
     def can_user_register(self, user):
-        """Check if user can register for tournament"""
+        """Check if user can register for tournament with detailed error messages"""
+        from django.utils import timezone
+        
         # Check if already registered first
-        if Participant.objects.filter(tournament=self, user=user).exists():
-            return False, "Already registered"
+        if self.is_team_based:
+            # For team-based tournaments, check if any of user's teams are registered
+            try:
+                from teams.models import Team, TeamMember
+                user_teams = Team.objects.filter(
+                    members__user=user,
+                    members__status='active',
+                    members__role__in=['captain', 'co_captain'],
+                    status='active',
+                    game=self.game
+                ).distinct()
+                
+                if Participant.objects.filter(tournament=self, team__in=user_teams).exists():
+                    return False, "Your team is already registered for this tournament"
+                
+                # Check if user has eligible teams to register
+                if not user_teams.exists():
+                    return False, "You must be a captain or co-captain of an active team for this game to register"
+                    
+            except ImportError:
+                return False, "Team system not available"
+        else:
+            # For individual tournaments, check user registration
+            if Participant.objects.filter(tournament=self, user=user).exists():
+                return False, "You are already registered for this tournament"
         
         # Check if tournament is full
         if self.is_full:
-            return False, "Tournament is full"
+            if self.is_team_based:
+                team_count = self.participants.filter(
+                    team__isnull=False,
+                    status__in=['confirmed', 'pending_payment']
+                ).count()
+                return False, f"Tournament is full ({team_count}/{self.max_participants} teams registered)"
+            else:
+                return False, f"Tournament is full ({self.total_registered}/{self.max_participants} participants)"
         
         # Check if registration is open (status and dates)
         now = timezone.now()
-        if self.status != 'registration':
-            return False, "Registration is not open"
         
-        if now < self.registration_start:
-            return False, "Registration has not started yet"
+        # Check tournament status
+        if self.status == 'draft':
+            return False, "Tournament is still in draft mode. Registration will open soon."
+        elif self.status == 'check_in':
+            return False, "Registration has closed. Tournament is in check-in phase."
+        elif self.status == 'in_progress':
+            return False, "Registration has closed. Tournament is in progress."
+        elif self.status == 'completed':
+            return False, "Tournament has ended."
+        elif self.status == 'cancelled':
+            return False, "Tournament has been cancelled."
+        elif self.status != 'registration':
+            return False, f"Registration is not open. Current status: {self.get_status_display()}. Please contact the tournament organizer."
         
-        if now > self.registration_end:
-            return False, "Registration has closed"
+        # Check registration dates - only if they are set
+        if self.registration_start:
+            if now < self.registration_start:
+                time_until = self.registration_start - now
+                if time_until.days > 0:
+                    return False, f"Registration opens in {time_until.days} day(s) on {self.registration_start.strftime('%B %d, %Y at %I:%M %p')}"
+                else:
+                    hours = time_until.seconds // 3600
+                    minutes = (time_until.seconds % 3600) // 60
+                    if hours > 0:
+                        return False, f"Registration opens in {hours} hour(s) and {minutes} minute(s)"
+                    else:
+                        return False, f"Registration opens in {minutes} minute(s)"
+        
+        if self.registration_end:
+            if now > self.registration_end:
+                return False, f"Registration closed on {self.registration_end.strftime('%B %d, %Y at %I:%M %p')}"
         
         # Check verification requirement
         if self.requires_verification and not user.is_verified:
-            return False, "Verified account required"
+            return False, "A verified account is required to register for this tournament"
         
-        return True, "Can register"
+        return True, "Registration is available"
     
     def get_registrations_today(self):
         """Get number of registrations in the last 24 hours"""
@@ -310,19 +415,32 @@ class Tournament(models.Model):
     
     def create_bracket(self):
         """Create bracket based on tournament format"""
-        from .services.bracket import generate_bracket
+        from django.db import transaction
+        from .services import BracketGenerator
         
         participants = list(self.participants.filter(checked_in=True, status='confirmed'))
+        
+        # Validate we have participants
+        if not participants:
+            raise ValueError("Cannot generate bracket: No checked-in participants found")
+        
         generator = BracketGenerator(self, participants)
         
-        if self.format == 'single_elim':
-            generator.generate_single_elimination()
-        elif self.format == 'double_elim':
-            generator.generate_double_elimination()
-        elif self.format == 'swiss':
-            generator.generate_swiss_rounds()
-        elif self.format == 'round_robin':
-            generator.generate_round_robin()
+        try:
+            with transaction.atomic():
+                if self.format == 'single_elim':
+                    return generator.generate_single_elimination()
+                elif self.format == 'double_elim':
+                    return generator.generate_double_elimination()
+                elif self.format == 'swiss':
+                    return generator.generate_swiss_rounds()
+                elif self.format == 'round_robin':
+                    return generator.generate_round_robin()
+                else:
+                    raise ValueError(f"Unsupported tournament format: {self.format}")
+        except ValueError as e:
+            # Re-raise with more context
+            raise ValueError(f"Bracket generation failed: {str(e)}")
 
 
 class Participant(CacheInvalidationMixin, models.Model):
@@ -395,17 +513,25 @@ class Participant(CacheInvalidationMixin, models.Model):
             return 0
         return round((self.matches_won / total) * 100, 2)
     
-    def check_in_participant(self):
+    def check_in_participant(self, force=False):
         """Mark participant as checked in"""
-        if not self.tournament.is_check_in_open:
+        # Allow organizers to force check-in even when check-in period is closed
+        if not force and not self.tournament.is_check_in_open:
             return False
+        
+        # Prevent double check-in
+        if self.checked_in:
+            return True
         
         self.checked_in = True
         self.check_in_time = timezone.now()
         self.save()
         
-        self.tournament.total_checked_in += 1
-        self.tournament.save()
+        # Update tournament total (with safety check to prevent negative values)
+        if not hasattr(self.tournament, '_checked_in_updated'):
+            self.tournament.total_checked_in = max(0, self.tournament.total_checked_in) + 1
+            self.tournament.save()
+        
         return True
 
 

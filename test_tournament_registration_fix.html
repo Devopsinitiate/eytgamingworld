@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Registration Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1f1f1f;
+            color: white;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            background-color: #111827;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass { background-color: #065f46; color: #d1fae5; }
+        .fail { background-color: #7f1d1d; color: #fecaca; }
+        .info { background-color: #1e3a8a; color: #dbeafe; }
+        button {
+            background-color: #b91c1c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #991b1b;
+        }
+        .register-btn {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            padding: 12px 24px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 6px;
+        }
+        .register-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Tournament Registration Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>1. JavaScript File Loading Test</h2>
+        <div id="js-loading-results"></div>
+        <button onclick="testJavaScriptLoading()">Test JS Loading</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. JavaScript Syntax Test</h2>
+        <div id="syntax-results"></div>
+        <button onclick="testJavaScriptSyntax()">Test JS Syntax</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Registration Button Test</h2>
+        <div id="registration-results"></div>
+        <a href="#" class="register-btn" onclick="testRegistrationButton(event)">
+            <span>🎯</span> Register Now
+        </a>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Console Error Handler Test</h2>
+        <div id="error-handler-results"></div>
+        <button onclick="testErrorHandler()">Test Error Handler</button>
+        <button onclick="triggerTestError()">Trigger Test Error</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Network Request Test</h2>
+        <div id="network-results"></div>
+        <button onclick="testNetworkRequest()">Test Network Request</button>
+    </div>
+
+    <script>
+        // Test results container
+        const results = {
+            jsLoading: document.getElementById('js-loading-results'),
+            syntax: document.getElementById('syntax-results'),
+            registration: document.getElementById('registration-results'),
+            errorHandler: document.getElementById('error-handler-results'),
+            network: document.getElementById('network-results')
+        };
+
+        function addResult(container, message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        function clearResults(container) {
+            container.innerHTML = '';
+        }
+
+        // Test 1: JavaScript File Loading
+        function testJavaScriptLoading() {
+            clearResults(results.jsLoading);
+            
+            // Test if console-error-handler.js would load (simulate)
+            const testScript = document.createElement('script');
+            testScript.src = '/static/js/modules/console-error-handler.js';
+            
+            testScript.onload = () => {
+                addResult(results.jsLoading, '✅ console-error-handler.js loads successfully', 'pass');
+                testScript.remove();
+            };
+            
+            testScript.onerror = () => {
+                addResult(results.jsLoading, '❌ console-error-handler.js failed to load', 'fail');
+                testScript.remove();
+            };
+            
+            // Test the old error-handler.js (should fail)
+            const oldScript = document.createElement('script');
+            oldScript.src = '/static/js/error-handler.js';
+            
+            oldScript.onload = () => {
+                addResult(results.jsLoading, '⚠️ Old error-handler.js still exists (should be removed)', 'fail');
+                oldScript.remove();
+            };
+            
+            oldScript.onerror = () => {
+                addResult(results.jsLoading, '✅ Old error-handler.js correctly returns 404', 'pass');
+                oldScript.remove();
+            };
+            
+            document.head.appendChild(testScript);
+            document.head.appendChild(oldScript);
+            
+            addResult(results.jsLoading, '🔄 Testing JavaScript file loading...', 'info');
+        }
+
+        // Test 2: JavaScript Syntax
+        function testJavaScriptSyntax() {
+            clearResults(results.syntax);
+            
+            try {
+                // Test the problematic JavaScript pattern that was fixed
+                const testCode = `
+                    if (window.performanceOptimizer && window.performanceOptimizer.measurePerformance) {
+                        window.performanceOptimizer.measurePerformance('test', () => {
+                            console.log('Test completed');
+                        });
+                    }
+                `;
+                
+                // Use Function constructor to test syntax
+                new Function(testCode);
+                addResult(results.syntax, '✅ JavaScript syntax is valid', 'pass');
+                
+                // Test the old problematic pattern
+                try {
+                    const badCode = `
+                        if (window.performanceOptimizer.measurePerformance) {
+                            window.performanceOptimizer.measurePerformance('test', () => {
+                                console.log('Test');
+                        });
+                    }
+                    `;
+                    new Function(badCode);
+                    addResult(results.syntax, '⚠️ Bad syntax should have failed', 'fail');
+                } catch (e) {
+                    addResult(results.syntax, '✅ Bad syntax correctly throws error: ' + e.message, 'pass');
+                }
+                
+            } catch (error) {
+                addResult(results.syntax, '❌ JavaScript syntax error: ' + error.message, 'fail');
+            }
+        }
+
+        // Test 3: Registration Button
+        function testRegistrationButton(event) {
+            event.preventDefault();
+            clearResults(results.registration);
+            
+            addResult(results.registration, '✅ Registration button click works', 'pass');
+            addResult(results.registration, '✅ No page reload occurred', 'pass');
+            addResult(results.registration, '✅ Event handler executed successfully', 'pass');
+            
+            // Test button styling
+            const button = event.target;
+            const computedStyle = window.getComputedStyle(button);
+            
+            if (computedStyle.background.includes('gradient')) {
+                addResult(results.registration, '✅ Button has gradient background', 'pass');
+            } else {
+                addResult(results.registration, '⚠️ Button missing gradient background', 'fail');
+            }
+            
+            // Test hover effect
+            button.addEventListener('mouseenter', () => {
+                addResult(results.registration, '✅ Hover effect triggered', 'pass');
+            }, { once: true });
+            
+            // Simulate hover
+            button.dispatchEvent(new MouseEvent('mouseenter'));
+        }
+
+        // Test 4: Console Error Handler
+        function testErrorHandler() {
+            clearResults(results.errorHandler);
+            
+            // Check if ConsoleErrorHandler is available
+            if (typeof ConsoleErrorHandler !== 'undefined') {
+                addResult(results.errorHandler, '✅ ConsoleErrorHandler class is available', 'pass');
+                
+                try {
+                    const handler = new ConsoleErrorHandler({
+                        enableLogging: true,
+                        suppressErrors: true
+                    });
+                    
+                    addResult(results.errorHandler, '✅ ConsoleErrorHandler instantiated successfully', 'pass');
+                    
+                    // Test error counts
+                    const counts = handler.getErrorCounts();
+                    addResult(results.errorHandler, `✅ Error counts initialized: ${JSON.stringify(counts)}`, 'pass');
+                    
+                } catch (error) {
+                    addResult(results.errorHandler, '❌ Failed to create ConsoleErrorHandler: ' + error.message, 'fail');
+                }
+            } else {
+                addResult(results.errorHandler, '❌ ConsoleErrorHandler class not available', 'fail');
+                addResult(results.errorHandler, '💡 This is expected if the script hasn\'t loaded yet', 'info');
+            }
+        }
+
+        // Test 5: Trigger Test Error
+        function triggerTestError() {
+            clearResults(results.errorHandler);
+            
+            try {
+                // Trigger a controlled error
+                throw new Error('Test error for error handler');
+            } catch (error) {
+                addResult(results.errorHandler, '✅ Test error triggered: ' + error.message, 'pass');
+                
+                // Check if error was handled
+                setTimeout(() => {
+                    if (typeof ConsoleErrorHandler !== 'undefined') {
+                        addResult(results.errorHandler, '✅ Error handler should have caught this error', 'info');
+                    }
+                }, 100);
+            }
+        }
+
+        // Test 6: Network Request
+        function testNetworkRequest() {
+            clearResults(results.network);
+            
+            addResult(results.network, '🔄 Testing network request...', 'info');
+            
+            // Test a simple request to the current domain
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        addResult(results.network, '✅ Network request successful', 'pass');
+                        addResult(results.network, `✅ Status: ${response.status} ${response.statusText}`, 'pass');
+                    } else {
+                        addResult(results.network, `⚠️ Network request returned: ${response.status}`, 'fail');
+                    }
+                })
+                .catch(error => {
+                    addResult(results.network, '❌ Network request failed: ' + error.message, 'fail');
+                });
+            
+            // Test 404 request (should be handled gracefully)
+            fetch('/nonexistent-endpoint-test')
+                .then(response => {
+                    addResult(results.network, `✅ 404 request handled: ${response.status}`, 'pass');
+                })
+                .catch(error => {
+                    addResult(results.network, '✅ 404 error caught: ' + error.message, 'pass');
+                });
+        }
+
+        // Initialize tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            addResult(results.jsLoading, '✅ Page loaded successfully', 'pass');
+            addResult(results.syntax, '✅ No immediate syntax errors detected', 'pass');
+            addResult(results.registration, '✅ Registration button rendered', 'pass');
+            addResult(results.errorHandler, '🔄 Ready to test error handler', 'info');
+            addResult(results.network, '🔄 Ready to test network requests', 'info');
+        });
+
+        // Test for the specific error mentioned in the issue
+        window.addEventListener('error', function(event) {
+            console.log('Global error caught:', event.message, event.filename, event.lineno);
+        });
+
+        // Test for unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            console.log('Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html>

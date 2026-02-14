@@ -1,0 +1,109 @@
+{% load static responsive_images %}
+
+<!-- Gaming-Styled Profile Header -->
+<div class="card-gaming-highlight overflow-hidden mb-6">
+    <!-- Banner with Parallax Effect -->
+    <div class="relative h-48 md:h-64 overflow-hidden">
+        {% if profile_owner.banner %}
+            {% responsive_banner profile_owner.banner "Profile banner" "w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" %}
+        {% else %}
+            <div class="w-full h-full bg-gradient-to-br from-electric-red via-deep-black to-neon-cyan"></div>
+        {% endif %}
+        
+        <!-- Overlay with gaming gradient -->
+        <div class="absolute inset-0 bg-gradient-to-t from-deep-black via-deep-black/50 to-transparent"></div>
+        
+        <!-- Animated scan lines effect -->
+        <div class="absolute inset-0 opacity-10" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, #DC2626 2px, #DC2626 4px);"></div>
+    </div>
+
+    <div class="card-gaming-content p-6">
+        <div class="flex flex-col md:flex-row md:items-end gap-6 -mt-20 md:-mt-16">
+            <!-- Avatar with Gaming Glow -->
+            <div class="relative group z-10">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-deep-black p-1 neon-red-glow-lg">
+                    {% if profile_owner.avatar %}
+                        {% responsive_avatar profile_owner.avatar "Profile avatar" "w-full h-full rounded-full object-cover border-4 border-deep-black" %}
+                    {% else %}
+                        <div class="w-full h-full rounded-full bg-gradient-to-br from-electric-red to-neon-cyan flex items-center justify-center">
+                            <span class="text-white text-5xl font-black gaming-header">
+                                {{ profile_owner.get_display_name|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if is_own_profile %}
+                <!-- Edit overlay -->
+                <div class="absolute inset-0 bg-deep-black/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
+                    <a href="{% url 'dashboard:profile_edit' %}" aria-label="Edit profile picture" class="flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-electric-red text-4xl neon-red-glow" aria-hidden="true">photo_camera</span>
+                        <span class="gaming-subheader text-xs text-electric-red">EDIT</span>
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Level badge -->
+                <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-electric-red to-deep-black rounded-full flex items-center justify-center border-4 border-deep-black neon-red-glow">
+                    <div class="text-center">
+                        <p class="gaming-stat text-sm text-white leading-none">{{ stats.level|default:1 }}</p>
+                        <p class="text-[8px] text-gray-400 leading-none gaming-subheader">LVL</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="flex-1 md:pb-4">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                    <div>
+                        <h1 class="gaming-header text-3xl md:text-4xl text-electric-red mb-2">
+                            {{ profile_owner.get_display_name|upper }}
+                        </h1>
+                        <p class="gaming-body text-gray-300 text-base md:text-lg mb-2">
+                            {% if profile_owner.bio %}{{ profile_owner.bio }}{% else %}Gaming enthusiast and competitor{% endif %}
+                        </p>
+                        <div class="flex items-center gap-4 text-sm">
+                            <span class="stat-label">
+                                <span class="material-symbols-outlined text-sm mr-1" aria-hidden="true">calendar_today</span>
+                                JOINED {{ profile_owner.date_joined|date:"M Y"|upper }}
+                            </span>
+                            {% if profile_owner.location %}
+                            <span class="stat-label">
+                                <span class="material-symbols-outlined text-sm mr-1" aria-hidden="true">location_on</span>
+                                {{ profile_owner.location|upper }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        {% if is_own_profile %}
+                        <a href="{% url 'dashboard:profile_edit' %}" class="btn-gaming-primary">
+                            <span class="btn-gaming-text">EDIT PROFILE</span>
+                        </a>
+                        {% else %}
+                        <button class="btn-gaming-secondary">
+                            <span class="btn-gaming-text">ADD FRIEND</span>
+                        </button>
+                        <button class="btn-gaming-secondary">
+                            <span class="btn-gaming-text">MESSAGE</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- XP Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="stat-label text-xs">EXPERIENCE POINTS</span>
+                        <span class="stat-value text-sm">{{ stats.total_points|default:0 }} / {{ stats.next_level_points|default:1000 }} XP</span>
+                    </div>
+                    <div class="progress-gaming">
+                        <div class="progress-gaming-bar" style="width: {{ stats.xp_percentage|default:65 }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

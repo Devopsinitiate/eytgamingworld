@@ -308,6 +308,137 @@ select:focus {
     }
 }
 
+/* Organizer Controls Styling */
+.organizer-controls {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(185, 28, 28, 0.3) !important;
+    border-radius: 0.75rem !important;
+    padding: 1.5rem !important;
+    margin-top: 1.5rem !important;
+}
+
+.organizer-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 1rem !important;
+    margin-top: 1rem !important;
+}
+
+.organizer-action-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.organizer-action-btn.primary {
+    background: linear-gradient(135deg, var(--eyt-primary) 0%, var(--eyt-primary-dark) 100%) !important;
+    color: white !important;
+    border-color: var(--eyt-primary) !important;
+    box-shadow: 0 4px 12px var(--eyt-primary-alpha-30) !important;
+}
+
+.organizer-action-btn.primary:hover {
+    background: linear-gradient(135deg, var(--eyt-primary-light) 0%, var(--eyt-primary) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px var(--eyt-primary-alpha-40) !important;
+    color: white !important;
+}
+
+.organizer-action-btn.secondary {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.organizer-action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--eyt-primary) !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+}
+
+.organizer-action-btn.success {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: white !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
+}
+
+.organizer-action-btn.success:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4) !important;
+    color: white !important;
+}
+
+.organizer-action-btn.danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3) !important;
+}
+
+.organizer-action-btn.danger:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4) !important;
+    color: white !important;
+}
+
+.organizer-action-btn.disabled {
+    background: rgba(107, 114, 128, 0.3) !important;
+    color: rgba(156, 163, 175, 0.8) !important;
+    border-color: rgba(107, 114, 128, 0.2) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+.organizer-action-btn.disabled:hover {
+    background: rgba(107, 114, 128, 0.3) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    color: rgba(156, 163, 175, 0.8) !important;
+}
+
+.organizer-action-btn .material-symbols-outlined {
+    font-size: 1.5rem !important;
+    flex-shrink: 0 !important;
+}
+
+.action-content {
+    flex: 1 !important;
+}
+
+.action-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.action-subtitle {
+    font-size: 0.875rem !important;
+    opacity: 0.8 !important;
+    font-weight: 400 !important;
+}
+
+.organizer-action-btn:active {
+    transform: translateY(0) !important;
+}
+
+.organizer-action-btn:focus {
+    outline: 2px solid var(--eyt-primary) !important;
+    outline-offset: 2px !important;
+}
+
 /* Force override for any remaining conflicting styles */
 [class*="primary"],
 [class*="brand"],

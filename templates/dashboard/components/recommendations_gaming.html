@@ -1,0 +1,52 @@
+{% load static %}
+
+<!-- Gaming Recommendations Component -->
+<!-- Requirements: 13.1, 13.2 - Display tournament and team recommendations -->
+
+<div class="card-gaming">
+    <div class="card-gaming-content">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="gaming-subheader text-xl text-white">RECOMMENDED FOR YOU</h2>
+        </div>
+        
+        {% if recommendations %}
+            <div class="space-y-4">
+                {% for item in recommendations|slice:":3" %}
+                    <a href="{{ item.url }}" 
+                       class="block card-gaming-flat hover:neon-border-red transition-all">
+                        <div class="flex items-center gap-3">
+                            <!-- Icon/Image -->
+                            <div class="flex-shrink-0 w-12 h-12 rounded bg-electric-red/20 flex items-center justify-center neon-red-glow">
+                                <span class="material-symbols-outlined text-electric-red" aria-hidden="true">
+                                    {% if item.type == 'tournament' %}emoji_events{% elif item.type == 'team' %}groups{% else %}stars{% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white font-bold text-sm truncate">{{ item.title }}</p>
+                                <p class="text-gray-400 text-xs mt-1 truncate">{{ item.description }}</p>
+                                {% if item.match_percentage %}
+                                <div class="mt-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="progress-gaming flex-1" style="max-width: 100px; height: 4px;">
+                                            <div class="progress-gaming-bar" style="width: {{ item.match_percentage }}%;"></div>
+                                        </div>
+                                        <span class="text-electric-red text-xs font-bold">{{ item.match_percentage }}% match</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <span class="material-symbols-outlined text-gray-600 text-5xl" aria-hidden="true">lightbulb</span>
+                <p class="text-gray-400 mt-3 text-sm">No recommendations yet</p>
+                <p class="text-gray-500 text-xs mt-1">Complete your profile to get personalized suggestions</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

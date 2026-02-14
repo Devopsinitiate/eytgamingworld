@@ -2,7 +2,160 @@
 {% load static %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard-mobile.css' %}">
 <style>
+    /* Force dark theme for all dashboard pages */
+    html {
+        color-scheme: dark;
+    }
+
+    /* Override white backgrounds with dark theme */
+    .bg-white,
+    .bg-gray-50,
+    .bg-gray-100 {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+
+    /* Override light text colors */
+    .text-gray-900 {
+        color: #ffffff !important;
+    }
+
+    .text-gray-800 {
+        color: #e5e7eb !important;
+    }
+
+    .text-gray-700 {
+        color: #d1d5db !important;
+    }
+
+    .text-gray-600 {
+        color: #9ca3af !important;
+    }
+
+    /* Override light borders */
+    .border-gray-200 {
+        border-color: #374151 !important;
+    }
+
+    .border-gray-300 {
+        border-color: #4b5563 !important;
+    }
+
+    /* Force dark theme for specific dashboard elements */
+    .bg-white.dark\:bg-\[\#111318\] {
+        background-color: #111318 !important;
+    }
+
+    /* Override form elements */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="password"],
+    input[type="url"],
+    textarea,
+    select {
+        background-color: #1f2937 !important;
+        color: #ffffff !important;
+        border-color: #4b5563 !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    input[type="password"]:focus,
+    input[type="url"]:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--eyt-primary) !important;
+        box-shadow: 0 0 0 2px var(--eyt-primary-alpha-20) !important;
+    }
+
+    /* Override button styles */
+    .btn-primary,
+    button[type="submit"] {
+        background-color: var(--eyt-primary) !important;
+        color: white !important;
+        border-color: var(--eyt-primary) !important;
+    }
+
+    .btn-primary:hover,
+    button[type="submit"]:hover {
+        background-color: var(--eyt-primary-dark) !important;
+    }
+
+    /* Override card backgrounds */
+    .card,
+    .widget,
+    .panel {
+        background-color: #111318 !important;
+        border-color: #374151 !important;
+    }
+
+    /* Override dropdown and modal backgrounds */
+    .dropdown-menu,
+    .modal-content {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+
+    /* Override table backgrounds */
+    table,
+    .table {
+        background-color: #111318 !important;
+        color: #ffffff !important;
+    }
+
+    table th,
+    .table th {
+        background-color: #1f2937 !important;
+        color: #ffffff !important;
+        border-color: #374151 !important;
+    }
+
+    table td,
+    .table td {
+        border-color: #374151 !important;
+        color: #e5e7eb !important;
+    }
+
+    /* Override alert backgrounds */
+    .alert {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+        color: #ffffff !important;
+    }
+
+    .alert-success {
+        background-color: #065f46 !important;
+        border-color: #059669 !important;
+        color: #d1fae5 !important;
+    }
+
+    .alert-error,
+    .alert-danger {
+        background-color: #7f1d1d !important;
+        border-color: #dc2626 !important;
+        color: #fecaca !important;
+    }
+
+    .alert-warning {
+        background-color: #78350f !important;
+        border-color: #f59e0b !important;
+        color: #fef3c7 !important;
+    }
+
+    .alert-info {
+        background-color: #1e3a8a !important;
+        border-color: #3b82f6 !important;
+        color: #dbeafe !important;
+    }
+
     /* Screen reader only content */
     .sr-only {
         position: absolute;
@@ -15,39 +168,40 @@
         white-space: nowrap;
         border-width: 0;
     }
-    
+
     /* Mobile menu animation */
     #mobile-menu {
         transition: opacity 0.3s ease-in-out;
     }
-    
+
     #mobile-menu:not(.hidden) {
         animation: fadeIn 0.3s ease-in-out;
     }
-    
-    #mobile-menu > div {
+
+    #mobile-menu>div {
         transition: transform 0.3s ease-in-out;
         transform: translateX(-100%);
     }
-    
-    #mobile-menu:not(.hidden) > div {
+
+    #mobile-menu:not(.hidden)>div {
         transform: translateX(0);
     }
-    
+
     @keyframes fadeIn {
         from {
             opacity: 0;
         }
+
         to {
             opacity: 1;
         }
     }
-    
+
     /* Ensure mobile menu is above everything */
     #mobile-menu {
         z-index: 9999;
     }
-    
+
     /* Better touch targets for mobile */
     @media (max-width: 768px) {
         #mobile-menu a {
@@ -59,112 +213,217 @@
 </style>
 {% endblock %}
 
+{% block navigation %}
+{# Dashboard has its own sidebar navigation, so we don't need the base.html nav #}
+{% endblock navigation %}
+
 {% block body %}
 <!-- Skip to main content link for keyboard navigation -->
-<a href="#main-content" class="skip-to-main">Skip to main content</a>
+<a href="#main-content"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded">Skip
+    to main content</a>
 
 <div class="flex min-h-screen">
     <!-- Sidebar Navigation -->
-    <aside class="w-64 flex-shrink-0 bg-background-light dark:bg-background-dark border-r border-card-border-dark hidden md:flex flex-col">
-        <div class="flex flex-col h-full p-4">
-            <!-- Logo -->
-            <div class="flex items-center gap-3 p-2 mb-6">
-                <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-10 w-auto"/>
-                <h1 class="text-white text-xl font-bold">EYTGaming</h1>
+    <aside class="w-64 flex-shrink-0 sidebar-gaming hidden md:flex flex-col" style="position: relative; z-index: 10;">
+        <div class="flex flex-col h-full" style="position: relative; z-index: 10;">
+            <!-- Logo Section - Completely Isolated -->
+            <div class="logo-container"
+                style="position: relative; z-index: 1000; background: #0A0A0A; padding: 1rem; border-bottom: 2px solid #1F1F1F; flex-shrink: 0;">
+                <div class="flex items-center gap-3" style="position: relative; z-index: 1001;">
+                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-10 w-auto neon-red-glow"
+                        style="border-radius: 0.5rem; display: block; position: relative; z-index: 1002;" />
+                    <h1 class="text-white gaming-subheader"
+                        style="font-size: 1.25rem; line-height: 1; position: relative; z-index: 1002; background: #0A0A0A;">
+                        EYTGAMING</h1>
+                </div>
             </div>
-            
-            <!-- Main Navigation -->
-            <nav class="flex flex-col gap-2" role="navigation" aria-label="Main navigation">
-                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
-                    <p class="text-sm font-medium">Dashboard</p>
-                </a>
-                
-                <a href="{% url 'tournaments:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'tournaments' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
-                    <p class="text-sm font-medium">Tournaments</p>
-                </a>
-                
-                <a href="{% url 'coaching:coach_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'coaching' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Coaching{% if 'coaching' in request.path %}, current page{% endif %}" {% if 'coaching' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">sports_esports</span>
-                    <p class="text-sm font-medium">Coaching</p>
-                </a>
-                
-                <a href="{% url 'teams:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'teams' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">groups</span>
-                    <p class="text-sm font-medium">Teams</p>
-                </a>
-                
-                <a href="{% url 'venues:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'venues' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Venues{% if 'venues' in request.path %}, current page{% endif %}" {% if 'venues' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    <p class="text-sm font-medium">Venues</p>
-                </a>
-                
-                <a href="{% url 'dashboard:profile_view' username=request.user.username %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'profile' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}" {% if 'profile' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">person</span>
-                    <p class="text-sm font-medium">Profile</p>
-                </a>
+
+            <!-- Main Navigation - World Standard Structure -->
+            <nav class="flex flex-col gap-1 p-4" role="navigation" aria-label="Main navigation"
+                style="position: relative; z-index: 1; background: #0A0A0A; flex: 1; overflow-y: auto;">
+
+                <!-- Primary Navigation Group -->
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="{% url 'dashboard:home' %}"
+                        class="nav-item-gaming {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}"
+                        {% if request.resolver_match.url_name == 'home' %}aria-current="page" {% endif %}>
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span>
+                        </span>
+                        <span class="nav-label">Dashboard</span>
+                        {% if request.resolver_match.url_name == 'home' %}
+                        <span class="nav-active-indicator" aria-hidden="true"></span>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <!-- Competition Group -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Competition</h3>
+                    <div class="nav-group" role="group" aria-label="Competition navigation">
+                        <a href="{% url 'tournaments:list' %}"
+                            class="nav-item-gaming {% if 'tournaments' in request.path %}active{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">emoji_events</span>
+                            </span>
+                            <span class="nav-label">Tournaments</span>
+                            {% if 'tournaments' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+
+                        <a href="{% url 'teams:list' %}"
+                            class="nav-item-gaming {% if 'teams' in request.path %}active{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>
+                            </span>
+                            <span class="nav-label">Teams</span>
+                            {% if 'teams' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Training Group -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Training</h3>
+                    <div class="nav-group" role="group" aria-label="Training navigation">
+                        <a href="{% url 'coaching:coach_list' %}"
+                            class="nav-item-gaming {% if 'coaching' in request.path %}active{% endif %}" aria-label="Coaching{% if 'coaching' in request.path %}, current page{% endif %}" {% if 'coaching' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon"
+                                    aria-hidden="true">sports_esports</span>
+                            </span>
+                            <span class="nav-label">Coaching</span>
+                            {% if 'coaching' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Marketplace Group -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Marketplace</h3>
+                    <div class="nav-group" role="group" aria-label="Marketplace navigation">
+                        <a href="{% url 'store:product_list' %}"
+                            class="nav-item-gaming {% if 'store' in request.path %}active{% endif %}" aria-label="Store{% if 'store' in request.path %}, current page{% endif %}" {% if 'store' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">shopping_bag</span>
+                            </span>
+                            <span class="nav-label">Store</span>
+                            {% if 'store' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+
+                        <a href="{% url 'venues:list' %}"
+                            class="nav-item-gaming {% if 'venues' in request.path %}active{% endif %}" aria-label="Venues{% if 'venues' in request.path %}, current page{% endif %}" {% if 'venues' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">location_on</span>
+                            </span>
+                            <span class="nav-label">Venues</span>
+                            {% if 'venues' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Personal Group -->
+                {% if user.is_authenticated %}
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Personal</h3>
+                    <div class="nav-group" role="group" aria-label="Personal navigation">
+                        <a href="{% url 'dashboard:profile_view' username=request.user.username %}"
+                            class="nav-item-gaming {% if 'profile' in request.path %}active{% endif %}" aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}" {% if 'profile' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">person</span>
+                            </span>
+                            <span class="nav-label">Profile</span>
+                            {% if 'profile' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
             </nav>
-            
-            <!-- Bottom Navigation -->
-            <div class="mt-auto flex flex-col gap-2">
-                <a href="{% url 'payments:payment_methods' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Payment methods">
-                    <span class="material-symbols-outlined" aria-hidden="true">payment</span>
-                    <p class="text-sm font-medium">Payments</p>
-                </a>
-                
-                <a href="{% url 'notifications:preferences' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Settings">
-                    <span class="material-symbols-outlined" aria-hidden="true">settings</span>
-                    <p class="text-sm font-medium">Settings</p>
-                </a>
-                
-                <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Logout">
-                    <span class="material-symbols-outlined" aria-hidden="true">logout</span>
-                    <p class="text-sm font-medium">Logout</p>
-                </a>
+
+            <!-- System Navigation -->
+            <div class="mt-auto pt-4 border-t border-gray-800">
+                <h3 class="nav-section-title">System</h3>
+                <div class="nav-group flex flex-col gap-1" role="group" aria-label="System navigation">
+                    <a href="{% url 'payments:payment_methods' %}" class="nav-item-gaming nav-item-subtle"
+                        aria-label="Payment methods">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">payment</span>
+                        </span>
+                        <span class="nav-label">Payments</span>
+                    </a>
+
+                    <a href="{% url 'notifications:preferences' %}" class="nav-item-gaming nav-item-subtle"
+                        aria-label="Settings">
+                        <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+                        <p class="text-sm font-medium">SETTINGS</p>
+                    </a>
+
+                    <a href="{% url 'account_logout' %}" class="nav-item-gaming" aria-label="Logout">
+                        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                        <p class="text-sm font-medium">LOGOUT</p>
+                    </a>
+                </div>
             </div>
-        </div>
     </aside>
-    
+
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col">
         <!-- Top Navigation Bar -->
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-card-border-dark px-6 py-3 h-16 flex-shrink-0">
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-solid border-card-border-dark px-6 py-3 h-16 flex-shrink-0">
             <!-- Mobile Menu Button -->
-            <button class="md:hidden text-gray-300" onclick="toggleMobileMenu()" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu">
-                <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+            <button class="md:hidden text-gray-300 relative z-[100000]" onclick="toggleMobileMenu()"
+                aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu"
+                style="pointer-events: auto !important; cursor: pointer !important; touch-action: manipulation !important;">
+                <span class="material-symbols-outlined" aria-hidden="true" style="pointer-events: none;">menu</span>
             </button>
-            
+
             <!-- Search Bar -->
             <div class="flex flex-1 items-center gap-8">
                 <label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
                     <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-                        <div class="text-gray-400 flex border-none bg-card-dark items-center justify-center pl-3 rounded-l-lg border-r-0">
+                        <div
+                            class="text-gray-400 flex border-none bg-card-dark items-center justify-center pl-3 rounded-l-lg border-r-0">
                             <span class="material-symbols-outlined">search</span>
                         </div>
-                        <input 
-                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-card-dark focus:border-none h-full placeholder:text-gray-400 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" 
-                            placeholder="Search tournaments, coaches..." 
-                            type="search"
-                            aria-label="Search tournaments, coaches, and other content"
-                        />
+                        <input
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-card-dark focus:border-none h-full placeholder:text-gray-400 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                            placeholder="Search tournaments, coaches..." type="search"
+                            aria-label="Search tournaments, coaches, and other content" />
                     </div>
                 </label>
             </div>
-            
+
             <!-- Right Side Icons -->
             <div class="flex items-center gap-4">
                 <!-- Notification Bell -->
                 <div class="relative">
-                    <button onclick="toggleNotifications()" class="relative text-gray-300 hover:text-white transition-colors" aria-label="Notifications" aria-expanded="false" aria-controls="notification-dropdown">
+                    <button onclick="toggleNotifications()"
+                        class="relative text-gray-300 hover:text-white transition-colors" aria-label="Notifications"
+                        aria-expanded="false" aria-controls="notification-dropdown">
                         <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
-                        <span id="notification-badge" class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold" aria-label="0 unread notifications">
+                        <span id="notification-badge"
+                            class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
+                            aria-label="0 unread notifications">
                             0
                         </span>
                     </button>
-                    
+
                     <!-- Notification Dropdown -->
-                    <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-card-dark border border-card-border-dark rounded-lg shadow-xl z-50">
+                    <div id="notification-dropdown"
+                        class="hidden absolute right-0 mt-2 w-80 bg-card-dark border border-card-border-dark rounded-lg shadow-xl z-50">
                         <div class="p-4 border-b border-card-border-dark">
                             <h3 class="text-white font-semibold">Notifications</h3>
                         </div>
@@ -172,65 +431,82 @@
                             <!-- Notifications loaded via AJAX -->
                         </div>
                         <div class="p-3 border-t border-card-border-dark text-center">
-                            <a href="{% url 'notifications:list' %}" class="text-primary hover:text-primary-light text-sm font-medium">View All</a>
+                            <a href="{% url 'notifications:list' %}"
+                                class="text-primary hover:text-primary-light text-sm font-medium">View All</a>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- User Profile Dropdown -->
                 <div class="relative">
-                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors" aria-label="User menu for {{ user.get_display_name }}" aria-expanded="false" aria-controls="user-dropdown">
+                    <button onclick="toggleUserMenu()"
+                        class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+                        aria-label="User menu for {{ user.get_display_name }}" aria-expanded="false"
+                        aria-controls="user-dropdown">
                         {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}" class="h-8 w-8 rounded-full object-cover"/>
+                        <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}"
+                            class="h-8 w-8 rounded-full object-cover" />
                         {% else %}
-                            <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-                                {{ user.get_display_name|first|upper }}
-                            </div>
+                        <div
+                            class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                            {{ user.get_display_name|first|upper }}
+                        </div>
                         {% endif %}
                         <span class="hidden sm:inline text-sm font-medium">{{ user.get_display_name }}</span>
                         <span class="material-symbols-outlined text-sm" aria-hidden="true">expand_more</span>
                     </button>
-                    
+
                     <!-- User Dropdown Menu -->
-                    <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-card-dark border border-card-border-dark rounded-lg shadow-xl z-50" role="menu" aria-label="User menu">
-                        <a href="{% url 'dashboard:profile_view' username=request.user.username %}" class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem" aria-label="View profile">
+                    {% if user.is_authenticated %}
+                    <div id="user-dropdown"
+                        class="hidden absolute right-0 mt-2 w-48 bg-card-dark border border-card-border-dark rounded-lg shadow-xl z-50"
+                        role="menu" aria-label="User menu">
+                        <a href="{% url 'dashboard:profile_view' username=request.user.username %}"
+                            class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem"
+                            aria-label="View profile">
                             <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">person</span>
                             Profile
                         </a>
-                        <a href="{% url 'payments:history' %}" class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem" aria-label="View payment history">
+                        <a href="{% url 'payments:history' %}"
+                            class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem"
+                            aria-label="View payment history">
                             <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">receipt</span>
                             Payments
                         </a>
-                        <a href="{% url 'notifications:preferences' %}" class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem" aria-label="Settings">
+                        <a href="{% url 'notifications:preferences' %}"
+                            class="block px-4 py-2 text-gray-300 hover:bg-neutral-800 transition-colors" role="menuitem"
+                            aria-label="Settings">
                             <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">settings</span>
                             Settings
                         </a>
-                        <hr class="border-card-border-dark my-1"/>
-                        <a href="{% url 'account_logout' %}" class="block px-4 py-2 text-red-400 hover:bg-neutral-800 transition-colors" role="menuitem" aria-label="Logout">
+                        <hr class="border-card-border-dark my-1" />
+                        <a href="{% url 'account_logout' %}"
+                            class="block px-4 py-2 text-red-400 hover:bg-neutral-800 transition-colors" role="menuitem"
+                            aria-label="Logout">
                             <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">logout</span>
                             Logout
                         </a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </header>
-        
+
         <!-- Page Content -->
-        <div id="main-content" class="flex-1 overflow-y-auto p-6" role="main">
+        <div id="main-content" class="flex-1 overflow-y-auto dashboard-mobile-container bg-deep-black" role="main">
             <!-- Django Messages -->
             {% if messages %}
-                <div class="mb-4 space-y-2" role="alert" aria-live="{% if message.tags == 'error' %}assertive{% else %}polite{% endif %}">
-                    {% for message in messages %}
-                        <div class="flex items-center gap-3 px-4 py-3 rounded-lg {% if message.tags == 'error' %}bg-red-900/20 border border-red-800 text-red-200{% elif message.tags == 'success' %}bg-green-900/20 border border-green-800 text-green-200{% elif message.tags == 'warning' %}bg-yellow-900/20 border border-yellow-800 text-yellow-200{% else %}bg-blue-900/20 border border-blue-800 text-blue-200{% endif %}" role="alert">
-                            <span class="material-symbols-outlined" aria-hidden="true">
-                                {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
-                            </span>
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
+            <div class="mb-4 space-y-2" role="alert"
+                aria-live="{% if message.tags == 'error' %}assertive{% else %}polite{% endif %}"> {% for message in messages %}
+                <div class="flex items-center gap-3 px-4 py-3 rounded-lg {% if message.tags == 'error' %}bg-red-900/20 border border-red-800 text-red-200{% elif message.tags == 'success' %}bg-green-900/20 border border-green-800 text-green-200{% elif message.tags == 'warning' %}bg-yellow-900/20 border border-yellow-800 text-yellow-200{% else %}bg-blue-900/20 border border-blue-800 text-blue-200{% endif %}"
+                    role="alert">
+                    <span class="material-symbols-outlined" aria-hidden="true">{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}</span>
+                    <p>{{ message }}</p>
                 </div>
+                {% endfor %}
+            </div>
             {% endif %}
-            
+
             {% block content %}{% endblock %}
         </div>
     </main>
@@ -238,88 +514,202 @@
 
 <!-- Mobile Menu Overlay -->
 <div id="mobile-menu" class="hidden fixed inset-0 bg-black/50 z-50 md:hidden" onclick="toggleMobileMenu()">
-    <div class="w-64 h-full bg-background-dark border-r border-card-border-dark" onclick="event.stopPropagation()">
-        <div class="flex flex-col h-full p-4">
-            <!-- Logo and Close Button -->
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-10 w-auto"/>
-                    <h1 class="text-white text-xl font-bold">EYTGaming</h1>
-                </div>
-                <button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white" aria-label="Close navigation menu">
+    <div class="w-64 h-full sidebar-gaming flex flex-col" onclick="event.stopPropagation()">
+        <!-- Logo Section - Fixed at top -->
+        <div class="logo-section flex-shrink-0"
+            style="position: relative; z-index: 100; background: rgba(10, 10, 10, 1); padding: 1rem;">
+            <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    aria-label="EYTGaming Dashboard Home">
+                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-10 w-auto neon-red-glow"
+                        style="border-radius: 0.5rem;" />
+                    <h1 class="text-white gaming-subheader text-lg">EYTGAMING</h1>
+                </a>
+                <button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white touch-target"
+                    aria-label="Close navigation menu">
                     <span class="material-symbols-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
-            
-            <!-- Main Navigation -->
-            <nav class="flex flex-col gap-2" role="navigation" aria-label="Mobile navigation">
-                <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if request.resolver_match.url_name == 'home' %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
-                    <p class="text-sm font-medium">Dashboard</p>
-                </a>
-                
-                <a href="{% url 'tournaments:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'tournaments' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
-                    <p class="text-sm font-medium">Tournaments</p>
-                </a>
-                
-                <a href="{% url 'coaching:coach_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'coaching' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Coaching{% if 'coaching' in request.path %}, current page{% endif %}" {% if 'coaching' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">sports_esports</span>
-                    <p class="text-sm font-medium">Coaching</p>
-                </a>
-                
-                <a href="{% url 'teams:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'teams' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">groups</span>
-                    <p class="text-sm font-medium">Teams</p>
-                </a>
-                
-                <a href="{% url 'venues:list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'venues' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Venues{% if 'venues' in request.path %}, current page{% endif %}" {% if 'venues' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    <p class="text-sm font-medium">Venues</p>
-                </a>
-                
-                <a href="{% url 'dashboard:profile_view' username=request.user.username %}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if 'profile' in request.path %}bg-primary/20 text-primary{% else %}text-gray-300 hover:bg-card-dark transition-colors{% endif %}" aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}" {% if 'profile' in request.path %}aria-current="page"{% endif %}>
-                    <span class="material-symbols-outlined" aria-hidden="true">person</span>
-                    <p class="text-sm font-medium">Profile</p>
-                </a>
+        </div>
+
+        <!-- Scrollable Navigation Container -->
+        <div class="flex-1 overflow-y-auto"
+            style="padding: 1rem; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
+            <!-- Main Navigation - Mobile -->
+            <nav class="flex flex-col gap-1" role="navigation" aria-label="Mobile navigation"
+                style="position: relative; z-index: 1;">
+
+                <!-- Primary -->
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="{% url 'dashboard:home' %}"
+                        class="nav-item-gaming {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}"
+                        {% if request.resolver_match.url_name == 'home' %}aria-current="page" {% endif %}>
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span>
+                        </span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Competition -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Competition</h3>
+                    <div class="nav-group" role="group" aria-label="Competition navigation">
+                        <a href="{% url 'tournaments:list' %}"
+                            class="nav-item-gaming {% if 'tournaments' in request.path %}active{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">emoji_events</span>
+                            </span>
+                            <span class="nav-label">Tournaments</span>
+                        </a>
+
+                        <a href="{% url 'teams:list' %}"
+                            class="nav-item-gaming {% if 'teams' in request.path %}active{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span>
+                            </span>
+                            <span class="nav-label">Teams</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Training -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Training</h3>
+                    <div class="nav-group" role="group" aria-label="Training navigation">
+                        <a href="{% url 'coaching:coach_list' %}"
+                            class="nav-item-gaming {% if 'coaching' in request.path %}active{% endif %}" aria-label="Coaching{% if 'coaching' in request.path %}, current page{% endif %}" {% if 'coaching' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon"
+                                    aria-hidden="true">sports_esports</span>
+                            </span>
+                            <span class="nav-label">Coaching</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Marketplace -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Marketplace</h3>
+                    <div class="nav-group" role="group" aria-label="Marketplace navigation">
+                        <a href="{% url 'store:product_list' %}"
+                            class="nav-item-gaming {% if 'store' in request.path %}active{% endif %}" aria-label="Store{% if 'store' in request.path %}, current page{% endif %}" {% if 'store' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">shopping_bag</span>
+                            </span>
+                            <span class="nav-label">Store</span>
+                        </a>
+
+                        <a href="{% url 'venues:list' %}"
+                            class="nav-item-gaming {% if 'venues' in request.path %}active{% endif %}" aria-label="Venues{% if 'venues' in request.path %}, current page{% endif %}" {% if 'venues' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">location_on</span>
+                            </span>
+                            <span class="nav-label">Venues</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Personal -->
+                {% if user.is_authenticated %}
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Personal</h3>
+                    <div class="nav-group" role="group" aria-label="Personal navigation">
+                        <a href="{% url 'dashboard:profile_view' username=request.user.username %}"
+                            class="nav-item-gaming {% if 'profile' in request.path %}active{% endif %}" aria-label="Profile{% if 'profile' in request.path %}, current page{% endif %}" {% if 'profile' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">person</span>
+                            </span>
+                            <span class="nav-label">Profile</span>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
             </nav>
-            
-            <!-- Bottom Navigation -->
-            <div class="mt-auto flex flex-col gap-2">
-                <a href="{% url 'payments:payment_methods' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Payment methods">
-                    <span class="material-symbols-outlined" aria-hidden="true">payment</span>
-                    <p class="text-sm font-medium">Payments</p>
-                </a>
-                
-                <a href="{% url 'notifications:preferences' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Settings">
-                    <span class="material-symbols-outlined" aria-hidden="true">settings</span>
-                    <p class="text-sm font-medium">Settings</p>
-                </a>
-                
-                <a href="{% url 'account_logout' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-card-dark transition-colors" aria-label="Logout">
-                    <span class="material-symbols-outlined" aria-hidden="true">logout</span>
-                    <p class="text-sm font-medium">Logout</p>
-                </a>
+
+            <!-- System Navigation - Fixed at bottom -->
+            <div class="pt-4 border-t border-gray-800 mt-4">
+                <h3 class="nav-section-title">System</h3>
+                <div class="nav-group flex flex-col gap-1" role="group" aria-label="System navigation">
+                    <a href="{% url 'payments:payment_methods' %}" class="nav-item-gaming nav-item-subtle"
+                        aria-label="Payment methods">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">payment</span>
+                        </span>
+                        <span class="nav-label">Payments</span>
+                    </a>
+
+                    <a href="{% url 'notifications:preferences' %}" class="nav-item-gaming nav-item-subtle"
+                        aria-label="Settings">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">settings</span>
+                        </span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+
+                    <a href="{% url 'account_logout' %}" class="nav-item-gaming nav-item-subtle" aria-label="Logout">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span>
+                        </span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Mobile Bottom Navigation (Fixed) -->
+<nav class="mobile-bottom-nav md:hidden">
+    <div class="mobile-nav-grid">
+        <a href="{% url 'dashboard:home' %}"
+            class="mobile-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page" {% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">dashboard</span>
+            <span>Home</span>
+        </a>
+
+        <a href="{% url 'tournaments:list' %}"
+            class="mobile-nav-item {% if 'tournaments' in request.path %}active{% endif %}" aria-label="Tournaments{% if 'tournaments' in request.path %}, current page{% endif %}" {% if 'tournaments' in request.path %}aria-current="page" {% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">emoji_events</span>
+            <span>Tournaments</span>
+        </a>
+
+        <a href="{% url 'teams:list' %}" class="mobile-nav-item {% if 'teams' in request.path %}active{% endif %}" aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page" {% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">groups</span>
+            <span>Teams</span>
+        </a>
+
+        <a href="{% url 'notifications:list' %}"
+            class="mobile-nav-item {% if 'notifications' in request.path %}active{% endif %}" aria-label="Notifications{% if 'notifications' in request.path %}, current page{% endif %}" {% if 'notifications' in request.path %}aria-current="page" {% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">notifications</span>
+            <span>Alerts</span>
+        </a>
+
+        <button onclick="toggleMobileMenu()" class="mobile-nav-item" aria-label="Open menu" aria-expanded="false"
+            aria-controls="mobile-menu">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">menu</span>
+            <span>Menu</span>
+        </button>
+    </div>
+</nav>
+
 <script>
-    // Toggle mobile menu
+    // Toggle mobile menu with touch support - MUST be defined before onclick handlers
     function toggleMobileMenu() {
         const mobileMenu = document.getElementById('mobile-menu');
-        const menuButton = document.querySelector('[aria-controls="mobile-menu"]');
+        const menuButtons = document.querySelectorAll('[aria-controls="mobile-menu"]');
         const isHidden = mobileMenu.classList.contains('hidden');
-        
+
         mobileMenu.classList.toggle('hidden');
-        
-        // Update ARIA attributes
-        if (menuButton) {
-            menuButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            menuButton.setAttribute('aria-label', isHidden ? 'Close navigation menu' : 'Open navigation menu');
-        }
-        
+
+        // Update ARIA attributes for all menu buttons
+        menuButtons.forEach(button => {
+            button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            if (button.getAttribute('aria-label')?.includes('Open')) {
+                button.setAttribute('aria-label', isHidden ? 'Close navigation menu' : 'Open navigation menu');
+            }
+        });
+
         // Prevent body scroll when menu is open
         if (!mobileMenu.classList.contains('hidden')) {
             document.body.style.overflow = 'hidden';
@@ -327,69 +717,48 @@
             document.body.style.overflow = '';
         }
     }
-    
-    // Close mobile menu when clicking on a link
-    document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
-        mobileMenuLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                toggleMobileMenu();
-            });
-        });
-    });
-    
-    // Toggle notifications dropdown
+
+    // Toggle notifications dropdown - MUST be defined before onclick handlers
     function toggleNotifications() {
         const dropdown = document.getElementById('notification-dropdown');
         const button = document.querySelector('[aria-controls="notification-dropdown"]');
         const isHidden = dropdown.classList.contains('hidden');
-        
+
         dropdown.classList.toggle('hidden');
-        
+
         // Update ARIA attributes
         if (button) {
             button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
         }
-        
+
         loadNotifications();
     }
-    
-    // Toggle user menu dropdown
+
+    // Toggle user menu dropdown - MUST be defined before onclick handlers
     function toggleUserMenu() {
         const dropdown = document.getElementById('user-dropdown');
         const button = document.querySelector('[aria-controls="user-dropdown"]');
         const isHidden = dropdown.classList.contains('hidden');
-        
+
         dropdown.classList.toggle('hidden');
-        
+
         // Update ARIA attributes
         if (button) {
             button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
         }
     }
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        const notifDropdown = document.getElementById('notification-dropdown');
-        const userDropdown = document.getElementById('user-dropdown');
-        
-        if (!event.target.closest('.relative')) {
-            notifDropdown.classList.add('hidden');
-            userDropdown.classList.add('hidden');
-        }
-    });
-    
-    // Load notifications via AJAX
+
+    // Load notifications via AJAX - Called by toggleNotifications
     async function loadNotifications() {
         try {
             const response = await fetch('/notifications/recent/', {
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
             const data = await response.json();
-            
+
             // Update badge
             document.getElementById('notification-badge').textContent = data.unread_count;
-            
+
             // Render notifications
             const list = document.getElementById('notification-list');
             if (data.notifications.length === 0) {
@@ -414,7 +783,63 @@
             console.error('Failed to load notifications:', error);
         }
     }
-    
+</script>
+
+{% endblock body %}
+
+{% block extra_js %}
+<script>
+    // Enhanced mobile menu handling
+    document.addEventListener('DOMContentLoaded', function () {
+        // Close mobile menu when clicking on a link
+        const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                toggleMobileMenu();
+            });
+        });
+
+        // Add touch event handling to mobile nav items
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+        mobileNavItems.forEach(item => {
+            item.addEventListener('touchstart', function () {
+                this.style.transform = 'scale(0.95)';
+            }, { passive: true });
+
+            item.addEventListener('touchend', function () {
+                this.style.transform = '';
+            }, { passive: true });
+        });
+
+        // Explicitly handle menu button in bottom nav
+        const bottomMenuButton = document.querySelector('.mobile-bottom-nav button[aria-controls="mobile-menu"]');
+        if (bottomMenuButton) {
+            // Add both click and touch handlers
+            bottomMenuButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+
+            bottomMenuButton.addEventListener('touchend', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMobileMenu();
+            }, { passive: false });
+        }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function (event) {
+        const notifDropdown = document.getElementById('notification-dropdown');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (!event.target.closest('.relative')) {
+            notifDropdown.classList.add('hidden');
+            userDropdown.classList.add('hidden');
+        }
+    });
+
     // Poll for new notifications every 30 seconds
     setInterval(async () => {
         try {
@@ -425,9 +850,14 @@
             console.error('Failed to update notification count:', error);
         }
     }, 30000);
-    
+
     // Load initial notification count
     loadNotifications();
 </script>
-{% endblock %}
 
+<!-- Gaming Animations & Effects -->
+<script src="{% static 'js/dashboard-animations.js' %}"></script>
+<script src="{% static 'js/pull-to-refresh.js' %}"></script>
+<script src="{% static 'js/dashboard-onboarding.js' %}"></script>
+
+{% endblock %}

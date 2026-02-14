@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
+from core.views import LandingPageView
 import os
 
 # Service Worker view for performance optimization
@@ -31,7 +32,7 @@ urlpatterns = [
     
     # Core app URLs
     path('', include('core.urls')),
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', LandingPageView.as_view(), name='home'),
     
     # App URLs (will be created)
     path('dashboard/', include('dashboard.urls')),
@@ -42,6 +43,7 @@ urlpatterns = [
     path('profile/', include('accounts.urls')),
     path('payments/', include('payments.urls')),
     path('notifications/', include('notifications.urls')),
+    path('store/', include('store.urls')),
     
     # API endpoints (future)
     # path('api/', include('api.urls')),

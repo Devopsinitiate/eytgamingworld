@@ -3,180 +3,135 @@
 {% block title %}Teams - EYTGaming{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl">
-    <!-- Header -->
+<!-- Include Skeleton Loaders -->
+{% include "dashboard/components/skeleton_loaders.html" %}
+
+<div class="max-w-7xl content-loaded">
+    <!-- Gaming Header -->
     <div class="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Teams</h1>
-            <p class="text-gray-400 text-sm md:text-base">Browse and join competitive gaming teams</p>
+            <h1 class="gaming-header text-2xl md:text-4xl text-electric-red mb-2">TEAMS</h1>
+            <p class="gaming-body text-gray-400 text-sm md:text-base">Browse and join competitive gaming teams</p>
         </div>
         {% if user.is_authenticated %}
-        <a href="{% url 'teams:create' %}" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">add</span>
-            <span class="hidden sm:inline">Create Team</span>
-            <span class="sm:hidden">Create</span>
+        <a href="{% url 'teams:create' %}" class="btn-gaming-primary">
+            <span class="material-symbols-outlined mr-2">add</span>
+            <span class="btn-gaming-text hidden sm:inline">CREATE TEAM</span>
+            <span class="btn-gaming-text sm:hidden">CREATE</span>
         </a>
         {% endif %}
     </div>
 
-    <!-- Filters -->
-    <div class="mb-6 bg-card-dark border border-card-border-dark rounded-lg p-4">
-        <form method="get" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3" role="search" aria-label="Team search and filters">
-            <!-- Search -->
-            <div class="flex-1 min-w-full sm:min-w-[200px]">
-                <label for="search-input" class="sr-only">Search teams by name, tag, or description</label>
-                <div class="relative">
-                    <input type="text" name="search" id="search-input" value="{{ filter_params.search }}" 
-                           placeholder="Search teams..." 
-                           aria-label="Search teams by name, tag, or description"
-                           class="w-full min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xl" aria-hidden="true">search</span>
+    <!-- Gaming Filters -->
+    <div class="card-gaming mb-6">
+        <div class="card-gaming-content p-4">
+            <form method="get" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3" role="search" aria-label="Team search and filters">
+                <!-- Search -->
+                <div class="flex-1 min-w-full sm:min-w-[200px]">
+                    <label for="search-input" class="sr-only">Search teams by name, tag, or description</label>
+                    <div class="relative">
+                        <input type="text" name="search" id="search-input" value="{{ filter_params.search }}" 
+                               placeholder="SEARCH TEAMS..." 
+                               aria-label="Search teams by name, tag, or description"
+                               class="w-full min-h-[48px] bg-deep-black text-white border-2 border-electric-red/30 rounded-lg px-4 py-3 pr-10 focus:outline-none focus:border-electric-red gaming-body placeholder:text-gray-600 placeholder:uppercase">
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-electric-red text-xl" aria-hidden="true">search</span>
+                    </div>
+                </div>
+                
+                <!-- Game Filter -->
+                <label for="game-filter" class="sr-only">Filter by game</label>
+                <select name="game" id="game-filter" aria-label="Filter teams by game" class="gaming-select w-full sm:w-auto min-h-[48px]">
+                    <option value="">All Games</option>
+                    {% for game in available_games %}
+                    <option value="{{ game.slug }}" {% if filter_params.game == game.slug %}selected{% endif %}>{{ game.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Recruiting Status Filter -->
+                <label for="recruiting-filter" class="sr-only">Filter by recruiting status</label>
+                <select name="recruiting" id="recruiting-filter" aria-label="Filter teams by recruiting status" class="gaming-select w-full sm:w-auto min-h-[48px]">
+                    <option value="">All Teams</option>
+                    <option value="true" {% if filter_params.recruiting == 'true' %}selected{% endif %}>Recruiting Only</option>
+                </select>
+                
+                <button type="submit" aria-label="Apply filters" class="btn-gaming-primary">
+                    <span class="btn-gaming-text">FILTER</span>
+                </button>
+                
+                <!-- Clear Filters Button -->
+                <button type="button" id="clear-filters" aria-label="Clear all filters" class="btn-gaming-secondary">
+                    <span class="btn-gaming-text">CLEAR</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Skeleton for teams -->
+    <div class="skeleton-loader" id="skeleton-teams">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for i in "123456" %}
+            <div class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="skeleton-avatar"></div>
+                        <div class="flex-1">
+                            <div class="skeleton-text skeleton-text-long"></div>
+                            <div class="skeleton-text skeleton-text-short"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-text skeleton-text-long mb-2"></div>
+                    <div class="flex justify-between mt-4">
+                        <div class="skeleton-text skeleton-text-short" style="width: 40%;"></div>
+                        <div class="skeleton-button" style="width: 40%;"></div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Game Filter -->
-            <label for="game-filter" class="sr-only">Filter by game</label>
-            <select name="game" id="game-filter" aria-label="Filter teams by game" class="w-full sm:w-auto min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                <option value="">All Games</option>
-                {% for game in available_games %}
-                <option value="{{ game.slug }}" {% if filter_params.game == game.slug %}selected{% endif %}>{{ game.name }}</option>
-                {% endfor %}
-            </select>
-            
-            <!-- Recruiting Status Filter -->
-            <label for="recruiting-filter" class="sr-only">Filter by recruiting status</label>
-            <select name="recruiting" id="recruiting-filter" aria-label="Filter teams by recruiting status" class="w-full sm:w-auto min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary">
-                <option value="">All Teams</option>
-                <option value="true" {% if filter_params.recruiting == 'true' %}selected{% endif %}>Recruiting Only</option>
-            </select>
-            
-            <button type="submit" aria-label="Apply filters" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark">
-                Filter
-            </button>
-            
-            <!-- Clear Filters Button -->
-            <button type="button" id="clear-filters" aria-label="Clear all filters" class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark">
-                Clear
-            </button>
-        </form>
+            {% endfor %}
+        </div>
     </div>
 
     <!-- Team List -->
     {% if teams %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Teams list">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 content-loaded" role="list" aria-label="Teams list">
         {% for team in teams %}
-        <article role="listitem">
-        <a href="{% url 'teams:detail' slug=team.slug %}" 
-           class="bg-card-dark border border-card-border-dark rounded-lg overflow-hidden hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark block"
-           aria-label="View {{ team.name }} team details">
-            <!-- Team Logo/Banner -->
-            <div class="h-40 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative">
-                {% if team.banner %}
-                <img src="{{ team.banner.url }}" alt="{{ team.name }} banner" class="w-full h-full object-cover">
-                {% elif team.logo %}
-                <img src="{{ team.logo.url }}" alt="{{ team.name }} logo" class="w-24 h-24 object-contain">
-                {% else %}
-                <span class="material-symbols-outlined text-primary text-6xl" aria-hidden="true">groups</span>
-                {% endif %}
-                
-                <!-- Recruiting Badge -->
-                {% if team.is_recruiting %}
-                <span class="absolute top-2 right-2 px-2 py-1 bg-green-500/90 text-white text-xs rounded-full font-medium" role="status" aria-label="Currently recruiting">
-                    Recruiting
-                </span>
-                {% endif %}
-            </div>
-            
-            <!-- Team Info -->
-            <div class="p-6">
-                <!-- Team Name and Tag -->
-                <div class="mb-3">
-                    <h3 class="text-white text-lg font-bold mb-1">{{ team.name }}</h3>
-                    <p class="text-gray-400 text-sm">[{{ team.tag }}]</p>
-                </div>
-                
-                <!-- Game Badge -->
-                <div class="mb-3">
-                    <span class="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
-                        {{ team.game.name }}
-                    </span>
-                </div>
-                
-                <!-- Description -->
-                {% if team.description %}
-                <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ team.description|truncatewords:15 }}</p>
-                {% endif %}
-                
-                <!-- Stats -->
-                <div class="flex items-center justify-between text-sm mb-3">
-                    <!-- Member Count -->
-                    <div class="text-gray-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">people</span>
-                        <span>{{ team.annotated_member_count }}/{{ team.max_members }}</span>
-                    </div>
-                    
-                    <!-- Win Rate -->
-                    {% if team.total_wins > 0 or team.total_losses > 0 %}
-                    <div class="text-gray-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">emoji_events</span>
-                        <span>{{ team.win_rate }}% WR</span>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Achievement Badges -->
-                    {% if team.annotated_achievement_count > 0 %}
-                    <div class="text-gray-400 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">military_tech</span>
-                        <span>{{ team.annotated_achievement_count }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Progress Bar (if team has capacity info) -->
-                <div class="w-full bg-gray-700 rounded-full h-2" role="progressbar" aria-valuenow="{{ team.annotated_member_count }}" aria-valuemin="0" aria-valuemax="{{ team.max_members }}" aria-label="Team capacity: {{ team.annotated_member_count }} of {{ team.max_members }} members">
-                    {% widthratio team.annotated_member_count team.max_members 100 as progress %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ progress }}%"></div>
-                </div>
-            </div>
-        </a>
-        </article>
+            {% include "teams/components/team_card_gaming.html" with team=team %}
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if is_paginated %}
-    <nav class="mt-8 flex flex-wrap justify-center gap-2 pagination" role="navigation" aria-label="Pagination">
+    <nav class="mt-8 flex flex-wrap justify-center gap-2 pagination content-loaded" role="navigation" aria-label="Pagination">
         {% if page_obj.has_previous %}
         <a href="?page=1{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
-           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           class="btn-gaming-secondary"
            aria-label="Go to first page">
-            <span class="hidden sm:inline">First</span>
+            <span class="hidden sm:inline btn-gaming-text">FIRST</span>
             <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">first_page</span>
         </a>
         <a href="?page={{ page_obj.previous_page_number }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
-           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           class="btn-gaming-secondary"
            aria-label="Go to previous page">
-            <span class="hidden sm:inline">Previous</span>
+            <span class="hidden sm:inline btn-gaming-text">PREVIOUS</span>
             <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">chevron_left</span>
         </a>
         {% endif %}
         
-        <span class="px-4 py-2 min-h-[48px] flex items-center bg-primary text-white rounded-lg" aria-current="page" aria-label="Current page, page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}">
-            <span class="hidden sm:inline">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <span class="px-4 py-2 min-h-[48px] flex items-center bg-electric-red text-white rounded gaming-subheader" aria-current="page" aria-label="Current page, page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}">
+            <span class="hidden sm:inline">PAGE {{ page_obj.number }} OF {{ page_obj.paginator.num_pages }}</span>
             <span class="sm:hidden">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
         </span>
         
         {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
-           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           class="btn-gaming-secondary"
            aria-label="Go to next page">
-            <span class="hidden sm:inline">Next</span>
+            <span class="hidden sm:inline btn-gaming-text">NEXT</span>
             <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">chevron_right</span>
         </a>
         <a href="?page={{ page_obj.paginator.num_pages }}{% if filter_params.search %}&search={{ filter_params.search }}{% endif %}{% if filter_params.game %}&game={{ filter_params.game }}{% endif %}{% if filter_params.recruiting %}&recruiting={{ filter_params.recruiting }}{% endif %}" 
-           class="px-4 py-2 min-h-[48px] flex items-center bg-card-dark border border-card-border-dark text-gray-400 rounded-lg hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+           class="btn-gaming-secondary"
            aria-label="Go to last page">
-            <span class="hidden sm:inline">Last</span>
+            <span class="hidden sm:inline btn-gaming-text">LAST</span>
             <span class="sm:hidden material-symbols-outlined text-sm" aria-hidden="true">last_page</span>
         </a>
         {% endif %}
@@ -185,12 +140,12 @@
     
     {% else %}
     <!-- Empty State -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
+    <div class="card-gaming p-12 text-center content-loaded">
         <div class="mb-6">
-            <span class="material-symbols-outlined text-gray-500 text-6xl">groups</span>
+            <span class="material-symbols-outlined text-electric-red text-6xl neon-red-glow">groups</span>
         </div>
-        <h2 class="text-white text-2xl font-bold mb-4">No Teams Found</h2>
-        <p class="text-gray-400 mb-6">
+        <h2 class="gaming-header text-2xl text-electric-red mb-4">NO TEAMS FOUND</h2>
+        <p class="gaming-body text-gray-400 mb-6">
             {% if filter_params.search or filter_params.game or filter_params.recruiting %}
                 No teams match your search criteria. Try adjusting your filters or browse all teams.
             {% else %}
@@ -199,15 +154,13 @@
         </p>
         <div class="flex justify-center gap-4">
             {% if filter_params.search or filter_params.game or filter_params.recruiting %}
-            <button onclick="document.getElementById('clear-filters').click()" 
-                    class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
-                Clear Filters
+            <button onclick="document.getElementById('clear-filters').click()" class="btn-gaming-secondary">
+                <span class="btn-gaming-text">CLEAR FILTERS</span>
             </button>
             {% endif %}
             {% if user.is_authenticated %}
-            <a href="{% url 'teams:create' %}" 
-               class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-                Create Team
+            <a href="{% url 'teams:create' %}" class="btn-gaming-primary">
+                <span class="btn-gaming-text">CREATE TEAM</span>
             </a>
             {% endif %}
         </div>

@@ -1,0 +1,116 @@
+{% load static %}
+
+<!-- Gaming-Styled Coach Card -->
+<div class="card-gaming group hover:scale-105 transition-transform duration-300">
+    <a href="{% url 'coaching:coach_detail' coach.pk %}" class="block">
+        <!-- Coach Banner/Avatar -->
+        <div class="relative h-48 overflow-hidden">
+            {% if coach.banner %}
+                <img src="{{ coach.banner.url }}" alt="{{ coach.user.get_display_name }}" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            {% else %}
+                <div class="w-full h-full bg-gradient-to-br from-electric-red via-deep-black to-neon-cyan"></div>
+            {% endif %}
+            
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-black via-deep-black/50 to-transparent"></div>
+            
+            <!-- Avatar -->
+            <div class="absolute bottom-4 left-4">
+                <div class="w-20 h-20 rounded-full bg-deep-black p-1 neon-red-glow-lg">
+                    {% if coach.user.avatar %}
+                        <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" 
+                             class="w-full h-full rounded-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full rounded-full bg-gradient-to-br from-electric-red to-neon-cyan flex items-center justify-center">
+                            <span class="text-white text-2xl font-black gaming-header">
+                                {{ coach.user.get_display_name|first|upper }}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Verified Badge -->
+            {% if coach.is_verified %}
+            <div class="absolute top-4 right-4">
+                <span class="px-3 py-1 bg-neon-cyan/90 text-deep-black text-xs gaming-subheader rounded backdrop-blur-sm flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">verified</span>
+                    VERIFIED
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card-gaming-content p-6">
+            <!-- Coach Name & Title -->
+            <div class="mb-3">
+                <h3 class="gaming-header text-xl text-electric-red mb-1 group-hover:text-neon-cyan transition-colors">
+                    {{ coach.user.get_display_name|upper }}
+                </h3>
+                <p class="gaming-body text-gray-400 text-sm">
+                    {{ coach.title|default:"Professional Coach" }}
+                </p>
+            </div>
+
+            <!-- Games -->
+            {% if coach.games.all %}
+            <div class="flex flex-wrap gap-2 mb-4">
+                {% for game in coach.games.all|slice:":3" %}
+                <span class="px-2 py-1 bg-electric-red/10 text-gray-300 text-xs rounded border border-electric-red/20">
+                    {{ game.name }}
+                </span>
+                {% endfor %}
+                {% if coach.games.count > 3 %}
+                <span class="px-2 py-1 bg-gray-800/50 text-gray-400 text-xs rounded">
+                    +{{ coach.games.count|add:"-3" }}
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-3 gap-3 mb-4 py-4 border-y border-gray-800">
+                <!-- Rating -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                        <span class="material-symbols-outlined text-yellow-500 text-lg">star</span>
+                        <p class="stat-value text-lg">{{ coach.average_rating|default:"0.0" }}</p>
+                    </div>
+                    <p class="stat-label text-xs">RATING</p>
+                </div>
+
+                <!-- Sessions -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                        <span class="material-symbols-outlined text-neon-cyan text-lg">school</span>
+                        <p class="stat-value text-lg">{{ coach.total_sessions|default:0 }}</p>
+                    </div>
+                    <p class="stat-label text-xs">SESSIONS</p>
+                </div>
+
+                <!-- Students -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-1 mb-1">
+                        <span class="material-symbols-outlined text-electric-red text-lg">people</span>
+                        <p class="stat-value text-lg">{{ coach.total_students|default:0 }}</p>
+                    </div>
+                    <p class="stat-label text-xs">STUDENTS</p>
+                </div>
+            </div>
+
+            <!-- Price & CTA -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="stat-label text-xs">HOURLY RATE</p>
+                    <p class="gaming-header text-2xl text-electric-red">
+                        ${{ coach.hourly_rate }}
+                    </p>
+                </div>
+                <div class="btn-gaming-primary">
+                    <span class="btn-gaming-text">BOOK NOW</span>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
