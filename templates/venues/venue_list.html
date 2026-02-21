@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gaming Venues - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<!-- Venue Components CSS -->
+<link rel="stylesheet" href="{% static 'css/venues.css' %}">
+<!-- Gaming Design CSS -->
+<link rel="stylesheet" href="{% static 'css/venues-gaming.css' %}">
+<style>
+    /* Gaming Design Variables */
+    :root {
+        --electric-red: #DC2626;
+        --deep-black: #0A0A0A;
+        --gunmetal-gray: #1F2937;
+        --neon-cyan: #06B6D4;
+    }
+
+    /* Gradient Text Effect */
+    .gradient-text {
+        background: linear-gradient(135deg, var(--electric-red) 0%, #FF6B6B 50%, var(--neon-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Skewed Filter Panel */
+    .filter-panel {
+        transform: skewY(-2deg);
+        background: var(--gunmetal-gray);
+        border: 2px solid var(--electric-red);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.3), inset 0 0 20px rgba(220, 38, 38, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .filter-panel:hover {
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.5), inset 0 0 30px rgba(220, 38, 38, 0.15);
+    }
+
+    .filter-panel-content {
+        transform: skewY(2deg);
+    }
+
+    /* Neon Input Styles */
+    .neon-input {
+        background: rgba(31, 41, 55, 0.8);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .neon-input:focus {
+        outline: none;
+        border-color: var(--electric-red);
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), inset 0 0 10px rgba(220, 38, 38, 0.1);
+    }
+
+    /* Skewed Button */
+    .skewed-button {
+        transform: skewX(-12deg);
+        background: var(--electric-red);
+        border: 1px solid var(--electric-red);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .skewed-button:hover {
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), 0 0 50px rgba(220, 38, 38, 0.3);
+        transform: skewX(-12deg) translateY(-2px);
+    }
+
+    .skewed-button-text {
+        transform: skewX(12deg);
+    }
+
+    /* Venue Card with Gaming Effects */
+    .venue-card {
+        background: var(--gunmetal-gray);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .venue-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .venue-card:hover {
+        transform: scale(1.03);
+        border-color: var(--electric-red);
+        box-shadow: 0 0 25px rgba(220, 38, 38, 0.4), 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .venue-card:hover::before {
+        left: 100%;
+    }
+
+    /* Capacity Slider */
+    .capacity-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: rgba(31, 41, 55, 0.8);
+        outline: none;
+        border-radius: 3px;
+    }
+
+    .capacity-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--electric-red);
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    .capacity-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--electric-red);
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    /* Responsive Grid */
+    @media (max-width: 768px) {
+        .venue-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .venue-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1025px) {
+        .venue-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1536px) {
+        .venue-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-deep-black py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Page Header with Gradient Text -->
+        <div class="mb-12 text-center">
+            <h1 class="font-barlow text-5xl md:text-6xl font-bold uppercase tracking-tight gradient-text mb-4">
+                Gaming Venues
+            </h1>
+            <p class="font-inter text-gray-400 text-lg">
+                Discover the perfect arena for your next tournament
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Skewed Filter Panel -->
+            <aside class="lg:col-span-1 filter-panel-mobile" role="complementary" aria-label="Venue filters">
+                <!-- Mobile Filter Toggle Button -->
+                <button 
+                    type="button" 
+                    class="filter-toggle touch-target mb-4 lg:hidden"
+                    onclick="toggleFilters()"
+                    aria-expanded="false"
+                    aria-controls="filter-content"
+                    aria-label="Toggle filter panel"
+                >
+                    <span class="material-symbols-outlined align-middle" aria-hidden="true">tune</span>
+                    Filters
+                    <span class="material-symbols-outlined align-middle" aria-hidden="true">expand_more</span>
+                </button>
+                
+                <div id="filter-content" class="filter-content">
+                    <div class="filter-panel rounded-lg p-6 lg:sticky lg:top-4">
+                        <div class="filter-panel-content">
+                            <h2 class="font-barlow text-2xl font-bold uppercase tracking-tight text-white mb-6">
+                                Filters
+                            </h2>
+                        
+                        <form method="get" class="space-y-6" id="filter-form" role="search" aria-label="Filter venues">
+                            <!-- Search Input -->
+                            <div>
+                                <label for="search" class="block font-inter text-sm font-medium text-gray-300 mb-2">
+                                    Search
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="search"
+                                    name="search" 
+                                    placeholder="Venue name or location..." 
+                                    value="{{ request.GET.search }}" 
+                                    class="neon-input w-full px-4 py-3 rounded-lg font-inter text-sm"
+                                    aria-label="Search venues by name or location"
+                                >
+                            </div>
+                            
+                            <!-- City Dropdown -->
+                            <div>
+                                <label for="city" class="block font-inter text-sm font-medium text-gray-300 mb-2">
+                                    City
+                                </label>
+                                <select 
+                                    id="city"
+                                    name="city" 
+                                    class="neon-input w-full px-4 py-3 rounded-lg font-inter text-sm"
+                                    aria-label="Filter by city"
+                                >
+                                    <option value="">All Cities</option>
+                                    {% for city in cities %}
+                                    <option value="{{ city }}" {% if request.GET.city == city %}selected{% endif %}>
+                                        {{ city }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Type Dropdown -->
+                            <div>
+                                <label for="venue_type" class="block font-inter text-sm font-medium text-gray-300 mb-2">
+                                    Venue Type
+                                </label>
+                                <select 
+                                    id="venue_type"
+                                    name="venue_type" 
+                                    class="neon-input w-full px-4 py-3 rounded-lg font-inter text-sm"
+                                    aria-label="Filter by venue type"
+                                >
+                                    <option value="">All Types</option>
+                                    {% for value, label in venue_types %}
+                                    <option value="{{ value }}" {% if request.GET.venue_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Capacity Slider -->
+                            <div>
+                                <label for="min_capacity" class="block font-inter text-sm font-medium text-gray-300 mb-2">
+                                    Minimum Capacity: <span id="capacity-value" class="text-electric-red font-bold">{{ request.GET.min_capacity|default:"0" }}</span>
+                                </label>
+                                <input 
+                                    type="range" 
+                                    id="min_capacity"
+                                    name="min_capacity" 
+                                    min="0" 
+                                    max="500" 
+                                    step="10"
+                                    value="{{ request.GET.min_capacity|default:"0" }}" 
+                                    class="capacity-slider"
+                                    aria-label="Filter by minimum capacity"
+                                    oninput="document.getElementById('capacity-value').textContent = this.value"
+                                >
+                            </div>
+                            
+                            <!-- Apply Filters Button -->
+                            <button 
+                                type="submit" 
+                                class="skewed-button w-full px-6 py-3 rounded-lg font-barlow font-bold uppercase tracking-wide text-white touch-target"
+                                aria-label="Apply filters"
+                            >
+                                <span class="skewed-button-text block">Apply Filters</span>
+                            </button>
+
+                            <!-- Clear Filters Button -->
+                            {% if request.GET.search or request.GET.city or request.GET.venue_type or request.GET.min_capacity %}
+                            <a 
+                                href="{% url 'venues:list' %}" 
+                                class="block text-center px-6 py-3 rounded-lg font-inter text-sm text-gray-400 hover:text-white border border-gray-600 hover:border-electric-red transition-all touch-target"
+                                aria-label="Clear all filters"
+                            >
+                                Clear Filters
+                            </a>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </aside>
+
+            <!-- Venue Grid -->
+            <main class="lg:col-span-3" role="main" aria-label="Venue listings">
+                <!-- Results Count -->
+                <div class="mb-6 font-inter text-gray-400" role="status" aria-live="polite" aria-atomic="true">
+                    <span class="text-white font-bold">{{ page_obj.paginator.count }}</span> venue{{ page_obj.paginator.count|pluralize }} found
+                </div>
+
+                <div class="venue-grid grid gap-6" role="list" aria-label="Available venues">
+                    {% for venue in page_obj %}
+                    {% include 'venues/components/venue_card.html' with venue=venue %}
+                    {% empty %}
+                    <div class="col-span-full text-center py-16" role="status">
+                        <span class="material-symbols-outlined text-6xl text-gray-600 mb-4 block" aria-hidden="true">search_off</span>
+                        <p class="font-inter text-xl text-gray-400 mb-2">No venues found</p>
+                        <p class="font-inter text-sm text-gray-500">Try adjusting your filters</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav class="mt-12 flex justify-center items-center space-x-2" aria-label="Pagination">
+                    {% if page_obj.has_previous %}
+                    <a 
+                        href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.city %}city={{ request.GET.city }}&{% endif %}{% if request.GET.venue_type %}venue_type={{ request.GET.venue_type }}&{% endif %}{% if request.GET.min_capacity %}min_capacity={{ request.GET.min_capacity }}&{% endif %}page={{ page_obj.previous_page_number }}" 
+                        class="touch-target px-4 py-2 bg-gunmetal-gray text-white rounded-lg hover:bg-electric-red transition-all font-inter"
+                        aria-label="Go to previous page"
+                    >
+                        Previous
+                    </a>
+                    {% endif %}
+                    
+                    <span class="touch-target px-4 py-2 bg-gunmetal-gray text-white rounded-lg font-inter">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                    <a 
+                        href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.city %}city={{ request.GET.city }}&{% endif %}{% if request.GET.venue_type %}venue_type={{ request.GET.venue_type }}&{% endif %}{% if request.GET.min_capacity %}min_capacity={{ request.GET.min_capacity }}&{% endif %}page={{ page_obj.next_page_number }}" 
+                        class="touch-target px-4 py-2 bg-gunmetal-gray text-white rounded-lg hover:bg-electric-red transition-all font-inter"
+                        aria-label="Go to next page"
+                    >
+                        Next
+                    </a>
+                    {% endif %}
+                </nav>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle filter panel on mobile
+    function toggleFilters() {
+        const filterContent = document.getElementById('filter-content');
+        const filterToggle = document.querySelector('.filter-toggle');
+        
+        filterContent.classList.toggle('expanded');
+        filterToggle.classList.toggle('active');
+        
+        // Update aria-expanded for accessibility
+        const isExpanded = filterContent.classList.contains('expanded');
+        filterToggle.setAttribute('aria-expanded', isExpanded);
+    }
+    
+    // Close filters when applying on mobile
+    document.getElementById('filter-form').addEventListener('submit', function() {
+        if (window.innerWidth < 1024) {
+            const filterContent = document.getElementById('filter-content');
+            const filterToggle = document.querySelector('.filter-toggle');
+            filterContent.classList.remove('expanded');
+            filterToggle.classList.remove('active');
+            filterToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    // Optional: Live filter updates without page reload
+    // This feature can be enabled by uncommenting the code below
+    /*
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filter-form');
+        const searchInput = document.getElementById('search');
+        const citySelect = document.getElementById('city');
+        const typeSelect = document.getElementById('venue_type');
+        const capacitySlider = document.getElementById('min_capacity');
+        
+        let filterTimeout;
+        
+        // Debounced filter update function
+        function updateFilters() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData);
+                
+                // Update URL without reload
+                const newUrl = window.location.pathname + '?' + params.toString();
+                
+                // Fetch filtered results
+                fetch(newUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the response and update venue grid
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newGrid = doc.querySelector('.venue-grid');
+                    const newCount = doc.querySelector('.mb-6.font-inter');
+                    const newPagination = doc.querySelector('nav[aria-label="Pagination"]');
+                    
+                    if (newGrid) {
+                        document.querySelector('.venue-grid').innerHTML = newGrid.innerHTML;
+                    }
+                    if (newCount) {
+                        document.querySelector('.mb-6.font-inter').innerHTML = newCount.innerHTML;
+                    }
+                    if (newPagination) {
+                        const currentPagination = document.querySelector('nav[aria-label="Pagination"]');
+                        if (currentPagination) {
+                            currentPagination.innerHTML = newPagination.innerHTML;
+                        }
+                    }
+                    
+                    // Update browser history
+                    window.history.pushState({}, '', newUrl);
+                    
+                    // Add smooth fade-in animation
+                    document.querySelector('.venue-grid').style.opacity = '0';
+                    setTimeout(() => {
+                        document.querySelector('.venue-grid').style.transition = 'opacity 0.3s ease';
+                        document.querySelector('.venue-grid').style.opacity = '1';
+                    }, 50);
+                })
+                .catch(error => {
+                    console.error('Filter update failed:', error);
+                });
+            }, 500); // 500ms debounce
+        }
+        
+        // Add event listeners for live updates
+        searchInput.addEventListener('input', updateFilters);
+        citySelect.addEventListener('change', updateFilters);
+        typeSelect.addEventListener('change', updateFilters);
+        capacitySlider.addEventListener('input', updateFilters);
+        
+        // Prevent form submission when live updates are enabled
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateFilters();
+        });
+    });
+    */
+</script>
+{% endblock %}

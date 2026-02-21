@@ -55,6 +55,7 @@ jmespath==1.0.1
 kombu==5.5.4
 libsass==0.23.0
 matplotlib-inline==0.2.1
+mysqlclient==2.2.8
 oauthlib==3.3.1
 packaging==25.0
 parso==0.8.5

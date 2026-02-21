@@ -1,0 +1,42 @@
+{% load static %}
+
+{# Review Card Component - Gaming Design #}
+{# Usage: {% include 'venues/components/review_card.html' with review=review %} #}
+
+<article class="review-card" role="listitem">
+    <header class="flex items-start justify-between mb-3">
+        <div>
+            <!-- Star Rating Display -->
+            <div class="flex items-center mb-2" role="img" aria-label="{{ review.rating }} out of 5 stars">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                    <span class="material-symbols-outlined text-electric-red text-lg star-glow" aria-hidden="true">star</span>
+                    {% else %}
+                    <span class="material-symbols-outlined text-gray-600 text-lg" aria-hidden="true">star</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Review Title -->
+            <h4 class="font-barlow text-lg font-bold text-white">{{ review.title }}</h4>
+        </div>
+        <!-- Review Date -->
+        <time datetime="{{ review.created_at|date:'Y-m-d' }}" class="font-inter text-gray-500 text-sm">{{ review.created_at|date:"M d, Y" }}</time>
+    </header>
+    
+    <!-- Review Text -->
+    <p class="font-inter text-gray-300 leading-relaxed mb-4">{{ review.review }}</p>
+    
+    <!-- Author and Recommendation Badge -->
+    <footer class="flex items-center justify-between pt-3 border-t border-gray-700">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-gray-500" aria-hidden="true">person</span>
+            <span class="font-inter text-gray-400 text-sm">{{ review.user.get_display_name }}</span>
+        </div>
+        {% if review.would_recommend %}
+        <span class="recommend-badge" role="status" aria-label="User recommends this venue">
+            <span class="material-symbols-outlined text-xs mr-1" aria-hidden="true">thumb_up</span>
+            Recommends
+        </span>
+        {% endif %}
+    </footer>
+</article>

@@ -1,0 +1,61 @@
+{% load static %}
+
+{# Venue Card Component - Gaming Design #}
+{# Usage: {% include 'venues/components/venue_card.html' with venue=venue %} #}
+
+<article class="venue-card rounded-lg overflow-hidden" role="listitem">
+    <a href="{% url 'venues:detail' venue.slug %}" class="block" aria-label="View details for {{ venue.name }}">
+        <!-- Venue Image -->
+        {% if venue.photo %}
+        <div class="relative h-48 overflow-hidden">
+            <img 
+                src="{{ venue.photo.url }}" 
+                alt="{{ venue.name }} venue photo" 
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                loading="lazy"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-gunmetal-gray to-transparent" aria-hidden="true"></div>
+        </div>
+        {% else %}
+        <div class="h-48 bg-gradient-to-br from-gunmetal-gray to-deep-black flex items-center justify-center">
+            <span class="material-symbols-outlined text-6xl text-gray-600" aria-hidden="true">location_on</span>
+        </div>
+        {% endif %}
+        
+        <!-- Venue Info -->
+        <div class="p-5">
+            <h3 class="font-barlow text-2xl font-bold uppercase tracking-tight text-white mb-2">
+                {{ venue.name }}
+            </h3>
+            
+            <ul class="space-y-2 mb-4" role="list">
+                <li class="font-inter text-sm text-gray-400 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">location_city</span>
+                    {{ venue.city }}, {{ venue.country }}
+                </li>
+                <li class="font-inter text-sm text-gray-400 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">category</span>
+                    {{ venue.get_venue_type_display }}
+                </li>
+                <li class="font-inter text-sm text-gray-400 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">groups</span>
+                    Capacity: {{ venue.capacity }}
+                </li>
+            </ul>
+            
+            <!-- Pricing -->
+            <div class="border-t border-gray-700 pt-4">
+                {% if venue.hourly_rate %}
+                <p class="font-barlow text-xl font-bold text-electric-red">
+                    <span aria-label="Hourly rate">${{ venue.hourly_rate }}</span><span class="text-sm text-gray-400">/hour</span>
+                </p>
+                {% endif %}
+                {% if venue.day_rate %}
+                <p class="font-inter text-sm text-gray-400 mt-1">
+                    <span aria-label="Day rate">${{ venue.day_rate }}/day</span>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</article>

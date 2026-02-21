@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Booking Confirmation - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<!-- Venue Components CSS -->
+<link rel="stylesheet" href="{% static 'css/venues.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Success Message -->
+    <div class="bg-green-900 border border-green-600 rounded-lg p-6 mb-8">
+        <div class="flex items-center">
+            <svg class="w-8 h-8 text-green-400 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h1 class="text-2xl font-bold text-white mb-1">Booking Confirmed!</h1>
+                <p class="text-green-200">Your venue booking has been successfully created.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Booking Details -->
+        <div class="lg:col-span-2">
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-white mb-6">Booking Details</h2>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">Booking ID:</span>
+                        <span class="text-white font-mono">{{ booking.id }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">Status:</span>
+                        <span class="px-3 py-1 rounded text-sm font-bold
+                            {% if booking.status == 'pending' %}bg-yellow-900 text-yellow-200
+                            {% elif booking.status == 'confirmed' %}bg-green-900 text-green-200
+                            {% elif booking.status == 'cancelled' %}bg-red-900 text-red-200
+                            {% elif booking.status == 'completed' %}bg-blue-900 text-blue-200
+                            {% endif %}">
+                            {{ booking.get_status_display|upper }}
+                        </span>
+                    </div>
+                    
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">Start Date & Time:</span>
+                        <span class="text-white">{{ booking.start_datetime|date:"M d, Y - g:i A" }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">End Date & Time:</span>
+                        <span class="text-white">{{ booking.end_datetime|date:"M d, Y - g:i A" }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">Expected Participants:</span>
+                        <span class="text-white">{{ booking.expected_participants }}</span>
+                    </div>
+                    
+                    {% if booking.tournament %}
+                    <div class="flex justify-between border-b border-gray-700 pb-3">
+                        <span class="text-gray-400">Tournament:</span>
+                        <span class="text-white">{{ booking.tournament.name }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if booking.notes %}
+                    <div class="border-b border-gray-700 pb-3">
+                        <span class="text-gray-400 block mb-2">Notes:</span>
+                        <p class="text-white">{{ booking.notes }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="flex justify-between pt-3">
+                        <span class="text-xl font-bold text-white">Total Cost:</span>
+                        <span class="text-2xl font-bold text-red-500">${{ booking.total_cost }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-4">
+                <a href="{% url 'venues:booking_list' %}" 
+                   class="px-6 py-3 bg-gray-700 text-white font-bold rounded hover:bg-gray-600 transform -skew-x-12">
+                    <span class="block transform skew-x-12">VIEW ALL BOOKINGS</span>
+                </a>
+                
+                {% if booking.status == 'pending' %}
+                <form method="post" action="{% url 'venues:booking_cancel' booking.pk %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            onclick="return confirm('Are you sure you want to cancel this booking?')"
+                            class="px-6 py-3 bg-red-600 text-white font-bold rounded hover:bg-red-700 transform -skew-x-12">
+                        <span class="block transform skew-x-12">CANCEL BOOKING</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Venue Summary -->
+        <div>
+            <div class="bg-gray-800 rounded-lg p-6 sticky top-4">
+                <h3 class="text-xl font-bold text-white mb-4">Venue Information</h3>
+                
+                {% if booking.venue.photo %}
+                <img src="{{ booking.venue.photo.url }}" 
+                     alt="{{ booking.venue.name }}" 
+                     class="w-full h-32 object-cover rounded mb-4">
+                {% endif %}
+                
+                <h4 class="text-lg font-bold text-white mb-2">{{ booking.venue.name }}</h4>
+                <p class="text-gray-400 mb-4">{{ booking.venue.city }}, {{ booking.venue.country }}</p>
+                
+                <div class="space-y-2 text-gray-300 mb-4">
+                    <p><strong>Type:</strong> {{ booking.venue.get_venue_type_display }}</p>
+                    <p><strong>Capacity:</strong> {{ booking.venue.capacity }}</p>
+                    <p><strong>Stations:</strong> {{ booking.venue.setup_stations }}</p>
+                </div>
+                
+                <div class="border-t border-gray-700 pt-4">
+                    <h4 class="text-white font-bold mb-2">Contact</h4>
+                    {% if booking.venue.phone %}
+                    <p class="text-gray-300 text-sm">{{ booking.venue.phone }}</p>
+                    {% endif %}
+                    {% if booking.venue.email %}
+                    <p class="text-gray-300 text-sm">{{ booking.venue.email }}</p>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'venues:detail' booking.venue.slug %}" 
+                   class="block mt-4 text-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">
+                    View Venue Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -282,13 +282,8 @@
 </div>
 
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
     // Payment method selection
-    const stripeMethod = document.getElementById('stripe-method');
-    const paystackMethod = document.getElementById('paystack-method');
-    const stripeCardElement = document.getElementById('stripe-card-element');
-    
     document.querySelectorAll('.payment-method').forEach(method => {
         method.addEventListener('click', function() {
             // Remove selected class from all methods
@@ -297,14 +292,6 @@
             this.classList.add('selected');
             // Check the radio button
             this.querySelector('input[type="radio"]').checked = true;
-            
-            // Show/hide Stripe card element
-            if (this.id === 'stripe-method') {
-                stripeCardElement.classList.remove('hidden');
-                initializeStripe();
-            } else {
-                stripeCardElement.classList.add('hidden');
-            }
         });
     });
 
@@ -335,19 +322,6 @@
                         color: '#ef4444',
                         iconColor: '#ef4444'
                     }
-                }
-            });
-            
-            // Mount card element
-            cardElement.mount('#card-element');
-            
-            // Handle card errors
-            cardElement.on('change', function(event) {
-                const displayError = document.getElementById('card-errors');
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
                 }
             });
         }
@@ -397,6 +371,11 @@
 
             if (!data.success) {
                 throw new Error(data.error || 'Failed to create payment intent');
+            }
+
+            // Initialize Stripe if not already done
+            if (!stripe) {
+                initializeStripe();
             }
 
             // Confirm payment with Stripe
@@ -452,7 +431,7 @@
         }
     }
 
-    // Handle Paystack payment
+    // Handle Paystack payment (placeholder for Task 13.5)
     async function handlePaystackPayment() {
         try {
             // Initialize Paystack transaction

@@ -45,8 +45,8 @@
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
 
     <!-- Menu Panel -->
-    <div class="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-[#0A0A0A] border-l-2 border-[#DC2626]/30 shadow-2xl transform transition-transform duration-300 translate-x-0 flex flex-col"
-        style="height: 100%;">
+    <div class="absolute right-0 top-0 w-80 max-w-[85vw] bg-[#0A0A0A] border-l-2 border-[#DC2626]/30 shadow-2xl transform transition-transform duration-300 translate-x-0 flex flex-col"
+        style="height: 100vh; height: 100dvh; max-height: 100vh; max-height: 100dvh;">
         <!-- Menu Header -->
         <div class="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
@@ -60,9 +60,9 @@
             </button>
         </div>
 
-        <!-- Menu Content -->
-        <div class="p-4 flex-1 min-h-0 overflow-y-auto"
-            style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
+        <!-- Menu Content - Scrollable Area -->
+        <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-8"
+            style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; max-height: calc(100vh - 74px); max-height: calc(100dvh - 74px);">
             <!-- Primary Navigation -->
             <div class="nav-section mb-6">
                 <h3 class="nav-section-title">PRIMARY</h3>
@@ -150,7 +150,7 @@
             {% endif %}
 
             <!-- System -->
-            <div class="nav-section">
+            <div class="nav-section mb-8">
                 <h3 class="nav-section-title">SYSTEM</h3>
                 <div class="nav-group" role="group" aria-label="System navigation">
                     {% if user.is_authenticated %}

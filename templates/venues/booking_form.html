@@ -1,0 +1,498 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Book {{ venue.name }} - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<!-- Venue Components CSS -->
+<link rel="stylesheet" href="{% static 'css/venues.css' %}">
+<!-- Gaming Design CSS -->
+<link rel="stylesheet" href="{% static 'css/venues-gaming.css' %}">
+<style>
+    /* Gaming Design Variables */
+    :root {
+        --electric-red: #DC2626;
+        --deep-black: #0A0A0A;
+        --gunmetal-gray: #1F2937;
+        --neon-cyan: #06B6D4;
+    }
+
+    /* Gradient Text Effect */
+    .gradient-text {
+        background: linear-gradient(135deg, var(--electric-red) 0%, #FF6B6B 50%, var(--neon-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Venue Summary Card with Neon Border */
+    .venue-summary-card {
+        background: var(--gunmetal-gray);
+        border: 2px solid rgba(220, 38, 38, 0.6);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.3), inset 0 0 20px rgba(220, 38, 38, 0.05);
+        position: sticky;
+        top: 1rem;
+    }
+
+    /* Form Container */
+    .booking-form-container {
+        background: var(--gunmetal-gray);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: 0.5rem;
+        padding: 2rem;
+    }
+
+    /* Form Inputs with Neon Focus States */
+    .neon-input {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: rgba(10, 10, 10, 0.8);
+        color: white;
+        border: 2px solid rgba(107, 114, 128, 0.5);
+        border-radius: 0.375rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .neon-input:focus {
+        outline: none;
+        border-color: var(--electric-red);
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.4), inset 0 0 10px rgba(220, 38, 38, 0.1);
+        background-color: rgba(10, 10, 10, 0.95);
+    }
+
+    .neon-input:hover {
+        border-color: rgba(220, 38, 38, 0.4);
+    }
+
+    textarea.neon-input {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Form Labels */
+    .form-label {
+        display: block;
+        color: white;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Skewed Submit Button with Glow */
+    .skewed-submit-button {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: var(--electric-red);
+        color: white;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 1.125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border: none;
+        border-radius: 0.375rem;
+        transform: skewX(-12deg);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .skewed-submit-button:hover {
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), 0 0 50px rgba(220, 38, 38, 0.3);
+        transform: skewX(-12deg) translateY(-2px);
+        background: #EF4444;
+    }
+
+    .skewed-submit-button:active {
+        transform: skewX(-8deg) scale(0.98);
+    }
+
+    .skewed-submit-button-text {
+        display: inline-block;
+        transform: skewX(12deg);
+    }
+
+    /* Live Cost Calculator */
+    .cost-calculator {
+        background: rgba(10, 10, 10, 0.8);
+        border: 2px solid var(--neon-cyan);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    }
+
+    .cost-amount {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+        text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .cost-amount.updating {
+        animation: pulse-glow 0.5s ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        50% { text-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 30px rgba(6, 182, 212, 0.4); }
+    }
+
+    /* Error Messages with Red Neon Border */
+    .error-message {
+        color: var(--electric-red);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.5);
+        border-radius: 0.25rem;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Warning Messages */
+    .warning-message {
+        color: #F59E0B;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        border-radius: 0.25rem;
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Venue Summary Image */
+    .venue-summary-image {
+        width: 100%;
+        height: 12rem;
+        object-fit: cover;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+        border: 2px solid rgba(220, 38, 38, 0.3);
+    }
+
+    /* Pricing Display */
+    .pricing-info {
+        border-top: 2px solid rgba(220, 38, 38, 0.3);
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .pricing-rate {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--electric-red);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .venue-summary-card {
+            position: static;
+            margin-top: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <header>
+        <h1 class="font-barlow text-5xl font-bold uppercase tracking-tight gradient-text mb-8">
+            Book Venue
+        </h1>
+    </header>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Booking Form -->
+        <main class="lg:col-span-2" role="main">
+            <div class="booking-form-container">
+                <h2 class="font-barlow text-3xl font-bold uppercase tracking-tight text-white mb-6">
+                    Booking Details
+                </h2>
+                
+                <form method="post" id="bookingForm" class="space-y-6" aria-label="Venue booking form">
+                    {% csrf_token %}
+                    
+                    <!-- Start Date & Time -->
+                    <div>
+                        <label for="{{ form.start_datetime.id_for_label }}" class="form-label">
+                            <span class="material-symbols-outlined text-sm inline-block align-middle mr-1" aria-hidden="true">event</span>
+                            Start Date & Time *
+                        </label>
+                        <input type="datetime-local" 
+                               name="{{ form.start_datetime.name }}" 
+                               id="{{ form.start_datetime.id_for_label }}"
+                               class="neon-input"
+                               required
+                               aria-required="true"
+                               aria-describedby="{% if form.start_datetime.errors %}error-start-datetime{% endif %}"
+                               aria-label="Select booking start date and time">
+                        {% if form.start_datetime.errors %}
+                        <div class="error-message" id="error-start-datetime" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">error</span>
+                            {{ form.start_datetime.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- End Date & Time -->
+                    <div>
+                        <label for="{{ form.end_datetime.id_for_label }}" class="form-label">
+                            <span class="material-symbols-outlined text-sm inline-block align-middle mr-1" aria-hidden="true">event</span>
+                            End Date & Time *
+                        </label>
+                        <input type="datetime-local" 
+                               name="{{ form.end_datetime.name }}" 
+                               id="{{ form.end_datetime.id_for_label }}"
+                               class="neon-input"
+                               required
+                               aria-required="true"
+                               aria-describedby="{% if form.end_datetime.errors %}error-end-datetime{% endif %}"
+                               aria-label="Select booking end date and time">
+                        {% if form.end_datetime.errors %}
+                        <div class="error-message" id="error-end-datetime" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">error</span>
+                            {{ form.end_datetime.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Expected Participants -->
+                    <div>
+                        <label for="{{ form.expected_participants.id_for_label }}" class="form-label">
+                            <span class="material-symbols-outlined text-sm inline-block align-middle mr-1" aria-hidden="true">groups</span>
+                            Expected Participants *
+                        </label>
+                        <input type="number" 
+                               name="{{ form.expected_participants.name }}" 
+                               id="{{ form.expected_participants.id_for_label }}"
+                               class="neon-input"
+                               min="1"
+                               required
+                               aria-required="true"
+                               aria-describedby="{% if form.expected_participants.errors %}error-participants{% endif %}"
+                               aria-label="Enter expected number of participants">
+                        {% if form.expected_participants.errors %}
+                        <div class="error-message" id="error-participants" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">error</span>
+                            {{ form.expected_participants.errors.0 }}
+                        </div>
+                        {% endif %}
+                        {% if form.get_warnings.expected_participants %}
+                        <div class="warning-message" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">warning</span>
+                            {{ form.get_warnings.expected_participants.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tournament (Optional) -->
+                    <div>
+                        <label for="{{ form.tournament.id_for_label }}" class="form-label">
+                            <span class="material-symbols-outlined text-sm inline-block align-middle mr-1" aria-hidden="true">emoji_events</span>
+                            Tournament (Optional)
+                        </label>
+                        <select name="{{ form.tournament.name }}" 
+                                id="{{ form.tournament.id_for_label }}"
+                                class="neon-input"
+                                aria-label="Select tournament (optional)">
+                            <option value="">-- Select Tournament --</option>
+                            {% for tournament in form.tournament.field.queryset %}
+                            <option value="{{ tournament.id }}">{{ tournament.name }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.tournament.errors %}
+                        <div class="error-message" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">error</span>
+                            {{ form.tournament.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Notes (Optional) -->
+                    <div>
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <span class="material-symbols-outlined text-sm inline-block align-middle mr-1" aria-hidden="true">notes</span>
+                            Notes (Optional)
+                        </label>
+                        <textarea name="{{ form.notes.name }}" 
+                                  id="{{ form.notes.id_for_label }}"
+                                  class="neon-input"
+                                  placeholder="Any special requirements or notes..."
+                                  aria-label="Enter any special requirements or notes (optional)"></textarea>
+                        {% if form.notes.errors %}
+                        <div class="error-message" role="alert">
+                            <span class="material-symbols-outlined text-sm" aria-hidden="true">error</span>
+                            {{ form.notes.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Live Cost Calculator -->
+                    <div class="cost-calculator" role="region" aria-live="polite" aria-atomic="true" aria-label="Cost calculator">
+                        <div class="flex justify-between items-center">
+                            <span class="font-barlow text-lg font-bold uppercase text-gray-400">
+                                Estimated Total Cost
+                            </span>
+                            <div class="cost-amount" id="costAmount" aria-label="Estimated cost">$0.00</div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2 font-inter">
+                            Cost calculated based on duration and venue rates
+                        </p>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="skewed-submit-button touch-target" aria-label="Submit booking request">
+                        <span class="skewed-submit-button-text">
+                            <span class="material-symbols-outlined text-xl inline-block align-middle mr-2" aria-hidden="true">check_circle</span>
+                            Submit Booking
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </main>
+        
+        <!-- Venue Summary Card -->
+        <aside role="complementary" aria-label="Venue summary">
+            <div class="venue-summary-card">
+                <h3 class="font-barlow text-2xl font-bold uppercase tracking-tight text-white mb-4">
+                    Venue Summary
+                </h3>
+                
+                {% if venue.photo %}
+                <img src="{{ venue.photo.url }}" 
+                     alt="{{ venue.name }} venue photo" 
+                     class="venue-summary-image"
+                     loading="lazy">
+                {% else %}
+                <div class="venue-summary-image bg-gradient-to-br from-gunmetal-gray to-deep-black flex items-center justify-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-600" aria-hidden="true">location_on</span>
+                </div>
+                {% endif %}
+                
+                <h4 class="font-barlow text-xl font-bold uppercase text-white mb-2">
+                    {{ venue.name }}
+                </h4>
+                <p class="font-inter text-gray-400 mb-4 flex items-center">
+                    <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">location_city</span>
+                    {{ venue.city }}, {{ venue.country }}
+                </p>
+                
+                <dl class="space-y-3 text-gray-300 mb-4 font-inter">
+                    <div class="flex items-center justify-between">
+                        <dt class="flex items-center">
+                            <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">groups</span>
+                            Capacity
+                        </dt>
+                        <dd class="text-white"><strong>{{ venue.capacity }}</strong></dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="flex items-center">
+                            <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">computer</span>
+                            Stations
+                        </dt>
+                        <dd class="text-white"><strong>{{ venue.setup_stations }}</strong></dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="flex items-center">
+                            <span class="material-symbols-outlined text-sm mr-2" aria-hidden="true">category</span>
+                            Type
+                        </dt>
+                        <dd class="text-white"><strong>{{ venue.get_venue_type_display }}</strong></dd>
+                    </div>
+                </dl>
+                
+                <div class="pricing-info">
+                    <h4 class="font-barlow text-lg font-bold uppercase text-white mb-3">
+                        Pricing
+                    </h4>
+                    {% if venue.hourly_rate %}
+                    <div class="mb-2">
+                        <span class="pricing-rate" aria-label="Hourly rate">${{ venue.hourly_rate }}</span>
+                        <span class="text-gray-400 font-inter text-sm">/hour</span>
+                    </div>
+                    {% endif %}
+                    {% if venue.day_rate %}
+                    <div>
+                        <span class="text-gray-300 font-inter" aria-label="Day rate">${{ venue.day_rate }}</span>
+                        <span class="text-gray-400 font-inter text-sm">/day (8+ hours)</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    // Live Cost Calculator
+    document.addEventListener('DOMContentLoaded', function() {
+        const startInput = document.getElementById('{{ form.start_datetime.id_for_label }}');
+        const endInput = document.getElementById('{{ form.end_datetime.id_for_label }}');
+        const costAmount = document.getElementById('costAmount');
+        
+        const hourlyRate = {{ venue.hourly_rate|default:"0" }};
+        const dayRate = {{ venue.day_rate|default:"0" }};
+        
+        function calculateCost() {
+            const startDate = new Date(startInput.value);
+            const endDate = new Date(endInput.value);
+            
+            if (!startInput.value || !endInput.value || endDate <= startDate) {
+                costAmount.textContent = '$0.00';
+                return;
+            }
+            
+            // Calculate duration in hours
+            const durationMs = endDate - startDate;
+            const durationHours = durationMs / (1000 * 60 * 60);
+            
+            let totalCost = 0;
+            
+            // If duration is 8 hours or more and day rate exists, use day rate
+            if (durationHours >= 8 && dayRate > 0) {
+                const numDays = Math.ceil(durationHours / 24);
+                totalCost = dayRate * numDays;
+            } else if (hourlyRate > 0) {
+                // Otherwise use hourly rate
+                totalCost = hourlyRate * durationHours;
+            }
+            
+            // Add animation class
+            costAmount.classList.add('updating');
+            setTimeout(() => costAmount.classList.remove('updating'), 500);
+            
+            // Update display
+            costAmount.textContent = '$' + totalCost.toFixed(2);
+        }
+        
+        // Add event listeners for real-time updates
+        startInput.addEventListener('change', calculateCost);
+        endInput.addEventListener('change', calculateCost);
+        startInput.addEventListener('input', calculateCost);
+        endInput.addEventListener('input', calculateCost);
+        
+        // Calculate initial cost if values are present
+        if (startInput.value && endInput.value) {
+            calculateCost();
+        }
+    });
+</script>
+{% endblock %}

@@ -224,7 +224,9 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# Email verification: 'mandatory', 'optional', or 'none'
+# Set to 'optional' or 'none' for PythonAnywhere free tier
+ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION', default='optional')
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True

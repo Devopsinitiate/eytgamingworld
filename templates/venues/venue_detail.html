@@ -1,0 +1,944 @@
+{% extends "base.html" %}
+{% load static %}
+{% load venue_filters %}
+
+{% block title %}{{ venue.name }} - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<!-- Venue Components CSS -->
+<link rel="stylesheet" href="{% static 'css/venues.css' %}">
+<!-- Gaming Design CSS -->
+<link rel="stylesheet" href="{% static 'css/venues-gaming.css' %}">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+<style>
+    /* Venue Detail Gaming Design */
+    .venue-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .venue-hero-image {
+        width: 100%;
+        height: 28rem;
+        object-fit: cover;
+    }
+    
+    .venue-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.3) 50%, transparent 100%);
+    }
+    
+    .venue-hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        z-index: 10;
+    }
+    
+    .venue-name-gradient {
+        background: linear-gradient(135deg, #fff 0%, #DC2626 50%, #fff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        font-weight: 900;
+    }
+    
+    .quick-stat {
+        background: rgba(31, 41, 55, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-stat:hover {
+        border-color: #DC2626;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .metallic-stat {
+        border: 2px solid;
+        border-image-source: linear-gradient(135deg, #444 0%, #eee 50%, #444 100%);
+        border-image-slice: 1;
+        background: rgba(31, 41, 55, 0.9);
+        padding: 0.75rem 1rem;
+    }
+    
+    .info-card {
+        background: #1F2937;
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        border-color: rgba(220, 38, 38, 0.5);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+    
+    .pricing-card {
+        background: #1F2937;
+        border: 2px solid #DC2626;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.3), inset 0 0 20px rgba(220, 38, 38, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .pricing-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 70%);
+        animation: pulseGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulseGlow {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+    }
+    
+    .booking-button {
+        position: relative;
+        display: block;
+        text-align: center;
+        padding: 1rem 2rem;
+        background: #DC2626;
+        color: white;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-radius: 0.375rem;
+        transform: skewX(-12deg);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .booking-button span {
+        display: block;
+        transform: skewX(12deg);
+    }
+    
+    .booking-button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+    
+    .booking-button:hover {
+        background: #991B1B;
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6);
+        transform: skewX(-12deg) scale(1.05);
+    }
+    
+    .booking-button:hover::before {
+        transform: translateX(100%);
+    }
+    
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(10, 10, 10, 0.3);
+        border-radius: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .amenity-item:hover {
+        background: rgba(220, 38, 38, 0.1);
+        transform: translateX(4px);
+    }
+    
+    .amenity-icon {
+        color: #DC2626;
+        margin-right: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .particle-effect {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .particle-effect::before,
+    .particle-effect::after {
+        content: '';
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #DC2626;
+        border-radius: 50%;
+        opacity: 0;
+        animation: floatParticle 5s ease-in-out infinite;
+    }
+    
+    .particle-effect::before {
+        left: 20%;
+        animation-delay: 0s;
+    }
+    
+    .particle-effect::after {
+        left: 70%;
+        animation-delay: 2.5s;
+    }
+    
+    @keyframes floatParticle {
+        0% { bottom: 0; opacity: 0; transform: translateX(0); }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { bottom: 100%; opacity: 0; transform: translateX(30px); }
+    }
+    
+    .section-heading {
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: #DC2626;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+        .venue-hero-image {
+            height: 20rem;
+        }
+        
+        .venue-hero-content {
+            padding: 1rem;
+        }
+        
+        .quick-stat {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* Leaflet Map Gaming Styling */
+    #venue-map {
+        height: 300px;
+        border-radius: 0.375rem;
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        overflow: hidden;
+    }
+    
+    .leaflet-popup-content-wrapper {
+        background: #1F2937;
+        color: white;
+        border: 1px solid #DC2626;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+    }
+    
+    .leaflet-popup-tip {
+        background: #1F2937;
+        border: 1px solid #DC2626;
+    }
+    
+    .leaflet-popup-content {
+        margin: 0.75rem;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .leaflet-popup-content h4 {
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #DC2626;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Review Section Gaming Styling */
+    .review-summary-card {
+        background: rgba(31, 41, 55, 0.5);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: 0.5rem;
+        padding: 2rem;
+    }
+    
+    .star-glow {
+        filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+        animation: starPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes starPulse {
+        0%, 100% { filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6)); }
+        50% { filter: drop-shadow(0 0 12px rgba(220, 38, 38, 0.9)); }
+    }
+    
+    .rating-bar {
+        transition: width 0.5s ease;
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+    
+    .review-form-card {
+        background: rgba(31, 41, 55, 0.5);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: 0.5rem;
+        padding: 2rem;
+    }
+    
+    .star-rating-input .star-radio:checked ~ .star-label .material-symbols-outlined,
+    .star-rating-input .star-radio:checked + .star-label .material-symbols-outlined {
+        color: #DC2626;
+        filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+    }
+    
+    .star-label:hover .material-symbols-outlined {
+        transform: scale(1.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .gaming-input {
+        transition: all 0.3s ease;
+    }
+    
+    .gaming-input:focus {
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+    }
+    
+    .review-submit-button {
+        position: relative;
+        display: inline-block;
+        padding: 1rem 3rem;
+        background: #DC2626;
+        color: white;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-radius: 0.375rem;
+        transform: skewX(-12deg);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .review-submit-button span {
+        display: block;
+        transform: skewX(12deg);
+    }
+    
+    .review-submit-button::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+    
+    .review-submit-button:hover {
+        background: #991B1B;
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6);
+        transform: skewX(-12deg) scale(1.05);
+    }
+    
+    .review-submit-button:hover::before {
+        transform: translateX(100%);
+    }
+    
+    .review-card {
+        background: rgba(31, 41, 55, 0.6);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .review-card:hover {
+        border-color: rgba(220, 38, 38, 0.5);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .recommend-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(6, 182, 212, 0.2);
+        color: #06B6D4;
+        border: 1px solid rgba(6, 182, 212, 0.5);
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+    
+    .pagination-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(31, 41, 55, 0.8);
+        border: 1px solid rgba(220, 38, 38, 0.3);
+        border-radius: 0.375rem;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination-button:hover {
+        background: #DC2626;
+        border-color: #DC2626;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-deep-black">
+    <!-- Venue Hero Section -->
+    <section class="venue-hero" role="banner" aria-label="Venue header">
+        {% if venue.photo %}
+        <img src="{{ venue.photo.url }}" alt="{{ venue.name }} venue photo" class="venue-hero-image" loading="eager">
+        <div class="venue-hero-overlay" aria-hidden="true"></div>
+        <div class="particle-effect" aria-hidden="true"></div>
+        {% else %}
+        <div class="venue-hero-image bg-gradient-to-br from-gunmetal-gray to-deep-black flex items-center justify-center">
+            <span class="material-symbols-outlined text-9xl text-gray-600" aria-hidden="true">location_on</span>
+        </div>
+        <div class="venue-hero-overlay" aria-hidden="true"></div>
+        {% endif %}
+        
+        <div class="venue-hero-content">
+            <h1 class="venue-name-gradient text-5xl md:text-6xl lg:text-7xl mb-4">
+                {{ venue.name }}
+            </h1>
+            
+            <p class="font-inter text-gray-300 text-lg mb-6">
+                <span class="material-symbols-outlined text-sm inline-block mr-2" aria-hidden="true">category</span>
+                {{ venue.get_venue_type_display }} in {{ venue.city }}, {{ venue.country }}
+            </p>
+            
+            <!-- Quick Stats -->
+            <div class="flex flex-wrap gap-4" role="list" aria-label="Venue quick statistics">
+                <div class="quick-stat metallic-stat" role="listitem">
+                    <span class="material-symbols-outlined text-electric-red inline-block mr-2" aria-hidden="true">groups</span>
+                    <span class="font-barlow font-bold text-white">{{ venue.capacity }}</span>
+                    <span class="font-inter text-gray-400 text-sm ml-1">Capacity</span>
+                </div>
+                
+                <div class="quick-stat metallic-stat" role="listitem">
+                    <span class="material-symbols-outlined text-electric-red inline-block mr-2" aria-hidden="true">computer</span>
+                    <span class="font-barlow font-bold text-white">{{ venue.setup_stations }}</span>
+                    <span class="font-inter text-gray-400 text-sm ml-1">Stations</span>
+                </div>
+                
+                {% if average_rating > 0 %}
+                <div class="quick-stat metallic-stat" role="listitem">
+                    <span class="material-symbols-outlined text-yellow-500 inline-block mr-2" aria-hidden="true">star</span>
+                    <span class="font-barlow font-bold text-white">{{ average_rating|floatformat:1 }}</span>
+                    <span class="font-inter text-gray-400 text-sm ml-1">({{ review_count }} reviews)</span>
+                </div>
+                {% endif %}
+                
+                <div class="quick-stat metallic-stat" role="listitem">
+                    <span class="material-symbols-outlined text-neon-cyan inline-block mr-2" aria-hidden="true">visibility</span>
+                    <span class="font-barlow font-bold text-white">{{ venue.view_count }}</span>
+                    <span class="font-inter text-gray-400 text-sm ml-1">Views</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Content Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6" role="main" aria-label="Venue information">
+                <!-- Description -->
+                <section class="info-card" aria-labelledby="about-heading">
+                    <h2 id="about-heading" class="section-heading text-2xl">About This Venue</h2>
+                    <p class="font-inter text-gray-300 leading-relaxed">
+                        {{ venue.description|default:"No description available." }}
+                    </p>
+                </section>
+                
+                <!-- Amenities -->
+                {% if venue.amenities %}
+                <section class="info-card" aria-labelledby="amenities-heading">
+                    <h2 id="amenities-heading" class="section-heading text-2xl">Amenities</h2>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-3" role="list" aria-label="Venue amenities">
+                        {% for amenity in venue.amenities %}
+                        <li class="amenity-item">
+                            <span class="material-symbols-outlined amenity-icon" aria-hidden="true">check_circle</span>
+                            <span class="font-inter text-gray-300">{{ amenity }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+                
+                <!-- Hours of Operation -->
+                {% if venue.hours_of_operation %}
+                <section class="info-card" aria-labelledby="hours-heading">
+                    <h2 id="hours-heading" class="section-heading text-2xl">Hours of Operation</h2>
+                    <dl class="space-y-2">
+                        {% for day, hours in venue.hours_of_operation.items %}
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
+                            <dt class="font-barlow font-bold text-white uppercase">{{ day|title }}</dt>
+                            <dd class="font-inter text-gray-400">{{ hours }}</dd>
+                        </div>
+                        {% endfor %}
+                    </dl>
+                </section>
+                {% endif %}
+                
+                <!-- Contact Information -->
+                <section class="info-card" aria-labelledby="contact-heading">
+                    <h2 id="contact-heading" class="section-heading text-2xl">Contact Information</h2>
+                    <address class="space-y-3 not-italic">
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-electric-red mr-3 mt-1" aria-hidden="true">location_on</span>
+                            <div>
+                                <p class="font-inter text-sm text-gray-500 uppercase tracking-wide">Address</p>
+                                <p class="font-inter text-gray-300">{{ venue.full_address }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if venue.phone %}
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-electric-red mr-3 mt-1" aria-hidden="true">phone</span>
+                            <div>
+                                <p class="font-inter text-sm text-gray-500 uppercase tracking-wide">Phone</p>
+                                <a href="tel:{{ venue.phone }}" class="font-inter text-gray-300 hover:text-electric-red transition-colors" aria-label="Call {{ venue.name }}">
+                                    {{ venue.phone }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if venue.email %}
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-electric-red mr-3 mt-1" aria-hidden="true">email</span>
+                            <div>
+                                <p class="font-inter text-sm text-gray-500 uppercase tracking-wide">Email</p>
+                                <a href="mailto:{{ venue.email }}" class="font-inter text-gray-300 hover:text-electric-red transition-colors" aria-label="Email {{ venue.name }}">
+                                    {{ venue.email }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if venue.website %}
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-electric-red mr-3 mt-1" aria-hidden="true">language</span>
+                            <div>
+                                <p class="font-inter text-sm text-gray-500 uppercase tracking-wide">Website</p>
+                                <a href="{{ venue.website }}" target="_blank" rel="noopener noreferrer" 
+                                   class="font-inter text-gray-300 hover:text-electric-red transition-colors"
+                                   aria-label="Visit {{ venue.name }} website (opens in new tab)">
+                                    {{ venue.website }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </address>
+                </section>
+                
+                <!-- Reviews Section -->
+                <section class="info-card" id="reviews-section" aria-labelledby="reviews-heading">
+                    <h2 id="reviews-heading" class="section-heading text-2xl">Reviews & Ratings</h2>
+                    
+                    <!-- Review Summary -->
+                    {% if review_count > 0 %}
+                    <div class="review-summary-card mb-8" role="region" aria-label="Review summary">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Average Rating Display -->
+                            <div class="flex flex-col items-center justify-center py-6">
+                                <div class="text-6xl font-barlow font-bold text-white mb-2" aria-label="Average rating {{ average_rating|floatformat:1 }} out of 5 stars">
+                                    {{ average_rating|floatformat:1 }}
+                                </div>
+                                <div class="flex items-center mb-2" role="img" aria-label="{{ average_rating|floatformat:1 }} stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= average_rating %}
+                                        <span class="material-symbols-outlined text-electric-red text-2xl star-glow" aria-hidden="true">star</span>
+                                        {% else %}
+                                        <span class="material-symbols-outlined text-gray-600 text-2xl" aria-hidden="true">star</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="font-inter text-gray-400">Based on {{ review_count }} review{{ review_count|pluralize }}</p>
+                            </div>
+                            
+                            <!-- Rating Distribution -->
+                            <div class="space-y-2">
+                                {% for rating in "54321" %}
+                                <div class="flex items-center gap-3">
+                                    <span class="font-barlow text-white font-bold w-8">{{ rating }}</span>
+                                    <span class="material-symbols-outlined text-electric-red text-sm star-glow">star</span>
+                                    <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                        <div class="rating-bar h-full bg-gradient-to-r from-electric-red to-red-700" 
+                                             style="width: {% widthratio rating_distribution|get_item:rating review_count 100 %}%"
+                                             data-rating="{{ rating }}"></div>
+                                    </div>
+                                    <span class="font-inter text-gray-400 text-sm w-12 text-right">
+                                        {{ rating_distribution|get_item:rating|default:0 }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Review Submission Form -->
+                    {% if is_authenticated and not user_has_reviewed %}
+                    <div class="review-form-card mb-8" role="form" aria-labelledby="review-form-heading">
+                        <h3 id="review-form-heading" class="font-barlow text-xl font-bold text-white mb-4 uppercase">Write a Review</h3>
+                        <form method="post" action="{% url 'venues:detail' venue.slug %}" class="space-y-4">
+                            {% csrf_token %}
+                            
+                            <!-- Star Rating Input -->
+                            <fieldset>
+                                <legend class="block font-inter text-gray-300 mb-2">Rating *</legend>
+                                <div class="star-rating-input flex items-center gap-2" role="radiogroup" aria-label="Select rating from 1 to 5 stars" aria-required="true">
+                                    {% for i in "12345" %}
+                                    <input type="radio" name="rating" value="{{ forloop.counter }}" 
+                                           id="star-{{ forloop.counter }}" class="hidden star-radio" required
+                                           aria-label="{{ forloop.counter }} star{{ forloop.counter|pluralize }}">
+                                    <label for="star-{{ forloop.counter }}" class="star-label cursor-pointer">
+                                        <span class="material-symbols-outlined text-4xl text-gray-600 hover:text-electric-red transition-colors" aria-hidden="true">star</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                {% if review_form.rating.errors %}
+                                <p class="text-electric-red text-sm mt-1" role="alert">{{ review_form.rating.errors.0 }}</p>
+                                {% endif %}
+                            </fieldset>
+                            
+                            <!-- Title Input -->
+                            <div>
+                                <label for="id_title" class="block font-inter text-gray-300 mb-2">Review Title *</label>
+                                <input type="text" name="title" id="id_title" maxlength="200" required
+                                       class="gaming-input w-full px-4 py-3 bg-deep-black border border-gray-700 rounded text-white font-inter focus:border-electric-red focus:ring-2 focus:ring-electric-red/50 transition-all"
+                                       placeholder="Sum up your experience"
+                                       value="{{ review_form.title.value|default:'' }}"
+                                       aria-required="true"
+                                       aria-describedby="{% if review_form.title.errors %}error-title{% endif %}">
+                                {% if review_form.title.errors %}
+                                <p class="text-electric-red text-sm mt-1" id="error-title" role="alert">{{ review_form.title.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Review Text -->
+                            <div>
+                                <label for="id_review" class="block font-inter text-gray-300 mb-2">Your Review *</label>
+                                <textarea name="review" id="id_review" rows="4" required
+                                          class="gaming-input w-full px-4 py-3 bg-deep-black border border-gray-700 rounded text-white font-inter focus:border-electric-red focus:ring-2 focus:ring-electric-red/50 transition-all resize-none"
+                                          placeholder="Share your experience with this venue..."
+                                          aria-required="true"
+                                          aria-describedby="{% if review_form.review.errors %}error-review{% endif %}">{{ review_form.review.value|default:'' }}</textarea>
+                                {% if review_form.review.errors %}
+                                <p class="text-electric-red text-sm mt-1" id="error-review" role="alert">{{ review_form.review.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Would Recommend Checkbox -->
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" name="would_recommend" id="id_would_recommend" 
+                                       class="w-5 h-5 bg-deep-black border-2 border-gray-700 rounded text-electric-red focus:ring-2 focus:ring-electric-red/50"
+                                       {% if review_form.would_recommend.value %}checked{% endif %}
+                                       aria-label="I would recommend this venue">
+                                <label for="id_would_recommend" class="font-inter text-gray-300 cursor-pointer">
+                                    I would recommend this venue
+                                </label>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="review-submit-button touch-target" aria-label="Submit review">
+                                <span>Submit Review</span>
+                            </button>
+                        </form>
+                    </div>
+                    {% elif is_authenticated and user_has_reviewed %}
+                    <div class="review-form-card mb-8 text-center py-6" role="status">
+                        <span class="material-symbols-outlined text-5xl text-neon-cyan mb-3 block" aria-hidden="true">check_circle</span>
+                        <p class="font-inter text-gray-300">You have already reviewed this venue. Thank you for your feedback!</p>
+                    </div>
+                    {% elif not is_authenticated %}
+                    <div class="review-form-card mb-8 text-center py-6" role="status">
+                        <span class="material-symbols-outlined text-5xl text-gray-600 mb-3 block" aria-hidden="true">login</span>
+                        <p class="font-inter text-gray-300 mb-4">Please log in to write a review</p>
+                        <a href="{% url 'account_login' %}?next={{ request.path }}#reviews-section" 
+                           class="inline-block px-6 py-3 bg-electric-red text-white font-barlow font-bold uppercase rounded hover:bg-red-700 transition-all touch-target"
+                           aria-label="Login to write a review">
+                            Login to Review
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Review List -->
+                    {% if reviews %}
+                    <div class="review-list space-y-4" role="list" aria-label="User reviews">
+                        <h3 class="font-barlow text-xl font-bold text-white mb-4 uppercase">User Reviews</h3>
+                        {% for review in reviews %}
+                        {% include 'venues/components/review_card.html' with review=review %}
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if review_count > 10 %}
+                    <nav class="flex justify-center mt-8" aria-label="Review pagination">
+                        <div class="flex items-center gap-2">
+                            {% if reviews.has_previous %}
+                            <a href="?page={{ reviews.previous_page_number }}#reviews-section" 
+                               class="pagination-button touch-target"
+                               aria-label="Go to previous page of reviews">
+                                <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+                            </a>
+                            {% endif %}
+                            
+                            <span class="font-inter text-gray-400 px-4" role="status" aria-live="polite">
+                                Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}
+                            </span>
+                            
+                            {% if reviews.has_next %}
+                            <a href="?page={{ reviews.next_page_number }}#reviews-section" 
+                               class="pagination-button touch-target"
+                               aria-label="Go to next page of reviews">
+                                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </nav>
+                    {% endif %}
+                    {% elif review_count == 0 %}
+                    <div class="text-center py-12" role="status">
+                        <span class="material-symbols-outlined text-7xl text-gray-600 mb-4 block" aria-hidden="true">rate_review</span>
+                        <p class="font-inter text-gray-400 text-lg">No reviews yet. Be the first to review this venue!</p>
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+            
+            <!-- Sidebar -->
+            <aside class="space-y-6" role="complementary" aria-label="Booking and venue details">
+                <!-- Pricing Card -->
+                <section class="pricing-card" aria-labelledby="pricing-heading">
+                    <h3 id="pricing-heading" class="font-barlow text-2xl font-bold uppercase text-white mb-4 relative z-10">Pricing</h3>
+                    
+                    <div class="space-y-3 mb-6 relative z-10">
+                        {% if venue.hourly_rate %}
+                        <div class="flex items-baseline">
+                            <span class="font-barlow text-4xl font-bold text-electric-red" aria-label="Hourly rate">${{ venue.hourly_rate }}</span>
+                            <span class="font-inter text-gray-400 ml-2">/hour</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if venue.day_rate %}
+                        <div class="flex items-baseline">
+                            <span class="font-barlow text-3xl font-bold text-electric-red" aria-label="Day rate">${{ venue.day_rate }}</span>
+                            <span class="font-inter text-gray-400 ml-2">/day</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if is_authenticated %}
+                    <a href="{% url 'venues:booking_create' venue.slug %}" class="booking-button touch-target relative z-10" aria-label="Book {{ venue.name }} now">
+                        <span>BOOK NOW</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'account_login' %}?next={{ request.path }}" 
+                       class="block text-center px-6 py-3 bg-gunmetal-gray text-white font-barlow font-bold uppercase rounded hover:bg-gray-700 transition-all relative z-10 touch-target"
+                       aria-label="Login to book this venue">
+                        Login to Book
+                    </a>
+                    {% endif %}
+                </section>
+                
+                <!-- Quick Info -->
+                <section class="info-card" aria-labelledby="quick-info-heading">
+                    <h3 id="quick-info-heading" class="section-heading text-xl">Quick Info</h3>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <dt class="font-inter text-gray-400">Type</dt>
+                            <dd class="font-barlow font-bold text-white">{{ venue.get_venue_type_display }}</dd>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <dt class="font-inter text-gray-400">Capacity</dt>
+                            <dd class="font-barlow font-bold text-white">{{ venue.capacity }} people</dd>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <dt class="font-inter text-gray-400">Stations</dt>
+                            <dd class="font-barlow font-bold text-white">{{ venue.setup_stations }}</dd>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <dt class="font-inter text-gray-400">Views</dt>
+                            <dd class="font-barlow font-bold text-white">{{ venue.view_count }}</dd>
+                        </div>
+                    </dl>
+                </section>
+                
+                <!-- Map -->
+                {% if venue.latitude and venue.longitude %}
+                <section class="info-card" aria-labelledby="location-heading">
+                    <h3 id="location-heading" class="section-heading text-xl">Location</h3>
+                    <div id="venue-map" role="img" aria-label="Map showing {{ venue.name }} location"></div>
+                </section>
+                {% endif %}
+            </aside>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+<!-- Star Rating Interactive Script -->
+<script>
+    // Star rating interactive functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const starLabels = document.querySelectorAll('.star-label');
+        const starRadios = document.querySelectorAll('.star-radio');
+        
+        // Highlight stars on hover with smooth transition
+        starLabels.forEach((label, index) => {
+            label.addEventListener('mouseenter', function() {
+                highlightStars(index + 1, true);
+            });
+            
+            label.addEventListener('click', function() {
+                // Keep stars highlighted after selection
+                setTimeout(() => {
+                    const checkedRadio = document.querySelector('.star-radio:checked');
+                    if (checkedRadio) {
+                        const checkedIndex = Array.from(starRadios).indexOf(checkedRadio);
+                        highlightStars(checkedIndex + 1, false);
+                    }
+                }, 10);
+            });
+        });
+        
+        // Reset stars on mouse leave from rating container
+        const starRatingContainer = document.querySelector('.star-rating-input');
+        if (starRatingContainer) {
+            starRatingContainer.addEventListener('mouseleave', function() {
+                const checkedRadio = document.querySelector('.star-radio:checked');
+                if (checkedRadio) {
+                    const checkedIndex = Array.from(starRadios).indexOf(checkedRadio);
+                    highlightStars(checkedIndex + 1, false);
+                } else {
+                    highlightStars(0, false);
+                }
+            });
+        }
+        
+        function highlightStars(count, isHover) {
+            starLabels.forEach((label, index) => {
+                const star = label.querySelector('.material-symbols-outlined');
+                if (index < count) {
+                    star.style.color = '#DC2626';
+                    star.style.filter = 'drop-shadow(0 0 8px rgba(220, 38, 38, 0.6))';
+                    star.style.transform = isHover ? 'scale(1.1)' : 'scale(1)';
+                    star.style.transition = 'all 0.2s ease';
+                } else {
+                    star.style.color = '#4B5563';
+                    star.style.filter = 'none';
+                    star.style.transform = 'scale(1)';
+                    star.style.transition = 'all 0.2s ease';
+                }
+            });
+        }
+        
+        // Initialize with checked value if exists
+        const checkedRadio = document.querySelector('.star-radio:checked');
+        if (checkedRadio) {
+            const checkedIndex = Array.from(starRadios).indexOf(checkedRadio);
+            highlightStars(checkedIndex + 1);
+        }
+    });
+</script>
+
+{% if venue.latitude and venue.longitude %}
+<script>
+    // Initialize the map
+    const map = L.map('venue-map', {
+        center: [{{ venue.latitude }}, {{ venue.longitude }}],
+        zoom: 15,
+        zoomControl: true,
+        scrollWheelZoom: false
+    });
+    
+    // Add OpenStreetMap tile layer with dark theme
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+    
+    // Create custom icon with gaming aesthetic
+    const venueIcon = L.divIcon({
+        className: 'custom-venue-marker',
+        html: '<div style="background: #DC2626; width: 32px; height: 32px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 20px; font-weight: bold;">📍</span></div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+    });
+    
+    // Add marker with popup
+    const marker = L.marker([{{ venue.latitude }}, {{ venue.longitude }}], {
+        icon: venueIcon
+    }).addTo(map);
+    
+    marker.bindPopup(`
+        <div style="min-width: 200px;">
+            <h4>{{ venue.name }}</h4>
+            <p style="margin: 0.5rem 0 0 0; color: #9CA3AF;">{{ venue.full_address }}</p>
+        </div>
+    `);
+    
+    // Enable scroll zoom on click
+    map.on('click', function() {
+        map.scrollWheelZoom.enable();
+    });
+    
+    // Disable scroll zoom on mouse leave
+    document.getElementById('venue-map').addEventListener('mouseleave', function() {
+        map.scrollWheelZoom.disable();
+    });
+</script>
+{% endif %}
+{% endblock %}
