@@ -1,0 +1,31 @@
+{% load account %}
+{% load i18n %}
+{% user_display user as user_display %}
+{% autoescape off %}
+🎮 Welcome to EYTGaming, {{ user_display }}!
+
+Thank you for joining the ultimate esports tournament platform. We're excited to have you as part of our gaming community!
+
+To get started and unlock all features, please confirm your email address by clicking the link below:
+
+{{ activate_url }}
+
+Once confirmed, you'll be able to:
+✓ Join and create tournaments
+✓ Form and manage teams
+✓ Book gaming venues
+✓ Connect with coaches
+✓ Shop for gaming gear
+✓ Track your competitive stats
+
+If you didn't create an account on EYTGaming, please ignore this email.
+
+Need help? Contact us at support@eytgaming.com
+
+Elevate Your Tournament Experience!
+The EYTGaming Team
+
+---
+EYTGaming - Where Champions Are Made
+{{ current_site.domain }}
+{% endautoescape %}

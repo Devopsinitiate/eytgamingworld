@@ -19,13 +19,15 @@
                     </h1>
                     <p class="gaming-body text-gray-400 text-lg">Ready to dominate the arena and claim victory?</p>
                 </div>
-                
+
                 <!-- Level & XP Stats -->
                 <div class="flex items-center gap-6">
                     <!-- Level Badge -->
                     <div class="text-center">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-electric-red to-neon-cyan flex items-center justify-center neon-red-glow-lg">
-                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-deep-black flex items-center justify-center">
+                        <div
+                            class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-electric-red to-neon-cyan flex items-center justify-center neon-red-glow-lg">
+                            <div
+                                class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-deep-black flex items-center justify-center">
                                 <div class="text-center">
                                     <p class="text-gray-400 text-xs gaming-subheader">LVL</p>
                                     <p class="gaming-stat text-2xl md:text-3xl text-electric-red">{{ stats.level|default:1 }}</p>
@@ -33,7 +35,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- XP Points -->
                     <div class="text-left">
                         <p class="stat-label text-xs">TOTAL XP</p>
@@ -46,133 +48,129 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Statistics Cards Component -->
     {% include 'dashboard/components/stats_cards_gaming.html' %}
-    
+
     <!-- Quick Actions - Mobile First -->
     <div class="block md:hidden">
         {% include 'dashboard/components/quick_actions_gaming.html' %}
     </div>
-    
+
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column - Activity & Upcoming Events -->
         <div class="lg:col-span-2 space-y-6">
             <!-- Activity Feed Component -->
             {% include 'dashboard/components/activity_feed_gaming.html' %}
-            
+
             <!-- Upcoming Events Section -->
             <div class="card-gaming">
                 <div class="card-gaming-content">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="gaming-subheader text-2xl text-white">UPCOMING BATTLES</h2>
-                        <a href="{% url 'tournaments:list' %}" 
-                           class="btn-gaming-ghost px-4 py-2 text-sm" 
-                           aria-label="View all tournaments">
+                        <a href="{% url 'tournaments:list' %}" class="btn-gaming-ghost px-4 py-2 text-sm"
+                            aria-label="View all tournaments">
                             VIEW ALL →
                         </a>
                     </div>
-                    
+
                     {% if upcoming_tournaments %}
-                        <!-- Desktop View -->
-                        <div class="hidden md:block space-y-3" role="list" aria-label="Upcoming tournaments">
-                            {% for tournament in upcoming_tournaments %}
-                                <a href="{% url 'tournaments:detail' tournament.slug %}" 
-                                   class="block p-4 card-gaming-flat hover:neon-border-red transition-all" 
-                                   role="listitem">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div class="flex items-center gap-4 flex-1 min-w-0">
-                                            <div class="flex-shrink-0 w-12 h-12 bg-electric-red/20 rounded flex items-center justify-center neon-red-glow">
-                                                <span class="material-symbols-outlined text-electric-red text-2xl" aria-hidden="true">emoji_events</span>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <h3 class="text-white font-bold truncate gaming-body">{{ tournament.name }}</h3>
-                                                <p class="text-gray-400 text-sm mt-1 flex items-center gap-2">
-                                                    <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>
-                                                    {{ tournament.game.name }}
-                                                    <span class="mx-1">•</span>
-                                                    <span class="material-symbols-outlined text-xs" aria-hidden="true">schedule</span>
-                                                    <time datetime="{{ tournament.start_datetime|date:'c' }}">
-                                                        {{ tournament.start_datetime|date:"M d, Y" }}
-                                                    </time>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="text-right flex-shrink-0">
-                                            <p class="text-electric-red font-black text-xl gaming-stat">${{ tournament.registration_fee|default:"0" }}</p>
-                                            <p class="text-gray-400 text-xs uppercase">Entry Fee</p>
-                                        </div>
+                    <!-- Desktop View -->
+                    <div class="hidden md:block space-y-3" role="list" aria-label="Upcoming tournaments">
+                        {% for tournament in upcoming_tournaments %}
+                        <a href="{% url 'tournaments:detail' tournament.slug %}"
+                            class="block p-4 card-gaming-flat hover:neon-border-red transition-all" role="listitem">
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-4 flex-1 min-w-0">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-electric-red/20 rounded flex items-center justify-center neon-red-glow">
+                                        <span class="material-symbols-outlined text-electric-red text-2xl" aria-hidden="true">emoji_events</span>
                                     </div>
-                                </a>
-                            {% endfor %}
-                        </div>
-                        
-                        <!-- Mobile Carousel -->
-                        <div class="mobile-carousel md:hidden">
-                            {% for tournament in upcoming_tournaments %}
-                                <div class="mobile-carousel-item">
-                                    <a href="{% url 'tournaments:detail' tournament.slug %}" 
-                                       class="block mobile-card neon-border-red">
-                                        <div class="mobile-card-header">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-electric-red/20 rounded flex items-center justify-center">
-                                                    <span class="material-symbols-outlined text-electric-red" aria-hidden="true">emoji_events</span>
-                                                </div>
-                                                <h3 class="text-white font-bold flex-1 gaming-body">{{ tournament.name }}</h3>
-                                            </div>
-                                        </div>
-                                        <div class="space-y-2">
-                                            <p class="text-gray-400 text-sm flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>
-                                                {{ tournament.game.name }}
-                                            </p>
-                                            <p class="text-gray-400 text-sm flex items-center gap-2">
-                                                <span class="material-symbols-outlined text-xs" aria-hidden="true">schedule</span>
-                                                <time datetime="{{ tournament.start_datetime|date:'c' }}">
-                                                    {{ tournament.start_datetime|date:"M d, Y" }}
-                                                </time>
-                                            </p>
-                                            <div class="pt-3 border-t border-electric-red/30 flex justify-between items-center">
-                                                <span class="text-gray-400 text-xs uppercase">Entry Fee</span>
-                                                <span class="text-electric-red font-black text-xl">${{ tournament.registration_fee|default:"0" }}</span>
-                                            </div>
-                                        </div>
-                                    </a>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-white font-bold truncate gaming-body">{{ tournament.name }}</h3>
+                                        <p class="text-gray-400 text-sm mt-1 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>
+                                            {{ tournament.game.name }}
+                                            <span class="mx-1">•</span>
+                                            <span class="material-symbols-outlined text-xs"aria-hidden="true">schedule</span>
+                                            <time datetime="{{ tournament.start_datetime|date:'c' }}">
+                                                {{ tournament.start_datetime|date:"M d, Y" }}
+                                            </time>
+                                        </p>
+                                    </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-12">
-                            <span class="material-symbols-outlined text-gray-600 text-6xl animate-glow-pulse" aria-hidden="true">emoji_events</span>
-                            <p class="text-gray-400 mt-4 gaming-body">No upcoming tournaments</p>
-                            <a href="{% url 'tournaments:list' %}" 
-                               class="btn-gaming-primary mt-4 inline-flex">
-                                <span>Browse Tournaments</span>
+                                <div class="text-right flex-shrink-0">
+                                    <p class="text-electric-red font-black text-xl gaming-stat">$ {{ tournament.registration_fee|default:"0" }} </p>
+                                    <p class="text-gray-400 text-xs uppercase">Entry Fee</p>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Mobile Carousel -->
+                    <div class="mobile-carousel md:hidden">
+                        {% for tournament in upcoming_tournaments %}
+                        <div class="mobile-carousel-item">
+                            <a href="{% url 'tournaments:detail' tournament.slug %}"
+                                class="block mobile-card neon-border-red">
+                                <div class="mobile-card-header">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 bg-electric-red/20 rounded flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-electric-red" aria-hidden="true">emoji_events</span>
+                                        </div>
+                                        <h3 class="text-white font-bold flex-1 gaming-body">{{ tournament.name }}</h3>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-gray-400 text-sm flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-xs" aria-hidden="true">sports_esports</span>{{ tournament.game.name }}
+                                    </p>
+                                    <p class="text-gray-400 text-sm flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-xs" aria-hidden="true">schedule</span>
+                                        <time datetime="{{ tournament.start_datetime|date:'c' }}"> {{ tournament.start_datetime|date:"M d, Y" }}
+                                        </time>
+                                    </p>
+                                    <div class="pt-3 border-t border-electric-red/30 flex justify-between items-center">
+                                        <span class="text-gray-400 text-xs uppercase">Entry Fee</span>
+                                        <span class="text-electric-red font-black text-xl">${{ tournament.registration_fee|default:"0" }}</span>
+                                    </div>
+                                </div>
                             </a>
                         </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-gray-600 text-6xl animate-glow-pulse" aria-hidden="true">emoji_events</span>
+                        <p class="text-gray-400 mt-4 gaming-body">No upcoming tournaments</p>
+                        <a href="{% url 'tournaments:list' %}" class="btn-gaming-primary mt-4 inline-flex">
+                            <span>Browse Tournaments</span>
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Column - Recommendations & Payment Summary -->
         <div class="space-y-6">
             <!-- Recommendations Component -->
             {% include 'dashboard/components/recommendations_gaming.html' %}
-            
+
             <!-- Payment Summary Section -->
             <div class="card-gaming">
                 <div class="card-gaming-content">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="gaming-subheader text-xl text-white">PAYMENT VAULT</h2>
-                        <a href="{% url 'payments:history' %}" 
-                           class="text-electric-red hover:text-neon-cyan text-sm font-bold transition-colors uppercase" 
-                           aria-label="View payment history">
+                        <a href="{% url 'payments:history' %}"
+                            class="text-electric-red hover:text-neon-cyan text-sm font-bold transition-colors uppercase"
+                            aria-label="View payment history">
                             VIEW ALL →
                         </a>
                     </div>
-                    
+
                     <div class="space-y-4">
                         <!-- Total Spent -->
                         <div class="stat-card-gaming p-4">
@@ -188,36 +186,34 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Recent Payments -->
                         {% if payment_summary.recent_payments %}
-                            <div>
-                                <h3 class="stat-label mb-3">RECENT TRANSACTIONS</h3>
-                                <div class="space-y-2">
-                                    {% for payment in payment_summary.recent_payments %}
-                                        <div class="flex items-center justify-between p-3 card-gaming-flat">
-                                            <div class="flex-1 min-w-0">
-                                                <p class="text-white text-sm font-medium truncate">{{ payment.description|default:"Payment" }}</p>
-                                                <p class="text-gray-500 text-xs mt-1">
-                                                    <time datetime="{{ payment.created_at|date:'c' }}">
-                                                        {{ payment.created_at|date:"M d, Y" }}
-                                                    </time>
-                                                </p>
-                                            </div>
-                                            <span class="text-electric-red text-sm font-bold ml-3">${{ payment.amount }}</span>
-                                        </div>
-                                    {% endfor %}
+                        <div>
+                            <h3 class="stat-label mb-3">RECENT TRANSACTIONS</h3>
+                            <div class="space-y-2">
+                                {% for payment in payment_summary.recent_payments %}
+                                <div class="flex items-center justify-between p-3 card-gaming-flat">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-white text-sm font-medium truncate">{{ payment.description|default:"Payment" }}</p>
+                                        <p class="text-gray-500 text-xs mt-1">
+                                            <time datetime="{{ payment.created_at|date:'c' }}"> {{ payment.created_at|date:"M d, Y" }}</time>
+                                        </p>
+                                    </div>
+                                    <span class="text-electric-red text-sm font-bold ml-3">${{ payment.amount }}</span>
                                 </div>
+                                {% endfor %}
                             </div>
+                        </div>
                         {% endif %}
-                        
+
                         <!-- Payment Methods -->
                         <div class="stat-card-gaming p-4">
                             <div class="stat-card-content">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-blue-500/20 rounded flex items-center justify-center">
-                                            <span class="material-symbols-outlined text-blue-500" aria-hidden="true">payments</span>
+                                            <span class="material-symbols-outlined text-green-500" aria-hidden="true">credit_card</span>
                                         </div>
                                         <span class="stat-label">SAVED METHODS</span>
                                     </div>
@@ -225,12 +221,9 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Manage Payment Methods Button -->
-                        <a 
-                            href="{% url 'payments:payment_methods' %}" 
-                            class="btn-gaming-primary w-full justify-center"
-                        >
+                        <a href="{% url 'payments:payment_methods' %}" class="btn-gaming-primary w-full justify-center">
                             <span>MANAGE PAYMENTS</span>
                         </a>
                     </div>
@@ -238,10 +231,72 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Quick Actions Component - Desktop -->
     <div class="hidden md:block">
         {% include 'dashboard/components/quick_actions_gaming.html' %}
+    </div>
+
+    <!-- Merch Teaser Section -->
+    <div class="card-gaming">
+        <div class="card-gaming-content">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="gaming-subheader text-2xl text-white">MERCH DROP</h2>
+                <a href="{% url 'store:product_list' %}" class="btn-gaming-ghost px-4 py-2 text-sm" aria-label="View all merch">
+                    SHOP ALL →
+                </a>
+            </div>
+            {% if featured_products %}
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;">
+                {% for product in featured_products %}
+                {% with primary_image=product.images.all|first %}
+                <a href="{% url 'store:product_detail' product.slug %}"
+                   class="block card-gaming-flat hover:neon-border-red transition-all group overflow-hidden rounded-lg"
+                   style="text-decoration:none;">
+                    <!-- Product Image -->
+                    <div style="position:relative;width:100%;padding-top:100%;background:#0a0a0a;overflow:hidden;">
+                        {% if primary_image %}
+                        <img src="{{ primary_image.image.url }}"
+                             alt="{{ primary_image.alt_text|default:product.name }}"
+                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.3s;">
+                        {% else %}
+                        {% with fallback=product.images.first %}
+                        {% if fallback %}
+                        <img src="{{ fallback.image.url }}"
+                             alt="{{ fallback.alt_text|default:product.name }}"
+                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.3s;">
+                        {% else %}
+                        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:2.5rem;line-height:1;text-transform:none;letter-spacing:0;color:#333;">checkroom</span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        {% endif %}
+                        {% if product.is_low_stock %}
+                        <div style="position:absolute;top:8px;left:8px;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;text-transform:uppercase;background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#eab308;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.06em;">
+                            Low Stock
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Product Info -->
+                    <div style="padding:0.75rem;">
+                        <p class="text-white gaming-body" style="font-size:0.875rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ product.name }}</p>
+                        <p class="text-electric-red gaming-stat" style="font-size:1rem;font-weight:900;margin-top:4px;">₦{{ product.price }}</p>
+                    </div>
+                </a>
+                {% endwith %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-10">
+                <span class="material-symbols-outlined text-gray-600 text-6xl animate-glow-pulse" aria-hidden="true">checkroom</span>
+                <p class="text-gray-400 mt-4 gaming-body">No featured products available yet. Check back soon!</p>
+                <a href="{% url 'store:product_list' %}" class="btn-gaming-primary mt-4 inline-flex">
+                    <span>Browse All Merch</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </main>
 {% endblock %}

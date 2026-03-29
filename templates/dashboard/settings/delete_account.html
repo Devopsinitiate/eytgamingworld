@@ -1,102 +1,125 @@
 {% extends "layouts/dashboard_base.html" %}
-
-{% block title %}Delete Account{% endblock %}
+{% load static %}
+{% block title %}Delete Account - EYTGaming{% endblock %}
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+<link rel="stylesheet" href="{% static 'css/settings-gaming.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 max-w-2xl">
-    <h1 class="text-3xl font-bold mb-6 text-red-600">Delete Account</h1>
-    
+<div class="st-page px-4 md:px-8 pb-12">
+<div class="max-w-6xl mx-auto">
+
+    <div class="st-header">
+        <h1 class="st-title">Delete Account</h1>
+        <p class="st-subtitle">Permanently remove your account and all associated data</p>
+    </div>
+
     {% if messages %}
-        <div class="mb-6">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} p-4 mb-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
+    <div class="space-y-2 mb-5">{% for message in messages %}
+    <div class="st-alert {% if message.tags == 'success' %}st-alert-success{% elif message.tags == 'error' %}st-alert-error{% elif message.tags == 'warning' %}st-alert-warning{% else %}st-alert-info{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:1.1rem; flex-shrink:0;">{% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}</span>
+        <p>{{ message }}</p>
+    </div>{% endfor %}</div>
     {% endif %}
-    
-    <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-6">
-        <h2 class="text-xl font-bold text-red-800 mb-4">⚠️ Warning: This action cannot be undone!</h2>
-        
-        <div class="text-red-700 space-y-3">
-            <p class="font-semibold">Deleting your account will:</p>
-            <ul class="list-disc list-inside space-y-2 ml-4">
-                <li>Permanently remove all your personal information</li>
-                <li>Delete your profile, avatar, and banner images</li>
-                <li>Remove your bio and contact information</li>
-                <li>Disconnect all linked gaming accounts (Steam, Discord, Twitch)</li>
-                <li>Anonymize your username and email address</li>
-                <li>Deactivate your account immediately</li>
-            </ul>
-            
-            <p class="font-semibold mt-4">What will be retained:</p>
-            <ul class="list-disc list-inside space-y-2 ml-4">
-                <li>Tournament participation records (for historical accuracy)</li>
-                <li>Match results and statistics (anonymized)</li>
-                <li>Team tournament history (anonymized)</li>
-            </ul>
-            
-            <p class="mt-4 font-semibold">
-                A confirmation email will be sent to your registered email address.
-            </p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1">
+            <div class="st-sidebar">
+                <p class="st-sidebar-title">Account Settings</p>
+                <nav>
+                    <a href="{% url 'dashboard:settings_profile' %}" class="st-nav-link"><span class="material-symbols-outlined">person</span>Profile</a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" class="st-nav-link"><span class="material-symbols-outlined">privacy_tip</span>Privacy</a>
+                    <a href="{% url 'dashboard:settings_security' %}" class="st-nav-link"><span class="material-symbols-outlined">security</span>Security</a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" class="st-nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" class="st-nav-link"><span class="material-symbols-outlined">link</span>Connected Accounts</a>
+                    <a href="{% url 'dashboard:account_delete' %}" class="st-nav-link danger active" aria-current="page"><span class="material-symbols-outlined">delete_forever</span>Delete Account</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="lg:col-span-3 flex flex-col gap-5">
+
+            <!-- Warning Banner -->
+            <div class="st-danger-zone">
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="material-symbols-outlined" style="font-size:1.5rem; color:#ef4444; flex-shrink:0; margin-top:0.1rem;">warning</span>
+                    <div>
+                        <p class="font-bold text-red-400" style="font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; letter-spacing:0.05em; font-size:1rem;">This action cannot be undone</p>
+                        <p class="text-sm text-gray-400 mt-1">Once you delete your account, there is no going back. Please be certain.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <p class="st-subsection-title" style="color:#f87171;"><span class="material-symbols-outlined" style="font-size:0.875rem;">delete_forever</span>Will Be Deleted</p>
+                        <ul class="st-check-list">
+                            <li>All personal information and profile data</li>
+                            <li>Avatar and banner images</li>
+                            <li>Bio and contact information</li>
+                            <li>Linked gaming accounts (Steam, Discord, Twitch)</li>
+                            <li>Account credentials and email address</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="st-subsection-title" style="color:#fcd34d;"><span class="material-symbols-outlined" style="font-size:0.875rem;">history</span>Will Be Retained</p>
+                        <ul class="st-check-list">
+                            <li>Tournament participation records (anonymized)</li>
+                            <li>Match results and statistics (anonymized)</li>
+                            <li>Team tournament history (anonymized)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Form -->
+            <div class="st-card">
+                <h2 class="st-section-title"><span class="material-symbols-outlined" style="font-size:1.1rem; color:#ef4444;">gpp_bad</span>Confirm Deletion</h2>
+
+                <form method="post" class="flex flex-col gap-4">
+                    {% csrf_token %}
+
+                    <div>
+                        <label for="{{ delete_form.password.id_for_label }}" class="st-label">{{ delete_form.password.label }}</label>
+                        {{ delete_form.password }}
+                        {% if delete_form.password.help_text %}
+                            <p class="text-xs text-gray-500 mt-1">{{ delete_form.password.help_text }}</p>
+                        {% endif %}
+                        {% if delete_form.password.errors %}
+                            <p class="text-xs text-red-400 mt-1">{{ delete_form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ delete_form.confirm_text.id_for_label }}" class="st-label">{{ delete_form.confirm_text.label }}</label>
+                        {{ delete_form.confirm_text }}
+                        {% if delete_form.confirm_text.help_text %}
+                            <p class="text-xs text-gray-500 mt-1">{{ delete_form.confirm_text.help_text }}</p>
+                        {% endif %}
+                        {% if delete_form.confirm_text.errors %}
+                            <p class="text-xs text-red-400 mt-1">{{ delete_form.confirm_text.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <a href="{% url 'dashboard:settings_profile' %}" class="st-btn st-btn-ghost">Cancel</a>
+                        <button type="submit" class="st-btn st-btn-danger" style="font-size:0.875rem; padding:0.625rem 1.5rem;">
+                            <span class="material-symbols-outlined" style="font-size:0.9rem;">delete_forever</span>
+                            Delete My Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center">
+                <p class="text-sm text-gray-600">Need help? <a href="#" class="text-red-400 hover:text-red-300 transition">Contact Support</a></p>
+            </div>
+
         </div>
-    </div>
-    
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-2xl font-bold mb-4">Confirm Account Deletion</h2>
-        
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            <div>
-                <label for="{{ delete_form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ delete_form.password.label }}
-                </label>
-                {{ delete_form.password }}
-                {% if delete_form.password.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ delete_form.password.help_text }}</p>
-                {% endif %}
-                {% if delete_form.password.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ delete_form.password.errors.0 }}</p>
-                {% endif %}
-            </div>
-            
-            <div>
-                <label for="{{ delete_form.confirm_text.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ delete_form.confirm_text.label }}
-                </label>
-                {{ delete_form.confirm_text }}
-                {% if delete_form.confirm_text.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ delete_form.confirm_text.help_text }}</p>
-                {% endif %}
-                {% if delete_form.confirm_text.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ delete_form.confirm_text.errors.0 }}</p>
-                {% endif %}
-            </div>
-            
-            <div class="flex items-center justify-between pt-4">
-                <a href="{% url 'dashboard:settings_profile' %}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-                    Cancel
-                </a>
-                <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
-                    Delete My Account
-                </button>
-            </div>
-        </form>
-    </div>
-    
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600">
-            Need help? <a href="#" class="text-blue-600 hover:underline">Contact Support</a>
-        </p>
     </div>
 </div>
+</div>
 {% endblock %}
-
-

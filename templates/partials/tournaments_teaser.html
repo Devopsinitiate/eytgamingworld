@@ -1,0 +1,110 @@
+{% load static %}
+
+<section id="tournaments" class="py-10 bg-gradient-to-b from-black to-gray-950 relative overflow-hidden">
+  <div class="container mx-auto px-4">
+
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
+      LIVE TOURNAMENTS
+    </h2>
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
+      Compete. Win. Dominate.
+    </p>
+
+    {% if home_tournaments %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for t in home_tournaments %}
+      <a href="{% url 'tournaments:detail' t.slug %}"
+         style="display:block;background:#111;border:1px solid #1f2937;border-radius:10px;
+                overflow:hidden;text-decoration:none;transition:border-color .25s,transform .25s;"
+         onmouseover="this.style.borderColor='#DC2626';this.style.transform='translateY(-4px)'"
+         onmouseout="this.style.borderColor='#1f2937';this.style.transform='translateY(0)'">
+
+        <!-- Banner / fallback -->
+        <div style="position:relative;height:100px;background:#1a1a1a;overflow:hidden;">
+          {% if t.banner %}
+          <img src="{{ t.banner.url }}" alt="{{ t.name }}"
+               style="width:100%;height:100%;object-fit:cover;opacity:.7;">
+          {% elif t.thumbnail %}
+          <img src="{{ t.thumbnail.url }}" alt="{{ t.name }}"
+               style="width:100%;height:100%;object-fit:cover;opacity:.7;">
+          {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+                      background:linear-gradient(135deg,#1a1a1a,#2d1515);">
+            <span style="font-family:'Material Symbols Outlined';font-size:48px;color:#374151;
+                         background:none;-webkit-background-clip:unset;background-clip:unset;
+                         -webkit-text-fill-color:#374151;">emoji_events</span>
+          </div>
+          {% endif %}
+
+          <!-- Status badge -->
+          <span style="position:absolute;top:10px;left:10px;padding:3px 10px;border-radius:4px;
+                       font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                       {% if t.status == 'in_progress' %}background:#16a34a;color:#fff;
+                       {% elif t.status == 'registration' %}background:#DC2626;color:#fff;
+                       {% else %}background:#d97706;color:#fff;{% endif %}">
+            {% if t.status == 'in_progress' %}LIVE
+            {% elif t.status == 'registration' %}OPEN
+            {% else %}CHECK-IN{% endif %}
+          </span>
+
+          <!-- Prize pool badge -->
+          {% if t.prize_pool %}
+          <span style="position:absolute;top:10px;right:10px;padding:3px 10px;border-radius:4px;
+                       font-size:.65rem;font-weight:700;background:rgba(0,0,0,.75);color:#fbbf24;">
+            ₦{{ t.prize_pool|floatformat:0 }}
+          </span>
+          {% endif %}
+        </div>
+
+        <div style="padding:14px 16px;">
+          <p style="font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px 0;">
+            {{ t.game.name }} &bull; {{ t.get_format_display }}
+          </p>
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;
+                     text-transform:uppercase;color:#fff;margin:0 0 10px 0;line-height:1.2;
+                     background:none;-webkit-background-clip:unset;background-clip:unset;
+                     -webkit-text-fill-color:#fff;">
+            {{ t.name|truncatechars:50 }}
+          </h3>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:.75rem;color:#9ca3af;">
+              <span style="font-family:'Material Symbols Outlined';font-size:14px;
+                           background:none;-webkit-background-clip:unset;background-clip:unset;
+                           -webkit-text-fill-color:#9ca3af;">calendar_today</span>
+              {{ t.start_datetime|date:"M d, Y" }}
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:.75rem;color:#9ca3af;">
+              <span style="font-family:'Material Symbols Outlined';font-size:14px;
+                           background:none;-webkit-background-clip:unset;background-clip:unset;
+                           -webkit-text-fill-color:#9ca3af;">group</span>
+              {{ t.total_registered }}/{{ t.max_participants }}
+            </span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="{% url 'tournaments:list' %}"
+         class="cta-secondary inline-block rounded-md">
+        View All Tournaments
+      </a>
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:48px 0;">
+      <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;
+                   margin-bottom:16px;background:none;-webkit-background-clip:unset;
+                   background-clip:unset;-webkit-text-fill-color:#374151;">emoji_events</span>
+      <p style="color:#6b7280;font-size:1.1rem;">No active tournaments right now. Check back soon.</p>
+      <a href="{% url 'tournaments:list' %}" style="display:inline-block;margin-top:16px;
+         color:#DC2626;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;">
+        Browse All Tournaments →
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

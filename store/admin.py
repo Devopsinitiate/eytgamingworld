@@ -278,17 +278,19 @@ class ProductAdmin(admin.ModelAdmin):
         'price',
         'stock_quantity',
         'is_active',
+        'is_featured',
         'is_in_stock',
         'is_low_stock',
         'variant_count',
         'image_count',
         'created_at'
     )
-    list_filter = ('is_active', 'category', 'created_at', 'updated_at', StockStatusFilter, LowStockFilter)
+    list_filter = ('is_active', 'is_featured', 'category', 'created_at', 'updated_at', StockStatusFilter, LowStockFilter)
     search_fields = ('name', 'description', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('created_at', 'updated_at', 'primary_image_preview')
     inlines = [ProductImageInline, ProductVariantInline]
+    list_editable = ('is_featured',)
     
     fieldsets = (
         ('Basic Information', {
@@ -299,8 +301,8 @@ class ProductAdmin(admin.ModelAdmin):
             'description': 'Set base price and stock quantity. Variants can have price adjustments.'
         }),
         ('Status', {
-            'fields': ('is_active',),
-            'description': 'Inactive products are soft-deleted and hidden from customers.'
+            'fields': ('is_active', 'is_featured'),
+            'description': 'Inactive products are soft-deleted and hidden from customers. Featured products appear in the Merch Teaser on the home dashboard.'
         }),
         ('Preview', {
             'fields': ('primary_image_preview',),
@@ -315,6 +317,8 @@ class ProductAdmin(admin.ModelAdmin):
     actions = [
         'mark_as_active',
         'mark_as_inactive',
+        'mark_as_featured',
+        'mark_as_not_featured',
         'duplicate_products',
         'adjust_stock',
         'apply_discount',
@@ -353,12 +357,24 @@ class ProductAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=True)
         self.message_user(request, f'{updated} product(s) marked as active.')
     mark_as_active.short_description = 'Mark selected products as active'
-    
+
     def mark_as_inactive(self, request, queryset):
         """Bulk action to mark products as inactive (soft delete)."""
         updated = queryset.update(is_active=False)
         self.message_user(request, f'{updated} product(s) marked as inactive.')
     mark_as_inactive.short_description = 'Mark selected products as inactive'
+
+    def mark_as_featured(self, request, queryset):
+        """Bulk action to feature products in the home Merch Teaser."""
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} product(s) marked as featured.')
+    mark_as_featured.short_description = 'Mark selected products as featured (Merch Teaser)'
+
+    def mark_as_not_featured(self, request, queryset):
+        """Bulk action to remove products from the home Merch Teaser."""
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} product(s) removed from featured.')
+    mark_as_not_featured.short_description = 'Remove selected products from featured'
     
     def duplicate_products(self, request, queryset):
         """Bulk action to duplicate selected products."""

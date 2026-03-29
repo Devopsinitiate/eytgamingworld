@@ -79,6 +79,10 @@ class Product(models.Model):
         validators=[MinValueValidator(0)]
     )
     is_active = models.BooleanField(default=True)  # Soft delete flag
+    is_featured = models.BooleanField(
+        default=False,
+        help_text='Feature this product in the Merch Teaser section on the home dashboard'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -89,6 +93,7 @@ class Product(models.Model):
             models.Index(fields=['slug']),
             models.Index(fields=['-created_at']),
             models.Index(fields=['is_active', '-created_at']),
+            models.Index(fields=['is_featured', 'is_active']),
         ]
 
     def __str__(self):
@@ -704,9 +709,11 @@ class ProductReview(models.Model):
     )
     order = models.ForeignKey(
         Order,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='reviews',
-        help_text='Order in which the product was purchased'
+        help_text='Order in which the product was purchased (optional)'
     )
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
@@ -722,7 +729,7 @@ class ProductReview(models.Model):
     class Meta:
         verbose_name = 'Product Review'
         verbose_name_plural = 'Product Reviews'
-        unique_together = ['product', 'user', 'order']
+        unique_together = ['product', 'user']
         indexes = [
             models.Index(fields=['product', '-created_at']),
             models.Index(fields=['user']),

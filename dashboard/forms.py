@@ -366,28 +366,28 @@ class PrivacySettingsForm(forms.Form):
         required=False,
         label='Private Profile',
         help_text='Hide your profile from non-friends',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=forms.CheckboxInput(attrs={'class': 'st-toggle-input'})
     )
     
     online_status_visible = forms.BooleanField(
         required=False,
         label='Show Online Status',
         help_text='Let others see when you are online',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=forms.CheckboxInput(attrs={'class': 'st-toggle-input'})
     )
     
     activity_visible = forms.BooleanField(
         required=False,
         label='Show Activity Feed',
         help_text='Let others see your recent activity',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=forms.CheckboxInput(attrs={'class': 'st-toggle-input'})
     )
     
     statistics_visible = forms.BooleanField(
         required=False,
         label='Show Statistics',
         help_text='Let others see your gaming statistics',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=forms.CheckboxInput(attrs={'class': 'st-toggle-input'})
     )
     
     def __init__(self, *args, **kwargs):

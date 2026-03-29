@@ -53,6 +53,18 @@
           </a>
         </li>
         <li>
+          <a href="{% url 'core:leaderboard' %}"
+            class="nav-link text-lg font-bold uppercase italic tracking-widest hover:text-red-600 transition-colors">
+            Leaderboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'about' %}"
+            class="nav-link text-lg font-bold uppercase italic tracking-widest hover:text-red-600 transition-colors">
+            About
+          </a>
+        </li>
+        <li>
           <a href="#community"
             class="nav-link text-lg font-bold uppercase italic tracking-widest hover:text-red-600 transition-colors">
             Community
@@ -138,6 +150,18 @@
           </a>
         </li>
         <li>
+          <a href="{% url 'core:leaderboard' %}"
+            class="block text-xl font-bold uppercase italic tracking-widest text-white hover:text-red-600 transition-colors py-2 touch-manipulation">
+            Leaderboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'about' %}"
+            class="block text-xl font-bold uppercase italic tracking-widest text-white hover:text-red-600 transition-colors py-2 touch-manipulation">
+            About
+          </a>
+        </li>
+        <li>
           <a href="#community"
             class="block text-xl font-bold uppercase italic tracking-widest text-white hover:text-red-600 transition-colors py-2 touch-manipulation">
             Community
@@ -167,6 +191,14 @@
         </a>
         {% endif %}
       </div>
+
+      <!-- Mobile footer links -->
+      <div class="mt-6 pt-6 border-t border-red-600/20 flex gap-6 flex-wrap">
+        <a href="{% url 'privacy' %}" class="text-xs text-gray-500 uppercase tracking-widest hover:text-red-500 transition-colors touch-manipulation">Privacy</a>
+        <a href="{% url 'terms' %}" class="text-xs text-gray-500 uppercase tracking-widest hover:text-red-500 transition-colors touch-manipulation">Terms</a>
+        <a href="{% url 'about' %}" class="text-xs text-gray-500 uppercase tracking-widest hover:text-red-500 transition-colors touch-manipulation">About</a>
+      </div>
+
     </div>
   </div>
 </nav>

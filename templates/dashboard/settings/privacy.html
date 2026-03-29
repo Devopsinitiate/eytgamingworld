@@ -1,263 +1,334 @@
 {% extends "layouts/dashboard_base.html" %}
 {% load static %}
-
 {% block title %}Privacy Settings - EYTGaming{% endblock %}
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/settings-gaming.css' %}">
 <style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    
-    /* Force dark theme overrides for privacy settings */
-    .bg-white,
-    .bg-gray-50 {
-        background-color: #111318 !important;
-        color: #ffffff !important;
-    }
-    
-    .text-gray-900 {
-        color: #ffffff !important;
-    }
-    
-    .text-gray-600 {
-        color: #9ca3af !important;
-    }
-    
-    .border-gray-200 {
-        border-color: #374151 !important;
-    }
+  /* Self-contained toggle — beats every global rule */
+  .prv-toggle-wrap {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .prv-toggle-wrap input[type="checkbox"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    top: 0 !important; left: 0 !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+  }
+  .prv-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: #1f2937;
+    border: 1px solid #374151;
+    transition: background .2s, border-color .2s;
+    pointer-events: none;
+  }
+  .prv-thumb {
+    position: absolute;
+    top: 4px; left: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #6b7280;
+    transition: transform .2s, background .2s, box-shadow .2s;
+    pointer-events: none;
+  }
+  /* ON state — driven by JS class */
+  .prv-toggle-wrap.is-on .prv-track {
+    background: rgba(185,28,28,.35);
+    border-color: #b91c1c;
+  }
+  .prv-toggle-wrap.is-on .prv-thumb {
+    transform: translateX(22px);
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239,68,68,.5);
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 p-8">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- Settings Sidebar Navigation -->
-        <aside class="lg:col-span-1">
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Settings</h2>
-                <nav class="space-y-2">
-                    <a href="{% url 'dashboard:settings_profile' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span class="material-symbols-outlined text-base">person</span>
-                        Profile
-                    </a>
-                    <a href="{% url 'dashboard:settings_privacy' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary text-white"
-                       aria-current="page">
-                        <span class="material-symbols-outlined text-base">privacy_tip</span>
-                        Privacy
-                    </a>
-                    <a href="{% url 'dashboard:settings_security' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span class="material-symbols-outlined text-base">security</span>
-                        Security
-                    </a>
-                    <a href="{% url 'dashboard:settings_notifications' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span class="material-symbols-outlined text-base">notifications</span>
-                        Notifications
-                    </a>
-                    <a href="{% url 'dashboard:settings_accounts' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                        <span class="material-symbols-outlined text-base">link</span>
-                        Connected Accounts
-                    </a>
-                    <a href="{% url 'dashboard:account_delete' %}" 
-                       class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
-                        <span class="material-symbols-outlined text-base">delete</span>
-                        Delete Account
-                    </a>
-                </nav>
-            </div>
-        </aside>
+<div class="st-page px-4 md:px-8 pb-12">
+<div class="max-w-6xl mx-auto">
 
-        <!-- Main Content -->
-        <div class="lg:col-span-3 space-y-8">
-            <!-- Page Header -->
-            <div>
-                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Privacy Settings</h1>
-                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Control what information is visible to other users on your profile</p>
-            </div>
+  <div class="st-header">
+    <h1 class="st-title">Privacy Settings</h1>
+    <p class="st-subtitle">Control what information is visible to other users on your profile</p>
+  </div>
 
-            <!-- Messages -->
-            {% if messages %}
-                <div class="space-y-3">
-                    {% for message in messages %}
-                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined">
-                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
-                                </span>
-                                <p>{{ message }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+  {% if messages %}
+  <div class="space-y-2 mb-5">
+  {% for message in messages %}
+  <div class="st-alert {% if message.tags == 'success' %}st-alert-success{% elif message.tags == 'error' %}st-alert-error{% elif message.tags == 'warning' %}st-alert-warning{% else %}st-alert-info{% endif %}">
+    <span class="material-symbols-outlined" style="font-size:1.1rem;flex-shrink:0;">{% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}</span>
+    <p>{{ message }}</p>
+  </div>
+  {% endfor %}
+  </div>
+  {% endif %}
 
-            <!-- Privacy Information Banner -->
-            <div class="bg-primary/10 border border-primary/20 rounded-xl p-4">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary">info</span>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                        These settings help you maintain your privacy while using the platform. Control what information is visible to other users.
-                    </p>
-                </div>
-            </div>
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-            <!-- Privacy Settings Form -->
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-primary text-2xl">privacy_tip</span>
-                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Profile Visibility</h2>
-                </div>
-                
-                <form id="privacy-form" method="post" class="space-y-6">
-                    {% csrf_token %}
-                    
-                    <div class="space-y-6">
-                        <!-- Online Status -->
-                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">visibility</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.online_status_visible.label }}</h3>
-                                    {% if form.online_status_visible.help_text %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.online_status_visible.help_text }}</p>
-                                    {% else %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show when you're online with a green indicator</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                {{ form.online_status_visible }}
-                                {% if form.online_status_visible.errors %}
-                                    <p class="text-sm text-red-400 ml-2">{{ form.online_status_visible.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- Activity Feed -->
-                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">activity_zone</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.activity_visible.label }}</h3>
-                                    {% if form.activity_visible.help_text %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.activity_visible.help_text }}</p>
-                                    {% else %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show your recent tournaments, teams, and achievements</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                {{ form.activity_visible }}
-                                {% if form.activity_visible.errors %}
-                                    <p class="text-sm text-red-400 ml-2">{{ form.activity_visible.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- Statistics -->
-                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">analytics</span>
-                                <div>
-                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ form.statistics_visible.label }}</h3>
-                                    {% if form.statistics_visible.help_text %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ form.statistics_visible.help_text }}</p>
-                                    {% else %}
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Show your tournament statistics and performance metrics</p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                {{ form.statistics_visible }}
-                                {% if form.statistics_visible.errors %}
-                                    <p class="text-sm text-red-400 ml-2">{{ form.statistics_visible.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    <aside class="lg:col-span-1">
+      <div class="st-sidebar">
+        <p class="st-sidebar-title">Account Settings</p>
+        <nav>
+          <a href="{% url 'dashboard:settings_profile' %}" class="st-nav-link"><span class="material-symbols-outlined">person</span>Profile</a>
+          <a href="{% url 'dashboard:settings_privacy' %}" class="st-nav-link active" aria-current="page"><span class="material-symbols-outlined">privacy_tip</span>Privacy</a>
+          <a href="{% url 'dashboard:settings_security' %}" class="st-nav-link"><span class="material-symbols-outlined">security</span>Security</a>
+          <a href="{% url 'dashboard:settings_notifications' %}" class="st-nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+          <a href="{% url 'dashboard:settings_accounts' %}" class="st-nav-link"><span class="material-symbols-outlined">link</span>Connected Accounts</a>
+          <a href="{% url 'dashboard:account_delete' %}" class="st-nav-link danger"><span class="material-symbols-outlined">delete_forever</span>Delete Account</a>
+        </nav>
+      </div>
+    </aside>
 
-            <!-- Privacy Information Section -->
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-primary text-2xl">info</span>
-                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Privacy Information</h2>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- What's Always Visible -->
-                    <div class="space-y-4">
-                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">visibility</span>
-                            What's Always Visible
-                        </h3>
-                        <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
-                                Your username and display name
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
-                                Your avatar and banner images
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
-                                Your bio and basic profile information
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-green-500">check</span>
-                                Your game profiles (games you play)
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- What You Can Control -->
-                    <div class="space-y-4">
-                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">tune</span>
-                            What You Can Control
-                        </h3>
-                        <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
-                                Online status indicator (green dot when you're active)
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
-                                Recent activity feed (tournaments, teams, achievements)
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xs text-primary">settings</span>
-                                Tournament statistics and performance metrics
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <div class="lg:col-span-3 flex flex-col gap-5">
 
-            <!-- Form Actions -->
-            <div class="flex items-center justify-between">
-                <a href="{% url 'dashboard:home' %}" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition">
-                    Cancel
-                </a>
-                <button type="submit" form="privacy-form" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                    <span class="material-symbols-outlined text-base">save</span>
-                    Save Privacy Settings
-                </button>
-            </div>
+      <!-- Live summary banner -->
+      <div class="st-info-banner" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <span class="material-symbols-outlined" style="font-size:1rem;color:#60a5fa;flex-shrink:0;">info</span>
+          <p style="font-size:.85rem;color:#d1d5db;font-weight:600;">Your current profile visibility</p>
         </div>
+        <div id="summary-items" style="display:flex;flex-wrap:wrap;gap:.5rem;padding-left:1.5rem;">
+          <span id="sum-private" style="display:none;"></span>
+          <span id="sum-online"></span>
+          <span id="sum-activity"></span>
+          <span id="sum-stats"></span>
+        </div>
+      </div>
+
+      <form id="privacy-form" method="post" class="flex flex-col gap-5">
+        {% csrf_token %}
+
+        <!-- Profile Access -->
+        <div class="st-card">
+          <h2 class="st-section-title">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">lock</span>
+            Profile Access
+          </h2>
+          <div class="st-toggle-row" style="background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);border-radius:8px;padding:1rem;">
+            <div class="flex items-center gap-3">
+              <div class="st-toggle-icon">
+                <span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">lock_person</span>
+              </div>
+              <div>
+                <p class="st-toggle-label">Private Profile</p>
+                <p class="st-toggle-desc">Only you can see your full profile. Other users will see a locked profile page.</p>
+                <p id="private-warning" class="st-toggle-desc" style="color:#f87171;margin-top:4px;display:none;">When enabled, the visibility settings below only apply to you.</p>
+              </div>
+            </div>
+            <!-- Custom toggle: overlay checkbox on top of visual track+thumb -->
+            <div class="prv-toggle-wrap{% if form.private_profile.value %} is-on{% endif %}" data-field="private_profile">
+              <input type="checkbox" name="private_profile" id="id_private_profile"{% if form.private_profile.value %} checked{% endif %}>
+              <div class="prv-track"></div>
+              <div class="prv-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Visibility -->
+        <div class="st-card" id="card-visibility">
+          <h2 class="st-section-title">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">privacy_tip</span>
+            Profile Visibility
+          </h2>
+          <p class="text-sm text-gray-500 mb-4">These settings control what visitors can see on your public profile.</p>
+          <div class="flex flex-col gap-3">
+
+            <div class="st-toggle-row">
+              <div class="flex items-center gap-3">
+                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">circle</span></div>
+                <div>
+                  <p class="st-toggle-label">Show Online Status</p>
+                  <p class="st-toggle-desc">Display a green dot when you are active. Others can see when you were last online.</p>
+                </div>
+              </div>
+              <div class="prv-toggle-wrap{% if form.online_status_visible.value %} is-on{% endif %}" data-field="online_status_visible">
+                <input type="checkbox" name="online_status_visible" id="id_online_status_visible"{% if form.online_status_visible.value %} checked{% endif %}>
+                <div class="prv-track"></div>
+                <div class="prv-thumb"></div>
+              </div>
+            </div>
+
+            <div class="st-toggle-row">
+              <div class="flex items-center gap-3">
+                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">timeline</span></div>
+                <div>
+                  <p class="st-toggle-label">Show Activity Feed</p>
+                  <p class="st-toggle-desc">Show your recent tournaments joined, teams created, and achievements earned.</p>
+                </div>
+              </div>
+              <div class="prv-toggle-wrap{% if form.activity_visible.value %} is-on{% endif %}" data-field="activity_visible">
+                <input type="checkbox" name="activity_visible" id="id_activity_visible"{% if form.activity_visible.value %} checked{% endif %}>
+                <div class="prv-track"></div>
+                <div class="prv-thumb"></div>
+              </div>
+            </div>
+
+            <div class="st-toggle-row">
+              <div class="flex items-center gap-3">
+                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">analytics</span></div>
+                <div>
+                  <p class="st-toggle-label">Show Statistics</p>
+                  <p class="st-toggle-desc">Show your win rate, match history, tournament placements, and prize winnings.</p>
+                </div>
+              </div>
+              <div class="prv-toggle-wrap{% if form.statistics_visible.value %} is-on{% endif %}" data-field="statistics_visible">
+                <input type="checkbox" name="statistics_visible" id="id_statistics_visible"{% if form.statistics_visible.value %} checked{% endif %}>
+                <div class="prv-track"></div>
+                <div class="prv-thumb"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Privacy Reference -->
+        <div class="st-card">
+          <h2 class="st-section-title">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">info</span>
+            Privacy Reference
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">visibility</span>Always Visible</p>
+              <ul class="st-check-list">
+                <li>Your username and display name</li>
+                <li>Your avatar and banner images</li>
+                <li>Your bio and basic profile info</li>
+                <li>Your game profiles</li>
+                <li>Your public achievements</li>
+              </ul>
+            </div>
+            <div>
+              <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">tune</span>Controlled by You</p>
+              <ul class="st-check-list">
+                <li>Whether your profile is private</li>
+                <li>Online / last-seen status</li>
+                <li>Recent activity feed</li>
+                <li>Tournament statistics and win rate</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <a href="{% url 'dashboard:home' %}" class="st-btn st-btn-ghost">Cancel</a>
+          <button type="submit" class="st-btn st-btn-primary">
+            <span class="material-symbols-outlined" style="font-size:0.9rem;">save</span>
+            Save Privacy Settings
+          </button>
+        </div>
+
+      </form>
     </div>
-</main>
+  </div>
+</div>
+</div>
+
+<script>
+(function () {
+  /* Wire up every .prv-toggle-wrap */
+  document.querySelectorAll('.prv-toggle-wrap').forEach(function (wrap) {
+    var cb = wrap.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+
+    /* Sync visual state from checkbox state */
+    function sync() {
+      if (cb.checked) {
+        wrap.classList.add('is-on');
+      } else {
+        wrap.classList.remove('is-on');
+      }
+      updateSummary();
+    }
+
+    /* Clicking anywhere on the wrap toggles the checkbox */
+    wrap.addEventListener('click', function (e) {
+      /* The checkbox itself also fires a change, so only toggle manually
+         when the click did NOT land on the checkbox input */
+      if (e.target !== cb) {
+        cb.checked = !cb.checked;
+      }
+      sync();
+    });
+
+    cb.addEventListener('change', sync);
+  });
+
+  /* ── Summary badges ── */
+  var sumPrivate  = document.getElementById('sum-private');
+  var sumOnline   = document.getElementById('sum-online');
+  var sumActivity = document.getElementById('sum-activity');
+  var sumStats    = document.getElementById('sum-stats');
+  var warning     = document.getElementById('private-warning');
+  var cardVis     = document.getElementById('card-visibility');
+
+  function badge(el, on, onLabel, offLabel) {
+    if (!el) return;
+    el.textContent = on ? onLabel : offLabel;
+    el.style.cssText = [
+      'display:inline-block',
+      'padding:3px 10px',
+      'border-radius:4px',
+      'font-size:.72rem',
+      'font-weight:700',
+      'text-transform:uppercase',
+      'letter-spacing:.05em',
+      on ? 'background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)'
+         : 'background:rgba(107,114,128,.15);color:#9ca3af;border:1px solid rgba(107,114,128,.3)'
+    ].join(';');
+  }
+
+  function updateSummary() {
+    var cbPrivate  = document.getElementById('id_private_profile');
+    var cbOnline   = document.getElementById('id_online_status_visible');
+    var cbActivity = document.getElementById('id_activity_visible');
+    var cbStats    = document.getElementById('id_statistics_visible');
+
+    var isPrivate  = cbPrivate  && cbPrivate.checked;
+    var isOnline   = cbOnline   && cbOnline.checked;
+    var isActivity = cbActivity && cbActivity.checked;
+    var isStats    = cbStats    && cbStats.checked;
+
+    if (sumPrivate) {
+      if (isPrivate) {
+        sumPrivate.textContent = 'Profile is Private';
+        sumPrivate.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(220,38,38,.3)';
+      } else {
+        sumPrivate.style.display = 'none';
+      }
+    }
+
+    badge(sumOnline,   isOnline,   'Online Status: Visible',  'Online Status: Hidden');
+    badge(sumActivity, isActivity, 'Activity: Visible',       'Activity: Hidden');
+    badge(sumStats,    isStats,    'Statistics: Visible',     'Statistics: Hidden');
+
+    if (cardVis) {
+      cardVis.style.opacity       = isPrivate ? '0.45' : '1';
+      cardVis.style.pointerEvents = isPrivate ? 'none' : '';
+    }
+    if (warning) warning.style.display = isPrivate ? 'block' : 'none';
+  }
+
+  updateSummary();
+}());
+</script>
 {% endblock %}
-
-

@@ -4,277 +4,161 @@
 {% block title %}Payment Method - EYTGaming Store{% endblock %}
 
 {% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
 <style>
-    /* Use Space Grotesk font for store pages */
-    body {
-        font-family: 'Space Grotesk', 'Spline Sans', sans-serif;
-    }
-
-    /* Payment method styles */
-    .payment-method {
-        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
-        border: 2px solid rgba(236, 19, 19, 0.2);
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .payment-method:hover {
-        border-color: rgba(236, 19, 19, 0.5);
-        box-shadow: 0 0 20px rgba(236, 19, 19, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    .payment-method.selected {
-        border-color: #ec1313;
-        box-shadow: 0 0 25px rgba(236, 19, 19, 0.4);
-        background: linear-gradient(135deg, #2a1f1f 0%, #3a2a2a 100%);
-    }
-    
-    .payment-method input[type="radio"] {
-        display: none;
-    }
-    
-    .order-summary-card {
-        background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
-        border: 1px solid rgba(236, 19, 19, 0.3);
-        box-shadow: 0 0 20px rgba(236, 19, 19, 0.1);
-    }
-    
-    .checkout-step {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        background: rgba(236, 19, 19, 0.1);
-        border: 1px solid rgba(236, 19, 19, 0.3);
-    }
-    
-    .checkout-step.active {
-        background: rgba(236, 19, 19, 0.2);
-        border-color: #ec1313;
-        box-shadow: 0 0 15px rgba(236, 19, 19, 0.3);
-    }
-    
-    .checkout-step.completed {
-        background: rgba(34, 197, 94, 0.1);
-        border-color: rgba(34, 197, 94, 0.5);
-    }
-    
-    .order-item {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(236, 19, 19, 0.1);
-    }
+    body { background:#080808; font-family:'Space Grotesk',sans-serif; }
+    .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-style:italic; text-transform:uppercase; font-size:clamp(1.75rem,4vw,2.5rem); letter-spacing:0.06em; color:#fff; line-height:1; }
+    .page-title span { color:#b91c1c; }
+    .step-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:2rem; }
+    .step { display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1rem; border-radius:0.625rem; background:#0d1117; border:1px solid #1f2937; }
+    .step.active { border-color:rgba(185,28,28,0.5); background:rgba(185,28,28,0.06); }
+    .step.done { border-color:rgba(74,222,128,0.3); background:rgba(6,78,59,0.1); }
+    .step-label { font-size:0.8125rem; font-weight:600; color:#9ca3af; }
+    .step.active .step-label { color:#fff; }
+    .step.done .step-label { color:#4ade80; }
+    .step-sub { font-size:0.7rem; color:#4b5563; }
+    .g-card { background:#0d1117; border:1px solid #1f2937; border-radius:0.75rem; overflow:hidden; position:relative; }
+    .g-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,0.2) 100%); }
+    .pay-method { background:#0d1117; border:2px solid #1f2937; border-radius:0.75rem; padding:1.25rem; cursor:pointer; transition:all 0.15s; }
+    .pay-method:hover { border-color:rgba(185,28,28,0.4); }
+    .pay-method.selected { border-color:#b91c1c; background:rgba(185,28,28,0.05); box-shadow:0 0 20px rgba(185,28,28,0.15); }
+    .pay-method input[type="radio"] { display:none; }
+    .pay-icon { width:3rem; height:3rem; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .order-item { background:#080808; border:1px solid #111827; border-radius:0.5rem; padding:0.75rem; }
+    .btn-primary { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.875rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; }
+    .btn-primary:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 20px rgba(185,28,28,0.4); }
+    .btn-ghost { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.875rem 1.25rem; background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:0.5rem; font-size:0.875rem; text-decoration:none; transition:all 0.15s; }
+    .btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
+    .loading-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; }
+    .loading-overlay.active { display:flex; }
+    .spinner { width:3rem; height:3rem; border-radius:50%; border:3px solid rgba(185,28,28,0.2); border-top-color:#b91c1c; animation:spin 0.8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-background-dark py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">Payment Method</h1>
-            <p class="text-gray-400">Choose how you'd like to pay</p>
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    <div class="mb-6">
+        <h1 class="page-title">Payment <span>Method</span></h1>
+        <p class="text-gray-500 text-sm mt-1">Choose how you'd like to pay</p>
+    </div>
+
+    <div class="step-bar">
+        <div class="step done">
+            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">check_circle</span>
+            <div><p class="step-label">Review Cart</p><p class="step-sub">Completed</p></div>
         </div>
-
-        <!-- Checkout Steps -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="checkout-step completed">
-                <span class="material-symbols-outlined text-green-500 mr-3 text-3xl">
-                    check_circle
-                </span>
-                <div>
-                    <h3 class="text-white font-semibold">Review Cart</h3>
-                    <p class="text-gray-400 text-sm">Completed</p>
-                </div>
-            </div>
-            <div class="checkout-step completed">
-                <span class="material-symbols-outlined text-green-500 mr-3 text-3xl">
-                    check_circle
-                </span>
-                <div>
-                    <h3 class="text-white font-semibold">Shipping Info</h3>
-                    <p class="text-gray-400 text-sm">Completed</p>
-                </div>
-            </div>
-            <div class="checkout-step active">
-                <span class="material-symbols-outlined text-primary mr-3 text-3xl">
-                    payment
-                </span>
-                <div>
-                    <h3 class="text-white font-semibold">Payment</h3>
-                    <p class="text-gray-400 text-sm">Current step</p>
-                </div>
-            </div>
+        <div class="step done">
+            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">check_circle</span>
+            <div><p class="step-label">Shipping</p><p class="step-sub">Completed</p></div>
         </div>
-
-        {% if error %}
-            <div class="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-6">
-                <div class="flex items-center">
-                    <span class="material-symbols-outlined text-red-500 mr-3">
-                        error
-                    </span>
-                    <span class="text-red-500">{{ error }}</span>
-                </div>
-            </div>
-        {% endif %}
-
-        <!-- Loading Indicator -->
-        <div id="payment-loading" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-gray-900 rounded-lg p-8 text-center">
-                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-                <p class="text-white text-lg font-semibold">Processing Payment...</p>
-                <p class="text-gray-400 text-sm mt-2">Please do not close this window</p>
-            </div>
+        <div class="step active">
+            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">payment</span>
+            <div><p class="step-label">Payment</p><p class="step-sub">Current step</p></div>
         </div>
+    </div>
 
-        <!-- Checkout Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Payment Methods -->
-            <div class="lg:col-span-2">
-                <h2 class="text-2xl font-bold text-white mb-6">Select Payment Method</h2>
-                
-                <form method="post" action="{% url 'store:checkout_payment' %}" id="payment-form">
-                    {% csrf_token %}
-                    
-                    <div class="space-y-4 mb-8">
-                        <!-- Stripe Payment Method -->
-                        <div class="payment-method rounded-lg p-6 block" id="stripe-method">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="payment_method" value="stripe" required>
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center">
-                                        <div class="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
-                                            <span class="material-symbols-outlined text-white text-3xl">
-                                                credit_card
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-xl font-bold text-white mb-1">Credit/Debit Card</h3>
-                                            <p class="text-gray-400 text-sm">Pay securely with Stripe</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <img src="{% static 'images/visa.svg' %}" alt="Visa" class="h-8" onerror="this.style.display='none'">
-                                        <img src="{% static 'images/mastercard.svg' %}" alt="Mastercard" class="h-8" onerror="this.style.display='none'">
-                                    </div>
+    {% if error %}
+    <div style="background:rgba(127,29,29,0.2);border:1px solid rgba(239,68,68,0.3);border-radius:0.625rem;padding:0.875rem 1rem;display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+        <span class="material-symbols-outlined" style="font-size:1.25rem;color:#ef4444;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">error</span>
+        <span class="text-red-300 text-sm">{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <div id="payment-loading" class="loading-overlay">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-white font-semibold">Processing Payment…</p>
+            <p class="text-gray-400 text-sm mt-1">Please do not close this window</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:1rem;color:#9ca3af;margin-bottom:1rem;">Select Payment Method</h2>
+            <form method="post" action="{% url 'store:checkout_payment' %}" id="payment-form">
+                {% csrf_token %}
+                <div class="space-y-4 mb-6">
+                    <div class="pay-method" id="stripe-method" onclick="selectMethod(this,'stripe')">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="payment_method" value="stripe">
+                            <div class="flex items-center gap-4">
+                                <div class="pay-icon" style="background:#1d4ed8;">
+                                    <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">credit_card</span>
                                 </div>
-                            </label>
-                            <!-- Stripe Card Element -->
-                            <div id="stripe-card-element" class="hidden bg-gray-900 border border-gray-700 rounded-lg p-4 mt-4">
-                                <div id="card-element" class="mb-3"></div>
-                                <div id="card-errors" class="text-red-500 text-sm"></div>
-                            </div>
-                        </div>
-
-                        <!-- Paystack Payment Method -->
-                        <label class="payment-method rounded-lg p-6 block cursor-pointer" id="paystack-method">
-                            <input type="radio" name="payment_method" value="paystack" required>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mr-4">
-                                        <span class="material-symbols-outlined text-white text-3xl">
-                                            account_balance
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-xl font-bold text-white mb-1">Paystack</h3>
-                                        <p class="text-gray-400 text-sm">Pay with card, bank transfer, or mobile money</p>
-                                    </div>
+                                <div>
+                                    <p class="text-white font-semibold">Credit / Debit Card</p>
+                                    <p class="text-gray-500 text-sm">Pay securely with Stripe</p>
                                 </div>
                             </div>
                         </label>
                     </div>
-
-                    <!-- Form Actions -->
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{% url 'store:checkout_shipping' %}" 
-                           class="flex-1 text-center px-6 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-all">
-                            Back
-                        </a>
-                        <button type="submit" 
-                                class="flex-1 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all hover:shadow-lg hover:shadow-primary/50"
-                                id="submit-payment">
-                            Continue to Payment
-                        </button>
-                    </div>
-
-                    <!-- Security Badge -->
-                    <div class="mt-6 flex items-center justify-center text-gray-400 text-sm">
-                        <span class="material-symbols-outlined mr-2 text-green-500">
-                            lock
-                        </span>
-                        <span>Your payment information is secure and encrypted</span>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Order Summary -->
-            <div class="lg:col-span-1">
-                <div class="order-summary-card rounded-lg p-6 sticky top-20">
-                    <h2 class="text-2xl font-bold text-white mb-6">Order Summary</h2>
-                    
-                    <!-- Order Items -->
-                    <div class="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                        {% for item in cart_items %}
-                            <div class="order-item rounded-lg p-3">
-                                <div class="flex items-center gap-3">
-                                    {% if item.product.images.all %}
-                                        <img src="{{ item.product.images.first.image.url }}" 
-                                             alt="{{ item.product.name }}"
-                                             class="w-12 h-12 object-cover rounded">
-                                    {% else %}
-                                        <div class="w-12 h-12 bg-gray-800 rounded flex items-center justify-center">
-                                            <span class="material-symbols-outlined text-gray-600">image</span>
-                                        </div>
-                                    {% endif %}
-                                    <div class="flex-grow">
-                                        <p class="text-white text-sm font-semibold">{{ item.product.name }}</p>
-                                        {% if item.variant %}
-                                            <p class="text-gray-400 text-xs">{{ item.variant.name }}</p>
-                                        {% endif %}
-                                        <p class="text-gray-400 text-xs">Qty: {{ item.quantity }}</p>
-                                    </div>
-                                    <p class="text-white font-semibold">${{ item.total_price }}</p>
+                    <div class="pay-method" id="paystack-method" onclick="selectMethod(this,'paystack')">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="payment_method" value="paystack">
+                            <div class="flex items-center gap-4">
+                                <div class="pay-icon" style="background:#059669;">
+                                    <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">account_balance</span>
+                                </div>
+                                <div>
+                                    <p class="text-white font-semibold">Paystack</p>
+                                    <p class="text-gray-500 text-sm">Card, bank transfer, or mobile money</p>
                                 </div>
                             </div>
-                        {% endfor %}
+                        </label>
                     </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="{% url 'store:checkout_shipping' %}" class="btn-ghost flex-1">Back</a>
+                    <button type="submit" class="btn-primary flex-1" id="submit-payment">
+                        Continue to Payment
+                        <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_forward</span>
+                    </button>
+                </div>
+                <div class="flex items-center justify-center gap-1.5 mt-5 text-gray-600 text-xs">
+                    <span class="material-symbols-outlined" style="font-size:0.875rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">lock</span>
+                    Your payment information is secure and encrypted
+                </div>
+            </form>
+        </div>
 
-                    <!-- Shipping Address -->
-                    <div class="border-t border-gray-700 pt-4 mb-4">
-                        <h3 class="text-white font-semibold mb-2">Shipping To:</h3>
-                        <p class="text-gray-400 text-sm">{{ shipping_info.shipping_name }}</p>
-                        <p class="text-gray-400 text-sm">{{ shipping_info.shipping_address_line1 }}</p>
-                        {% if shipping_info.shipping_address_line2 %}
-                            <p class="text-gray-400 text-sm">{{ shipping_info.shipping_address_line2 }}</p>
+        <div class="lg:col-span-1">
+            <div class="g-card p-6 sticky top-20">
+                <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:1.25rem;color:#fff;letter-spacing:0.05em;margin-bottom:1.25rem;">Order Summary</h2>
+                <div class="space-y-2 mb-4 max-h-56 overflow-y-auto">
+                    {% for item in cart_items %}
+                    <div class="order-item flex items-center gap-3">
+                        {% if item.product.images.all %}
+                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="w-10 h-10 object-cover rounded">
+                        {% else %}
+                        <div class="w-10 h-10 bg-gray-900 rounded flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined" style="font-size:1rem;color:#374151;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">image</span>
+                        </div>
                         {% endif %}
-                        <p class="text-gray-400 text-sm">
-                            {{ shipping_info.shipping_city }}, {{ shipping_info.shipping_state }} {{ shipping_info.shipping_postal_code }}
-                        </p>
-                        <p class="text-gray-400 text-sm">{{ shipping_info.shipping_country }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white text-xs font-semibold truncate">{{ item.product.name }}</p>
+                            <p class="text-gray-500 text-xs">Qty: {{ item.quantity }}</p>
+                        </div>
+                        <p class="text-white text-sm font-semibold flex-shrink-0">₦{{ item.total_price }}</p>
                     </div>
-
-                    <!-- Price Breakdown -->
-                    <div class="space-y-3 border-t border-gray-700 pt-4">
-                        <div class="flex justify-between text-gray-300">
-                            <span>Subtotal</span>
-                            <span class="font-semibold">${{ subtotal }}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-300">
-                            <span>Shipping</span>
-                            <span class="font-semibold">${{ shipping_cost }}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-300">
-                            <span>Tax (10%)</span>
-                            <span class="font-semibold">${{ tax }}</span>
-                        </div>
-                        <div class="border-t border-gray-700 pt-3">
-                            <div class="flex justify-between text-white text-xl font-bold">
-                                <span>Total</span>
-                                <span>${{ total }}</span>
-                            </div>
+                    {% endfor %}
+                </div>
+                <div style="border-top:1px solid #111827;padding-top:0.875rem;" class="space-y-2 mb-4">
+                    <div class="flex justify-between text-gray-400 text-sm"><span>Subtotal</span><span class="text-white">₦{{ subtotal }}</span></div>
+                    <div class="flex justify-between text-gray-400 text-sm"><span>Shipping</span><span class="text-white">₦{{ shipping_cost }}</span></div>
+                    <div class="flex justify-between text-gray-400 text-sm"><span>Tax (10%)</span><span class="text-white">₦{{ tax }}</span></div>
+                    <div style="border-top:1px solid #111827;padding-top:0.625rem;">
+                        <div class="flex justify-between text-white font-bold">
+                            <span>Total</span>
+                            <span class="gaming-header text-2xl text-electric-red">₦{{ total }}</span>
                         </div>
                     </div>
+                </div>
+                <div style="border-top:1px solid #111827;padding-top:0.875rem;">
+                    <p class="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Shipping To</p>
+                    <p class="text-gray-300 text-sm">{{ shipping_info.shipping_name }}</p>
+                    <p class="text-gray-500 text-xs">{{ shipping_info.shipping_address_line1 }}, {{ shipping_info.shipping_city }}</p>
+                    <p class="text-gray-500 text-xs">{{ shipping_info.shipping_country }}</p>
                 </div>
             </div>
         </div>
@@ -282,214 +166,102 @@
 </div>
 
 <script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-    // Payment method selection
-    document.querySelectorAll('.payment-method').forEach(method => {
-        method.addEventListener('click', function() {
-            // Remove selected class from all methods
-            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-            // Add selected class to clicked method
-            this.classList.add('selected');
-            // Check the radio button
-            this.querySelector('input[type="radio"]').checked = true;
-        });
-    });
-
-    // Stripe payment integration
-    const stripePublishableKey = '{{ STRIPE_PUBLISHABLE_KEY }}';
-    let stripe = null;
-    let elements = null;
-    let cardElement = null;
-
-    // Initialize Stripe when Stripe method is selected
-    function initializeStripe() {
-        if (!stripe && stripePublishableKey) {
-            stripe = Stripe(stripePublishableKey);
-            elements = stripe.elements();
-            
-            // Create card element
-            cardElement = elements.create('card', {
-                style: {
-                    base: {
-                        color: '#ffffff',
-                        fontFamily: '"Space Grotesk", sans-serif',
-                        fontSize: '16px',
-                        '::placeholder': {
-                            color: '#9ca3af'
-                        }
-                    },
-                    invalid: {
-                        color: '#ef4444',
-                        iconColor: '#ef4444'
-                    }
-                }
-            });
-        }
+    function selectMethod(el, method) {
+        document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+        el.classList.add('selected');
+        el.querySelector('input[type="radio"]').checked = true;
     }
 
-    // Handle form submission
     const paymentForm = document.getElementById('payment-form');
     const submitButton = document.getElementById('submit-payment');
     const loadingIndicator = document.getElementById('payment-loading');
 
     paymentForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-
-        const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
-        
-        if (!selectedMethod) {
-            alert('Please select a payment method');
+        const selected = document.querySelector('input[name="payment_method"]:checked');
+        if (!selected) {
+            document.querySelectorAll('.pay-method').forEach(m => m.style.borderColor = '#ef4444');
+            alert('Please select a payment method to continue.');
             return;
         }
-
-        const paymentMethod = selectedMethod.value;
-
-        // Show loading indicator
-        loadingIndicator.classList.remove('hidden');
+        document.querySelectorAll('.pay-method').forEach(m => m.style.borderColor = '');
+        loadingIndicator.classList.add('active');
         submitButton.disabled = true;
-
-        if (paymentMethod === 'stripe') {
-            await handleStripePayment();
-        } else if (paymentMethod === 'paystack') {
-            await handlePaystackPayment();
-        }
+        if (selected.value === 'stripe') { await handleStripePayment(); }
+        else if (selected.value === 'paystack') { await handlePaystackPayment(); }
     });
 
-    // Handle Stripe payment
     async function handleStripePayment() {
         try {
-            // Create payment intent
-            const response = await fetch('{% url "store:stripe_create_intent" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to create payment intent');
-            }
-
-            // Initialize Stripe if not already done
-            if (!stripe) {
-                initializeStripe();
-            }
-
-            // Confirm payment with Stripe
-            const result = await stripe.confirmCardPayment(data.client_secret, {
-                payment_method: {
-                    card: cardElement,
-                    billing_details: {
-                        name: '{{ shipping_info.shipping_name }}',
-                        email: '{{ user.email }}',
-                        phone: '{{ shipping_info.shipping_phone }}',
-                        address: {
-                            line1: '{{ shipping_info.shipping_address_line1 }}',
-                            line2: '{{ shipping_info.shipping_address_line2 }}',
-                            city: '{{ shipping_info.shipping_city }}',
-                            state: '{{ shipping_info.shipping_state }}',
-                            postal_code: '{{ shipping_info.shipping_postal_code }}',
-                            country: '{{ shipping_info.shipping_country }}'
-                        }
-                    }
-                }
-            });
-
-            if (result.error) {
-                throw new Error(result.error.message);
-            }
-
-            // Payment succeeded, confirm with backend
-            const confirmResponse = await fetch('{% url "store:stripe_confirm" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    payment_intent_id: result.paymentIntent.id
-                })
-            });
-
-            const confirmData = await confirmResponse.json();
-
-            if (!confirmData.success) {
-                throw new Error(confirmData.error || 'Payment confirmation failed');
-            }
-
-            // Redirect to confirmation page
-            window.location.href = confirmData.redirect_url;
-
-        } catch (error) {
-            console.error('Stripe payment error:', error);
-            alert('Payment failed: ' + error.message);
-            loadingIndicator.classList.add('hidden');
-            submitButton.disabled = false;
-        }
+            const r = await fetch('{% url "store:stripe_create_intent" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'} });
+            const d = await r.json();
+            if (!d.success) throw new Error(d.error || 'Failed to create payment intent');
+            const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
+            const result = await stripe.confirmCardPayment(d.client_secret);
+            if (result.error) throw new Error(result.error.message);
+            const cr = await fetch('{% url "store:stripe_confirm" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'}, body:JSON.stringify({payment_intent_id:result.paymentIntent.id}) });
+            const cd = await cr.json();
+            if (!cd.success) throw new Error(cd.error || 'Payment confirmation failed');
+            window.location.href = cd.redirect_url;
+        } catch(err) { alert('Payment failed: ' + err.message); loadingIndicator.classList.remove('active'); submitButton.disabled = false; }
     }
 
-    // Handle Paystack payment (placeholder for Task 13.5)
+    let paystackInitializing = false;
+
     async function handlePaystackPayment() {
+        if (paystackInitializing) return;  // prevent double-click duplicate reference
+        paystackInitializing = true;
         try {
-            // Initialize Paystack transaction
-            const response = await fetch('{% url "store:paystack_initialize" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to initialize payment');
-            }
-
-            // Open Paystack popup
+            const r = await fetch('{% url "store:paystack_initialize" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'} });
+            const d = await r.json();
+            if (!d.success) throw new Error(d.error || 'Failed to initialize payment');
             const handler = PaystackPop.setup({
-                key: data.public_key,
+                key: d.public_key,
                 email: '{{ user.email }}',
-                amount: data.amount,
-                currency: data.currency,
-                ref: data.reference,
-                callback: async function(response) {
-                    // Payment successful, verify with backend
-                    const verifyResponse = await fetch('{% url "store:paystack_verify" %}', {
+                amount: d.amount,
+                currency: d.currency,
+                ref: d.reference,
+                callback: function(response) {
+                    // Must be a plain (non-async) function — Paystack rejects async callbacks
+                    loadingIndicator.classList.add('active');
+                    submitButton.disabled = true;
+                    fetch('{% url "store:paystack_verify" %}', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({
-                            reference: response.reference
-                        })
+                        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+                        body: JSON.stringify({reference: response.reference})
+                    })
+                    .then(function(vr) { return vr.json(); })
+                    .then(function(vd) {
+                        if (vd.success) {
+                            window.location.href = vd.redirect_url;
+                        } else {
+                            alert('Payment verification failed: ' + (vd.error || 'Unknown error'));
+                            loadingIndicator.classList.remove('active');
+                            submitButton.disabled = false;
+                            paystackInitializing = false;
+                        }
+                    })
+                    .catch(function(err) {
+                        alert('Verification error: ' + err.message);
+                        loadingIndicator.classList.remove('active');
+                        submitButton.disabled = false;
+                        paystackInitializing = false;
                     });
-
-                    const verifyData = await verifyResponse.json();
-
-                    if (verifyData.success) {
-                        window.location.href = verifyData.redirect_url;
-                    } else {
-                        throw new Error(verifyData.error || 'Payment verification failed');
-                    }
                 },
                 onClose: function() {
-                    loadingIndicator.classList.add('hidden');
+                    loadingIndicator.classList.remove('active');
                     submitButton.disabled = false;
+                    paystackInitializing = false;  // allow retry after closing
                 }
             });
-
             handler.openIframe();
-
-        } catch (error) {
-            console.error('Paystack payment error:', error);
-            alert('Payment failed: ' + error.message);
-            loadingIndicator.classList.add('hidden');
+        } catch(err) {
+            alert('Payment failed: ' + err.message);
+            loadingIndicator.classList.remove('active');
             submitButton.disabled = false;
+            paystackInitializing = false;
         }
     }
 </script>

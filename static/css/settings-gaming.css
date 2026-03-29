@@ -1,0 +1,437 @@
+/**
+ * Settings Pages — Gaming Design
+ * Shared styles for all account settings pages
+ */
+
+/* ── Page ── */
+.st-page { background: #080808; min-height: 100vh; }
+
+/* ── Header ── */
+.st-header { position: relative; padding: 2rem 0 1.5rem; margin-bottom: 0.25rem; }
+.st-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 3rem; height: 3px;
+    background: linear-gradient(90deg, #b91c1c, transparent);
+    border-radius: 2px;
+}
+.st-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900; font-style: italic;
+    text-transform: uppercase;
+    font-size: 2.25rem; letter-spacing: 0.05em;
+    color: #fff; line-height: 1;
+}
+.st-subtitle { color: #6b7280; font-size: 0.875rem; margin-top: 0.375rem; }
+
+/* ── Sidebar ── */
+.st-sidebar {
+    background: #0d1117;
+    border: 1px solid #1f2937;
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    height: fit-content;
+}
+.st-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #b91c1c 0%, rgba(185,28,28,0.3) 60%, transparent 100%);
+}
+.st-sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 0.75rem;
+    color: #4b5563; margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #111827;
+}
+.st-nav-link {
+    display: flex; align-items: center; gap: 0.625rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.5rem;
+    color: #9ca3af; font-size: 0.8125rem; font-weight: 500;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    margin-bottom: 0.125rem;
+}
+.st-nav-link:hover {
+    color: #f87171;
+    background: rgba(185,28,28,0.08);
+    border-left-color: #b91c1c;
+    padding-left: 0.875rem;
+}
+.st-nav-link.active {
+    color: #fff;
+    background: rgba(185,28,28,0.12);
+    border-left-color: #b91c1c;
+    padding-left: 0.875rem;
+}
+.st-nav-link.danger { color: #f87171; }
+.st-nav-link.danger:hover { color: #fca5a5; background: rgba(239,68,68,0.1); border-left-color: #ef4444; }
+.st-nav-link .material-symbols-outlined { font-size: 1rem; flex-shrink: 0; }
+
+/* ── Cards ── */
+.st-card {
+    background: #0d1117;
+    border: 1px solid #1f2937;
+    border-radius: 0.875rem;
+    padding: 1.5rem;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+}
+.st-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #b91c1c 0%, rgba(185,28,28,0.3) 60%, transparent 100%);
+}
+.st-card:hover { border-color: rgba(185,28,28,0.25); }
+
+/* ── Section Title ── */
+.st-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 0.9375rem;
+    color: #fff;
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #111827;
+}
+.st-section-title::before {
+    content: '';
+    width: 3px; height: 1rem;
+    background: #b91c1c;
+    border-radius: 2px;
+    box-shadow: 0 0 6px rgba(185,28,28,0.6);
+    flex-shrink: 0;
+}
+.st-subsection-title {
+    display: flex; align-items: center; gap: 0.375rem;
+    font-size: 0.8125rem; font-weight: 600;
+    color: #e5e7eb; margin-bottom: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+/* ── Toggle Row ── */
+.st-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-radius: 0.625rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #111827;
+    transition: border-color 0.15s;
+}
+.st-toggle-row:hover { border-color: rgba(185,28,28,0.2); }
+.st-toggle-icon {
+    width: 2rem; height: 2rem; border-radius: 0.5rem;
+    background: rgba(185,28,28,0.1); border: 1px solid rgba(185,28,28,0.2);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.st-toggle-label { font-size: 0.875rem; font-weight: 600; color: #e5e7eb; }
+.st-toggle-desc { font-size: 0.75rem; color: #4b5563; margin-top: 0.125rem; }
+
+/* Custom toggle switch */
+.st-toggle {
+    position: relative; display: inline-block;
+    width: 2.5rem; height: 1.375rem; flex-shrink: 0;
+}
+.st-toggle input { opacity: 0; width: 0; height: 0; }
+.st-toggle-slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #1f2937; border-radius: 9999px;
+    transition: 0.2s; border: 1px solid #374151;
+}
+.st-toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 1rem; width: 1rem;
+    left: 0.125rem; bottom: 0.125rem;
+    background: #6b7280; border-radius: 50%;
+    transition: 0.2s;
+}
+.st-toggle input:checked + .st-toggle-slider { background: rgba(185,28,28,0.3); border-color: #b91c1c; }
+.st-toggle input:checked + .st-toggle-slider::before { transform: translateX(1.125rem); background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+
+/* ── Form Inputs ── */
+.st-input {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid #1f2937;
+    background: #080808;
+    color: #e5e7eb;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+.st-input::placeholder { color: #374151; }
+.st-input:hover { border-color: #374151; }
+.st-input:focus {
+    outline: none;
+    border-color: #b91c1c;
+    box-shadow: 0 0 0 2px rgba(185,28,28,0.2);
+    background: #0d1117;
+}
+select.st-input option { background: #0d1117; }
+
+/* ── Label ── */
+.st-label {
+    display: block;
+    font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: #6b7280; margin-bottom: 0.375rem;
+}
+
+/* ── Buttons ── */
+.st-btn {
+    display: inline-flex; align-items: center; gap: 0.375rem;
+    padding: 0.5625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; border: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    text-decoration: none;
+}
+.st-btn-primary {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(185,28,28,0.3);
+}
+.st-btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 0 24px rgba(185,28,28,0.5);
+    transform: translateY(-1px);
+}
+.st-btn-ghost {
+    background: transparent; color: #9ca3af;
+    border: 1px solid #1f2937;
+}
+.st-btn-ghost:hover { border-color: #374151; color: #e5e7eb; background: rgba(255,255,255,0.03); }
+.st-btn-danger {
+    background: rgba(239,68,68,0.1);
+    color: #f87171; border: 1px solid rgba(239,68,68,0.3);
+}
+.st-btn-danger:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.5); }
+
+/* ── Alerts ── */
+.st-alert {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.875rem 1rem; border-radius: 0.625rem;
+    border: 1px solid; font-size: 0.875rem;
+}
+.st-alert-success { background: rgba(6,78,59,0.2); border-color: rgba(16,185,129,0.3); color: #6ee7b7; }
+.st-alert-error   { background: rgba(127,29,29,0.2); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+.st-alert-warning { background: rgba(120,53,15,0.2); border-color: rgba(245,158,11,0.3); color: #fcd34d; }
+.st-alert-info    { background: rgba(30,58,138,0.2); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+
+/* ── Info Banner ── */
+.st-info-banner {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.625rem;
+    background: rgba(59,130,246,0.05);
+    border: 1px solid rgba(59,130,246,0.15);
+}
+
+/* ── Check List ── */
+.st-check-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.st-check-list li {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8125rem; color: #6b7280;
+}
+.st-check-list li::before {
+    content: '';
+    width: 0.375rem; height: 0.375rem;
+    border-radius: 50%; background: #b91c1c;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(185,28,28,0.5);
+}
+
+/* ── Status Badge ── */
+.st-badge {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.2rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    font-family: 'Barlow Condensed', sans-serif;
+}
+.st-badge-green { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+.st-badge-yellow { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+.st-badge-red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+
+/* ── Account Row (connected accounts) ── */
+.st-account-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.125rem;
+    border-radius: 0.625rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #111827;
+    transition: border-color 0.15s;
+}
+.st-account-row:hover { border-color: rgba(185,28,28,0.2); }
+.st-account-icon {
+    width: 2.5rem; height: 2.5rem; border-radius: 0.625rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* ── Danger Zone ── */
+.st-danger-zone {
+    background: rgba(127,29,29,0.08);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 0.875rem;
+    padding: 1.5rem;
+    position: relative; overflow: hidden;
+}
+.st-danger-zone::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #ef4444 0%, rgba(239,68,68,0.3) 60%, transparent 100%);
+}
+
+/* ── Base Override Fixes ── */
+/* Override dashboard_base.html global !important rules for settings pages */
+.st-page input[type="text"],
+.st-page input[type="email"],
+.st-page input[type="tel"],
+.st-page input[type="date"],
+.st-page input[type="password"],
+.st-page input[type="url"],
+.st-page input[type="time"],
+.st-page textarea,
+.st-page select {
+    background-color: #080808 !important;
+    color: #e5e7eb !important;
+    border-color: #1f2937 !important;
+    border-radius: 0.5rem !important;
+    padding: 0.625rem 0.875rem !important;
+    font-size: 0.875rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.st-page input[type="text"]:focus,
+.st-page input[type="email"]:focus,
+.st-page input[type="tel"]:focus,
+.st-page input[type="date"]:focus,
+.st-page input[type="password"]:focus,
+.st-page input[type="url"]:focus,
+.st-page input[type="time"]:focus,
+.st-page textarea:focus,
+.st-page select:focus {
+    border-color: #b91c1c !important;
+    box-shadow: 0 0 0 2px rgba(185,28,28,0.2) !important;
+    background-color: #0d1117 !important;
+    outline: none !important;
+}
+.st-page input::placeholder,
+.st-page textarea::placeholder { color: #374151 !important; }
+.st-page select option { background: #0d1117 !important; }
+
+/* Textarea resize */
+.st-page textarea { resize: vertical !important; min-height: 5rem !important; }
+
+/* Override global button[type="submit"] rule */
+.st-page button[type="submit"],
+.st-page .st-btn-primary {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+    box-shadow: 0 0 16px rgba(185,28,28,0.3) !important;
+}
+.st-page button[type="submit"]:hover,
+.st-page .st-btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 24px rgba(185,28,28,0.5) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Danger button override */
+.st-page .st-btn-danger {
+    background: rgba(239,68,68,0.1) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(239,68,68,0.3) !important;
+    box-shadow: none !important;
+}
+.st-page .st-btn-danger:hover {
+    background: rgba(239,68,68,0.2) !important;
+    border-color: rgba(239,68,68,0.5) !important;
+    transform: none !important;
+}
+
+/* Ghost button override */
+.st-page .st-btn-ghost {
+    background: transparent !important;
+    color: #9ca3af !important;
+    border: 1px solid #1f2937 !important;
+    box-shadow: none !important;
+}
+.st-page .st-btn-ghost:hover {
+    border-color: #374151 !important;
+    color: #e5e7eb !important;
+    background: rgba(255,255,255,0.03) !important;
+    transform: none !important;
+}
+
+/* File input override */
+.st-page input[type="file"] {
+    padding: 0.5rem 0.75rem !important;
+    cursor: pointer !important;
+    border-style: dashed !important;
+    border-color: rgba(185,28,28,0.3) !important;
+    background: rgba(185,28,28,0.04) !important;
+    color: #9ca3af !important;
+}
+.st-page input[type="file"]:hover {
+    border-color: #b91c1c !important;
+    background: rgba(185,28,28,0.08) !important;
+}
+
+/* ── Toggle input — hard override to beat dashboard_base global rules ── */
+.st-toggle input,
+.st-toggle input.st-toggle-input,
+.st-toggle input[type="checkbox"] {
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+/* Ensure the slider is always visible and clickable */
+.st-toggle .st-toggle-slider {
+    display: block !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* Save button — override brand-consistency-fix.css flat color with gradient */
+.st-page button[type="submit"].st-btn-primary,
+.st-page .st-btn-primary[type="submit"] {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 0 16px rgba(185,28,28,0.3) !important;
+}
+.st-page button[type="submit"].st-btn-primary:hover,
+.st-page .st-btn-primary[type="submit"]:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 24px rgba(185,28,28,0.5) !important;
+    transform: translateY(-1px) !important;
+}

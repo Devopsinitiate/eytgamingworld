@@ -458,9 +458,8 @@ select:focus {
     border-color: var(--eyt-primary) !important;
 }
 
-/* Override any hardcoded colors that might conflict */
-[style*="#3b82f6"],
-[style*="#ef4444"] {
+/* Override blue hardcoded colors that conflict with brand */
+[style*="#3b82f6"] {
     color: var(--eyt-primary) !important;
     background-color: var(--eyt-primary) !important;
     border-color: var(--eyt-primary) !important;

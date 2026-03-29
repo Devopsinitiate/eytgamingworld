@@ -1419,18 +1419,15 @@ class PrivacyService:
         if viewer and viewer.id == profile_owner.id:
             return True
         
-        # Check if profile is public (no privacy restrictions)
-        # If all privacy fields are True, profile is considered public
-        if (profile_owner.online_status_visible and 
-            profile_owner.activity_visible and 
-            profile_owner.statistics_visible):
+        # Check if profile is public (uses the dedicated private_profile flag)
+        if not profile_owner.private_profile:
             return True
         
         # For private profiles, check if viewer is a friend
         if viewer:
             return cls.are_friends(viewer, profile_owner)
         
-        # Anonymous users can only view public profiles
+        # Anonymous users cannot view private profiles
         return False
     
     @classmethod

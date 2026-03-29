@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reduced Motion Support Test</title>
+  <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+  <style>
+    body {
+      padding: 2rem;
+      background: #0A0A0A;
+      color: white;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    
+    .test-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(31, 41, 55, 0.6);
+      border: 2px solid rgba(220, 38, 38, 0.3);
+      border-radius: 0.5rem;
+    }
+    
+    .test-title {
+      font-size: 1.5rem;
+      color: #DC2626;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    
+    .test-description {
+      color: #9CA3AF;
+      margin-bottom: 1rem;
+    }
+    
+    .motion-toggle {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(220, 38, 38, 0.1);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: 0.5rem;
+    }
+    
+    .motion-status {
+      font-size: 1.2rem;
+      color: #10B981;
+      margin-top: 0.5rem;
+    }
+    
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="gaming-heading gaming-heading-primary">Reduced Motion Support Test</h1>
+  
+  <div class="motion-toggle">
+    <h2 class="test-title">Motion Preference Detection</h2>
+    <p class="test-description">
+      This test verifies that decorative animations are disabled when the user has enabled reduced motion preferences.
+    </p>
+    <div class="motion-status" id="motion-status">
+      Checking motion preference...
+    </div>
+    <p style="color: #9CA3AF; margin-top: 1rem; font-size: 0.875rem;">
+      To test: Enable "Reduce motion" in your OS accessibility settings, then refresh this page.
+      <br>
+      <strong>Windows:</strong> Settings > Accessibility > Visual effects > Animation effects (OFF)
+      <br>
+      <strong>Mac:</strong> System Preferences > Accessibility > Display > Reduce motion (ON)
+      <br>
+      <strong>Linux:</strong> Varies by desktop environment
+    </p>
+  </div>
+
+  <div class="test-section">
+    <h2 class="test-title">Test 1: Stat Card Animations</h2>
+    <p class="test-description">
+      Hover over cards. With reduced motion: no gradient animation, instant transform.
+    </p>
+    <div class="test-grid">
+      <div class="gaming-stat-card">
+        <div class="gaming-stat-value">42</div>
+        <div class="gaming-stat-label">Total Registered</div>
+      </div>
+      <div class="gaming-stat-card">
+        <div class="gaming-stat-value">38</div>
+        <div class="gaming-stat-label">Checked In</div>
+      </div>
+      <div class="gaming-stat-card">
+        <div class="gaming-stat-value">4</div>
+        <div class="gaming-stat-label">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2 class="test-title">Test 2: Status Indicators</h2>
+    <p class="test-description">
+      With reduced motion: status dots should not pulse.
+    </p>
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+      <div class="gaming-status-indicator">
+        <span class="gaming-status-dot checked-in"></span>
+        <span>Checked In (should pulse normally, not with reduced motion)</span>
+      </div>
+      <div class="gaming-status-indicator">
+        <span class="gaming-status-dot pending"></span>
+        <span>Pending (should pulse normally, not with reduced motion)</span>
+      </div>
+      <div class="gaming-status-indicator">
+        <span class="gaming-status-dot confirmed"></span>
+        <span>Confirmed (no animation)</span>
+      </div>
+      <div class="gaming-status-indicator">
+        <span class="gaming-status-dot disqualified"></span>
+        <span>Disqualified (no animation)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2 class="test-title">Test 3: Button Interactions</h2>
+    <p class="test-description">
+      Click buttons. With reduced motion: instant transform, no ripple delay.
+    </p>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <button class="gaming-btn-primary" onclick="addRipple(event)">Primary Button</button>
+      <button class="gaming-btn-ghost">Ghost Button</button>
+      <button class="gaming-btn-action">Action Button</button>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2 class="test-title">Test 4: Modal Animations</h2>
+    <p class="test-description">
+      Open modal. With reduced motion: instant appearance, no fade/slide animation.
+    </p>
+    <button class="gaming-btn-primary" onclick="openTestModal()">Open Test Modal</button>
+  </div>
+
+  <div class="test-section">
+    <h2 class="test-title">Test 5: Page Load Animation</h2>
+    <p class="test-description">
+      Refresh page. With reduced motion: content appears instantly, no fade-in-up.
+    </p>
+    <div class="gaming-fade-in-up">
+      <div class="gaming-stat-card">
+        <div class="gaming-stat-value">✓</div>
+        <div class="gaming-stat-label">This card has fade-in-up animation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Modal -->
+  <div id="test-modal" style="display: none;" class="gaming-modal-backdrop">
+    <div class="gaming-modal">
+      <div class="gaming-modal-header">
+        <h3 class="gaming-modal-title">Test Modal</h3>
+        <button class="gaming-modal-close" onclick="closeTestModal()">&times;</button>
+      </div>
+      <div class="gaming-modal-body">
+        <p style="color: white;">This modal should appear instantly with reduced motion enabled.</p>
+      </div>
+      <div class="gaming-modal-footer">
+        <button class="gaming-btn-ghost" onclick="closeTestModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check motion preference
+    function checkMotionPreference() {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const statusEl = document.getElementById('motion-status');
+      
+      if (prefersReducedMotion) {
+        statusEl.textContent = '✓ Reduced motion is ENABLED - Decorative animations should be disabled';
+        statusEl.style.color = '#10B981';
+      } else {
+        statusEl.textContent = '✗ Reduced motion is DISABLED - Animations should be visible';
+        statusEl.style.color = '#F59E0B';
+      }
+    }
+
+    // Listen for changes to motion preference
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', checkMotionPreference);
+    
+    // Check on load
+    checkMotionPreference();
+
+    // Ripple effect
+    function addRipple(event) {
+      const button = event.currentTarget;
+      const ripple = document.createElement('span');
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      ripple.classList.add('ripple-effect');
+
+      button.appendChild(ripple);
+
+      ripple.addEventListener('animationend', () => {
+        ripple.remove();
+      });
+    }
+
+    // Modal functions
+    function openTestModal() {
+      document.getElementById('test-modal').style.display = 'flex';
+    }
+
+    function closeTestModal() {
+      const modal = document.getElementById('test-modal');
+      modal.classList.add('closing');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
+      }, 300);
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeTestModal();
+      }
+    });
+
+    // Close modal on backdrop click
+    document.getElementById('test-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'test-modal') {
+        closeTestModal();
+      }
+    });
+  </script>
+</body>
+</html>

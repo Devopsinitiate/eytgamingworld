@@ -1,659 +1,430 @@
-{% extends 'base.html' %}
+{% extends "layouts/dashboard_base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block title %}{% if form.instance.pk %}Edit Tournament{% else %}Create Tournament{% endif %} - EYTGaming{% endblock %}
+{% block title %}{% if form.instance.slug %}Edit Tournament{% else %}Create Tournament{% endif %} — EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+{{ block.super }}
+<style>
+/* ── Gaming form design ── */
+.tf-page { background:#080808; min-height:100vh; }
+.tf-card {
+  background:#0d1117; border:1px solid #1f2937; border-radius:12px;
+  padding:1.75rem; position:relative; overflow:hidden; margin-bottom:1.5rem;
+}
+.tf-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,.3) 60%,transparent 100%);
+}
+.tf-section-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; font-size:1rem;
+  color:#fff; display:flex; align-items:center; gap:.5rem;
+  margin-bottom:1.25rem; padding-bottom:.75rem; border-bottom:1px solid #111827;
+}
+.tf-section-title::before {
+  content:''; width:3px; height:1rem; background:#b91c1c; border-radius:2px;
+  box-shadow:0 0 6px rgba(185,28,28,.6); flex-shrink:0;
+}
+.tf-label {
+  display:block; font-size:.75rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:.06em; color:#6b7280; margin-bottom:.375rem;
+}
+.tf-required { color:#dc2626; margin-left:2px; }
+.tf-input {
+  width:100%; background:#080808; border:1px solid #1f2937; border-radius:.5rem;
+  color:#e5e7eb; padding:.625rem .875rem; font-size:.875rem;
+  transition:border-color .2s, box-shadow .2s; font-family:'Inter',sans-serif;
+  box-sizing:border-box;
+}
+.tf-input:focus { outline:none; border-color:#b91c1c; box-shadow:0 0 0 2px rgba(185,28,28,.2); }
+.tf-input::placeholder { color:#374151; }
+select.tf-input option { background:#0d1117; }
+textarea.tf-input { resize:vertical; min-height:5rem; }
+.tf-error { color:#f87171; font-size:.75rem; margin-top:.3rem; display:flex; align-items:center; gap:4px; }
+.tf-hint { color:#4b5563; font-size:.72rem; margin-top:.3rem; }
+.tf-upload-zone {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  width:100%; min-height:140px; border:2px dashed rgba(185,28,28,.3); border-radius:.75rem;
+  background:rgba(185,28,28,.04); cursor:pointer; transition:all .2s; padding:1.5rem;
+  box-sizing:border-box;
+}
+.tf-upload-zone:hover { border-color:#b91c1c; background:rgba(185,28,28,.08); }
+.tf-upload-zone input[type="file"] { display:none; }
+.tf-toggle-row {
+  display:flex; align-items:center; gap:.75rem; padding:.75rem 1rem;
+  background:rgba(255,255,255,.02); border:1px solid #111827; border-radius:.625rem;
+  transition:border-color .15s;
+}
+.tf-toggle-row:hover { border-color:rgba(185,28,28,.2); }
+.tf-toggle-row label { font-size:.875rem; font-weight:500; color:#e5e7eb; cursor:pointer; }
+.tf-toggle-row input[type="checkbox"] { accent-color:#dc2626; width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+.tf-btn-primary {
+  display:inline-flex; align-items:center; gap:.5rem; padding:.65rem 1.75rem;
+  background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; border:none;
+  border-radius:.5rem; font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+  box-shadow:0 0 16px rgba(185,28,28,.3); transition:all .15s;
+}
+.tf-btn-primary:hover { background:linear-gradient(135deg,#dc2626,#b91c1c); box-shadow:0 0 24px rgba(185,28,28,.5); transform:translateY(-1px); }
+.tf-btn-ghost {
+  display:inline-flex; align-items:center; gap:.5rem; padding:.65rem 1.5rem;
+  background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:.5rem;
+  font-family:'Barlow Condensed',sans-serif; font-size:.9rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.05em; cursor:pointer; text-decoration:none;
+  transition:all .15s;
+}
+.tf-btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
+.tf-alert-error {
+  display:flex; align-items:flex-start; gap:.75rem; padding:.875rem 1rem;
+  border-radius:.625rem; background:rgba(127,29,29,.2); border:1px solid rgba(239,68,68,.3);
+  color:#fca5a5; font-size:.875rem; margin-bottom:1.25rem;
+}
+/* Override dashboard_base global input rules for this page */
+.tf-page input[type="text"], .tf-page input[type="number"],
+.tf-page input[type="email"], .tf-page input[type="url"],
+.tf-page input[type="datetime-local"], .tf-page select, .tf-page textarea {
+  background-color:#080808 !important; color:#e5e7eb !important;
+  border-color:#1f2937 !important; border-radius:.5rem !important;
+  padding:.625rem .875rem !important; font-size:.875rem !important;
+}
+.tf-page input[type="datetime-local"] { color-scheme:dark; }
+.tf-page input:focus, .tf-page select:focus, .tf-page textarea:focus {
+  border-color:#b91c1c !important; box-shadow:0 0 0 2px rgba(185,28,28,.2) !important; outline:none !important;
+}
+.tf-page input[type="file"] {
+  padding:.5rem .75rem !important; cursor:pointer !important;
+  border-style:dashed !important; border-color:rgba(185,28,28,.3) !important;
+  background:rgba(185,28,28,.04) !important; color:#9ca3af !important;
+}
+.tf-page button[type="submit"] {
+  background:linear-gradient(135deg,#b91c1c,#991b1b) !important;
+  color:#fff !important; border:none !important;
+  box-shadow:0 0 16px rgba(185,28,28,.3) !important;
+}
+</style>
 {% endblock %}
 
-{% block body %}
-<div class="min-h-screen bg-background-dark py-8">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+{% block content %}
+<div class="tf-page px-4 md:px-8 pb-16">
+<div style="max-width:900px;margin:0 auto;">
 
-        <!-- Breadcrumbs -->
-        <div class="flex flex-wrap gap-2 mb-6">
-            <a class="text-gray-500 dark:text-gray-400 hover:text-primary text-base font-medium leading-normal"
-                href="{% url 'dashboard:home' %}">Dashboard</a>
-            <span class="text-gray-500 dark:text-gray-400 text-base font-medium leading-normal">/</span>
-            <a class="text-gray-500 dark:text-gray-400 hover:text-primary text-base font-medium leading-normal"
-                href="{% url 'tournaments:list' %}">Tournaments</a>
-            <span class="text-gray-500 dark:text-gray-400 text-base font-medium leading-normal">/</span>
-            <span class="text-gray-900 dark:text-white text-base font-medium leading-normal">
-                {% if form.instance.pk %}Edit{% else %}Create New{% endif %}
-            </span>
-        </div>
-
-        <!-- Page Heading -->
-        <div class="flex flex-wrap justify-between gap-3 mb-6">
-            <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">
-                {% if form.instance.pk %}Edit Tournament{% else %}Create a New Tournament{% endif %}
-            </h1>
-        </div>
-
-        <!-- Form Container -->
-        <form method="post" enctype="multipart/form-data"
-            class="flex flex-col gap-8 bg-surface-dark border border-white/10 rounded-xl p-6 md:p-8">
-            {% csrf_token %}
-
-            <!-- Display form errors -->
-            {% if form.non_field_errors %}
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                            Please correct the following errors:
-                        </h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            {{ form.non_field_errors }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Section 1: Basic Information -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Basic Information
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Tournament Name -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.name.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Tournament Name <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.name }}
-                        {% if form.name.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Slug -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.slug.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            URL Slug <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.slug }}
-                        {% if form.slug.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.slug.errors.0 }}</p>
-                        {% endif %}
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used in the tournament URL</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Game Selection -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.game.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Game <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.game }}
-                        {% if form.game.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.game.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Format -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.format.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Tournament Format <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.format }}
-                        {% if form.format.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.format.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Tournament Banner -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.banner.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Tournament Banner
-                    </label>
-                    <div class="flex items-center justify-center w-full">
-                        <label
-                            class="flex flex-col items-center justify-center w-full h-64 border-2 border-white/20 border-dashed rounded-lg cursor-pointer bg-background-dark hover:bg-surface-dark transition-colors">
-                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-10 h-10 text-gray-500 dark:text-gray-400 mb-4" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                    </path>
-                                </svg>
-                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
-                                        class="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG or GIF (REC. 1200x480px)
-                                </p>
-                            </div>
-                            {{ form.banner }}
-                        </label>
-                    </div>
-                    {% if form.banner.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.banner.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Section 2: Details & Rules -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Details &amp; Rules
-                </h3>
-
-                <!-- Description -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.description.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Detailed Description <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.description.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Rules -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.rules.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Rules
-                    </label>
-                    {{ form.rules }}
-                    {% if form.rules.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.rules.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Section 3: Configuration -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Configuration
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Tournament Type -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.tournament_type.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Tournament Type
-                        </label>
-                        {{ form.tournament_type }}
-                        {% if form.tournament_type.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.tournament_type.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Min Participants -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.min_participants.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Min Participants
-                        </label>
-                        {{ form.min_participants }}
-                        {% if form.min_participants.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.min_participants.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Max Participants -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.max_participants.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Max Participants <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.max_participants }}
-                        {% if form.max_participants.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.max_participants.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Team Based -->
-                    <div class="flex items-center gap-4">
-                        {{ form.is_team_based }}
-                        <label for="{{ form.is_team_based.id_for_label }}"
-                            class="text-white text-sm font-medium">
-                            Team-Based Tournament
-                        </label>
-                    </div>
-
-                    <!-- Team Size -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.team_size.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Team Size
-                        </label>
-                        {{ form.team_size }}
-                        {% if form.team_size.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.team_size.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 4: Schedule -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Schedule
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Registration Start -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.registration_start.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Registration Start <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.registration_start }}
-                        {% if form.registration_start.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_start.errors.0 }}
-                        </p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Registration End -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.registration_end.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Registration End <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.registration_end }}
-                        {% if form.registration_end.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_end.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Check-in Start -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.check_in_start.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Check-in Start <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.check_in_start }}
-                        {% if form.check_in_start.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.check_in_start.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Tournament Start -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.start_datetime.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Tournament Start <span class="text-red-500">*</span>
-                        </label>
-                        {{ form.start_datetime }}
-                        {% if form.start_datetime.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.start_datetime.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Estimated End -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.estimated_end.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Estimated End (Optional)
-                    </label>
-                    {{ form.estimated_end }}
-                    {% if form.estimated_end.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.estimated_end.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Section 5: Participation & Prizing -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Participation &amp; Prizing
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Prize Pool -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.prize_pool.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Prize Pool ($)
-                        </label>
-                        {{ form.prize_pool }}
-                        {% if form.prize_pool.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.prize_pool.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Registration Fee -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.registration_fee.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Registration Fee ($)
-                        </label>
-                        {{ form.registration_fee }}
-                        {% if form.registration_fee.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.registration_fee.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Seeding Method -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.seeding_method.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Seeding Method
-                        </label>
-                        {{ form.seeding_method }}
-                        {% if form.seeding_method.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.seeding_method.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Best Of -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.best_of.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Best Of
-                        </label>
-                        {{ form.best_of }}
-                        {% if form.best_of.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.best_of.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Prize Distribution -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.prize_distribution.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Prize Distribution (JSON)
-                    </label>
-                    {{ form.prize_distribution }}
-                    {% if form.prize_distribution.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.prize_distribution.errors.0 }}</p>
-                    {% endif %}
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Example: {"1st": 50, "2nd": 30, "3rd": 20}
-                    </p>
-                </div>
-
-                <!-- Checkboxes -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-4">
-                        {{ form.requires_approval }}
-                        <label for="{{ form.requires_approval.id_for_label }}"
-                            class="text-white text-sm font-medium">
-                            Require Approval for Registration
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 6: Media & Links -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Media &amp; Links
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Thumbnail -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.thumbnail.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Thumbnail
-                        </label>
-                        {{ form.thumbnail }}
-                        {% if form.thumbnail.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.thumbnail.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Venue -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.venue.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Venue (for local tournaments)
-                        </label>
-                        {{ form.venue }}
-                        {% if form.venue.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.venue.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Stream URL -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.stream_url.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Stream URL
-                        </label>
-                        {{ form.stream_url }}
-                        {% if form.stream_url.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.stream_url.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Discord Invite -->
-                    <div class="flex flex-col w-full">
-                        <label for="{{ form.discord_invite.id_for_label }}"
-                            class="text-white text-sm font-medium leading-normal pb-2">
-                            Discord Invite
-                        </label>
-                        {{ form.discord_invite }}
-                        {% if form.discord_invite.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.discord_invite.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 7: Access & Visibility -->
-            <div class="flex flex-col gap-6">
-                <h3
-                    class="text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-2 border-b border-white/10">
-                    Access &amp; Visibility
-                </h3>
-
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-4">
-                        {{ form.is_public }}
-                        <label for="{{ form.is_public.id_for_label }}"
-                            class="text-white text-sm font-medium">
-                            Public Tournament
-                        </label>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        {{ form.is_featured }}
-                        <label for="{{ form.is_featured.id_for_label }}"
-                            class="text-white text-sm font-medium">
-                            Featured Tournament
-                        </label>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        {{ form.requires_verification }}
-                        <label for="{{ form.requires_verification.id_for_label }}"
-                            class="text-white text-sm font-medium">
-                            Require Verified Accounts
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Skill Requirement -->
-                <div class="flex flex-col w-full">
-                    <label for="{{ form.skill_requirement.id_for_label }}"
-                        class="text-white text-sm font-medium leading-normal pb-2">
-                        Skill Requirement
-                    </label>
-                    {{ form.skill_requirement }}
-                    {% if form.skill_requirement.errors %}
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.skill_requirement.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div
-                class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t border-white/10">
-                <a href="{% url 'tournaments:list' %}"
-                    class="flex w-full sm:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-gray-700 text-gray-200 px-6 text-base font-bold hover:bg-gray-600 transition-colors">
-                    Cancel
-                </a>
-                <button type="submit"
-                    class="flex w-full sm:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-primary text-white px-8 text-base font-bold shadow-lg shadow-primary/30 hover:bg-primary/90">
-                    {% if form.instance.pk %}Update Tournament{% else %}Create Tournament{% endif %}
-                </button>
-            </div>
-        </form>
-
+  <!-- Header -->
+  <div style="padding:2rem 0 1.5rem;position:relative;">
+    <div style="position:absolute;bottom:0;left:0;width:3rem;height:3px;
+                background:linear-gradient(90deg,#b91c1c,transparent);border-radius:2px;"></div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+      <a href="{% url 'tournaments:list' %}" style="color:#6b7280;font-size:.8rem;text-decoration:none;
+         font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;
+         letter-spacing:.06em;display:flex;align-items:center;gap:4px;transition:color .15s;"
+         onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#6b7280'">
+        <span style="font-family:'Material Symbols Outlined';font-size:14px;font-feature-settings:'liga' 1;
+                     text-transform:none;letter-spacing:0;line-height:1;">arrow_back</span>
+        Tournaments
+      </a>
+      <span style="color:#374151;font-size:.8rem;">/</span>
+      <span style="color:#9ca3af;font-size:.8rem;font-family:'Barlow Condensed',sans-serif;
+                   font-weight:600;text-transform:uppercase;letter-spacing:.06em;">
+        {% if form.instance.slug %}Edit{% else %}Create{% endif %}
+      </span>
     </div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:2.25rem;font-weight:900;
+               text-transform:uppercase;letter-spacing:.04em;color:#fff;line-height:1;margin:0;">
+      {% if form.instance.slug %}
+        <span style="color:#dc2626;">Edit</span> Tournament
+      {% else %}
+        <span style="color:#dc2626;">Create</span> Tournament
+      {% endif %}
+    </h1>
+    {% if form.instance.slug %}
+    <p style="color:#6b7280;font-size:.85rem;margin-top:.35rem;">{{ form.instance.name }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Non-field errors -->
+  {% if form.non_field_errors %}
+  <div class="tf-alert-error">
+    <span style="font-family:'Material Symbols Outlined';font-size:1.1rem;flex-shrink:0;
+                 font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">error</span>
+    <div>
+      <p style="font-weight:600;margin:0 0 4px;">Please fix the following errors:</p>
+      {{ form.non_field_errors }}
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- ── 1. Basic Information ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">info</span>
+        Basic Information
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.name.id_for_label }}">Tournament Name <span class="tf-required">*</span></label>
+          {{ form.name }}
+          {% if form.name.errors %}<p class="tf-error">{{ form.name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.slug.id_for_label }}">URL Slug <span class="tf-required">*</span></label>
+          {{ form.slug }}
+          {% if form.slug.errors %}<p class="tf-error">{{ form.slug.errors.0 }}</p>{% endif %}
+          <p class="tf-hint">Used in the tournament URL</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.game.id_for_label }}">Game <span class="tf-required">*</span></label>
+          {{ form.game }}
+          {% if form.game.errors %}<p class="tf-error">{{ form.game.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.format.id_for_label }}">Format <span class="tf-required">*</span></label>
+          {{ form.format }}
+          {% if form.format.errors %}<p class="tf-error">{{ form.format.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <!-- Banner upload -->
+      <div>
+        <label class="tf-label">Tournament Banner</label>
+        <label class="tf-upload-zone" for="{{ form.banner.id_for_label }}">
+          <span style="font-family:'Material Symbols Outlined';font-size:2.5rem;color:#374151;
+                       font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;
+                       margin-bottom:.5rem;">upload_file</span>
+          <p style="color:#9ca3af;font-size:.85rem;margin:0 0 4px;"><span style="color:#dc2626;font-weight:600;">Click to upload</span> or drag and drop</p>
+          <p style="color:#4b5563;font-size:.75rem;margin:0;">PNG, JPG or GIF — recommended 1200×480px</p>
+          {{ form.banner }}
+        </label>
+        {% if form.banner.errors %}<p class="tf-error">{{ form.banner.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── 2. Details & Rules ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">description</span>
+        Details &amp; Rules
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label class="tf-label" for="{{ form.description.id_for_label }}">Description <span class="tf-required">*</span></label>
+        {{ form.description }}
+        {% if form.description.errors %}<p class="tf-error">{{ form.description.errors.0 }}</p>{% endif %}
+      </div>
+      <div>
+        <label class="tf-label" for="{{ form.rules.id_for_label }}">Rules</label>
+        {{ form.rules }}
+        {% if form.rules.errors %}<p class="tf-error">{{ form.rules.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── 3. Configuration ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">settings</span>
+        Configuration
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.tournament_type.id_for_label }}">Type</label>
+          {{ form.tournament_type }}
+          {% if form.tournament_type.errors %}<p class="tf-error">{{ form.tournament_type.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.min_participants.id_for_label }}">Min Participants</label>
+          {{ form.min_participants }}
+          {% if form.min_participants.errors %}<p class="tf-error">{{ form.min_participants.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.max_participants.id_for_label }}">Max Participants <span class="tf-required">*</span></label>
+          {{ form.max_participants }}
+          {% if form.max_participants.errors %}<p class="tf-error">{{ form.max_participants.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="tf-toggle-row">
+          {{ form.is_team_based }}
+          <label for="{{ form.is_team_based.id_for_label }}">Team-Based Tournament</label>
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.team_size.id_for_label }}">Team Size</label>
+          {{ form.team_size }}
+          {% if form.team_size.errors %}<p class="tf-error">{{ form.team_size.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. Schedule ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">calendar_month</span>
+        Schedule
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.registration_start.id_for_label }}">Registration Start <span class="tf-required">*</span></label>
+          {{ form.registration_start }}
+          {% if form.registration_start.errors %}<p class="tf-error">{{ form.registration_start.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.registration_end.id_for_label }}">Registration End <span class="tf-required">*</span></label>
+          {{ form.registration_end }}
+          {% if form.registration_end.errors %}<p class="tf-error">{{ form.registration_end.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.check_in_start.id_for_label }}">Check-in Start <span class="tf-required">*</span></label>
+          {{ form.check_in_start }}
+          {% if form.check_in_start.errors %}<p class="tf-error">{{ form.check_in_start.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.start_datetime.id_for_label }}">Tournament Start <span class="tf-required">*</span></label>
+          {{ form.start_datetime }}
+          {% if form.start_datetime.errors %}<p class="tf-error">{{ form.start_datetime.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div>
+        <label class="tf-label" for="{{ form.estimated_end.id_for_label }}">Estimated End (optional)</label>
+        {{ form.estimated_end }}
+        {% if form.estimated_end.errors %}<p class="tf-error">{{ form.estimated_end.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── 5. Participation & Prizing ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">emoji_events</span>
+        Participation &amp; Prizing
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.prize_pool.id_for_label }}">Prize Pool (₦)</label>
+          {{ form.prize_pool }}
+          {% if form.prize_pool.errors %}<p class="tf-error">{{ form.prize_pool.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.registration_fee.id_for_label }}">Registration Fee (₦)</label>
+          {{ form.registration_fee }}
+          {% if form.registration_fee.errors %}<p class="tf-error">{{ form.registration_fee.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.seeding_method.id_for_label }}">Seeding Method</label>
+          {{ form.seeding_method }}
+          {% if form.seeding_method.errors %}<p class="tf-error">{{ form.seeding_method.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.best_of.id_for_label }}">Best Of</label>
+          {{ form.best_of }}
+          {% if form.best_of.errors %}<p class="tf-error">{{ form.best_of.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label class="tf-label" for="{{ form.prize_distribution.id_for_label }}">Prize Distribution (JSON)</label>
+        {{ form.prize_distribution }}
+        {% if form.prize_distribution.errors %}<p class="tf-error">{{ form.prize_distribution.errors.0 }}</p>{% endif %}
+        <p class="tf-hint">Example: {"1st": 50, "2nd": 30, "3rd": 20}</p>
+      </div>
+      <div class="tf-toggle-row">
+        {{ form.requires_approval }}
+        <label for="{{ form.requires_approval.id_for_label }}">Require Approval for Registration</label>
+      </div>
+    </div>
+
+    <!-- ── 6. Media & Links ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">perm_media</span>
+        Media &amp; Links
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="tf-label">Thumbnail</label>
+          <label class="tf-upload-zone" for="{{ form.thumbnail.id_for_label }}" style="min-height:110px;">
+            <span style="font-family:'Material Symbols Outlined';font-size:2rem;color:#374151;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;
+                         margin-bottom:.4rem;">image</span>
+            <p style="color:#9ca3af;font-size:.8rem;margin:0 0 3px;"><span style="color:#dc2626;font-weight:600;">Click to upload</span></p>
+            <p style="color:#4b5563;font-size:.72rem;margin:0;">PNG, JPG — 400×300px</p>
+            {{ form.thumbnail }}
+          </label>
+          {% if form.thumbnail.errors %}<p class="tf-error">{{ form.thumbnail.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.venue.id_for_label }}">Venue (local tournaments)</label>
+          {{ form.venue }}
+          {% if form.venue.errors %}<p class="tf-error">{{ form.venue.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <label class="tf-label" for="{{ form.stream_url.id_for_label }}">Stream URL</label>
+          {{ form.stream_url }}
+          {% if form.stream_url.errors %}<p class="tf-error">{{ form.stream_url.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="tf-label" for="{{ form.discord_invite.id_for_label }}">Discord Invite</label>
+          {{ form.discord_invite }}
+          {% if form.discord_invite.errors %}<p class="tf-error">{{ form.discord_invite.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Access & Visibility ── -->
+    <div class="tf-card">
+      <div class="tf-section-title">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">visibility</span>
+        Access &amp; Visibility
+      </div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;">
+        <div class="tf-toggle-row">
+          {{ form.is_public }}
+          <label for="{{ form.is_public.id_for_label }}">Public Tournament</label>
+        </div>
+        <div class="tf-toggle-row">
+          {{ form.is_featured }}
+          <label for="{{ form.is_featured.id_for_label }}">Featured Tournament</label>
+        </div>
+        <div class="tf-toggle-row">
+          {{ form.requires_verification }}
+          <label for="{{ form.requires_verification.id_for_label }}">Require Verified Accounts</label>
+        </div>
+      </div>
+      <div>
+        <label class="tf-label" for="{{ form.skill_requirement.id_for_label }}">Skill Requirement</label>
+        {{ form.skill_requirement }}
+        {% if form.skill_requirement.errors %}<p class="tf-error">{{ form.skill_requirement.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── Actions ── -->
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:.75rem;
+                padding-top:1.25rem;border-top:1px solid #111827;">
+      <a href="{% if form.instance.slug %}{% url 'tournaments:detail' form.instance.slug %}{% else %}{% url 'tournaments:list' %}{% endif %}"
+         class="tf-btn-ghost">
+        <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;
+                     text-transform:none;letter-spacing:0;line-height:1;">close</span>
+        Cancel
+      </a>
+      <button type="submit" class="tf-btn-primary">
+        <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;
+                     text-transform:none;letter-spacing:0;line-height:1;">save</span>
+        {% if form.instance.slug %}Update Tournament{% else %}Create Tournament{% endif %}
+      </button>
+    </div>
+
+  </form>
 </div>
-
-<style>
-    /* Style form inputs to match the design */
-    input[type="text"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="datetime-local"],
-    input[type="file"],
-    select,
-    textarea {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 0.5rem;
-        background-color: var(--background-dark, #1f1f1f);
-        color: var(--text-light, #f9fafb);
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    input[type="email"]:focus,
-    input[type="url"]:focus,
-    input[type="datetime-local"]:focus,
-    select:focus,
-    textarea:focus {
-        outline: none;
-        border-color: var(--eyt-primary);
-        box-shadow: 0 0 0 3px var(--eyt-primary-alpha-20);
-    }
-
-    /* Keep inputs consistent (no dark mode needed since we're always dark) */
-
-    /* Placeholder text */
-    input::placeholder,
-    textarea::placeholder {
-        color: var(--text-muted, #9ca3af);
-    }
-
-    .dark input::placeholder,
-    .dark textarea::placeholder {
-        color: var(--text-muted-dark, #6b7280);
-    }
-
-    /* Select dropdown arrow */
-    select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.5rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-        padding-right: 2.5rem;
-    }
-
-    .dark select {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    }
-
-    /* Checkbox toggle styling */
-    input[type="checkbox"] {
-        width: 2.75rem;
-        height: 1.5rem;
-        background-color: var(--checkbox-bg, #e5e7eb);
-        border-radius: 9999px;
-        position: relative;
-        cursor: pointer;
-        appearance: none;
-        transition: background-color 0.2s;
-    }
-
-    .dark input[type="checkbox"] {
-        background-color: var(--checkbox-bg-dark, #374151);
-    }
-
-    input[type="checkbox"]:checked {
-        background-color: var(--eyt-primary);
-    }
-
-    input[type="checkbox"]::after {
-        content: '';
-        position: absolute;
-        top: 0.125rem;
-        left: 0.125rem;
-        background-color: white;
-        border: 1px solid var(--border-light, #d1d5db);
-        border-radius: 9999px;
-        height: 1.25rem;
-        width: 1.25rem;
-        transition: all 0.2s;
-    }
-
-    input[type="checkbox"]:checked::after {
-        transform: translateX(1.25rem);
-        border-color: white;
-    }
-
-    /* File input */
-    input[type="file"] {
-        display: none;
-    }
-
-    /* Select height */
-    select {
-        height: 3rem;
-    }
-
-    /* Textarea min height */
-    textarea {
-        min-height: 8rem;
-        resize: vertical;
-    }
-
-    /* Option text in select */
-    select option {
-        background-color: var(--option-bg-light, #ffffff);
-        color: var(--option-text-light, #1f2937);
-    }
-
-    .dark select option {
-        background-color: var(--option-bg-dark, #1f2937);
-        color: var(--option-text-dark, #f9fafb);
-    }
-</style>
+</div>
 {% endblock %}

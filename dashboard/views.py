@@ -21,6 +21,7 @@ from PIL import Image
 import io
 import json
 from tournaments.models import Tournament, Participant, Match
+from store.models import Product
 from coaching.models import CoachingSession
 from notifications.models import Notification
 from teams.models import TeamMember, Team, TeamInvite
@@ -174,6 +175,18 @@ def dashboard_home(request):
     except Exception as e:
         recent_notifications = []
     
+    # Get featured products for merch teaser (up to 4)
+    try:
+        featured_products = list(Product.objects.filter(
+            is_active=True,
+            is_featured=True,
+            stock_quantity__gt=0
+        ).prefetch_related('images').order_by('-created_at')[:4])
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f'featured_products query failed: {e}')
+        featured_products = []
+
     context = {
         # New dashboard data
         'stats': stats,
@@ -181,7 +194,10 @@ def dashboard_home(request):
         'upcoming_tournaments': upcoming_tournaments,
         'recommendations': recommendations,
         'payment_summary': payment_summary,
-        
+
+        # Merch teaser
+        'featured_products': featured_products,
+
         # Legacy data for backward compatibility
         'user_tournaments': user_tournaments,
         'upcoming_sessions': upcoming_sessions,
@@ -436,7 +452,18 @@ def profile_view(request, username):
         in_showcase=True,
         is_completed=True
     ).select_related('achievement').order_by('showcase_order')[:6]
-    
+
+    # Recent tournament participations for overview (last 5)
+    try:
+        recent_participations = Participant.objects.filter(
+            user=profile_owner,
+            status='confirmed'
+        ).select_related(
+            'tournament', 'tournament__game'
+        ).order_by('-registered_at')[:5]
+    except Exception:
+        recent_participations = []
+
     # Build context
     context = {
         'profile_owner': profile_owner,
@@ -448,6 +475,7 @@ def profile_view(request, username):
         'user_stats': user_stats,
         'recent_activities': recent_activities,
         'showcase_achievements': showcase_achievements,
+        'recent_participations': recent_participations,
     }
     
     return render(request, 'dashboard/profile_view.html', context)
@@ -701,6 +729,259 @@ def profile_export(request):
 
 
 @login_required
+def profile_export_pdf(request):
+    """Export user profile data as a styled PDF (gaming card format)."""
+    from django.http import HttpResponse
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+    import io
+
+    user = request.user
+
+    # ── Gather data ──────────────────────────────────────────────────────────
+    game_profiles = UserGameProfile.objects.filter(user=user).select_related('game')
+    tournament_participations = Participant.objects.filter(
+        user=user, status='confirmed'
+    ).select_related('tournament', 'tournament__game').order_by('-registered_at')[:20]
+    team_memberships = TeamMember.objects.filter(
+        user=user, status='active'
+    ).select_related('team', 'team__game')
+    achievements = UserAchievement.objects.filter(
+        user=user, is_completed=True
+    ).select_related('achievement').order_by('-earned_at')[:20]
+
+    # ── Colour palette ────────────────────────────────────────────────────────
+    BG       = colors.HexColor('#0A0A0A')
+    CARD     = colors.HexColor('#111111')
+    RED      = colors.HexColor('#DC2626')
+    RED_DIM  = colors.HexColor('#7f1d1d')
+    WHITE    = colors.white
+    GREY     = colors.HexColor('#9ca3af')
+    GREY_DIM = colors.HexColor('#374151')
+    GOLD     = colors.HexColor('#facc15')
+
+    # ── Styles ────────────────────────────────────────────────────────────────
+    styles = getSampleStyleSheet()
+
+    def ps(name, **kw):
+        return ParagraphStyle(name, **kw)
+
+    S_TITLE   = ps('title',   fontName='Helvetica-Bold', fontSize=22, textColor=WHITE,
+                   spaceAfter=2, alignment=TA_LEFT)
+    S_SUB     = ps('sub',     fontName='Helvetica',      fontSize=10, textColor=GREY,
+                   spaceAfter=6, alignment=TA_LEFT)
+    S_SECTION = ps('section', fontName='Helvetica-Bold', fontSize=9,  textColor=RED,
+                   spaceBefore=14, spaceAfter=4, alignment=TA_LEFT)
+    S_BODY    = ps('body',    fontName='Helvetica',      fontSize=9,  textColor=WHITE,
+                   spaceAfter=3, leading=13)
+    S_LABEL   = ps('label',   fontName='Helvetica-Bold', fontSize=8,  textColor=GREY)
+    S_VALUE   = ps('value',   fontName='Helvetica',      fontSize=9,  textColor=WHITE)
+    S_SMALL   = ps('small',   fontName='Helvetica',      fontSize=8,  textColor=GREY)
+    S_FOOTER  = ps('footer',  fontName='Helvetica',      fontSize=7,  textColor=GREY_DIM,
+                   alignment=TA_CENTER)
+
+    # ── Table style helper ────────────────────────────────────────────────────
+    def table_style(header=True):
+        cmds = [
+            ('BACKGROUND',  (0, 0), (-1, 0 if header else -1), CARD),
+            ('TEXTCOLOR',   (0, 0), (-1, -1), WHITE),
+            ('FONTNAME',    (0, 0), (-1, 0),  'Helvetica-Bold'),
+            ('FONTSIZE',    (0, 0), (-1, 0),  8),
+            ('FONTNAME',    (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE',    (0, 1), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#111111'), colors.HexColor('#161616')]),
+            ('GRID',        (0, 0), (-1, -1), 0.3, GREY_DIM),
+            ('TOPPADDING',  (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING',(0,0), (-1, -1), 4),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING',(0, 0), (-1, -1), 6),
+            ('LINEBELOW',   (0, 0), (-1, 0),  1, RED),
+        ]
+        if header:
+            cmds.append(('TEXTCOLOR', (0, 0), (-1, 0), RED))
+        return TableStyle(cmds)
+
+    # ── Build content ─────────────────────────────────────────────────────────
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buf, pagesize=A4,
+        leftMargin=18*mm, rightMargin=18*mm,
+        topMargin=18*mm, bottomMargin=18*mm,
+        title=f"{user.get_display_name()} — EYTGaming Profile",
+        author='EYTGaming',
+    )
+
+    W = A4[0] - 36*mm   # usable width
+    story = []
+
+    # ── Header block ──────────────────────────────────────────────────────────
+    header_data = [[
+        Paragraph(f"<b>{user.get_display_name().upper()}</b>", S_TITLE),
+        Paragraph(f"<b>EYTGAMING</b>", ps('brand', fontName='Helvetica-Bold',
+                  fontSize=14, textColor=RED, alignment=TA_RIGHT)),
+    ]]
+    header_tbl = Table(header_data, colWidths=[W*0.7, W*0.3])
+    header_tbl.setStyle(TableStyle([
+        ('BACKGROUND',   (0,0), (-1,-1), BG),
+        ('VALIGN',       (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING',   (0,0), (-1,-1), 0),
+        ('BOTTOMPADDING',(0,0), (-1,-1), 0),
+    ]))
+    story.append(header_tbl)
+
+    role_str = user.get_role_display() if hasattr(user, 'get_role_display') else user.role.title()
+    story.append(Paragraph(
+        f"@{user.username}  ·  {role_str}  ·  Level {user.level}  ·  {user.total_points} pts",
+        S_SUB
+    ))
+    story.append(HRFlowable(width=W, thickness=1, color=RED, spaceAfter=8))
+
+    # ── Bio ───────────────────────────────────────────────────────────────────
+    if user.bio:
+        story.append(Paragraph("BIO", S_SECTION))
+        story.append(Paragraph(user.bio, S_BODY))
+
+    # ── Profile info grid ─────────────────────────────────────────────────────
+    story.append(Paragraph("PLAYER INFO", S_SECTION))
+    info_rows = []
+    fields = [
+        ("Full Name",    user.get_full_name() or "—"),
+        ("Email",        user.email),
+        ("Country",      user.country or "—"),
+        ("City",         user.city or "—"),
+        ("Skill Level",  user.get_skill_level_display() if hasattr(user, 'get_skill_level_display') else user.skill_level.title()),
+        ("Member Since", user.date_joined.strftime("%B %d, %Y") if user.date_joined else "—"),
+        ("Discord",      user.discord_username or "—"),
+        ("Steam ID",     user.steam_id or "—"),
+        ("Twitch",       user.twitch_username or "—"),
+    ]
+    # 2-column layout
+    for i in range(0, len(fields), 2):
+        left  = fields[i]
+        right = fields[i+1] if i+1 < len(fields) else ("", "")
+        info_rows.append([
+            Paragraph(left[0],  S_LABEL), Paragraph(left[1],  S_VALUE),
+            Paragraph(right[0], S_LABEL), Paragraph(right[1], S_VALUE),
+        ])
+    info_tbl = Table(info_rows, colWidths=[W*0.15, W*0.35, W*0.15, W*0.35])
+    info_tbl.setStyle(TableStyle([
+        ('BACKGROUND',   (0,0), (-1,-1), CARD),
+        ('ROWBACKGROUNDS',(0,0),(-1,-1), [CARD, colors.HexColor('#161616')]),
+        ('GRID',         (0,0), (-1,-1), 0.3, GREY_DIM),
+        ('TOPPADDING',   (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING',(0,0), (-1,-1), 4),
+        ('LEFTPADDING',  (0,0), (-1,-1), 6),
+        ('RIGHTPADDING', (0,0), (-1,-1), 6),
+    ]))
+    story.append(info_tbl)
+
+    # ── Game profiles ─────────────────────────────────────────────────────────
+    if game_profiles.exists():
+        story.append(Paragraph("GAME PROFILES / TRADEMARKS", S_SECTION))
+        gp_rows = [["Game", "IGN", "Rank", "MMR", "W/L", "Win %", "Tournaments"]]
+        for gp in game_profiles:
+            total = gp.matches_won + gp.matches_lost
+            win_pct = f"{round(gp.matches_won/total*100)}%" if total else "—"
+            gp_rows.append([
+                gp.game.name,
+                gp.in_game_name or "—",
+                gp.rank or "—",
+                str(gp.mmr),
+                f"{gp.matches_won}W / {gp.matches_lost}L",
+                win_pct,
+                str(gp.tournaments_won),
+            ])
+        gp_tbl = Table(gp_rows, colWidths=[W*0.18, W*0.16, W*0.12, W*0.1, W*0.14, W*0.1, W*0.2])
+        gp_tbl.setStyle(table_style())
+        story.append(gp_tbl)
+
+    # ── Tournament history ────────────────────────────────────────────────────
+    if tournament_participations.exists():
+        story.append(Paragraph("TOURNAMENT HISTORY", S_SECTION))
+        t_rows = [["Tournament", "Game", "Format", "Placement", "W", "L", "Prize"]]
+        for p in tournament_participations:
+            t = p.tournament
+            placement = f"#{p.final_placement}" if p.final_placement else "—"
+            prize = f"₦{p.prize_won:,.0f}" if p.prize_won else "—"
+            t_rows.append([
+                t.name[:28],
+                t.game.name[:14],
+                t.get_format_display(),
+                placement,
+                str(p.matches_won),
+                str(p.matches_lost),
+                prize,
+            ])
+        t_tbl = Table(t_rows, colWidths=[W*0.26, W*0.14, W*0.14, W*0.1, W*0.06, W*0.06, W*0.14])
+        t_tbl.setStyle(table_style())
+        story.append(t_tbl)
+
+    # ── Team memberships ──────────────────────────────────────────────────────
+    if team_memberships.exists():
+        story.append(Paragraph("TEAM MEMBERSHIPS", S_SECTION))
+        tm_rows = [["Team", "Game", "Role", "Joined"]]
+        for m in team_memberships:
+            tm_rows.append([
+                m.team.name,
+                m.team.game.name if m.team.game else "—",
+                m.get_role_display() if hasattr(m, 'get_role_display') else m.role.title(),
+                m.joined_at.strftime("%b %Y") if hasattr(m, 'joined_at') and m.joined_at else "—",
+            ])
+        tm_tbl = Table(tm_rows, colWidths=[W*0.35, W*0.25, W*0.2, W*0.2])
+        tm_tbl.setStyle(table_style())
+        story.append(tm_tbl)
+
+    # ── Achievements ──────────────────────────────────────────────────────────
+    if achievements.exists():
+        story.append(Paragraph("ACHIEVEMENTS", S_SECTION))
+        ach_rows = [["Achievement", "Type", "Rarity", "Points", "Earned"]]
+        for ua in achievements:
+            a = ua.achievement
+            earned = ua.earned_at.strftime("%b %d, %Y") if ua.earned_at else "—"
+            ach_rows.append([
+                a.name,
+                a.get_achievement_type_display(),
+                a.get_rarity_display(),
+                str(a.points_reward),
+                earned,
+            ])
+        ach_tbl = Table(ach_rows, colWidths=[W*0.35, W*0.15, W*0.15, W*0.1, W*0.25])
+        ach_tbl.setStyle(table_style())
+        story.append(ach_tbl)
+
+    # ── Footer ────────────────────────────────────────────────────────────────
+    story.append(Spacer(1, 12))
+    story.append(HRFlowable(width=W, thickness=0.5, color=GREY_DIM))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph(
+        f"Generated by EYTGaming  ·  {timezone.now().strftime('%B %d, %Y at %H:%M UTC')}  ·  eytgaming.com",
+        S_FOOTER
+    ))
+
+    # ── Page background callback ──────────────────────────────────────────────
+    def draw_bg(canvas, doc):
+        canvas.saveState()
+        canvas.setFillColor(BG)
+        canvas.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
+        # Red top bar
+        canvas.setFillColor(RED)
+        canvas.rect(0, A4[1]-4, A4[0], 4, fill=1, stroke=0)
+        canvas.restoreState()
+
+    doc.build(story, onFirstPage=draw_bg, onLaterPages=draw_bg)
+
+    buf.seek(0)
+    filename = f"{user.username}_eytgaming_{timezone.now().strftime('%Y%m%d')}.pdf"
+    response = HttpResponse(buf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+@login_required
 def game_profile_list(request):
     """
     List user's game profiles.
@@ -739,6 +1020,8 @@ def game_profile_create(request):
     """
     if request.method == 'POST':
         form = GameProfileForm(request.POST, user=request.user)
+        # Assign user to the instance BEFORE is_valid() so clean() can access it
+        form.instance.user = request.user
         if form.is_valid():
             try:
                 game_profile = form.save(commit=False)
@@ -1337,10 +1620,11 @@ def settings_privacy(request):
         privacy_form = PrivacySettingsForm(request.POST, user=user)
         if privacy_form.is_valid():
             # Update user privacy settings
+            user.private_profile = privacy_form.cleaned_data.get('private_profile', False)
             user.online_status_visible = privacy_form.cleaned_data.get('online_status_visible', False)
             user.activity_visible = privacy_form.cleaned_data.get('activity_visible', False)
             user.statistics_visible = privacy_form.cleaned_data.get('statistics_visible', False)
-            user.save(update_fields=['online_status_visible', 'activity_visible', 'statistics_visible'])
+            user.save(update_fields=['private_profile', 'online_status_visible', 'activity_visible', 'statistics_visible'])
             
             # Record activity
             ActivityService.record_activity(

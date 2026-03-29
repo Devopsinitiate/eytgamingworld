@@ -102,7 +102,14 @@ class TournamentListView(ListView):
         format_type = self.request.GET.get('format')
         if format_type:
             queryset = queryset.filter(format=format_type)
-        
+
+        # Filter by prize pool
+        prize = self.request.GET.get('prize')
+        if prize == 'free':
+            queryset = queryset.filter(Q(prize_pool__isnull=True) | Q(prize_pool=0))
+        elif prize == 'paid':
+            queryset = queryset.filter(prize_pool__gt=0)
+
         # Search
         search = self.request.GET.get('search')
         if search:
@@ -132,6 +139,7 @@ class TournamentListView(ListView):
             'game': self.request.GET.get('game', ''),
             'format': self.request.GET.get('format', ''),
             'search': self.request.GET.get('search', ''),
+            'prize': self.request.GET.get('prize', ''),
         }
         
         return context
@@ -170,7 +178,8 @@ class TournamentContextMixin:
         Calculate comprehensive tournament statistics for display
         Requirements: 4.1, 4.2, 4.3
         """
-        registered_count = tournament.total_registered or 0
+        # Use get_current_registrations() instead of cached total_registered
+        registered_count = tournament.get_current_registrations()
         max_participants = tournament.max_participants or 0
         checked_in_count = tournament.total_checked_in or 0
         
@@ -178,8 +187,8 @@ class TournamentContextMixin:
         registration_percentage = (registered_count / max_participants * 100) if max_participants > 0 else 0
         checkin_percentage = (checked_in_count / registered_count * 100) if registered_count > 0 else 0
         
-        # Calculate spots remaining
-        spots_remaining = max(0, max_participants - registered_count) if max_participants > 0 else 0
+        # Use spots_remaining property instead of calculating manually
+        spots_remaining = tournament.spots_remaining if max_participants > 0 else 0
         
         # Determine registration status
         registration_status = self.get_registration_status(tournament)
@@ -195,7 +204,7 @@ class TournamentContextMixin:
                 'spots_remaining': spots_remaining,
                 'registration_percentage': round(registration_percentage, 1),
                 'checkin_percentage': round(checkin_percentage, 1),
-                'is_full': registered_count >= max_participants if max_participants > 0 else False,
+                'is_full': tournament.is_full,
                 'has_participants': registered_count > 0,
             },
             'engagement': {
@@ -862,7 +871,9 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
                     'registered': registered_count,
                     'checked_in': tournament.total_checked_in,
                     'capacity': tournament.max_participants,
-                    'percentage_full': tournament.registration_progress
+                    'spots_remaining': tournament.spots_remaining,
+                    'percentage_full': tournament.registration_progress,
+                    'is_full': tournament.is_full,
                 },
                 'engagement': {
                     'views': tournament.view_count,

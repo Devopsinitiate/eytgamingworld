@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Contrast and Touch Target Verification</title>
+  <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      background: #0A0A0A;
+      color: #FFFFFF;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(31, 41, 55, 0.6);
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid rgba(220, 38, 38, 0.3);
+    }
+    
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(10, 10, 10, 0.5);
+      border-radius: 4px;
+    }
+    
+    .test-result {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    
+    .test-pass {
+      background: rgba(16, 185, 129, 0.2);
+      border-left: 4px solid #10B981;
+    }
+    
+    .test-fail {
+      background: rgba(220, 38, 38, 0.2);
+      border-left: 4px solid #DC2626;
+    }
+    
+    .test-warning {
+      background: rgba(245, 158, 11, 0.2);
+      border-left: 4px solid #F59E0B;
+    }
+    
+    .summary {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    
+    .summary.pass {
+      background: rgba(16, 185, 129, 0.3);
+      color: #10B981;
+    }
+    
+    .summary.fail {
+      background: rgba(220, 38, 38, 0.3);
+      color: #DC2626;
+    }
+    
+    h1, h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      text-transform: uppercase;
+      color: #DC2626;
+    }
+    
+    .element-sample {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(31, 41, 55, 0.3);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>WCAG 2.1 AA Compliance Verification</h1>
+    <p>Testing color contrast ratios and touch target sizes for accessibility compliance.</p>
+    
+    <div class="test-section">
+      <h2>Test Elements</h2>
+      
+      <!-- Stat Cards -->
+      <div class="element-sample">
+        <div class="gaming-stat-card" style="max-width: 200px;">
+          <div class="gaming-stat-value">42</div>
+          <div class="gaming-stat-label">Total Registered</div>
+        </div>
+      </div>
+      
+      <!-- Buttons -->
+      <div class="element-sample">
+        <button class="gaming-btn-primary">Add Participant</button>
+        <button class="gaming-btn-ghost">Filter</button>
+        <button class="gaming-btn-action">Check In</button>
+      </div>
+      
+      <!-- Search Bar -->
+      <div class="element-sample">
+        <input type="text" class="gaming-search-bar" placeholder="Search participants...">
+      </div>
+      
+      <!-- Status Indicators -->
+      <div class="element-sample">
+        <div class="gaming-status-indicator">
+          <span class="gaming-status-dot checked-in"></span>
+          <span>Checked In</span>
+        </div>
+        <div class="gaming-status-indicator">
+          <span class="gaming-status-dot pending"></span>
+          <span>Pending</span>
+        </div>
+        <div class="gaming-status-indicator">
+          <span class="gaming-status-dot confirmed"></span>
+          <span>Confirmed</span>
+        </div>
+      </div>
+      
+      <!-- Table -->
+      <div class="element-sample">
+        <div class="gaming-table-container">
+          <table class="gaming-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Seed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>John Doe</td>
+                <td>
+                  <div class="gaming-status-indicator">
+                    <span class="gaming-status-dot checked-in"></span>
+                    <span>Checked In</span>
+                  </div>
+                </td>
+                <td><span class="gaming-seed-badge">1</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Modal Elements -->
+      <div class="element-sample">
+        <label class="gaming-label">Seed Number</label>
+        <input type="number" class="gaming-input" placeholder="Enter seed number">
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Color Contrast Test Results</h2>
+      <div id="contrast-results"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Touch Target Test Results</h2>
+      <div id="touch-target-results"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Screen Reader Announcements</h2>
+      <div id="aria-results"></div>
+      
+      <!-- ARIA live region for testing -->
+      <div id="status-announcer" role="status" aria-live="polite" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
+      
+      <button id="test-announcement" class="gaming-btn-primary" style="margin-top: 10px;">
+        Test Status Announcement
+      </button>
+    </div>
+    
+    <div id="summary"></div>
+  </div>
+
+  <script>
+    // Utility function to calculate relative luminance
+    function getLuminance(r, g, b) {
+      const [rs, gs, bs] = [r, g, b].map(c => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+    
+    // Calculate contrast ratio between two colors
+    function getContrastRatio(rgb1, rgb2) {
+      const l1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+      const l2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+      const lighter = Math.max(l1, l2);
+      const darker = Math.min(l1, l2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+    
+    // Parse RGB color string to object
+    function parseRGB(rgbString) {
+      const match = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) return null;
+      return {
+        r: parseInt(match[1]),
+        g: parseInt(match[2]),
+        b: parseInt(match[3])
+      };
+    }
+    
+    // Get background color of element (including inherited backgrounds)
+    function getEffectiveBackgroundColor(element) {
+      let current = element;
+      while (current) {
+        const bg = window.getComputedStyle(current).backgroundColor;
+        const rgb = parseRGB(bg);
+        if (rgb && (rgb.r !== 0 || rgb.g !== 0 || rgb.b !== 0)) {
+          return rgb;
+        }
+        current = current.parentElement;
+      }
+      // Default to deep black background
+      return { r: 10, g: 10, b: 10 };
+    }
+    
+    // Test color contrast for an element
+    function testContrast(element, description, isLargeText = false) {
+      const color = window.getComputedStyle(element).color;
+      const textRGB = parseRGB(color);
+      const bgRGB = getEffectiveBackgroundColor(element);
+      
+      if (!textRGB || !bgRGB) {
+        return {
+          pass: false,
+          description,
+          message: 'Could not parse colors'
+        };
+      }
+      
+      const ratio = getContrastRatio(textRGB, bgRGB);
+      const requiredRatio = isLargeText ? 3.0 : 4.5;
+      const pass = ratio >= requiredRatio;
+      
+      return {
+        pass,
+        description,
+        ratio: ratio.toFixed(2),
+        required: requiredRatio,
+        message: `${description}: ${ratio.toFixed(2)}:1 (required: ${requiredRatio}:1) - ${pass ? 'PASS' : 'FAIL'}`
+      };
+    }
+    
+    // Test touch target size
+    function testTouchTarget(element, description) {
+      const rect = element.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      const minSize = 44;
+      
+      const pass = width >= minSize && height >= minSize;
+      
+      return {
+        pass,
+        description,
+        width: Math.round(width),
+        height: Math.round(height),
+        message: `${description}: ${Math.round(width)}px × ${Math.round(height)}px (required: ${minSize}px × ${minSize}px) - ${pass ? 'PASS' : 'FAIL'}`
+      };
+    }
+    
+    // Run all tests
+    function runTests() {
+      const contrastResults = [];
+      const touchTargetResults = [];
+      
+      // Color Contrast Tests
+      const statValue = document.querySelector('.gaming-stat-value');
+      const statLabel = document.querySelector('.gaming-stat-label');
+      const btnPrimary = document.querySelector('.gaming-btn-primary');
+      const btnGhost = document.querySelector('.gaming-btn-ghost');
+      const btnAction = document.querySelector('.gaming-btn-action');
+      const searchBar = document.querySelector('.gaming-search-bar');
+      const tableHeader = document.querySelector('.gaming-table th');
+      const tableCell = document.querySelector('.gaming-table td');
+      const statusText = document.querySelectorAll('.gaming-status-indicator span')[1];
+      const label = document.querySelector('.gaming-label');
+      const input = document.querySelector('.gaming-input');
+      const seedBadge = document.querySelector('.gaming-seed-badge');
+      
+      // Test contrast for various elements
+      contrastResults.push(testContrast(statValue, 'Stat Card Value (large text)', true));
+      contrastResults.push(testContrast(statLabel, 'Stat Card Label'));
+      contrastResults.push(testContrast(btnPrimary, 'Primary Button Text'));
+      contrastResults.push(testContrast(btnGhost, 'Ghost Button Text'));
+      contrastResults.push(testContrast(btnAction, 'Action Button Text'));
+      contrastResults.push(testContrast(tableHeader, 'Table Header Text'));
+      contrastResults.push(testContrast(tableCell, 'Table Cell Text'));
+      contrastResults.push(testContrast(statusText, 'Status Indicator Text'));
+      contrastResults.push(testContrast(label, 'Form Label Text'));
+      contrastResults.push(testContrast(seedBadge, 'Seed Badge Text'));
+      
+      // Test placeholder contrast (when focused)
+      searchBar.focus();
+      const placeholderColor = window.getComputedStyle(searchBar, '::placeholder').color;
+      if (placeholderColor && placeholderColor !== 'rgba(0, 0, 0, 0)') {
+        const placeholderRGB = parseRGB(placeholderColor);
+        const bgRGB = getEffectiveBackgroundColor(searchBar);
+        if (placeholderRGB && bgRGB) {
+          const ratio = getContrastRatio(placeholderRGB, bgRGB);
+          contrastResults.push({
+            pass: ratio >= 4.5,
+            description: 'Search Bar Placeholder',
+            ratio: ratio.toFixed(2),
+            required: 4.5,
+            message: `Search Bar Placeholder: ${ratio.toFixed(2)}:1 (required: 4.5:1) - ${ratio >= 4.5 ? 'PASS' : 'FAIL'}`
+          });
+        }
+      }
+      searchBar.blur();
+      
+      // Touch Target Tests
+      touchTargetResults.push(testTouchTarget(btnPrimary, 'Primary Button'));
+      touchTargetResults.push(testTouchTarget(btnGhost, 'Ghost Button'));
+      touchTargetResults.push(testTouchTarget(btnAction, 'Action Button'));
+      touchTargetResults.push(testTouchTarget(searchBar, 'Search Bar'));
+      touchTargetResults.push(testTouchTarget(input, 'Input Field'));
+      
+      // Test modal close button if exists
+      const modalClose = document.querySelector('.gaming-modal-close');
+      if (modalClose) {
+        touchTargetResults.push(testTouchTarget(modalClose, 'Modal Close Button'));
+      }
+      
+      // Display results
+      displayContrastResults(contrastResults);
+      displayTouchTargetResults(touchTargetResults);
+      testARIASupport();
+      displaySummary(contrastResults, touchTargetResults);
+    }
+    
+    function displayContrastResults(results) {
+      const container = document.getElementById('contrast-results');
+      container.innerHTML = '';
+      
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = `test-result ${result.pass ? 'test-pass' : 'test-fail'}`;
+        div.textContent = result.message;
+        container.appendChild(div);
+      });
+    }
+    
+    function displayTouchTargetResults(results) {
+      const container = document.getElementById('touch-target-results');
+      container.innerHTML = '';
+      
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = `test-result ${result.pass ? 'test-pass' : 'test-fail'}`;
+        div.textContent = result.message;
+        container.appendChild(div);
+      });
+    }
+    
+    function testARIASupport() {
+      const container = document.getElementById('aria-results');
+      const announcer = document.getElementById('status-announcer');
+      const testButton = document.getElementById('test-announcement');
+      
+      // Check if ARIA live region exists
+      const hasLiveRegion = announcer !== null;
+      
+      let html = '';
+      html += `<div class="test-result ${hasLiveRegion ? 'test-pass' : 'test-fail'}">`;
+      html += `ARIA Live Region Present: ${hasLiveRegion ? 'PASS' : 'FAIL'}`;
+      html += '</div>';
+      
+      // Check for proper ARIA attributes
+      if (hasLiveRegion) {
+        const hasRole = announcer.hasAttribute('role');
+        const hasLive = announcer.hasAttribute('aria-live');
+        const hasAtomic = announcer.hasAttribute('aria-atomic');
+        
+        html += `<div class="test-result ${hasRole ? 'test-pass' : 'test-fail'}">`;
+        html += `ARIA Role Attribute: ${hasRole ? 'PASS' : 'FAIL'}`;
+        html += '</div>';
+        
+        html += `<div class="test-result ${hasLive ? 'test-pass' : 'test-fail'}">`;
+        html += `ARIA Live Attribute: ${hasLive ? 'PASS' : 'FAIL'}`;
+        html += '</div>';
+        
+        html += `<div class="test-result ${hasAtomic ? 'test-pass' : 'test-fail'}">`;
+        html += `ARIA Atomic Attribute: ${hasAtomic ? 'PASS' : 'FAIL'}`;
+        html += '</div>';
+      }
+      
+      container.innerHTML = html;
+      
+      // Add test button functionality
+      testButton.addEventListener('click', () => {
+        announcer.textContent = 'Participant status changed to Checked In';
+        setTimeout(() => {
+          announcer.textContent = '';
+        }, 1000);
+        
+        const feedback = document.createElement('div');
+        feedback.className = 'test-result test-pass';
+        feedback.textContent = 'Status announcement triggered! Screen readers should announce: "Participant status changed to Checked In"';
+        container.appendChild(feedback);
+        
+        setTimeout(() => {
+          feedback.remove();
+        }, 5000);
+      });
+    }
+    
+    function displaySummary(contrastResults, touchTargetResults) {
+      const container = document.getElementById('summary');
+      
+      const contrastPassed = contrastResults.filter(r => r.pass).length;
+      const contrastTotal = contrastResults.length;
+      const touchPassed = touchTargetResults.filter(r => r.pass).length;
+      const touchTotal = touchTargetResults.length;
+      
+      const allPassed = (contrastPassed === contrastTotal) && (touchPassed === touchTotal);
+      
+      container.innerHTML = `
+        <div class="summary ${allPassed ? 'pass' : 'fail'}">
+          <div>Color Contrast: ${contrastPassed}/${contrastTotal} tests passed</div>
+          <div>Touch Targets: ${touchPassed}/${touchTotal} tests passed</div>
+          <div style="margin-top: 10px; font-size: 24px;">
+            ${allPassed ? '✓ WCAG 2.1 AA COMPLIANT' : '✗ COMPLIANCE ISSUES FOUND'}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Run tests when page loads
+    window.addEventListener('load', () => {
+      setTimeout(runTests, 100);
+    });
+  </script>
+</body>
+</html>

@@ -1,19 +1,19 @@
 {% load static %}
 
 {# Media Highlights Section - Battle Moments and Gameplay Videos #}
-<section id="highlights" class="media-highlights py-20 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
+<section id="highlights" class="media-highlights py-10 bg-gradient-to-b from-gray-900 to-black relative overflow-hidden">
   <div class="container mx-auto px-4">
     {# Section Title #}
-    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
       BATTLE MOMENTS
     </h2>
-    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
       Epic Highlights & Tournament Clips
     </p>
     
     {# Featured Video - Large Display #}
     {% if featured_video %}
-    <div class="featured-video mb-12 max-w-5xl mx-auto">
+    <div class="featured-video mb-6 max-w-5xl mx-auto">
       <div class="video-wrapper relative group cursor-pointer" data-video-url="{{ featured_video.video_url }}">
         {% if featured_video.thumbnail %}
         <img 

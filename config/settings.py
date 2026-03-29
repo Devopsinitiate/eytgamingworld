@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.humanize',
+    'django.contrib.sitemaps',
 
 
     # Third party apps
@@ -224,6 +225,7 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_ADAPTER = 'accounts.adapter.CustomAccountAdapter'
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FORM_CLASS = 'accounts.forms.CustomSignupForm'
 # Email verification: 'mandatory', 'optional', or 'none'
 # Set to 'optional' or 'none' for PythonAnywhere free tier
 ACCOUNT_EMAIL_VERIFICATION = config('ACCOUNT_EMAIL_VERIFICATION', default='optional')
@@ -390,7 +392,7 @@ TAILWIND_APP_NAME = 'frontend'
 NPM_BIN_PATH = config('NPM_BIN_PATH', default='/usr/local/bin/npm')
 
 # Custom Settings
-TOURNAMENT_CHECK_IN_WINDOW = 30  # minutes before start
+TOURNAMENT_CHECK_IN_WINDOW = 10  # minutes before start
 MAX_TEAM_SIZE = 10
 MIN_TOURNAMENT_PARTICIPANTS = 4
 COACHING_SESSION_DURATION = 60  # minutes

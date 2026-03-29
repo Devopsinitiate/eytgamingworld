@@ -96,6 +96,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     total_points = models.IntegerField(default=0)
     level = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     
+    # Gender
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('prefer_not_to_say', 'Prefer not to say'),
+    ]
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True, default='')
+    
     # Metadata
     email_notifications = models.BooleanField(default=True)
     push_notifications = models.BooleanField(default=True)
@@ -383,11 +391,17 @@ class UserGameProfile(models.Model):
         to ensure data integrity regardless of how the model is saved.
         """
         from django.core.exceptions import ValidationError
-        
+
+        # Guard: user may not be set yet during form validation
+        try:
+            user = self.user
+        except Exception:
+            return
+
         if self.is_main_game:
             # Check if another profile for this user is already main
             existing_main = UserGameProfile.objects.filter(
-                user=self.user,
+                user=user,
                 is_main_game=True
             ).exclude(pk=self.pk)
             
@@ -631,8 +645,11 @@ class NewsArticle(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        from django.urls import reverse
-        return reverse('news:detail', kwargs={'slug': self.slug})
+        from django.urls import reverse, NoReverseMatch
+        try:
+            return reverse('core:news_detail', kwargs={'slug': self.slug})
+        except NoReverseMatch:
+            return '#'
 
 
 class Product(models.Model):

@@ -1,221 +1,297 @@
 {% extends "layouts/dashboard_base.html" %}
 {% load static %}
 
-{% block title %}Activity Feed - EYTGaming{% endblock %}
+{% block title %}Activity Feed — EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{{ block.super }}
+<style>
+.af-page { background:#080808; min-height:100vh; }
+.af-card {
+  background:#0d1117; border:1px solid #1f2937; border-radius:12px;
+  padding:1.5rem; position:relative; overflow:hidden; margin-bottom:1.25rem;
+}
+.af-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,.3) 60%,transparent 100%);
+}
+.af-title {
+  font-family:'Barlow Condensed',sans-serif; font-size:2rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.04em; color:#fff; line-height:1;
+}
+.af-title span { color:#dc2626; }
+.af-label {
+  display:block; font-size:.72rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:.06em; color:#6b7280; margin-bottom:.375rem;
+}
+.af-select {
+  width:100%; background:#080808; border:1px solid #1f2937; border-radius:.5rem;
+  color:#e5e7eb; padding:.6rem .875rem; font-size:.875rem; outline:none;
+  transition:border-color .2s; font-family:'Inter',sans-serif; box-sizing:border-box;
+}
+.af-select:focus { border-color:#b91c1c; box-shadow:0 0 0 2px rgba(185,28,28,.2); }
+.af-select option { background:#0d1117; }
+.af-btn-primary {
+  display:inline-flex; align-items:center; gap:6px; padding:.6rem 1.25rem;
+  background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; border:none;
+  border-radius:.5rem; font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+  box-shadow:0 0 12px rgba(185,28,28,.25); transition:all .15s; text-decoration:none;
+  white-space:nowrap;
+}
+.af-btn-primary:hover { box-shadow:0 0 20px rgba(185,28,28,.45); color:#fff; }
+.af-btn-ghost {
+  display:inline-flex; align-items:center; gap:6px; padding:.6rem 1.25rem;
+  background:transparent; color:#9ca3af; border:1px solid #1f2937;
+  border-radius:.5rem; font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+  transition:all .15s; text-decoration:none; white-space:nowrap;
+}
+.af-btn-ghost:hover { border-color:#374151; color:#fff; }
+
+/* Activity item */
+.af-item {
+  display:flex; align-items:flex-start; gap:.875rem;
+  padding:.875rem 1rem; background:rgba(255,255,255,.02);
+  border:1px solid #111827; border-radius:.625rem;
+  transition:border-color .15s, background .15s;
+}
+.af-item:hover { border-color:rgba(185,28,28,.2); background:rgba(185,28,28,.03); }
+.af-icon {
+  width:40px; height:40px; border-radius:.5rem; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.af-section-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; font-size:.95rem;
+  color:#fff; display:flex; align-items:center; gap:.5rem;
+  margin-bottom:1.1rem; padding-bottom:.65rem; border-bottom:1px solid #111827;
+}
+.af-section-title::before {
+  content:''; width:3px; height:1rem; background:#b91c1c; border-radius:2px;
+  box-shadow:0 0 6px rgba(185,28,28,.6); flex-shrink:0;
+}
+.af-page-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:6px; background:#111;
+  border:1px solid #1f2937; color:#9ca3af; text-decoration:none;
+  font-size:.85rem; font-weight:700; transition:all .15s;
+}
+.af-page-btn:hover, .af-page-btn.active { background:#dc2626; border-color:#dc2626; color:#fff; }
+.af-page-btn.disabled { opacity:.35; pointer-events:none; }
+</style>
 {% endblock %}
 
 {% block content %}
-<main id="main-content" class="space-y-6 pb-20 md:pb-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="af-page px-4 md:px-8 pb-16">
+<div style="max-width:900px;margin:0 auto;">
+
+  {# Header #}
+  <div style="padding:2rem 0 1.5rem;position:relative;">
+    <div style="position:absolute;bottom:0;left:0;width:3rem;height:3px;
+                background:linear-gradient(90deg,#b91c1c,transparent);border-radius:2px;"></div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+      <a href="{% url 'dashboard:home' %}" class="af-btn-ghost" style="padding:4px 10px;font-size:.75rem;">
+        <span style="font-family:'Material Symbols Outlined';font-size:14px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">arrow_back</span>
+        Dashboard
+      </a>
+    </div>
+    <h1 class="af-title">Activity <span>Feed</span></h1>
+    <p style="color:#6b7280;font-size:.85rem;margin-top:.35rem;">Your complete activity history</p>
+  </div>
+
+  {# Filters #}
+  <div class="af-card">
+    <div class="af-section-title">
+      <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">filter_alt</span>
+      Filters
+    </div>
+    <form method="get" action="{% url 'dashboard:activity' %}">
+      <div style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:.75rem;align-items:end;">
         <div>
-            <h1 class="text-white text-2xl sm:text-3xl font-bold">Activity Feed</h1>
-            <p class="text-gray-400 mt-1">View your complete activity history</p>
+          <label class="af-label" for="activity_type">Activity Type</label>
+          <select name="activity_type" id="activity_type" class="af-select">
+            <option value="">All Activities</option>
+            {% for type in activity_types %}
+            <option value="{{ type.value }}" {% if selected_activity_type == type.value %}selected{% endif %}>{{ type.label }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </div>
-    
-    <!-- Filters -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-        <form method="get" action="{% url 'dashboard:activity' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Activity Type Filter -->
-            <div>
-                <label for="activity_type" class="block text-sm font-medium text-gray-400 mb-2">Activity Type</label>
-                <select name="activity_type" id="activity_type" class="w-full px-4 py-2 bg-neutral-900 border border-card-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="">All Activities</option>
-                    {% for type in activity_types %}
-                    <option value="{{ type.value }}" {% if selected_activity_type == type.value %}selected{% endif %}>
-                        {{ type.label }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Date Range Filter -->
-            <div>
-                <label for="date_range" class="block text-sm font-medium text-gray-400 mb-2">Date Range</label>
-                <select name="date_range" id="date_range" class="w-full px-4 py-2 bg-neutral-900 border border-card-border-dark rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="all" {% if selected_date_range == 'all' %}selected{% endif %}>All Time</option>
-                    <option value="7d" {% if selected_date_range == '7d' %}selected{% endif %}>Last 7 Days</option>
-                    <option value="30d" {% if selected_date_range == '30d' %}selected{% endif %}>Last 30 Days</option>
-                    <option value="90d" {% if selected_date_range == '90d' %}selected{% endif %}>Last 90 Days</option>
-                </select>
-            </div>
-            
-            <!-- Filter Button -->
-            <div class="flex items-end">
-                <button type="submit" class="w-full px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">filter_alt</span>
-                    Apply Filters
-                </button>
-            </div>
-            
-            <!-- Reset Button -->
-            <div class="flex items-end">
-                <a href="{% url 'dashboard:activity' %}" class="w-full px-6 py-2 bg-neutral-800 hover:bg-neutral-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">refresh</span>
-                    Reset
-                </a>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Activity List -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-white text-xl font-bold">
-                {% if total_count > 0 %}
-                    {{ total_count }} {% if total_count == 1 %}Activity{% else %}Activities{% endif %}
-                {% else %}
-                    Activities
-                {% endif %}
-            </h2>
-            {% if page > 1 or has_next %}
-            <p class="text-gray-400 text-sm">
-                Page {{ page }} of {{ total_pages }}
-            </p>
-            {% endif %}
+        <div>
+          <label class="af-label" for="date_range">Date Range</label>
+          <select name="date_range" id="date_range" class="af-select">
+            <option value="all" {% if selected_date_range == 'all' %}selected{% endif %}>All Time</option>
+            <option value="7d" {% if selected_date_range == '7d' %}selected{% endif %}>Last 7 Days</option>
+            <option value="30d" {% if selected_date_range == '30d' %}selected{% endif %}>Last 30 Days</option>
+            <option value="90d" {% if selected_date_range == '90d' %}selected{% endif %}>Last 90 Days</option>
+          </select>
         </div>
-        
-        {% if activities %}
-            <div class="space-y-3">
-                {% for activity in activities %}
-                    <div class="p-4 bg-neutral-900/50 hover:bg-neutral-800/50 rounded-lg border border-card-border-dark transition-colors">
-                        <div class="flex items-start gap-3">
-                            <!-- Activity Icon -->
-                            <div class="flex-shrink-0 bg-primary/20 p-2 rounded-lg">
-                                <span class="material-symbols-outlined text-primary text-xl" aria-hidden="true">
-                                    {% if activity.activity_type == 'tournament_registered' %}emoji_events
-                                    {% elif activity.activity_type == 'tournament_completed' %}emoji_events
-                                    {% elif activity.activity_type == 'team_joined' %}groups
-                                    {% elif activity.activity_type == 'team_left' %}groups
-                                    {% elif activity.activity_type == 'achievement_earned' %}military_tech
-                                    {% elif activity.activity_type == 'payment_completed' %}payment
-                                    {% elif activity.activity_type == 'profile_updated' %}person
-                                    {% elif activity.activity_type == 'game_profile_added' %}sports_esports
-                                    {% elif activity.activity_type == 'coaching_session_booked' %}school
-                                    {% elif activity.activity_type == 'coaching_session_completed' %}school
-                                    {% else %}circle{% endif %}
-                                </span>
-                            </div>
-                            
-                            <!-- Activity Content -->
-                            <div class="flex-1 min-w-0">
-                                <p class="text-white font-medium text-sm">
-                                    {% if activity.activity_type == 'tournament_registered' %}
-                                        Registered for tournament
-                                    {% elif activity.activity_type == 'tournament_completed' %}
-                                        Completed tournament
-                                    {% elif activity.activity_type == 'team_joined' %}
-                                        Joined a team
-                                    {% elif activity.activity_type == 'team_left' %}
-                                        Left a team
-                                    {% elif activity.activity_type == 'achievement_earned' %}
-                                        Earned an achievement
-                                    {% elif activity.activity_type == 'payment_completed' %}
-                                        Payment completed
-                                    {% elif activity.activity_type == 'profile_updated' %}
-                                        Updated profile
-                                    {% elif activity.activity_type == 'game_profile_added' %}
-                                        Added game profile
-                                    {% elif activity.activity_type == 'coaching_session_booked' %}
-                                        Booked coaching session
-                                    {% elif activity.activity_type == 'coaching_session_completed' %}
-                                        Completed coaching session
-                                    {% else %}
-                                        Activity recorded
-                                    {% endif %}
-                                </p>
-                                
-                                {% if activity.data %}
-                                    <p class="text-gray-400 text-xs mt-1">
-                                        {% if activity.data.game %}{{ activity.data.game }}{% endif %}
-                                        {% if activity.data.tournament %}{{ activity.data.tournament }}{% endif %}
-                                        {% if activity.data.team %}{{ activity.data.team }}{% endif %}
-                                        {% if activity.data.achievement %}{{ activity.data.achievement }}{% endif %}
-                                        {% if activity.data.coach %}{{ activity.data.coach }}{% endif %}
-                                    </p>
-                                {% endif %}
-                                
-                                <p class="text-gray-500 text-xs mt-1">
-                                    <time datetime="{{ activity.created_at|date:'c' }}">
-                                        {{ activity.created_at|date:"M d, Y - g:i A" }}
-                                    </time>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <!-- Pagination -->
-            {% if total_pages > 1 %}
-            <div class="flex items-center justify-between mt-6 pt-6 border-t border-card-border-dark">
-                <div class="flex gap-2">
-                    {% if has_previous %}
-                        <a href="?page={{ page|add:'-1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" 
-                           class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors flex items-center gap-2">
-                            <span class="material-symbols-outlined">chevron_left</span>
-                            Previous
-                        </a>
-                    {% else %}
-                        <button disabled class="px-4 py-2 bg-neutral-900 text-gray-600 rounded-lg cursor-not-allowed flex items-center gap-2">
-                            <span class="material-symbols-outlined">chevron_left</span>
-                            Previous
-                        </button>
-                    {% endif %}
-                </div>
-                
-                <div class="text-gray-400 text-sm">
-                    Page {{ page }} of {{ total_pages }}
-                </div>
-                
-                <div class="flex gap-2">
-                    {% if has_next %}
-                        <a href="?page={{ page|add:'1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" 
-                           class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg transition-colors flex items-center gap-2">
-                            Next
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </a>
-                    {% else %}
-                        <button disabled class="px-4 py-2 bg-neutral-900 text-gray-600 rounded-lg cursor-not-allowed flex items-center gap-2">
-                            Next
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </button>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-        {% else %}
-            <!-- Empty State -->
-            <div class="text-center py-12">
-                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">history</span>
-                <p class="text-gray-400 text-lg font-medium">No activities found</p>
-                <p class="text-gray-500 text-sm mt-2">
-                    {% if selected_activity_type or selected_date_range != 'all' %}
-                        Try adjusting your filters to see more activities
-                    {% else %}
-                        Your activities will appear here as you participate in tournaments, join teams, and more
-                    {% endif %}
-                </p>
-                {% if selected_activity_type or selected_date_range != 'all' %}
-                <a href="{% url 'dashboard:activity' %}" class="inline-block mt-4 px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-                    Reset Filters
-                </a>
-                {% endif %}
-            </div>
-        {% endif %}
-    </div>
-    
-    <!-- Back to Dashboard -->
-    <div class="flex justify-center">
-        <a href="{% url 'dashboard:home' %}" class="px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-            <span class="material-symbols-outlined">arrow_back</span>
-            Back to Dashboard
+        <button type="submit" class="af-btn-primary">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">filter_alt</span>
+          Apply
+        </button>
+        <a href="{% url 'dashboard:activity' %}" class="af-btn-ghost">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">refresh</span>
+          Reset
         </a>
+      </div>
+    </form>
+  </div>
+
+  {# Activity list #}
+  <div class="af-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;padding-bottom:.65rem;border-bottom:1px solid #111827;">
+      <div class="af-section-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">history</span>
+        {% if total_count > 0 %}{{ total_count }} {% if total_count == 1 %}Activity{% else %}Activities{% endif %}{% else %}Activities{% endif %}
+      </div>
+      {% if total_pages > 1 %}
+      <span style="color:#555;font-size:.78rem;">Page {{ page }} of {{ total_pages }}</span>
+      {% endif %}
     </div>
-</main>
+
+    {% if activities %}
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      {% for activity in activities %}
+      <div class="af-item">
+        {# Icon #}
+        <div class="af-icon" style="
+          {% if activity.activity_type == 'tournament_registered' or activity.activity_type == 'tournament_completed' %}
+            background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);
+          {% elif activity.activity_type == 'team_joined' or activity.activity_type == 'team_left' %}
+            background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);
+          {% elif activity.activity_type == 'achievement_earned' %}
+            background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);
+          {% elif activity.activity_type == 'payment_completed' %}
+            background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);
+          {% elif activity.activity_type == 'coaching_session_booked' or activity.activity_type == 'coaching_session_completed' %}
+            background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);
+          {% else %}
+            background:rgba(107,114,128,.12);border:1px solid rgba(107,114,128,.25);
+          {% endif %}
+        ">
+          <span style="font-family:'Material Symbols Outlined';font-size:18px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;
+            {% if activity.activity_type == 'tournament_registered' or activity.activity_type == 'tournament_completed' %}color:#dc2626;
+            {% elif activity.activity_type == 'team_joined' or activity.activity_type == 'team_left' %}color:#3b82f6;
+            {% elif activity.activity_type == 'achievement_earned' %}color:#fbbf24;
+            {% elif activity.activity_type == 'payment_completed' %}color:#22c55e;
+            {% elif activity.activity_type == 'coaching_session_booked' or activity.activity_type == 'coaching_session_completed' %}color:#a855f7;
+            {% else %}color:#6b7280;{% endif %}
+          ">
+            {% if activity.activity_type == 'tournament_registered' %}emoji_events
+            {% elif activity.activity_type == 'tournament_completed' %}emoji_events
+            {% elif activity.activity_type == 'team_joined' %}groups
+            {% elif activity.activity_type == 'team_left' %}group_remove
+            {% elif activity.activity_type == 'achievement_earned' %}military_tech
+            {% elif activity.activity_type == 'payment_completed' %}payments
+            {% elif activity.activity_type == 'profile_updated' %}manage_accounts
+            {% elif activity.activity_type == 'game_profile_added' %}sports_esports
+            {% elif activity.activity_type == 'coaching_session_booked' %}school
+            {% elif activity.activity_type == 'coaching_session_completed' %}verified
+            {% else %}circle{% endif %}
+          </span>
+        </div>
+
+        {# Content #}
+        <div style="flex:1;min-width:0;">
+          <p style="color:#e5e7eb;font-weight:600;font-size:.875rem;margin:0 0 2px;">
+            {% if activity.activity_type == 'tournament_registered' %}Registered for tournament
+            {% elif activity.activity_type == 'tournament_completed' %}Completed tournament
+            {% elif activity.activity_type == 'team_joined' %}Joined a team
+            {% elif activity.activity_type == 'team_left' %}Left a team
+            {% elif activity.activity_type == 'achievement_earned' %}Earned an achievement
+            {% elif activity.activity_type == 'payment_completed' %}Payment completed
+            {% elif activity.activity_type == 'profile_updated' %}Updated profile
+            {% elif activity.activity_type == 'game_profile_added' %}Added game profile
+            {% elif activity.activity_type == 'coaching_session_booked' %}Booked coaching session
+            {% elif activity.activity_type == 'coaching_session_completed' %}Completed coaching session
+            {% else %}Activity recorded{% endif %}
+          </p>
+          {% if activity.data %}
+          <p style="color:#6b7280;font-size:.78rem;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {% if activity.data.game %}{{ activity.data.game }}{% endif %}
+            {% if activity.data.tournament %}{{ activity.data.tournament }}{% endif %}
+            {% if activity.data.team %}{{ activity.data.team }}{% endif %}
+            {% if activity.data.achievement %}{{ activity.data.achievement }}{% endif %}
+            {% if activity.data.coach %}{{ activity.data.coach }}{% endif %}
+          </p>
+          {% endif %}
+          <time style="color:#4b5563;font-size:.72rem;" datetime="{{ activity.created_at|date:'c' }}">
+            {{ activity.created_at|date:"M d, Y — g:i A" }}
+          </time>
+        </div>
+
+        {# Type badge #}
+        <span style="flex-shrink:0;font-size:.65rem;font-weight:700;text-transform:uppercase;
+                     letter-spacing:.05em;padding:3px 8px;border-radius:4px;
+          {% if activity.activity_type == 'tournament_registered' or activity.activity_type == 'tournament_completed' %}
+            background:rgba(220,38,38,.15);color:#f87171;
+          {% elif activity.activity_type == 'team_joined' or activity.activity_type == 'team_left' %}
+            background:rgba(59,130,246,.15);color:#93c5fd;
+          {% elif activity.activity_type == 'achievement_earned' %}
+            background:rgba(251,191,36,.15);color:#fcd34d;
+          {% elif activity.activity_type == 'payment_completed' %}
+            background:rgba(34,197,94,.15);color:#86efac;
+          {% elif activity.activity_type == 'coaching_session_booked' or activity.activity_type == 'coaching_session_completed' %}
+            background:rgba(168,85,247,.15);color:#d8b4fe;
+          {% else %}
+            background:rgba(107,114,128,.15);color:#9ca3af;
+          {% endif %}
+        ">
+          {{ activity.activity_type|cut:"_"|title }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+
+    {# Pagination #}
+    {% if total_pages > 1 %}
+    <div style="display:flex;justify-content:center;align-items:center;gap:.4rem;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #111827;flex-wrap:wrap;">
+      {% if has_previous %}
+      <a href="?page={{ page|add:'-1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" class="af-page-btn">
+        <span style="font-family:'Material Symbols Outlined';font-size:16px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">chevron_left</span>
+      </a>
+      {% else %}
+      <span class="af-page-btn disabled">
+        <span style="font-family:'Material Symbols Outlined';font-size:16px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">chevron_left</span>
+      </span>
+      {% endif %}
+
+      <span style="color:#9ca3af;font-size:.82rem;padding:0 .5rem;">{{ page }} / {{ total_pages }}</span>
+
+      {% if has_next %}
+      <a href="?page={{ page|add:'1' }}{% if selected_activity_type %}&activity_type={{ selected_activity_type }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}" class="af-page-btn">
+        <span style="font-family:'Material Symbols Outlined';font-size:16px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">chevron_right</span>
+      </a>
+      {% else %}
+      <span class="af-page-btn disabled">
+        <span style="font-family:'Material Symbols Outlined';font-size:16px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">chevron_right</span>
+      </span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    {# Empty state #}
+    <div style="text-align:center;padding:4rem 1rem;">
+      <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;margin-bottom:1rem;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">history</span>
+      <p style="color:#9ca3af;font-size:1rem;font-weight:600;margin:0 0 .5rem;">No activities found</p>
+      <p style="color:#555;font-size:.85rem;margin:0;">
+        {% if selected_activity_type or selected_date_range != 'all' %}
+          Try adjusting your filters to see more activities.
+        {% else %}
+          Your activities will appear here as you participate in tournaments, join teams, and more.
+        {% endif %}
+      </p>
+      {% if selected_activity_type or selected_date_range != 'all' %}
+      <a href="{% url 'dashboard:activity' %}" class="af-btn-primary" style="display:inline-flex;margin-top:1.25rem;">
+        Reset Filters
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+</div>
 {% endblock %}

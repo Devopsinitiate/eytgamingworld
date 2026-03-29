@@ -1,0 +1,446 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Session — {{ session.game.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: #0A0A0A; }
+
+.sd-card {
+    background: #111;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.sd-card-accent {
+    background: #111;
+    border: 1px solid #1f1f1f;
+    border-top: 3px solid #DC2626;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.sd-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #DC2626;
+    margin-bottom: 12px;
+}
+
+.sd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.875rem;
+}
+.sd-row:last-child { border-bottom: none; }
+.sd-row .lbl { color: #6b7280; }
+.sd-row .val { color: #fff; font-weight: 500; }
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.status-pending    { background: rgba(234,179,8,0.15);  color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+.status-confirmed  { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.status-in_progress{ background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+.status-completed  { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.status-cancelled  { background: rgba(239,68,68,0.15);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.status-no_show    { background: rgba(107,114,128,0.15);color: #6b7280; border: 1px solid rgba(107,114,128,0.3); }
+
+.ms-icon {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal; font-style: normal;
+    line-height: 1; letter-spacing: normal; text-transform: none;
+    white-space: nowrap; word-wrap: normal; direction: ltr;
+    -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+.action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all 0.2s;
+}
+.btn-primary { background: #DC2626; color: #fff; }
+.btn-primary:hover { background: #b91c1c; box-shadow: 0 0 16px rgba(220,38,38,0.4); color: #fff; }
+.btn-outline { background: transparent; color: #9ca3af; border: 1px solid #2a2a2a; }
+.btn-outline:hover { border-color: #DC2626; color: #fff; }
+.btn-danger { background: transparent; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+.coach-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    overflow: hidden; background: rgba(220,38,38,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #DC2626; font-size: 1.3rem;
+    flex-shrink: 0; border: 2px solid rgba(220,38,38,0.3);
+}
+
+.topic-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(220,38,38,0.1);
+    border: 1px solid rgba(220,38,38,0.25);
+    border-radius: 4px;
+    color: #DC2626;
+    font-size: 0.8rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 3px;
+}
+
+.paid-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(34,197,94,0.1); color: #22c55e;
+    border: 1px solid rgba(34,197,94,0.25);
+    font-size: 0.75rem; font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.unpaid-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(234,179,8,0.1); color: #eab308;
+    border: 1px solid rgba(234,179,8,0.25);
+    font-size: 0.75rem; font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.info-box {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.875rem; color: #93c5fd;
+}
+
+.success-box {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 6px;
+    padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.875rem; color: #86efac;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:24px 16px;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <a href="{% url 'coaching:session_list' %}" class="action-btn btn-outline" style="padding:8px 14px;">
+                <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+                Sessions
+            </a>
+            <div>
+                <h1 style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;margin:0;line-height:1;">
+                    {{ session.game.name }} Session
+                </h1>
+                <p style="color:#6b7280;font-size:0.85rem;margin:4px 0 0;">
+                    {{ session.scheduled_start|date:"l, F j, Y" }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Status + Payment badges -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="status-badge status-{{ session.status }}">
+                <span class="ms-icon" style="font-size:14px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">
+                    {% if session.status == 'confirmed' %}check_circle
+                    {% elif session.status == 'pending' %}schedule
+                    {% elif session.status == 'in_progress' %}play_circle
+                    {% elif session.status == 'completed' %}task_alt
+                    {% elif session.status == 'cancelled' %}cancel
+                    {% else %}info{% endif %}
+                </span>
+                {{ session.get_status_display }}
+            </span>
+            {% if session.is_paid %}
+            <span class="paid-badge">
+                <span class="ms-icon" style="font-size:14px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">payments</span>
+                Paid
+            </span>
+            {% else %}
+            <span class="unpaid-badge">
+                <span class="ms-icon" style="font-size:14px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">payments</span>
+                Unpaid
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Success message -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="{% if message.tags == 'success' %}success-box{% else %}info-box{% endif %}">
+        <span class="ms-icon" style="font-size:20px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0;">
+            {% if message.tags == 'success' %}check_circle{% else %}info{% endif %}
+        </span>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;" class="sd-grid">
+
+        <!-- LEFT -->
+        <div>
+            <!-- Session Info -->
+            <div class="sd-card-accent">
+                <div class="sd-label">Session Details</div>
+                <div class="sd-row">
+                    <span class="lbl">Game</span>
+                    <span class="val">{{ session.game.name }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Type</span>
+                    <span class="val">{{ session.get_session_type_display }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Date</span>
+                    <span class="val">{{ session.scheduled_start|date:"F j, Y" }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Start Time</span>
+                    <span class="val">{{ session.scheduled_start|date:"g:i A" }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">End Time</span>
+                    <span class="val">{{ session.scheduled_end|date:"g:i A" }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Duration</span>
+                    <span class="val">{{ session.duration_minutes }} minutes</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Price</span>
+                    <span class="val" style="color:#DC2626;font-size:1.1rem;font-family:'Barlow Condensed',sans-serif;font-weight:800;">
+                        &#8358;{{ session.price|floatformat:2 }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Topics -->
+            {% if session.topics %}
+            <div class="sd-card">
+                <div class="sd-label">Topics</div>
+                <div>
+                    {% for topic in session.topics %}
+                    <span class="topic-tag">{{ topic }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Student Notes -->
+            {% if session.student_notes %}
+            <div class="sd-card">
+                <div class="sd-label">Session Goals</div>
+                <p style="color:#d1d5db;font-size:0.9rem;line-height:1.6;margin:0;">{{ session.student_notes }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Coach Notes (visible after session) -->
+            {% if session.coach_notes %}
+            <div class="sd-card">
+                <div class="sd-label">Coach Notes</div>
+                <p style="color:#d1d5db;font-size:0.9rem;line-height:1.6;margin:0;">{{ session.coach_notes }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Video Link -->
+            {% if session.video_link and session.status in 'confirmed,in_progress' %}
+            <div class="sd-card">
+                <div class="sd-label">Session Link</div>
+                <a href="{{ session.video_link }}" target="_blank" rel="noopener" class="action-btn btn-primary" style="display:inline-flex;">
+                    <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">videocam</span>
+                    Join Session
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="sd-card" style="display:flex;flex-wrap:wrap;gap:10px;">
+                {% if session.status == 'completed' and session.student == request.user %}
+                    {% if not session.review %}
+                    <a href="{% url 'coaching:review_session' pk=session.pk %}" class="action-btn btn-primary">
+                        <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+                        Leave Review
+                    </a>
+                    {% endif %}
+                {% endif %}
+
+                {% if session.status == 'confirmed' and session.coach.user == request.user %}
+                <a href="{% url 'coaching:start_session' pk=session.pk %}" class="action-btn btn-primary">
+                    <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">play_arrow</span>
+                    Start Session
+                </a>
+                {% endif %}
+
+                {% if session.status == 'in_progress' and session.coach.user == request.user %}
+                <form method="post" action="{% url 'coaching:complete_session' pk=session.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn btn-primary">
+                        <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">task_alt</span>
+                        Complete Session
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if session.can_cancel %}
+                <a href="{% url 'coaching:cancel_session' pk=session.pk %}" class="action-btn btn-danger">
+                    <span class="ms-icon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">cancel</span>
+                    Cancel Session
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <div>
+            <!-- Coach Card -->
+            <div class="sd-card">
+                <div class="sd-label">Coach</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <div class="coach-avatar">
+                        {% if session.coach.user.avatar %}
+                        <img src="{{ session.coach.user.avatar.url }}" alt="{{ session.coach.user.get_display_name }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                        {{ session.coach.user.get_display_name|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div style="color:#fff;font-weight:600;font-size:0.95rem;">{{ session.coach.user.get_display_name }}</div>
+                        <div style="display:flex;align-items:center;gap:2px;margin-top:3px;">
+                            {% for i in "12345" %}
+                            <span class="ms-icon" style="font-size:14px;color:#facc15;font-variation-settings:'FILL' {% if session.coach.average_rating >= forloop.counter %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+                            {% endfor %}
+                            <span style="color:#9ca3af;font-size:0.75rem;margin-left:4px;">{{ session.coach.average_rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Experience</span>
+                    <span class="val">{{ session.coach.get_experience_level_display }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Platform</span>
+                    <span class="val">{{ session.coach.get_platform_display }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Total Sessions</span>
+                    <span class="val">{{ session.coach.total_sessions }}</span>
+                </div>
+                <div style="margin-top:14px;">
+                    <a href="{% url 'coaching:coach_detail' pk=session.coach.pk %}" class="action-btn btn-outline" style="width:100%;justify-content:center;">
+                        View Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Student Card (visible to coach) -->
+            {% if session.coach.user == request.user %}
+            <div class="sd-card">
+                <div class="sd-label">Student</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="coach-avatar" style="width:40px;height:40px;font-size:1rem;">
+                        {% if session.student.avatar %}
+                        <img src="{{ session.student.avatar.url }}" alt="{{ session.student.get_display_name }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                        {{ session.student.get_display_name|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div style="color:#fff;font-weight:600;font-size:0.9rem;">{{ session.student.get_display_name }}</div>
+                        <div style="color:#6b7280;font-size:0.8rem;">{{ session.student.email }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Payment Info -->
+            <div class="sd-card">
+                <div class="sd-label">Payment</div>
+                <div class="sd-row">
+                    <span class="lbl">Amount</span>
+                    <span class="val" style="color:#DC2626;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.1rem;">&#8358;{{ session.price|floatformat:2 }}</span>
+                </div>
+                <div class="sd-row">
+                    <span class="lbl">Status</span>
+                    <span>
+                        {% if session.is_paid %}
+                        <span class="paid-badge">
+                            <span class="ms-icon" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">check_circle</span>
+                            Paid
+                        </span>
+                        {% else %}
+                        <span class="unpaid-badge">Pending</span>
+                        {% endif %}
+                    </span>
+                </div>
+                {% if session.payment_intent_id %}
+                <div class="sd-row">
+                    <span class="lbl">Reference</span>
+                    <span class="val" style="font-size:0.8rem;color:#6b7280;font-family:monospace;">{{ session.payment_intent_id }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Review (if exists) -->
+            {% if session.review %}
+            <div class="sd-card">
+                <div class="sd-label">Your Review</div>
+                <div style="display:flex;gap:2px;margin-bottom:8px;">
+                    {% for i in "12345" %}
+                    <span class="ms-icon" style="font-size:16px;color:#facc15;font-variation-settings:'FILL' {% if session.review.rating >= forloop.counter %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+                    {% endfor %}
+                </div>
+                {% if session.review.title %}
+                <p style="color:#fff;font-weight:600;font-size:0.9rem;margin:0 0 6px;">{{ session.review.title }}</p>
+                {% endif %}
+                <p style="color:#9ca3af;font-size:0.85rem;line-height:1.5;margin:0;">{{ session.review.review }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<style>
+@media (max-width: 768px) {
+    .sd-grid { grid-template-columns: 1fr !important; }
+}
+</style>
+{% endblock %}

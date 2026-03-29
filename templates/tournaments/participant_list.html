@@ -8,20 +8,49 @@
     rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     rel="stylesheet">
+<!-- Gaming CSS must load AFTER Tailwind to override styles -->
+<link rel="stylesheet" href="{% static 'css/manage-participant-gaming.css' %}">
 <style>
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 
-    body {
-        font-family: 'Spline Sans', sans-serif;
+    /* Critical: Override Tailwind with gaming styles */
+    .gaming-page-container {
+        background-color: #0A0A0A !important;
+        background-image: 
+            linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(220, 38, 38, 0.03) 1px, transparent 1px) !important;
+        background-size: 50px 50px !important;
+    }
+    
+    /* Ensure modals start hidden */
+    #seed-modal.hidden,
+    #add-participant-modal.hidden {
+        display: none !important;
+    }
+    
+    /* Override Tailwind bg classes */
+    .gaming-table-container {
+        background: rgba(31, 41, 55, 0.6) !important;
+        border: 2px solid rgba(220, 38, 38, 0.3) !important;
+    }
+    
+    .gaming-stat-card {
+        background: rgba(31, 41, 55, 0.6) !important;
+        border: 2px solid rgba(220, 38, 38, 0.3) !important;
     }
 </style>
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/gaming-ripple-effect.js' %}"></script>
+<script src="{% static 'js/gaming-modal-handler.js' %}"></script>
+{% endblock %}
+
 {% block body %}
-<div class="min-h-screen bg-[#111827] py-6 lg:py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="gaming-page-container min-h-screen py-6 lg:py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 gaming-fade-in-up">
 
         <!-- Breadcrumbs -->
         <div class="flex flex-wrap gap-2 mb-6">
@@ -45,7 +74,7 @@
         <!-- Page Heading -->
         <div class="mt-6 flex flex-wrap items-start justify-between gap-4 mb-8">
             <div class="flex min-w-72 flex-col gap-2">
-                <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+                <h1 class="gaming-heading gaming-heading-primary text-white text-4xl font-black leading-tight tracking-[-0.033em]">
                     {% if request.GET.tab == 'checkin' %}
                         Check-in Management: {{ tournament.name }}
                     {% else %}
@@ -62,55 +91,57 @@
             </div>
 
             <!-- Stats Summary -->
-            <div class="flex items-center gap-6">
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-white">{{ participants|length }}</div>
-                    <div class="text-sm text-[#9da6b9]">Total Registered</div>
+            <div class="gaming-stats-container flex items-center gap-6">
+                <div class="gaming-stat-card text-center">
+                    <div class="gaming-stat-value gaming-text-numeric text-2xl font-bold text-white">{{ participants|length }}</div>
+                    <div class="gaming-stat-label text-sm text-[#9da6b9]">Total Registered</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-green-400">{{ stats.checked_in|default:0 }}</div>
-                    <div class="text-sm text-[#9da6b9]">Checked In</div>
+                <div class="gaming-stat-card text-center">
+                    <div class="gaming-stat-value gaming-text-numeric text-2xl font-bold text-green-400">{{ stats.checked_in|default:0 }}</div>
+                    <div class="gaming-stat-label text-sm text-[#9da6b9]">Checked In</div>
                 </div>
                 {% if request.GET.tab == 'checkin' %}
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-yellow-400">{{ stats.pending_checkin|default:0 }}</div>
-                    <div class="text-sm text-[#9da6b9]">Pending Check-in</div>
+                <div class="gaming-stat-card text-center">
+                    <div class="gaming-stat-value gaming-text-numeric text-2xl font-bold text-yellow-400">{{ stats.pending_checkin|default:0 }}</div>
+                    <div class="gaming-stat-label text-sm text-[#9da6b9]">Pending Check-in</div>
                 </div>
                 {% endif %}
-                <div class="text-center">
-                    <div class="text-2xl font-bold text-[#9da6b9]">{{ stats.spots_remaining|default:"∞" }}</div>
-                    <div class="text-sm text-[#9da6b9]">Spots Remaining</div>
+                <div class="gaming-stat-card text-center">
+                    <div class="gaming-stat-value gaming-text-numeric text-2xl font-bold text-[#9da6b9]">{{ stats.spots_remaining|default:"∞" }}</div>
+                    <div class="gaming-stat-label text-sm text-[#9da6b9]">Spots Remaining</div>
                 </div>
             </div>
         </div>
 
         <!-- Search and Toolbar -->
         <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-            <div class="flex-1">
+            <div class="flex-1 gaming-search-container">
                 <label class="flex flex-col min-w-40 h-12 w-full max-w-lg">
                     <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                         <div
-                            class="text-[#9da6b9] flex border-none bg-[#282e39] items-center justify-center pl-4 rounded-l-lg border-r-0">
+                            class="gaming-search-icon text-[#9da6b9] flex border-none bg-[#282e39] items-center justify-center pl-4 rounded-l-lg border-r-0">
                             <span class="material-symbols-outlined">search</span>
                         </div>
                         <input type="text" id="search-input"
-                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-[#b91c1c] border-none bg-[#282e39] focus:border-none h-full placeholder:text-[#9da6b9] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                            class="gaming-search-bar form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-[#b91c1c] border-none bg-[#282e39] focus:border-none h-full placeholder:text-[#9da6b9] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
                             placeholder="Search by name, ID, or team..." />
                     </div>
                 </label>
             </div>
             <div class="flex items-center gap-2">
                 <button
-                    class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#282e39] text-white transition-colors hover:bg-white/20">
-                    <span class="material-symbols-outlined">filter_list</span>
+                    class="gaming-btn-ghost flex h-12 w-12 items-center justify-center rounded-lg bg-[#282e39] text-white transition-colors hover:bg-white/20"
+                    aria-label="Filter participants">
+                    <span class="material-symbols-outlined" aria-hidden="true">filter_list</span>
                 </button>
                 <button
-                    class="flex h-12 w-12 items-center justify-center rounded-lg bg-[#282e39] text-white transition-colors hover:bg-white/20">
-                    <span class="material-symbols-outlined">download</span>
+                    class="gaming-btn-ghost flex h-12 w-12 items-center justify-center rounded-lg bg-[#282e39] text-white transition-colors hover:bg-white/20"
+                    aria-label="Download participant list">
+                    <span class="material-symbols-outlined" aria-hidden="true">download</span>
                 </button>
                 {% if user == tournament.organizer or user.role == 'admin' %}
                 <button onclick="showAddParticipantModal()"
-                    class="flex h-12 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#b91c1c] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-4 transition-colors hover:bg-[#b91c1c]/90">
+                    class="gaming-btn-primary flex h-12 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#b91c1c] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-4 transition-colors hover:bg-[#b91c1c]/90">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
                     <span class="truncate">Add Participant</span>
                 </button>
@@ -119,46 +150,46 @@
         </div>
 
         <!-- Participants Table -->
-        <div class="mt-6 overflow-x-auto rounded-xl bg-[#282e39]/50">
-            <table class="w-full text-left text-sm text-gray-300">
+        <div class="gaming-table-container mt-6 overflow-x-auto rounded-xl bg-[#282e39]/50">
+            <table class="gaming-table w-full text-left text-sm text-gray-300">
                 <thead class="border-b border-gray-200/10 text-xs uppercase text-gray-400">
                     <tr>
                         {% if user == tournament.organizer or user.role == 'admin' %}
                         <th class="p-4" scope="col">
                             <input
                                 class="form-checkbox rounded border-gray-500 bg-transparent text-[#b91c1c] focus:ring-[#b91c1c]/50"
-                                type="checkbox" id="select-all" />
+                                type="checkbox" id="select-all" aria-label="Select all participants" />
                         </th>
                         {% endif %}
                         <th class="px-6 py-3" scope="col">
-                            <div class="flex items-center gap-1 cursor-pointer">
+                            <button class="flex items-center gap-1 cursor-pointer" aria-label="Sort by participant name">
                                 Participant
-                                <span class="material-symbols-outlined text-base">unfold_more</span>
-                            </div>
+                                <span class="material-symbols-outlined text-base" aria-hidden="true">unfold_more</span>
+                            </button>
                         </th>
                         <th class="px-6 py-3" scope="col">
-                            <div class="flex items-center gap-1 cursor-pointer">
+                            <button class="flex items-center gap-1 cursor-pointer" aria-label="Sort by team">
                                 Team
-                                <span class="material-symbols-outlined text-base">unfold_more</span>
-                            </div>
+                                <span class="material-symbols-outlined text-base" aria-hidden="true">unfold_more</span>
+                            </button>
                         </th>
                         <th class="px-6 py-3" scope="col">
-                            <div class="flex items-center gap-1 cursor-pointer">
+                            <button class="flex items-center gap-1 cursor-pointer" aria-label="Sort by status">
                                 Status
-                                <span class="material-symbols-outlined text-base">unfold_more</span>
-                            </div>
+                                <span class="material-symbols-outlined text-base" aria-hidden="true">unfold_more</span>
+                            </button>
                         </th>
                         <th class="px-6 py-3" scope="col">
-                            <div class="flex items-center gap-1 cursor-pointer">
+                            <button class="flex items-center gap-1 cursor-pointer" aria-label="Sort by seed">
                                 Seed
-                                <span class="material-symbols-outlined text-base">unfold_more</span>
-                            </div>
+                                <span class="material-symbols-outlined text-base" aria-hidden="true">unfold_more</span>
+                            </button>
                         </th>
                         <th class="px-6 py-3" scope="col">
-                            <div class="flex items-center gap-1 cursor-pointer">
+                            <button class="flex items-center gap-1 cursor-pointer" aria-label="Sort by record">
                                 Record
-                                <span class="material-symbols-outlined text-base">unfold_more</span>
-                            </div>
+                                <span class="material-symbols-outlined text-base" aria-hidden="true">unfold_more</span>
+                            </button>
                         </th>
                         <th class="px-6 py-3" scope="col">
                             <span class="sr-only">Actions</span>
@@ -172,7 +203,7 @@
                         <td class="w-4 p-4">
                             <input
                                 class="form-checkbox rounded border-gray-500 bg-transparent text-[#b91c1c] focus:ring-[#b91c1c]/50"
-                                type="checkbox" />
+                                type="checkbox" aria-label="Select {{ participant.display_name }}" />
                         </td>
                         {% endif %}
 
@@ -180,7 +211,9 @@
                         <th class="flex items-center gap-3 px-6 py-4 text-white" scope="row">
                             {% if participant.user.profile_picture %}
                             <img class="h-10 w-10 rounded-full object-cover"
-                                src="{{ participant.user.profile_picture.url }}" alt="{{ participant.display_name }}" />
+                                src="{{ participant.user.profile_picture.url }}" 
+                                alt="{{ participant.display_name }}"
+                                loading="lazy" />
                             {% else %}
                             <div
                                 class="h-10 w-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white font-bold text-lg">
@@ -189,7 +222,13 @@
                             {% endif %}
                             <div>
                                 <div class="text-base font-semibold">{{ participant.display_name }}</div>
-                                <div class="font-normal text-gray-400">ID: {{ participant.id }}</div>
+                                <div class="font-normal text-gray-400">
+                                    {% if participant.user %}
+                                        @{{ participant.user.username }}
+                                    {% elif participant.team %}
+                                        Team
+                                    {% endif %}
+                                </div>
                             </div>
                         </th>
 
@@ -204,9 +243,9 @@
 
                         <!-- Status -->
                         <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
+                            <div class="gaming-status-indicator flex items-center gap-2">
                                 {% if participant.checked_in %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-green-500"></div>
+                                <div class="gaming-status-dot checked-in h-2.5 w-2.5 rounded-full bg-green-500"></div>
                                 <span class="text-green-400 font-medium">Checked In</span>
                                 {% if participant.check_in_time %}
                                 <div class="text-xs text-gray-500 ml-2">
@@ -214,19 +253,19 @@
                                 </div>
                                 {% endif %}
                                 {% elif participant.status == 'confirmed' %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
+                                <div class="gaming-status-dot confirmed h-2.5 w-2.5 rounded-full bg-blue-500"></div>
                                 <span class="text-blue-400">Confirmed</span>
                                 {% elif participant.status == 'pending' %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-yellow-500"></div>
+                                <div class="gaming-status-dot pending h-2.5 w-2.5 rounded-full bg-yellow-500"></div>
                                 <span class="text-yellow-400">Pending</span>
                                 {% elif participant.status == 'withdrawn' %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-gray-500"></div>
+                                <div class="gaming-status-dot withdrawn h-2.5 w-2.5 rounded-full bg-gray-500"></div>
                                 <span class="text-gray-400">Withdrawn</span>
                                 {% elif participant.status == 'disqualified' %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+                                <div class="gaming-status-dot disqualified h-2.5 w-2.5 rounded-full bg-red-500"></div>
                                 <span class="text-red-400">Disqualified</span>
                                 {% else %}
-                                <div class="h-2.5 w-2.5 rounded-full bg-gray-500"></div>
+                                <div class="gaming-status-dot h-2.5 w-2.5 rounded-full bg-gray-500"></div>
                                 <span class="text-gray-400">{{ participant.status|title }}</span>
                                 {% endif %}
                             </div>
@@ -236,7 +275,7 @@
                         <td class="px-6 py-4 font-medium text-gray-300">
                             {% if participant.seed %}
                             <span
-                                class="inline-flex items-center justify-center w-8 h-8 bg-[#b91c1c]/20 text-[#b91c1c] rounded-full font-semibold text-sm">
+                                class="gaming-seed-badge inline-flex items-center justify-center w-8 h-8 bg-[#b91c1c]/20 text-[#b91c1c] rounded-full font-semibold text-sm">
                                 {{ participant.seed }}
                             </span>
                             {% else %}
@@ -271,7 +310,7 @@
                                             <input type="hidden" name="action" value="check_out">
                                             <input type="hidden" name="participant_id" value="{{ participant.id }}">
                                             <button type="submit" 
-                                                    class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded-md transition-colors"
+                                                    class="gaming-btn-action px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded-md transition-colors"
                                                     onclick="return confirm('Check out {{ participant.display_name }}?')">
                                                 <span class="material-symbols-outlined text-sm">logout</span>
                                                 Check Out
@@ -284,7 +323,7 @@
                                             <input type="hidden" name="action" value="check_in">
                                             <input type="hidden" name="participant_id" value="{{ participant.id }}">
                                             <button type="submit" 
-                                                    class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors">
+                                                    class="gaming-btn-action px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors">
                                                 <span class="material-symbols-outlined text-sm">login</span>
                                                 Check In
                                             </button>
@@ -293,7 +332,7 @@
                                     
                                     <!-- Seed Assignment Button -->
                                     <button onclick="assignSeed({{ participant.id }})" 
-                                            class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors">
+                                            class="gaming-btn-action px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors">
                                         <span class="material-symbols-outlined text-sm">tag</span>
                                         Seed
                                     </button>
@@ -301,8 +340,9 @@
                                 
                                 <!-- More Actions Menu -->
                                 <button class="text-gray-400 hover:text-white transition p-1"
-                                        onclick="showParticipantMenu({{ participant.id }})">
-                                    <span class="material-symbols-outlined">more_horiz</span>
+                                        onclick="showParticipantMenu({{ participant.id }})"
+                                        aria-label="More actions for {{ participant.display_name }}">
+                                    <span class="material-symbols-outlined" aria-hidden="true">more_horiz</span>
                                 </button>
                             </div>
                         </td>
@@ -355,27 +395,27 @@
 
 <!-- Seed Assignment Modal -->
 <div id="seed-modal"
-    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#1F2937] rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-700">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-white">Assign Seed</h3>
-            <button onclick="closeSeedModal()" class="text-gray-400 hover:text-white transition">
-                <span class="material-symbols-outlined">close</span>
+    class="gaming-modal-backdrop hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="gaming-modal bg-[#1F2937] rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-700">
+        <div class="gaming-modal-header flex items-center justify-between mb-4">
+            <h3 class="gaming-modal-title text-xl font-bold text-white">Assign Seed</h3>
+            <button onclick="closeSeedModal()" class="gaming-modal-close text-gray-400 hover:text-white transition" aria-label="Close seed assignment modal">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
         </div>
-        <form id="seed-form" method="post">
+        <form id="seed-form" method="post" class="gaming-modal-body">
             {% csrf_token %}
             <input type="hidden" name="action" value="assign_seed">
             <input type="hidden" id="participant-id" name="participant_id">
             <div class="mb-6">
-                <label for="seed-input" class="block text-sm font-medium text-gray-300 mb-2">
+                <label for="seed-input" class="gaming-label block text-sm font-medium text-gray-300 mb-2">
                     Seed Position
                 </label>
                 <input type="number" id="seed-input" name="seed" min="1" max="{{ tournament.max_participants }}"
-                    class="w-full px-4 py-3 bg-[#111827] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
+                    class="gaming-input w-full px-4 py-3 bg-[#111827] border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#b91c1c] focus:border-transparent"
                     placeholder="Enter seed number" />
             </div>
-            <div class="flex gap-3 justify-end">
+            <div class="gaming-modal-footer flex gap-3 justify-end">
                 <button type="button" onclick="closeSeedModal()"
                     class="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition">
                     Cancel
@@ -391,46 +431,31 @@
 
 <!-- Add Participant Modal -->
 <div id="add-participant-modal"
-    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#1F2937] rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-700">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-white">Add Participant</h3>
-            <button onclick="closeAddParticipantModal()" class="text-gray-400 hover:text-white transition">
-                <span class="material-symbols-outlined">close</span>
+    class="gaming-modal-backdrop hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="gaming-modal bg-[#1F2937] rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-700">
+        <div class="gaming-modal-header flex items-center justify-between mb-4">
+            <h3 class="gaming-modal-title text-xl font-bold text-white">Add Participant</h3>
+            <button onclick="closeAddParticipantModal()" class="gaming-modal-close text-gray-400 hover:text-white transition" aria-label="Close add participant modal">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
         </div>
-        <div class="text-center py-8">
+        <div class="gaming-modal-body text-center py-8">
             <span class="material-symbols-outlined text-gray-500 text-6xl mb-4 block">person_add</span>
             <p class="text-gray-400 mb-4">
                 To add participants manually, users must register through the tournament registration page.
             </p>
             <a href="{% url 'tournaments:detail' tournament.slug %}"
-                class="inline-block px-4 py-2 bg-[#b91c1c] text-white rounded-lg font-medium hover:bg-[#b91c1c]/90 transition">
+                class="gaming-btn-primary inline-block px-4 py-2 bg-[#b91c1c] text-white rounded-lg font-medium hover:bg-[#b91c1c]/90 transition">
                 Go to Tournament Page
             </a>
         </div>
     </div>
 </div>
 
+<script src="{% static 'js/manage-participant-performance.js' %}"></script>
 <script>
-    // Seed Assignment Modal
-    function assignSeed(participantId) {
-        document.getElementById('participant-id').value = participantId;
-        document.getElementById('seed-modal').classList.remove('hidden');
-    }
-
-    function closeSeedModal() {
-        document.getElementById('seed-modal').classList.add('hidden');
-    }
-
-    // Add Participant Modal
-    function showAddParticipantModal() {
-        document.getElementById('add-participant-modal').classList.remove('hidden');
-    }
-
-    function closeAddParticipantModal() {
-        document.getElementById('add-participant-modal').classList.add('hidden');
-    }
+    // Note: Modal functions (assignSeed, closeSeedModal, showAddParticipantModal, closeAddParticipantModal)
+    // are now handled by gaming-modal-handler.js
 
     // Participant Menu
     function showParticipantMenu(participantId) {
@@ -446,43 +471,17 @@
         });
     });
 
-    // Search Functionality
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', function (e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+    // Note: Search functionality is handled by manage-participant-performance.js with debouncing
+    // Note: Modal keyboard handlers and background click handlers are in gaming-modal-handler.js
+    
+    // Keyboard navigation for sort buttons
+    document.querySelectorAll('th button[aria-label^="Sort"]').forEach(button => {
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
         });
-    }
-
-    // Close modals on escape key
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            closeSeedModal();
-            closeAddParticipantModal();
-        }
-    });
-
-    // Close modals on background click
-    document.getElementById('seed-modal')?.addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeSeedModal();
-        }
-    });
-
-    document.getElementById('add-participant-modal')?.addEventListener('click', function (e) {
-        if (e.target === this) {
-            closeAddParticipantModal();
-        }
     });
 </script>
 {% endblock %}

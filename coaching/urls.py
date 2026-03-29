@@ -13,7 +13,7 @@ urlpatterns = [
     # Booking
     path('coach/<uuid:coach_pk>/book/', views.book_session, name='book_session'),
     path('session/<uuid:pk>/payment/', views.session_payment, name='session_payment'),
-    path('session/<uuid:pk>/confirm-payment/', views.confirm_payment, name='confirm_payment'),
+    path('session/<uuid:pk>/paystack-callback/', views.paystack_callback, name='paystack_callback'),
     
     # Session management
     path('sessions/', views.SessionListView.as_view(), name='session_list'),

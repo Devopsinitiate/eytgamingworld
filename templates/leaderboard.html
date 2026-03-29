@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Leaderboard — EYTGaming{% endblock %}
+{% block meta_description %}See the top-ranked players and teams on EYTGaming. Compete in tournaments to climb the esports leaderboard.{% endblock %}
+{% block og_title %}Leaderboard - EYTGaming{% endblock %}
+{% block og_description %}See the top-ranked players and teams. Compete in tournaments to climb the esports leaderboard.{% endblock %}
+{% block twitter_title %}Leaderboard - EYTGaming{% endblock %}
+{% block twitter_description %}See the top-ranked players and teams. Compete in tournaments to climb the esports leaderboard.{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: #0A0A0A; }
+.lb-section { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.lb-card {
+    background: #111;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: border-color .2s;
+}
+.lb-card:hover { border-color: rgba(220,38,38,.35); }
+.lb-card-accent { border-top: 3px solid #DC2626; }
+.section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: #fff; margin: 0;
+}
+.section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .7rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: #DC2626; margin-bottom: 14px;
+}
+.status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .7rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+}
+.s-registration { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.25); }
+.s-check_in     { background: rgba(234,179,8,.12);  color: #eab308; border: 1px solid rgba(234,179,8,.25); }
+.s-in_progress  { background: rgba(59,130,246,.12); color: #3b82f6; border: 1px solid rgba(59,130,246,.25); }
+.s-completed    { background: rgba(107,114,128,.12);color: #9ca3af; border: 1px solid rgba(107,114,128,.25); }
+.s-draft        { background: rgba(107,114,128,.12);color: #6b7280; border: 1px solid rgba(107,114,128,.2); }
+.rank-badge {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .85rem; font-weight: 800; flex-shrink: 0;
+}
+.rank-1 { background: rgba(250,204,21,.15); color: #facc15; border: 1px solid rgba(250,204,21,.3); }
+.rank-2 { background: rgba(156,163,175,.15); color: #9ca3af; border: 1px solid rgba(156,163,175,.3); }
+.rank-3 { background: rgba(180,83,9,.15);   color: #d97706; border: 1px solid rgba(180,83,9,.3); }
+.rank-n { background: rgba(30,30,30,.8);    color: #6b7280; border: 1px solid #2a2a2a; }
+.lb-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid #1a1a1a;
+    transition: background .15s;
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-row:hover { background: rgba(220,38,38,.04); }
+.avatar-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(220,38,38,.15); border: 1px solid rgba(220,38,38,.25);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; color: #DC2626; font-size: .9rem; flex-shrink: 0;
+    overflow: hidden;
+}
+.stat-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,.04); border: 1px solid #222;
+    font-size: .75rem; color: #9ca3af;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+}
+.win-chip { background: rgba(34,197,94,.08); color: #22c55e; border-color: rgba(34,197,94,.2); }
+.prize-chip { background: rgba(250,204,21,.08); color: #facc15; border-color: rgba(250,204,21,.2); }
+.t-card {
+    display: flex; gap: 14px; padding: 16px;
+    border-bottom: 1px solid #1a1a1a; align-items: flex-start;
+    transition: background .15s;
+}
+.t-card:last-child { border-bottom: none; }
+.t-card:hover { background: rgba(220,38,38,.04); }
+.t-banner {
+    width: 72px; height: 52px; border-radius: 6px;
+    background: linear-gradient(135deg,#1a0a0a,#1f1f1f);
+    border: 1px solid #2a2a2a; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.btn-red {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 6px;
+    background: #DC2626; color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .8rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    text-decoration: none; transition: all .2s;
+    border: none; cursor: pointer;
+}
+.btn-red:hover { background: #b91c1c; box-shadow: 0 0 14px rgba(220,38,38,.4); color: #fff; }
+.btn-outline {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 6px;
+    background: transparent; color: #9ca3af;
+    border: 1px solid #2a2a2a;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .8rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    text-decoration: none; transition: all .2s;
+}
+.btn-outline:hover { border-color: #DC2626; color: #fff; }
+.ms { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal;
+      line-height: 1; letter-spacing: normal; text-transform: none;
+      white-space: nowrap; word-wrap: normal; direction: ltr;
+      -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased; }
+.tab-btn {
+    padding: 8px 18px; border-radius: 6px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: .85rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    border: 1px solid #2a2a2a; background: transparent;
+    color: #6b7280; transition: all .2s;
+}
+.tab-btn.active { background: #DC2626; color: #fff; border-color: #DC2626; }
+.tab-btn:hover:not(.active) { border-color: #DC2626; color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+@media (max-width: 768px) {
+    .lb-grid { grid-template-columns: 1fr !important; }
+    .hero-grid { grid-template-columns: 1fr !important; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div style="background:#0A0A0A;min-height:100vh;padding-bottom:60px;">
+
+  <!-- Hero Banner -->
+  <div style="background:linear-gradient(135deg,#0d0000 0%,#1a0505 40%,#0A0A0A 100%);border-bottom:1px solid rgba(220,38,38,.2);padding:48px 16px 36px;">
+    <div class="lb-section">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <span class="ms" style="font-size:40px;color:#DC2626;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">emoji_events</span>
+        <div>
+          <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:2.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin:0;line-height:1;text-shadow:0 0 30px rgba(220,38,38,.4);">
+            Leaderboard
+          </h1>
+          <p style="color:#6b7280;font-size:.95rem;margin:6px 0 0;">Top players, teams &amp; tournaments on EYTGaming</p>
+        </div>
+      </div>
+
+      <!-- Featured tournaments strip -->
+      {% if featured %}
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
+        {% for t in featured %}
+        <a href="{% url 'tournaments:detail' slug=t.slug %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(220,38,38,.2);border-radius:8px;text-decoration:none;transition:all .2s;" onmouseover="this.style.borderColor='rgba(220,38,38,.5)'" onmouseout="this.style.borderColor='rgba(220,38,38,.2)'">
+          <span class="ms" style="font-size:20px;color:#DC2626;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+          <div>
+            <div style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;">{{ t.name }}</div>
+            <div style="color:#6b7280;font-size:.75rem;">{{ t.game.name }} &bull; {{ t.get_status_display }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="lb-section" style="margin-top:32px;">
+
+    <!-- Stats bar -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;" class="hero-grid">
+      <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#DC2626;">{{ active_tournaments|length }}</div>
+        <div style="color:#6b7280;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed',sans-serif;font-weight:600;">Live / Open</div>
+      </div>
+      <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#DC2626;">{{ completed_tournaments|length }}</div>
+        <div style="color:#6b7280;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed',sans-serif;font-weight:600;">Completed</div>
+      </div>
+      <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#DC2626;">{{ top_players|length }}</div>
+        <div style="color:#6b7280;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed',sans-serif;font-weight:600;">Top Players</div>
+      </div>
+      <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#DC2626;">{{ games|length }}</div>
+        <div style="color:#6b7280;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-family:'Barlow Condensed',sans-serif;font-weight:600;">Games</div>
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;" class="lb-grid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- Leaderboard tabs: Players / Teams -->
+        <div class="lb-card lb-card-accent" style="margin-bottom:24px;">
+          <div style="padding:16px 16px 0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+              <div class="section-title">
+                <span class="ms" style="font-size:22px;vertical-align:middle;color:#DC2626;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;margin-right:6px;">leaderboard</span>
+                Rankings
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="tab-btn active" onclick="switchTab('players')" id="tab-players">Players</button>
+                <button class="tab-btn" onclick="switchTab('teams')" id="tab-teams">Teams</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Players tab -->
+          <div id="panel-players" class="tab-panel active">
+            {% if top_players %}
+            {% for p in top_players %}
+            <div class="lb-row">
+              <div class="rank-badge {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}rank-n{% endif %}">
+                {% if forloop.counter <= 3 %}
+                <span class="ms" style="font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">{% if forloop.counter == 1 %}workspace_premium{% else %}military_tech{% endif %}</span>
+                {% else %}{{ forloop.counter }}{% endif %}
+              </div>
+              <div class="avatar-circle">
+                {% if p.user__avatar %}<img src="{{ p.user__avatar }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+                {% else %}{{ p.user__username|first|upper }}{% endif %}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="color:#fff;font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  {{ p.user__display_name|default:p.user__username }}
+                </div>
+                <div style="color:#6b7280;font-size:.75rem;">{{ p.tournaments_played }} tournament{{ p.tournaments_played|pluralize }}</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+                <span class="stat-chip win-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">check_circle</span>
+                  {{ p.total_wins }}W
+                </span>
+                <span class="stat-chip">{{ p.total_losses }}L</span>
+                {% if p.total_prize and p.total_prize > 0 %}
+                <span class="stat-chip prize-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">payments</span>
+                  ₦{{ p.total_prize|floatformat:0 }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="padding:40px;text-align:center;color:#4b5563;">
+              <span class="ms" style="font-size:40px;display:block;margin-bottom:10px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">leaderboard</span>
+              No player rankings yet. Check back after tournaments complete.
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Teams tab -->
+          <div id="panel-teams" class="tab-panel">
+            {% if top_teams %}
+            {% for t in top_teams %}
+            <div class="lb-row">
+              <div class="rank-badge {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}rank-n{% endif %}">
+                {% if forloop.counter <= 3 %}
+                <span class="ms" style="font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">{% if forloop.counter == 1 %}workspace_premium{% else %}military_tech{% endif %}</span>
+                {% else %}{{ forloop.counter }}{% endif %}
+              </div>
+              <div class="avatar-circle">
+                {% if t.team__logo %}<img src="{{ t.team__logo }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+                {% else %}<span class="ms" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">shield</span>{% endif %}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="color:#fff;font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  {{ t.team__name }}
+                  {% if t.team__tag %}<span style="color:#6b7280;font-size:.75rem;margin-left:6px;">[{{ t.team__tag }}]</span>{% endif %}
+                </div>
+                <div style="color:#6b7280;font-size:.75rem;">{{ t.tournaments_played }} tournament{{ t.tournaments_played|pluralize }}</div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+                <span class="stat-chip win-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">check_circle</span>
+                  {{ t.total_wins }}W
+                </span>
+                <span class="stat-chip">{{ t.total_losses }}L</span>
+                {% if t.total_prize and t.total_prize > 0 %}
+                <span class="stat-chip prize-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">payments</span>
+                  ₦{{ t.total_prize|floatformat:0 }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="padding:40px;text-align:center;color:#4b5563;">
+              <span class="ms" style="font-size:40px;display:block;margin-bottom:10px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">groups</span>
+              No team rankings yet.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Active / Upcoming Tournaments -->
+        <div class="lb-card lb-card-accent">
+          <div style="padding:16px 16px 0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <div class="section-title">
+                <span class="ms" style="font-size:22px;vertical-align:middle;color:#DC2626;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;margin-right:6px;">sports_esports</span>
+                Active Tournaments
+              </div>
+              <a href="{% url 'tournaments:list' %}" class="btn-outline" style="padding:6px 12px;font-size:.75rem;">View All</a>
+            </div>
+          </div>
+          {% if active_tournaments %}
+          {% for t in active_tournaments %}
+          <a href="{% url 'tournaments:detail' slug=t.slug %}" class="t-card" style="text-decoration:none;display:flex;">
+            <div class="t-banner">
+              {% if t.banner %}<img src="{{ t.banner.url }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+              {% else %}<span class="ms" style="font-size:28px;color:#DC2626;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">emoji_events</span>{% endif %}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                <div style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.03em;line-height:1.2;">{{ t.name }}</div>
+                <span class="status-pill s-{{ t.status }}">{{ t.get_status_display }}</span>
+              </div>
+              <div style="color:#6b7280;font-size:.8rem;margin-top:4px;">{{ t.game.name }} &bull; {{ t.get_format_display }}</div>
+              <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+                {% if t.prize_pool > 0 %}
+                <span class="stat-chip prize-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">payments</span>
+                  ₦{{ t.prize_pool|floatformat:0 }} Prize
+                </span>
+                {% endif %}
+                <span class="stat-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">group</span>
+                  {{ t.total_registered }}/{{ t.max_participants }}
+                </span>
+                <span class="stat-chip">
+                  <span class="ms" style="font-size:13px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">calendar_today</span>
+                  {{ t.start_datetime|date:"M j, Y" }}
+                </span>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+          {% else %}
+          <div style="padding:40px;text-align:center;color:#4b5563;">
+            <span class="ms" style="font-size:40px;display:block;margin-bottom:10px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">event_busy</span>
+            No active tournaments right now.
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div>
+
+        <!-- Prize Winners -->
+        {% if prize_winners %}
+        <div class="lb-card lb-card-accent" style="margin-bottom:20px;">
+          <div style="padding:16px 16px 0;">
+            <div class="section-label">Prize Winners</div>
+          </div>
+          {% for pw in prize_winners %}
+          <div class="lb-row">
+            <span class="ms" style="font-size:22px;color:#facc15;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0;">
+              {% if forloop.counter == 1 %}workspace_premium{% elif forloop.counter == 2 %}military_tech{% else %}emoji_events{% endif %}
+            </span>
+            <div style="flex:1;min-width:0;">
+              <div style="color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                {% if pw.user %}{{ pw.user.get_display_name }}{% elif pw.team %}{{ pw.team.name }}{% endif %}
+              </div>
+              <div style="color:#6b7280;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ pw.tournament.name }}</div>
+            </div>
+            <span class="stat-chip prize-chip" style="flex-shrink:0;">₦{{ pw.prize_won|floatformat:0 }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Completed Tournaments -->
+        <div class="lb-card" style="margin-bottom:20px;">
+          <div style="padding:16px 16px 8px;">
+            <div class="section-label">Recent Results</div>
+          </div>
+          {% if completed_tournaments %}
+          {% for t in completed_tournaments %}
+          <a href="{% url 'tournaments:detail' slug=t.slug %}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #1a1a1a;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='rgba(220,38,38,.04)'" onmouseout="this.style.background='transparent'">
+            <span class="ms" style="font-size:20px;color:#6b7280;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0;">emoji_events</span>
+            <div style="flex:1;min-width:0;">
+              <div style="color:#d1d5db;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ t.name }}</div>
+              <div style="color:#6b7280;font-size:.75rem;">{{ t.game.name }}{% if t.prize_pool > 0 %} &bull; ₦{{ t.prize_pool|floatformat:0 }}{% endif %}</div>
+            </div>
+            <span class="status-pill s-completed" style="flex-shrink:0;">Done</span>
+          </a>
+          {% endfor %}
+          {% else %}
+          <div style="padding:24px;text-align:center;color:#4b5563;font-size:.85rem;">No completed tournaments yet.</div>
+          {% endif %}
+        </div>
+
+        <!-- Games filter -->
+        {% if games %}
+        <div class="lb-card">
+          <div style="padding:16px 16px 8px;">
+            <div class="section-label">Browse by Game</div>
+          </div>
+          <div style="padding:0 16px 16px;display:flex;flex-wrap:wrap;gap:8px;">
+            <a href="{% url 'tournaments:list' %}" class="btn-outline" style="padding:5px 12px;font-size:.75rem;">All</a>
+            {% for g in games %}
+            <a href="{% url 'tournaments:list' %}?game={{ g.slug }}" class="btn-outline" style="padding:5px 12px;font-size:.75rem;">{{ g.name }}</a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- CTA -->
+        <div style="background:linear-gradient(135deg,#1a0505,#111);border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:20px;text-align:center;margin-top:20px;">
+          <span class="ms" style="font-size:36px;color:#DC2626;display:block;margin-bottom:8px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">emoji_events</span>
+          <div style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Join a Tournament</div>
+          <p style="color:#6b7280;font-size:.8rem;margin:0 0 14px;">Compete, win prizes, and climb the leaderboard.</p>
+          <a href="{% url 'tournaments:list' %}" class="btn-red" style="width:100%;justify-content:center;">
+            <span class="ms" style="font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_forward</span>
+            Browse Tournaments
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+}
+</script>
+{% endblock %}

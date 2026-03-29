@@ -3,98 +3,215 @@
 
 {% block title %}Sign Out - EYTGaming{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+<style>
+    body { background: #080808; }
+    .logout-page {
+        min-height: 100vh;
+        background: #080808;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    /* Subtle red glow background */
+    .logout-page::before {
+        content: '';
+        position: fixed;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60vw;
+        height: 60vw;
+        background: radial-gradient(ellipse, rgba(185,28,28,0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .logout-card {
+        width: 100%;
+        max-width: 26rem;
+        background: #0d1117;
+        border: 1px solid #1f2937;
+        border-radius: 1rem;
+        padding: 2.5rem 2rem;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+    .logout-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, #b91c1c 0%, rgba(185,28,28,0.3) 60%, transparent 100%);
+    }
+    .logout-icon-wrap {
+        width: 4.5rem; height: 4.5rem;
+        border-radius: 50%;
+        background: rgba(185,28,28,0.08);
+        border: 1px solid rgba(185,28,28,0.25);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 0 24px rgba(185,28,28,0.15);
+    }
+    .logout-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900; font-style: italic;
+        text-transform: uppercase;
+        font-size: 2.25rem; letter-spacing: 0.05em;
+        color: #fff; line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    .logout-subtitle {
+        color: #6b7280; font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    .logout-divider {
+        height: 1px; background: #111827;
+        margin: 1.5rem 0;
+    }
+    .btn-confirm {
+        display: flex; align-items: center; justify-content: center; gap: 0.375rem;
+        width: 100%; padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        color: #fff; border: none; cursor: pointer;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700; font-size: 0.9375rem;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        box-shadow: 0 0 16px rgba(185,28,28,0.3);
+        transition: all 0.15s;
+        margin-bottom: 0.75rem;
+    }
+    .btn-confirm:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        box-shadow: 0 0 24px rgba(185,28,28,0.5);
+        transform: translateY(-1px);
+    }
+    .btn-cancel {
+        display: flex; align-items: center; justify-content: center; gap: 0.375rem;
+        width: 100%; padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        background: transparent;
+        color: #9ca3af; border: 1px solid #1f2937; cursor: pointer;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700; font-size: 0.9375rem;
+        text-transform: uppercase; letter-spacing: 0.06em;
+        transition: all 0.15s;
+        text-decoration: none;
+    }
+    .btn-cancel:hover {
+        border-color: #374151; color: #e5e7eb;
+        background: rgba(255,255,255,0.03);
+    }
+    .logout-logo {
+        display: flex; align-items: center; justify-content: center; gap: 0.625rem;
+        margin-bottom: 2rem;
+    }
+    .logout-logo img {
+        height: 2.25rem; width: auto; border-radius: 0.375rem;
+    }
+    .logout-logo span {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900; font-style: italic;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        font-size: 1.25rem; color: #fff;
+    }
+    .st-alert {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.75rem 1rem; border-radius: 0.625rem;
+        border: 1px solid; font-size: 0.875rem;
+        margin-bottom: 1rem; text-align: left;
+    }
+    .st-alert-success { background: rgba(6,78,59,0.2); border-color: rgba(16,185,129,0.3); color: #6ee7b7; }
+    .st-alert-error   { background: rgba(127,29,29,0.2); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+    .st-alert-info    { background: rgba(30,58,138,0.2); border-color: rgba(59,130,246,0.3); color: #93c5fd; }
+    .btn-confirm .material-symbols-outlined,
+    .btn-cancel .material-symbols-outlined {
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        font-family: 'Material Symbols Outlined' !important;
+        font-style: normal !important;
+        font-weight: normal !important;
+        font-feature-settings: 'liga' 1 !important;
+        -webkit-font-feature-settings: 'liga' 1 !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+    }
+    .logout-icon {
+        font-family: 'Material Symbols Outlined' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+        font-variant-ligatures: normal !important;
+        font-feature-settings: 'liga' 1 !important;
+        -webkit-font-feature-settings: 'liga' 1 !important;
+        -webkit-font-smoothing: antialiased !important;
+        font-optical-sizing: none !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="flex h-screen w-full flex-col bg-background-dark p-4 sm:p-6 lg:p-8">
-    <!-- Header -->
-    <header class="mb-6">
-        <div class="flex items-center gap-3">
-            <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-8 w-8 rounded-lg object-cover"/>
-            <h1 class="text-2xl font-bold tracking-tight text-white">Account Settings</h1>
+<div class="logout-page">
+    <div class="logout-card">
+
+        <!-- Logo -->
+        <div class="logout-logo">
+            <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming">
+            <span>EYTGaming</span>
         </div>
-    </header>
-    
-    <!-- Main Container -->
-    <div class="flex flex-1 flex-col overflow-hidden rounded-xl border border-white/10 bg-gray-800/50 shadow-2xl shadow-gray-900/40 backdrop-blur-lg md:flex-row">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="w-full border-b border-gray-700 p-4 md:w-64 md:border-b-0 md:border-r md:p-6">
-            <nav class="flex flex-col gap-2 md:flex-col">
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'account_email' %}">
-                    <span class="material-symbols-outlined !text-xl">mail</span>
-                    <span class="text-sm font-medium">Change Email</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'account_change_password' %}">
-                    <span class="material-symbols-outlined !text-xl">lock</span>
-                    <span class="text-sm font-medium">Change Password</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white" href="{% url 'socialaccount_connections' %}">
-                    <span class="material-symbols-outlined !text-xl">link</span>
-                    <span class="text-sm font-medium">Account Connections</span>
-                </a>
-                <a class="flex items-center gap-3 rounded-lg bg-gray-800/50 px-3 py-2 font-medium text-white transition-colors hover:bg-gray-800" href="{% url 'account_logout' %}">
-                    <span class="material-symbols-outlined !text-xl text-primary">logout</span>
-                    <span class="text-sm font-medium">Sign Out</span>
-                </a>
-            </nav>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="flex flex-1 items-center justify-center p-6 md:p-8">
-            <div class="w-full max-w-md">
-                <div class="flex flex-col items-center text-center">
-                    
-                    <!-- Icon -->
-                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-gray-700 bg-gray-800 text-primary">
-                        <span class="material-symbols-outlined !text-4xl">logout</span>
-                    </div>
-                    
-                    <!-- Heading -->
-                    <h2 class="font-display text-3xl font-bold tracking-tight text-white">
-                        Sign Out?
-                    </h2>
-                    
-                    <!-- Description -->
-                    <p class="mt-2 font-display text-base font-normal leading-normal text-gray-400">
-                        Are you sure you want to end your session?
-                    </p>
-                    
-                    <!-- Django Messages -->
-                    {% if messages %}
-                        <div class="mt-6 w-full space-y-2">
-                            {% for message in messages %}
-                                <div class="flex items-center gap-3 px-4 py-3 rounded-lg {% if message.tags == 'error' %}bg-red-900/20 border border-red-800 text-red-200{% elif message.tags == 'success' %}bg-green-900/20 border border-green-800 text-green-200{% else %}bg-blue-900/20 border border-blue-800 text-blue-200{% endif %}">
-                                    <span class="material-symbols-outlined text-sm">
-                                        {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
-                                    </span>
-                                    <p class="text-sm">{{ message }}</p>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Action Buttons -->
-                    <form method="post" action="{% url 'account_logout' %}" class="mt-8 w-full">
-                        {% csrf_token %}
-                        <div class="flex w-full flex-col gap-3 sm:flex-row">
-                            <!-- Confirm Sign Out Button -->
-                            <button type="submit" class="flex h-12 flex-1 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-5 text-base font-bold leading-normal tracking-[0.015em] text-white transition-all hover:bg-primary/90 shadow-lg shadow-primary/30 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                                <span class="truncate">Confirm Sign Out</span>
-                            </button>
-                            
-                            <!-- Cancel Button -->
-                            <a href="{% url 'dashboard:home' %}" class="flex h-12 flex-1 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-gray-700 bg-gray-800 px-5 text-base font-bold leading-normal tracking-[0.015em] text-white transition-colors hover:bg-gray-700">
-                                <span class="truncate">Cancel</span>
-                            </a>
-                        </div>
-                    </form>
-                    
-                    <!-- Additional Info -->
-                    <div class="mt-6 text-sm text-gray-500">
-                        <p>You can always sign back in anytime.</p>
-                    </div>
-                </div>
+
+        <!-- Icon -->
+        <div class="logout-icon-wrap">
+            <span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span>
+        </div>
+
+        <!-- Heading -->
+        <h1 class="logout-title">Sign Out?</h1>
+        <p class="logout-subtitle">Are you sure you want to end your session?</p>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="st-alert {% if message.tags == 'error' %}st-alert-error{% elif message.tags == 'success' %}st-alert-success{% else %}st-alert-info{% endif %}">
+                <span class="logout-icon" style="font-size:1rem; flex-shrink:0; font-family:'Material Symbols Outlined' !important; font-weight:normal !important; font-style:normal !important; line-height:1; letter-spacing:normal !important; text-transform:none !important; display:inline-block; white-space:nowrap; font-feature-settings:'liga' 1 !important; -webkit-font-feature-settings:'liga' 1 !important; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}</span>
+                <p>{{ message }}</p>
             </div>
-        </main>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="logout-divider"></div>
+
+        <!-- Actions -->
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirm">
+                <span class="material-symbols-outlined" style="font-size:1rem; font-family:'Material Symbols Outlined' !important; font-style:normal; font-weight:normal; text-transform:none !important; letter-spacing:0 !important; font-feature-settings:'liga' 1; -webkit-font-feature-settings:'liga' 1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; display:inline-block; line-height:1; white-space:nowrap;">logout</span>
+                Confirm Sign Out
+            </button>
+        </form>
+        <a href="{% url 'dashboard:home' %}" class="btn-cancel">
+            <span class="material-symbols-outlined" style="font-size:1rem; font-family:'Material Symbols Outlined' !important; font-style:normal; font-weight:normal; text-transform:none !important; letter-spacing:0 !important; font-feature-settings:'liga' 1; -webkit-font-feature-settings:'liga' 1; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; display:inline-block; line-height:1; white-space:nowrap;">arrow_back</span>
+            Go Back
+        </a>
+
+        <p style="margin-top:1.5rem; font-size:0.75rem; color:#374151;">You can always sign back in anytime.</p>
     </div>
 </div>
 {% endblock %}

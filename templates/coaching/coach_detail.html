@@ -1,324 +1,296 @@
 {% extends "layouts/dashboard_base.html" %}
 {% load static %}
 
-{% block title %}{{ coach.user.get_display_name }} - Coach Profile{% endblock %}
+{% block title %}{{ coach.user.get_display_name }} - Coach Profile - EYTGaming{% endblock %}
+{% block meta_robots %}index, follow{% endblock %}
+{% block meta_description %}{{ coach.bio|truncatewords:25|default:'Book a coaching session with this expert on EYTGaming.' }}{% endblock %}
+{% block og_title %}{{ coach.user.get_display_name }} - EYTGaming Coach{% endblock %}
+{% block og_description %}{{ coach.bio|truncatewords:25|default:'Book a coaching session with this expert on EYTGaming.' }}{% endblock %}
+{% block twitter_title %}{{ coach.user.get_display_name }} - EYTGaming Coach{% endblock %}
+{% block twitter_description %}{{ coach.bio|truncatewords:25|default:'Book a coaching session with this expert on EYTGaming.' }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .availability-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 0.5rem;
-    }
-    .time-slot {
-        transition: all 0.2s ease;
-    }
-    .time-slot:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
-    }
-    .rating-stars {
-        color: #fbbf24;
-    }
+.cd-page{background:#080808;min-height:100vh;}
+.cd-banner{position:relative;height:280px;border-radius:12px;overflow:hidden;margin-bottom:2rem;}
+.cd-banner img{width:100%;height:100%;object-fit:cover;}
+.cd-banner-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#1a0000 0%,#0d0d0d 60%,#1a0000 100%);display:flex;align-items:center;justify-content:center;}
+.cd-banner-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.3) 50%,transparent 100%);}
+.cd-banner-top{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#dc2626,#ef4444,#dc2626);}
+.cd-info-overlay{position:absolute;bottom:0;left:0;right:0;padding:1.5rem;}
+.cd-avatar{width:96px;height:96px;border-radius:50%;border:3px solid #dc2626;box-shadow:0 0 20px rgba(220,38,38,.5);overflow:hidden;flex-shrink:0;background:#1a1a1a;}
+.cd-avatar img{width:100%;height:100%;object-fit:cover;}
+.cd-avatar-init{width:100%;height:100%;background:linear-gradient(135deg,#dc2626,#7f1d1d);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:700;color:#fff;}
+.cd-name{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#fff;line-height:1;text-shadow:0 0 20px rgba(220,38,38,.4);}
+.cd-verified{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.cd-stars{color:#fbbf24;display:flex;align-items:center;gap:1px;}
+.cd-stat-pill{display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.8);font-size:.85rem;}
+.cd-price{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#dc2626;text-shadow:0 0 12px rgba(220,38,38,.4);}
+.cd-book-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;border:1px solid rgba(220,38,38,.5);box-shadow:0 0 16px rgba(220,38,38,.35);transition:all .2s;}
+.cd-book-btn:hover{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 24px rgba(220,38,38,.55);color:#fff;}
+.cd-unavail{padding:10px 22px;border-radius:6px;background:#1f1f1f;border:1px solid #333;color:#555;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:not-allowed;}
+.g-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;padding:1.5rem;position:relative;overflow:hidden;margin-bottom:1.5rem;}
+.g-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#dc2626,#ef4444,#dc2626);}
+.g-card-title{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:1rem;}
+.g-inner-card{background:#0d0d0d;border:1px solid #1f1f1f;border-radius:8px;padding:1rem;}
+.g-spec-tag{padding:3px 8px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#f87171;font-size:.72rem;border-radius:4px;}
+.g-pkg-price{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:#dc2626;}
+.g-pkg-btn{display:block;width:100%;padding:8px 16px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-align:center;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 10px rgba(220,38,38,.25);transition:all .2s;}
+.g-pkg-btn:hover{box-shadow:0 0 18px rgba(220,38,38,.45);color:#fff;}
+.g-review-card{background:#0d0d0d;border:1px solid #1f1f1f;border-radius:8px;padding:1rem;margin-bottom:.85rem;}
+.g-review-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(220,38,38,.3),rgba(220,38,38,.1));border:1px solid rgba(220,38,38,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;color:#f87171;flex-shrink:0;}
+.g-sidebar-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;padding:1.25rem;position:relative;overflow:hidden;margin-bottom:1.25rem;}
+.g-sidebar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#dc2626,#ef4444,#dc2626);}
+.g-sidebar-title{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:.85rem;}
+.g-stat-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #1a1a1a;}
+.g-stat-row:last-child{border-bottom:none;}
+.g-avail-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #1a1a1a;}
+.g-avail-row:last-child{border-bottom:none;}
+.g-report-btn{width:100%;padding:9px 16px;border-radius:6px;background:#111;border:1px solid #2a2a2a;color:#555;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all .2s;}
+.g-report-btn:hover{border-color:#dc2626;color:#f87171;}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl">
-    <!-- Coach Header -->
-    <div class="relative mb-8">
-        <!-- Banner -->
-        <div class="h-64 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl overflow-hidden">
-            {% if coach.banner %}
-            <img src="{{ coach.banner.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
-            {% else %}
-            <div class="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                <span class="material-symbols-outlined text-primary text-8xl">school</span>
-            </div>
-            {% endif %}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="cd-page">
+<div style="max-width:1200px;margin:0 auto;padding:0 1rem 3rem;">
+
+<!-- Banner -->
+<div class="cd-banner">
+  <div class="cd-banner-top"></div>
+  {% if coach.banner %}
+  <img src="{{ coach.banner.url }}" alt="{{ coach.user.get_display_name }}">
+  {% else %}
+  <div class="cd-banner-placeholder">
+    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;font-size:6rem;color:rgba(220,38,38,.2);text-transform:none;letter-spacing:0;">school</span>
+  </div>
+  {% endif %}
+  <div class="cd-banner-overlay"></div>
+  <div class="cd-info-overlay">
+    <div style="display:flex;align-items:flex-end;gap:1.25rem;flex-wrap:wrap;">
+      <div class="cd-avatar">
+        {% if coach.user.avatar %}<img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}">
+        {% else %}<div class="cd-avatar-init">{{ coach.user.get_display_name|first|upper }}</div>{% endif %}
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.4rem;">
+          <h1 class="cd-name">{{ coach.user.get_display_name }}</h1>
+          {% if coach.is_verified %}
+          <span class="cd-verified">
+            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;font-size:13px;text-transform:none;letter-spacing:0;">verified</span>
+            Verified Coach
+          </span>
+          {% endif %}
         </div>
-        
-        <!-- Coach Info Overlay -->
-        <div class="absolute bottom-6 left-6 right-6">
-            <div class="flex items-end gap-6">
-                <!-- Avatar -->
-                <div class="w-24 h-24 rounded-full border-4 border-white/20 overflow-hidden bg-card-dark">
-                    {% if coach.user.avatar %}
-                    <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
-                    {% else %}
-                    <div class="w-full h-full bg-primary flex items-center justify-center text-white font-bold text-2xl">
-                        {{ coach.user.get_display_name|first|upper }}
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Info -->
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <h1 class="text-white text-3xl font-bold">{{ coach.user.get_display_name }}</h1>
-                        {% if coach.is_verified %}
-                        <span class="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm">verified</span>
-                            Verified Coach
-                        </span>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Rating and Stats -->
-                    <div class="flex items-center gap-6 text-white/90">
-                        <div class="flex items-center gap-2">
-                            <div class="flex items-center rating-stars">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= coach.average_rating %}
-                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    {% else %}
-                                    <span class="material-symbols-outlined text-sm">star</span>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="text-sm">{{ coach.average_rating|floatformat:1 }} ({{ coach.total_reviews }} reviews)</span>
-                        </div>
-                        <div class="text-sm">
-                            <span class="material-symbols-outlined text-xs align-middle">school</span>
-                            {{ coach.total_sessions }} sessions taught
-                        </div>
-                        <div class="text-sm">
-                            <span class="material-symbols-outlined text-xs align-middle">people</span>
-                            {{ coach.total_students }} students
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Price and Book Button -->
-                <div class="text-right">
-                    <div class="text-white text-2xl font-bold mb-2">${{ coach.hourly_rate }}/hour</div>
-                    {% if coach.is_available %}
-                    <a href="{% url 'coaching:book_session' coach_pk=coach.pk %}" 
-                       class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined">calendar_add_on</span>
-                        Book Session
-                    </a>
-                    {% else %}
-                    <button disabled class="px-6 py-3 bg-gray-600 text-gray-400 font-medium rounded-lg cursor-not-allowed">
-                        Currently Unavailable
-                    </button>
-                    {% endif %}
-                </div>
+        <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <div class="cd-stars">
+              {% for i in "12345" %}
+              {% if forloop.counter <= coach.average_rating %}
+              <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;font-size:16px;text-transform:none;letter-spacing:0;">star</span>
+              {% else %}
+              <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;font-size:16px;text-transform:none;letter-spacing:0;">star</span>
+              {% endif %}
+              {% endfor %}
             </div>
+            <span style="color:rgba(255,255,255,.8);font-size:.85rem;">{{ coach.average_rating|floatformat:1 }} ({{ coach.total_reviews }} reviews)</span>
+          </div>
+          <div class="cd-stat-pill">
+            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20;font-size:15px;text-transform:none;letter-spacing:0;">school</span>
+            {{ coach.total_sessions }} sessions
+          </div>
+          <div class="cd-stat-pill">
+            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20;font-size:15px;text-transform:none;letter-spacing:0;">people</span>
+            {{ coach.total_students }} students
+          </div>
         </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="cd-price" style="margin-bottom:.6rem;">${{ coach.hourly_rate }}/hr</div>
+        {% if coach.is_available %}
+        <a href="{% url 'coaching:book_session' coach_pk=coach.pk %}" class="cd-book-btn">
+          <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;">calendar_add_on</span>
+          Book Session
+        </a>
+        {% else %}
+        <button disabled class="cd-unavail">Currently Unavailable</button>
+        {% endif %}
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-8">
-            <!-- About -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4">About</h2>
-                <p class="text-gray-300 leading-relaxed">{{ coach.bio|default:"This coach hasn't added a bio yet." }}</p>
-                
-                {% if coach.achievements %}
-                <div class="mt-6">
-                    <h3 class="text-white font-semibold mb-3">Achievements</h3>
-                    <p class="text-gray-300">{{ coach.achievements }}</p>
-                </div>
-                {% endif %}
-            </div>
+<!-- Main Grid -->
+<div style="display:grid;grid-template-columns:1fr 320px;gap:2rem;">
+<div style="min-width:0;">
 
-            <!-- Games & Expertise -->
-            {% if games %}
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4">Games & Expertise</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for expertise in games %}
-                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
-                        <div class="flex items-center gap-3 mb-3">
-                            {% if expertise.game.icon %}
-                            <img src="{{ expertise.game.icon.url }}" alt="{{ expertise.game.name }}" class="w-10 h-10 rounded">
-                            {% else %}
-                            <div class="w-10 h-10 bg-primary/20 rounded flex items-center justify-center">
-                                <span class="material-symbols-outlined text-primary">sports_esports</span>
-                            </div>
-                            {% endif %}
-                            <div>
-                                <h3 class="text-white font-semibold">{{ expertise.game.name }}</h3>
-                                <p class="text-gray-400 text-sm">{{ expertise.get_skill_level_display }}</p>
-                            </div>
-                        </div>
-                        
-                        {% if expertise.specializations %}
-                        <div class="mb-3">
-                            <p class="text-gray-400 text-sm mb-2">Specializations:</p>
-                            <div class="flex flex-wrap gap-2">
-                                {% for spec in expertise.specializations_list %}
-                                <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full">{{ spec }}</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        {% if expertise.custom_rate %}
-                        <div class="text-primary font-semibold">${{ expertise.custom_rate }}/hour for this game</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+<!-- About -->
+<div class="g-card">
+  <h2 class="g-card-title">About</h2>
+  <p style="color:#aaa;line-height:1.7;font-size:.95rem;">{{ coach.bio|default:"This coach has not added a bio yet." }}</p>
+  {% if coach.achievements %}
+  <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #1f1f1f;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;margin-bottom:.6rem;">Achievements</div>
+    <p style="color:#aaa;font-size:.9rem;line-height:1.6;">{{ coach.achievements }}</p>
+  </div>
+  {% endif %}
+</div>
 
-            <!-- Packages -->
-            {% if packages %}
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4">Coaching Packages</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for package in packages %}
-                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-white font-semibold">{{ package.name }}</h3>
-                            <span class="text-primary font-bold">${{ package.total_price }}</span>
-                        </div>
-                        <p class="text-gray-400 text-sm mb-3">{{ package.description }}</p>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-400">{{ package.number_of_sessions }} sessions</span>
-                            <span class="text-gray-400">Valid {{ package.valid_for_days }} days</span>
-                        </div>
-                        <div class="mt-4">
-                            <a href="{% url 'coaching:purchase_package' pk=package.pk %}" 
-                               class="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors text-center block">
-                                Purchase Package
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- Reviews -->
-            {% if reviews %}
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4">Student Reviews</h2>
-                <div class="space-y-4">
-                    {% for review in reviews %}
-                    <div class="bg-background-dark border border-card-border-dark rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                                    <span class="text-primary text-sm font-bold">{{ review.student.get_display_name|first|upper }}</span>
-                                </div>
-                                <div>
-                                    <p class="text-white font-medium">{{ review.student.get_display_name }}</p>
-                                    <p class="text-gray-400 text-sm">{{ review.created_at|date:"M d, Y" }}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center rating-stars">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= review.rating %}
-                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    {% else %}
-                                    <span class="material-symbols-outlined text-sm">star</span>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <p class="text-gray-300">{{ review.comment }}</p>
-                        {% if review.session.game %}
-                        <p class="text-gray-400 text-sm mt-2">Game: {{ review.session.game.name }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+{% if games %}
+<div class="g-card">
+  <h2 class="g-card-title">Games &amp; Expertise</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
+    {% for expertise in games %}
+    <div class="g-inner-card">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+        {% if expertise.game.icon %}
+        <img src="{{ expertise.game.icon.url }}" alt="{{ expertise.game.name }}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;">
+        {% else %}
+        <div style="width:40px;height:40px;border-radius:6px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.2);display:flex;align-items:center;justify-content:center;">
+          <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:20px;color:#dc2626;text-transform:none;letter-spacing:0;">sports_esports</span>
         </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-6">
-            <!-- Quick Stats -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h3 class="text-white font-semibold mb-4">Coach Stats</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Experience Level</span>
-                        <span class="text-white">{{ coach.get_experience_level_display }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Response Time</span>
-                        <span class="text-white">{{ coach.response_time_hours }}h avg</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Languages</span>
-                        <span class="text-white">{{ coach.languages|default:"English" }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Timezone</span>
-                        <span class="text-white">{{ coach.timezone|default:"UTC" }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Availability -->
-            {% if availability %}
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h3 class="text-white font-semibold mb-4">Weekly Availability</h3>
-                <div class="space-y-3">
-                    {% for avail in availability %}
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">{{ avail.get_weekday_display }}</span>
-                        <span class="text-white text-sm">{{ avail.start_time|time:"g:i A" }} - {{ avail.end_time|time:"g:i A" }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-                <p class="text-gray-500 text-xs mt-4">Times shown in coach's timezone</p>
-            </div>
-            {% endif %}
-
-            <!-- Contact Info -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h3 class="text-white font-semibold mb-4">Platform</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary">videocam</span>
-                        <span class="text-white">{{ coach.get_platform_display }}</span>
-                    </div>
-                    {% if coach.platform_username %}
-                    <p class="text-gray-400 text-sm">Username: {{ coach.platform_username }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Report Coach -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <button class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-sm">flag</span>
-                    Report Coach
-                </button>
-            </div>
+        {% endif %}
+        <div>
+          <div style="color:#fff;font-weight:600;font-size:.9rem;">{{ expertise.game.name }}</div>
+          {% if expertise.rank %}
+          <span style="display:inline-block;padding:2px 8px;border-radius:4px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#f87171;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;line-height:1.6;">{{ expertise.get_rank_display }}</span>
+          {% endif %}
         </div>
+      </div>
+      {% if expertise.specialization_notes %}
+      <div style="margin-bottom:.6rem;">
+        <div style="color:#555;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;">Specializations</div>
+        <p style="color:#aaa;font-size:.82rem;line-height:1.5;margin:0;">{{ expertise.specialization_notes }}</p>
+      </div>
+      {% endif %}
+      {% if expertise.custom_hourly_rate %}
+      <div style="color:#dc2626;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;">${{ expertise.custom_hourly_rate }}/hr for this game</div>
+      {% endif %}
     </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if packages %}
+<div class="g-card">
+  <h2 class="g-card-title">Coaching Packages</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
+    {% for package in packages %}
+    <div class="g-inner-card" style="display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.5rem;">
+        <div style="color:#fff;font-weight:600;font-size:.95rem;">{{ package.name }}</div>
+        <div class="g-pkg-price">${{ package.total_price }}</div>
+      </div>
+      <p style="color:#777;font-size:.85rem;line-height:1.5;flex:1;margin-bottom:.75rem;">{{ package.description }}</p>
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;color:#555;margin-bottom:.85rem;">
+        <span>{{ package.number_of_sessions }} sessions</span>
+        <span>Valid {{ package.valid_for_days }} days</span>
+      </div>
+      <a href="{% url 'coaching:purchase_package' pk=package.pk %}" class="g-pkg-btn">Purchase Package</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if reviews %}
+<div class="g-card">
+  <h2 class="g-card-title">Student Reviews</h2>
+  {% for review in reviews %}
+  <div class="g-review-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;">
+        <div class="g-review-avatar">{{ review.student.get_display_name|first|upper }}</div>
+        <div>
+          <div style="color:#fff;font-size:.9rem;font-weight:600;">{{ review.student.get_display_name }}</div>
+          <div style="color:#555;font-size:.75rem;">{{ review.created_at|date:"M d, Y" }}</div>
+        </div>
+      </div>
+      <div class="cd-stars">
+        {% for i in "12345" %}
+        {% if forloop.counter <= review.rating %}
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;font-size:14px;text-transform:none;letter-spacing:0;">star</span>
+        {% else %}
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;font-size:14px;text-transform:none;letter-spacing:0;">star</span>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    <p style="color:#aaa;font-size:.88rem;line-height:1.6;">{{ review.comment }}</p>
+    {% if review.session.game %}
+    <div style="color:#555;font-size:.78rem;margin-top:.4rem;">Game: {{ review.session.game.name }}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+</div>
+
+<!-- Sidebar -->
+<div>
+
+<div class="g-sidebar-card">
+  <div class="g-sidebar-title">Coach Stats</div>
+  <div class="g-stat-row"><span style="color:#666;font-size:.85rem;">Experience</span><span style="color:#fff;font-size:.85rem;">{{ coach.get_experience_level_display }}</span></div>
+  <div class="g-stat-row"><span style="color:#666;font-size:.85rem;">Response Time</span><span style="color:#fff;font-size:.85rem;">{{ coach.response_time_hours }}h avg</span></div>
+  <div class="g-stat-row"><span style="color:#666;font-size:.85rem;">Languages</span><span style="color:#fff;font-size:.85rem;">{{ coach.languages|default:"English" }}</span></div>
+  <div class="g-stat-row"><span style="color:#666;font-size:.85rem;">Timezone</span><span style="color:#fff;font-size:.85rem;">{{ coach.timezone|default:"UTC" }}</span></div>
+</div>
+
+{% if availability %}
+<div class="g-sidebar-card">
+  <div class="g-sidebar-title">Weekly Availability</div>
+  {% for avail in availability %}
+  <div class="g-avail-row">
+    <span style="color:#666;font-size:.82rem;">{{ avail.get_weekday_display }}</span>
+    <span style="color:#fff;font-size:.82rem;">{{ avail.start_time|time:"g:i A" }} - {{ avail.end_time|time:"g:i A" }}</span>
+  </div>
+  {% endfor %}
+  <div style="color:#444;font-size:.72rem;margin-top:.6rem;">Times in coach timezone</div>
+</div>
+{% endif %}
+
+<div class="g-sidebar-card">
+  <div class="g-sidebar-title">Platform</div>
+  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;">
+    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:20px;color:#dc2626;text-transform:none;letter-spacing:0;">videocam</span>
+    <span style="color:#fff;font-size:.9rem;">{{ coach.get_platform_display }}</span>
+  </div>
+  {% if coach.platform_username %}
+  <div style="color:#555;font-size:.8rem;">Username: {{ coach.platform_username }}</div>
+  {% endif %}
+</div>
+
+<div class="g-sidebar-card" style="padding:1rem;">
+  <button class="g-report-btn">
+    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:16px;text-transform:none;letter-spacing:0;">flag</span>
+    Report Coach
+  </button>
+</div>
+
+</div>
+</div>
+</div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Copy profile link functionality
-    const shareButton = document.querySelector('[data-action="share"]');
-    if (shareButton) {
-        shareButton.addEventListener('click', function() {
-            navigator.clipboard.writeText(window.location.href).then(function() {
-                // Show success message
-                const message = document.createElement('div');
-                message.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg z-50';
-                message.textContent = 'Profile link copied!';
-                document.body.appendChild(message);
-                
-                setTimeout(() => {
-                    message.remove();
-                }, 3000);
-            });
-        });
-    }
+  var shareButton = document.querySelector('[data-action="share"]');
+  if (shareButton) {
+    shareButton.addEventListener('click', function() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'position:fixed;top:1rem;right:1rem;background:#dc2626;color:#fff;padding:.5rem 1rem;border-radius:6px;z-index:9999;font-size:.85rem;';
+        msg.textContent = 'Profile link copied!';
+        document.body.appendChild(msg);
+        setTimeout(function(){ msg.remove(); }, 3000);
+      });
+    });
+  }
 });
 </script>
 {% endblock %}

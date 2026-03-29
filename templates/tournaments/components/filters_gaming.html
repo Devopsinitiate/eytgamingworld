@@ -152,4 +152,31 @@ document.querySelectorAll('.gaming-select').forEach(select => {
         document.getElementById('filter-form').submit();
     });
 });
+
+// Submit on Enter key in search input
+(function() {
+    var searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    // Submit on Enter
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('filter-form').submit();
+        }
+    });
+
+    // Debounced auto-submit while typing (500ms)
+    var debounceTimer;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        var val = this.value;
+        debounceTimer = setTimeout(function() {
+            // Only auto-submit if 3+ chars or field was cleared
+            if (val.length >= 3 || val.length === 0) {
+                document.getElementById('filter-form').submit();
+            }
+        }, 500);
+    });
+}());
 </script>

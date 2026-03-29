@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Terms of Service — EYTGaming{% endblock %}
+{% block extra_css %}
+<style>
+.legal-page{background:#080808;min-height:100vh;color:#e5e7eb;}
+.legal-hero{position:relative;padding:6rem 0 4rem;text-align:center;overflow:hidden;}
+.legal-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(185,28,28,.18) 0%,transparent 65%);pointer-events:none;}
+.legal-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(185,28,28,.35),transparent);}
+.legal-tag{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 1rem;border-radius:9999px;background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.35);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#f87171;margin-bottom:1.5rem;}
+.legal-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(3rem,7vw,5.5rem);line-height:.95;color:#fff;letter-spacing:.02em;margin-bottom:1rem;}
+.legal-title span{color:#dc2626;text-shadow:0 0 30px rgba(220,38,38,.4);}
+.legal-meta{color:#6b7280;font-size:.875rem;}
+.legal-body{max-width:800px;margin:0 auto;padding:4rem 24px 6rem;}
+.legal-section{margin-bottom:2.5rem;}
+.legal-h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:1.35rem;letter-spacing:.06em;color:#fff;margin:0 0 .75rem;padding-bottom:.5rem;border-bottom:1px solid #1f1f1f;display:flex;align-items:center;gap:.5rem;}
+.legal-h2::before{content:'';width:3px;height:1.2em;background:#dc2626;border-radius:2px;flex-shrink:0;}
+.legal-p{color:#9ca3af;line-height:1.8;font-size:.9375rem;margin:0 0 .75rem;}
+.legal-ul{color:#9ca3af;line-height:1.8;font-size:.9375rem;padding-left:1.25rem;margin:0 0 .75rem;}
+.legal-ul li{margin-bottom:.35rem;}
+.legal-ul li::marker{color:#dc2626;}
+.legal-highlight{background:rgba(185,28,28,.08);border:1px solid rgba(185,28,28,.2);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.5rem;}
+.legal-highlight p{color:#fca5a5;font-size:.875rem;margin:0;}
+.legal-contact{background:#111;border:1px solid #1f1f1f;border-top:3px solid #dc2626;border-radius:10px;padding:1.5rem;margin-top:2rem;}
+.legal-contact p{color:#9ca3af;font-size:.9rem;margin:0 0 .5rem;}
+.legal-contact a{color:#dc2626;text-decoration:none;}
+.legal-contact a:hover{text-decoration:underline;}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="legal-page">
+
+  <!-- Hero -->
+  <div class="legal-hero">
+    <div style="max-width:900px;margin:0 auto;padding:0 24px;">
+      <div class="legal-tag">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:14px;line-height:1;text-transform:none;letter-spacing:0;">gavel</span>
+        Legal
+      </div>
+      <h1 class="legal-title">Terms of <span>Service</span></h1>
+      <p class="legal-meta">Last updated: March 2026 &nbsp;·&nbsp; Effective: March 1, 2026</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="legal-body">
+
+    <div class="legal-highlight">
+      <p>By accessing or using EYTGaming, you agree to be bound by these Terms of Service. Please read them carefully. If you do not agree, do not use the platform.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">1. Acceptance of Terms</h2>
+      <p class="legal-p">These Terms of Service ("Terms") govern your access to and use of the EYTGaming platform, including our website, mobile applications, and all related services (collectively, the "Platform"). By creating an account or using the Platform, you confirm that you are at least 13 years old and agree to these Terms.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">2. Account Registration</h2>
+      <p class="legal-p">To access most features, you must create an account. You agree to:</p>
+      <ul class="legal-ul">
+        <li>Provide accurate, current, and complete information during registration</li>
+        <li>Maintain the security of your password and account credentials</li>
+        <li>Notify us immediately of any unauthorised access to your account</li>
+        <li>Be responsible for all activity that occurs under your account</li>
+        <li>Not create multiple accounts or impersonate other users</li>
+      </ul>
+      <p class="legal-p">Users aged 13–17 must have parental or guardian consent. We reserve the right to suspend or terminate accounts that violate these Terms.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">3. Tournament Rules</h2>
+      <p class="legal-p">When participating in tournaments on EYTGaming:</p>
+      <ul class="legal-ul">
+        <li>You must comply with the specific rules set by each tournament organizer</li>
+        <li>Cheating, exploiting bugs, or using unauthorised software is strictly prohibited</li>
+        <li>Match results must be reported honestly; disputes must be raised within 24 hours</li>
+        <li>Registration fees are non-refundable unless a tournament is cancelled by the organizer</li>
+        <li>Prize distributions are subject to verification and may be withheld pending investigation of rule violations</li>
+        <li>EYTGaming reserves the right to disqualify participants for conduct violations</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">4. Coaching Services</h2>
+      <p class="legal-p">EYTGaming facilitates connections between coaches and students. By using coaching services:</p>
+      <ul class="legal-ul">
+        <li>Coaches are independent contractors, not employees of EYTGaming</li>
+        <li>Session payments are processed via Paystack and are subject to our refund policy</li>
+        <li>Cancellations must be made at least 24 hours before the scheduled session for a refund</li>
+        <li>EYTGaming is not liable for the quality or outcome of coaching sessions</li>
+        <li>Coaches must maintain accurate availability and honour confirmed bookings</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">5. Payments & Refunds</h2>
+      <p class="legal-p">All payments on EYTGaming are processed securely via Paystack. By making a payment, you agree to Paystack's terms of service. Our refund policy:</p>
+      <ul class="legal-ul">
+        <li>Tournament registration fees: non-refundable unless the tournament is cancelled</li>
+        <li>Coaching sessions: refundable if cancelled 24+ hours before the session start time</li>
+        <li>Store purchases: subject to our returns policy at the time of purchase</li>
+        <li>Disputed charges must be raised within 30 days of the transaction</li>
+      </ul>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">6. Acceptable Use</h2>
+      <p class="legal-p">You agree not to use EYTGaming to:</p>
+      <ul class="legal-ul">
+        <li>Harass, threaten, or abuse other users</li>
+        <li>Post or transmit offensive, defamatory, or illegal content</li>
+        <li>Attempt to gain unauthorised access to any part of the Platform</li>
+        <li>Use automated tools to scrape, crawl, or extract data without permission</li>
+        <li>Engage in match-fixing, collusion, or any form of competitive manipulation</li>
+        <li>Sell, transfer, or share your account with others</li>
+        <li>Violate any applicable laws or regulations</li>
+      </ul>
+      <p class="legal-p">Violations may result in immediate account suspension or permanent ban without refund.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">7. Intellectual Property</h2>
+      <p class="legal-p">All content on EYTGaming — including logos, graphics, software, and text — is owned by EYTGaming or its licensors and is protected by copyright and trademark law. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+      <p class="legal-p">By submitting content (profile images, reviews, etc.) to the Platform, you grant EYTGaming a non-exclusive, royalty-free licence to use, display, and distribute that content in connection with the Platform.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">8. Limitation of Liability</h2>
+      <p class="legal-p">EYTGaming is provided "as is" without warranties of any kind. To the maximum extent permitted by law, EYTGaming shall not be liable for:</p>
+      <ul class="legal-ul">
+        <li>Indirect, incidental, or consequential damages</li>
+        <li>Loss of data, profits, or gaming progress</li>
+        <li>Service interruptions or technical failures</li>
+        <li>Actions of third-party coaches, organizers, or other users</li>
+      </ul>
+      <p class="legal-p">Our total liability to you for any claim shall not exceed the amount you paid to EYTGaming in the 12 months preceding the claim.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">9. Termination</h2>
+      <p class="legal-p">You may delete your account at any time via Settings → Delete Account. EYTGaming may suspend or terminate your account at any time for violations of these Terms, with or without notice. Upon termination, your right to use the Platform ceases immediately.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">10. Changes to Terms</h2>
+      <p class="legal-p">We may update these Terms from time to time. We will notify you of material changes via email or in-platform notification at least 14 days before they take effect. Continued use of the Platform after changes constitutes acceptance of the updated Terms.</p>
+    </div>
+
+    <div class="legal-section">
+      <h2 class="legal-h2">11. Governing Law</h2>
+      <p class="legal-p">These Terms are governed by the laws of Nigeria. Any disputes arising from these Terms or your use of EYTGaming shall be subject to the exclusive jurisdiction of the courts of Nigeria.</p>
+    </div>
+
+    <div class="legal-contact">
+      <p><strong style="color:#fff;">Questions about these Terms?</strong></p>
+      <p>Contact us at <a href="mailto:legal@eytgaming.com">legal@eytgaming.com</a> or visit our <a href="{% url 'about' %}">About page</a>.</p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

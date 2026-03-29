@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Ripple Effect Test</title>
+    <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+    <style>
+        body {
+            background-color: #0A0A0A;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            color: #DC2626;
+            font-family: 'Barlow Condensed', sans-serif;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gaming Ripple Effect Test</h1>
+    
+    <div class="button-container">
+        <button class="gaming-btn-primary">Primary Button</button>
+        <button class="gaming-btn-ghost">Ghost Button</button>
+        <button class="gaming-btn-action">Action Button</button>
+    </div>
+    
+    <div class="button-container">
+        <button class="gaming-btn-primary" style="width: 200px;">Wide Button</button>
+        <button class="gaming-btn-primary" style="padding: 20px 40px;">Large Button</button>
+    </div>
+    
+    <p style="color: #9da6b9; font-family: 'Barlow Condensed', sans-serif; text-align: center; max-width: 600px;">
+        Click any button to see the ripple effect animation. The ripple should appear at the exact position where you click.
+    </p>
+
+    <script src="gaming-ripple-effect.js"></script>
+</body>
+</html>

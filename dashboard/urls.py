@@ -12,6 +12,7 @@ urlpatterns = [
     # Profile URLs - order matters! More specific patterns first
     path('profile/edit/', views.profile_edit, name='profile_edit'),
     path('profile/export/', views.profile_export, name='profile_export'),
+    path('profile/export/pdf/', views.profile_export_pdf, name='profile_export_pdf'),
     path('profile/<str:username>/report/', views.user_report, name='user_report'),
     path('profile/<str:username>/', views.profile_view, name='profile_view'),
     

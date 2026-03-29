@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Optimizations Test</title>
+    <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+    <style>
+        body {
+            background: #0A0A0A;
+            color: white;
+            font-family: 'Barlow Condensed', sans-serif;
+            padding: 2rem;
+        }
+        .test-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(31, 41, 55, 0.6);
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            border-radius: 0.5rem;
+        }
+        .test-section h2 {
+            color: #DC2626;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .test-result {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.25rem;
+        }
+        .test-result.pass {
+            border-left: 4px solid #10B981;
+        }
+        .test-result.fail {
+            border-left: 4px solid #DC2626;
+        }
+        .spacer {
+            height: 150vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B7280;
+        }
+        .avatar-test {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0.5rem;
+        }
+        .glow-test-element {
+            padding: 1rem;
+            margin: 1rem 0;
+            background: rgba(220, 38, 38, 0.2);
+            border: 2px solid #DC2626;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Performance Optimizations Test Suite</h1>
+    <p>Testing lazy loading, debouncing, and viewport-based glow effects</p>
+
+    <!-- Test 1: Debounced Search -->
+    <div class="test-section">
+        <h2>Test 1: Debounced Search (300ms delay)</h2>
+        <p>Type in the search box. The search should only execute 300ms after you stop typing.</p>
+        
+        <input type="text" id="search-input" placeholder="Search participants..." 
+               style="width: 100%; padding: 0.75rem; background: rgba(31, 31, 31, 0.8); 
+                      border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 0.5rem; 
+                      color: white; margin: 1rem 0;">
+        
+        <div id="search-results">
+            <div class="test-result">
+                <strong>Search execution count:</strong> <span id="search-count">0</span>
+            </div>
+            <div class="test-result">
+                <strong>Last search term:</strong> <span id="last-search">-</span>
+            </div>
+            <div class="test-result">
+                <strong>Time since last keystroke:</strong> <span id="time-since-keystroke">-</span>
+            </div>
+        </div>
+
+        <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+            <tbody>
+                <tr style="border-bottom: 1px solid rgba(220, 38, 38, 0.1);">
+                    <td style="padding: 1rem;">Alice Johnson</td>
+                    <td style="padding: 1rem;">Team Alpha</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(220, 38, 38, 0.1);">
+                    <td style="padding: 1rem;">Bob Smith</td>
+                    <td style="padding: 1rem;">Team Beta</td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(220, 38, 38, 0.1);">
+                    <td style="padding: 1rem;">Charlie Brown</td>
+                    <td style="padding: 1rem;">Team Gamma</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Test 2: Lazy Loading Avatars -->
+    <div class="test-section">
+        <h2>Test 2: Lazy Loading Avatars</h2>
+        <p>Avatar images below should have loading="lazy" attribute and show shimmer effect while loading.</p>
+        
+        <div id="lazy-load-results">
+            <div class="test-result">
+                <strong>Images with loading="lazy":</strong> <span id="lazy-count">0</span>
+            </div>
+            <div class="test-result">
+                <strong>Images with shimmer effect:</strong> <span id="shimmer-count">0</span>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap;">
+            <img src="https://i.pravatar.cc/150?img=1" alt="Avatar 1" class="avatar-test">
+            <img src="https://i.pravatar.cc/150?img=2" alt="Avatar 2" class="avatar-test">
+            <img src="https://i.pravatar.cc/150?img=3" alt="Avatar 3" class="avatar-test">
+            <img src="https://i.pravatar.cc/150?img=4" alt="Avatar 4" class="avatar-test">
+        </div>
+    </div>
+
+    <!-- Test 3: Viewport-Based Glow Effects -->
+    <div class="test-section">
+        <h2>Test 3: Viewport-Based Glow Effects</h2>
+        <p>Scroll down to see glow effects being disabled/enabled based on viewport visibility.</p>
+        
+        <div id="glow-results">
+            <div class="test-result">
+                <strong>Elements with glow-enabled:</strong> <span id="glow-enabled-count">0</span>
+            </div>
+            <div class="test-result">
+                <strong>Elements with glow-disabled:</strong> <span id="glow-disabled-count">0</span>
+            </div>
+        </div>
+
+        <div class="glow-test-element gaming-stat-card">
+            Element 1 - Should have glow when visible
+        </div>
+    </div>
+
+    <div class="spacer">
+        ↓ Scroll down to test viewport-based glow optimization ↓
+    </div>
+
+    <div class="test-section">
+        <div class="glow-test-element gaming-stat-card">
+            Element 2 - Should have glow when visible (scroll to see)
+        </div>
+    </div>
+
+    <div class="spacer">
+        ↓ Keep scrolling ↓
+    </div>
+
+    <div class="test-section">
+        <div class="glow-test-element gaming-stat-card">
+            Element 3 - Should have glow when visible (scroll to see)
+        </div>
+    </div>
+
+    <div class="spacer">
+        ↑ Scroll back up to see glows being disabled ↑
+    </div>
+
+    <!-- Test Results Summary -->
+    <div class="test-section" style="position: sticky; bottom: 0; background: rgba(31, 41, 55, 0.95);">
+        <h2>Test Results Summary</h2>
+        <div id="test-summary"></div>
+    </div>
+
+    <script src="./manage-participant-performance.js"></script>
+    <script>
+        // Test monitoring script
+        let searchExecutionCount = 0;
+        let lastKeystrokeTime = null;
+
+        // Override the search function to track executions
+        const originalSearch = document.getElementById('search-input');
+        if (originalSearch) {
+            // Monitor search executions
+            const observer = new MutationObserver(() => {
+                const rows = document.querySelectorAll('tbody tr');
+                let visibleCount = 0;
+                rows.forEach(row => {
+                    if (row.style.display !== 'none') visibleCount++;
+                });
+                
+                if (lastKeystrokeTime) {
+                    const timeSince = Date.now() - lastKeystrokeTime;
+                    document.getElementById('time-since-keystroke').textContent = timeSince + 'ms';
+                }
+            });
+
+            originalSearch.addEventListener('input', (e) => {
+                lastKeystrokeTime = Date.now();
+                searchExecutionCount++;
+                document.getElementById('search-count').textContent = searchExecutionCount;
+                document.getElementById('last-search').textContent = e.target.value || '(empty)';
+            });
+        }
+
+        // Test lazy loading
+        function testLazyLoading() {
+            const images = document.querySelectorAll('.avatar-test');
+            let lazyCount = 0;
+            let shimmerCount = 0;
+
+            images.forEach(img => {
+                if (img.getAttribute('loading') === 'lazy') {
+                    lazyCount++;
+                }
+                if (img.classList.contains('avatar-loading')) {
+                    shimmerCount++;
+                }
+            });
+
+            document.getElementById('lazy-count').textContent = lazyCount;
+            document.getElementById('shimmer-count').textContent = shimmerCount;
+
+            return {
+                lazyCount,
+                shimmerCount,
+                totalImages: images.length
+            };
+        }
+
+        // Test viewport-based glow
+        function testViewportGlow() {
+            const glowElements = document.querySelectorAll('.glow-test-element');
+            let enabledCount = 0;
+            let disabledCount = 0;
+
+            glowElements.forEach(el => {
+                if (el.classList.contains('glow-enabled')) {
+                    enabledCount++;
+                }
+                if (el.classList.contains('glow-disabled')) {
+                    disabledCount++;
+                }
+            });
+
+            document.getElementById('glow-enabled-count').textContent = enabledCount;
+            document.getElementById('glow-disabled-count').textContent = disabledCount;
+
+            return {
+                enabledCount,
+                disabledCount,
+                totalElements: glowElements.length
+            };
+        }
+
+        // Update test summary
+        function updateTestSummary() {
+            const lazyResults = testLazyLoading();
+            const glowResults = testViewportGlow();
+
+            const summary = document.getElementById('test-summary');
+            summary.innerHTML = `
+                <div class="test-result ${lazyResults.lazyCount === lazyResults.totalImages ? 'pass' : 'fail'}">
+                    <strong>Lazy Loading:</strong> ${lazyResults.lazyCount}/${lazyResults.totalImages} images have loading="lazy"
+                </div>
+                <div class="test-result ${glowResults.enabledCount > 0 || glowResults.disabledCount > 0 ? 'pass' : 'fail'}">
+                    <strong>Viewport Glow:</strong> ${glowResults.enabledCount} enabled, ${glowResults.disabledCount} disabled
+                </div>
+                <div class="test-result ${searchExecutionCount > 0 ? 'pass' : 'fail'}">
+                    <strong>Debounced Search:</strong> ${searchExecutionCount} executions (should be less than keystrokes)
+                </div>
+            `;
+        }
+
+        // Run tests periodically
+        setInterval(updateTestSummary, 1000);
+
+        // Initial test run
+        setTimeout(() => {
+            updateTestSummary();
+            console.log('Performance optimization tests initialized');
+        }, 1000);
+    </script>
+</body>
+</html>

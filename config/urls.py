@@ -5,7 +5,9 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
+from django.contrib.sitemaps.views import sitemap
 from core.views import LandingPageView
+from core.sitemaps import sitemaps
 import os
 
 # Service Worker view for performance optimization
@@ -20,10 +22,39 @@ def service_worker(request):
     except FileNotFoundError:
         return HttpResponse('// Service worker not found', content_type='application/javascript', status=404)
 
+def robots_txt(request):
+    """Serve robots.txt dynamically so we can gate crawlers in DEBUG mode."""
+    if settings.DEBUG:
+        content = "User-agent: *\nDisallow: /\n"
+    else:
+        content = (
+            "User-agent: *\n"
+            "Disallow: /admin/\n"
+            "Disallow: /accounts/\n"
+            "Disallow: /dashboard/\n"
+            "Disallow: /payments/\n"
+            "Disallow: /notifications/\n"
+            "Disallow: /store/cart/\n"
+            "Disallow: /store/checkout/\n"
+            "Disallow: /store/wishlist/\n"
+            f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}\n"
+        )
+    return HttpResponse(content, content_type='text/plain')
+
+
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
     
+    # About page - public, no auth required
+    path('about/', TemplateView.as_view(template_name='about.html'), name='about'),
+    path('privacy/', TemplateView.as_view(template_name='privacy.html'), name='privacy'),
+    path('terms/', TemplateView.as_view(template_name='terms.html'), name='terms'),
+    
+    # SEO
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots.txt', robots_txt, name='robots_txt'),
+
     # Service Worker for performance optimization
     path('sw.js', service_worker, name='service_worker'),
     

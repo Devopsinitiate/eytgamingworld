@@ -1,373 +1,494 @@
 {% extends "layouts/dashboard_base.html" %}
+{% load static %}
 
 {% block title %}Create Team - EYTGaming{% endblock %}
 
-{% block content %}
-<div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="mb-6 md:mb-8">
-        <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Create Your Team</h1>
-        <p class="text-gray-400 text-sm md:text-base">Build your competitive gaming team and start competing</p>
-    </div>
-
-    <!-- Form -->
-    <form method="post" enctype="multipart/form-data" class="space-y-6" aria-label="Create team form">
-        {% csrf_token %}
-        
-        <!-- Display form errors -->
-        {% if form.non_field_errors %}
-        <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4" role="alert" aria-live="assertive">
-            <div class="flex items-start gap-3">
-                <span class="material-symbols-outlined text-red-500" aria-hidden="true">error</span>
-                <div class="flex-1">
-                    <h3 class="text-red-500 font-medium mb-1">Form Errors</h3>
-                    {% for error in form.non_field_errors %}
-                    <p class="text-red-400 text-sm">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Basic Information -->
-        <fieldset class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <legend class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true">info</span>
-                Basic Information
-            </legend>
-            
-            <div class="space-y-4">
-                <!-- Team Name -->
-                <div>
-                    <label for="{{ form.name.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.name.label }} <span class="text-red-500" aria-label="required">*</span>
-                    </label>
-                    {{ form.name }}
-                    {% if form.name.help_text %}
-                    <p class="text-gray-500 text-sm mt-1" id="{{ form.name.id_for_label }}-help">{{ form.name.help_text }}</p>
-                    {% endif %}
-                    {% if form.name.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert" id="{{ form.name.id_for_label }}-error">{{ form.name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Team Tag -->
-                <div>
-                    <label for="{{ form.tag.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.tag.label }} <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.tag }}
-                    {% if form.tag.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.tag.help_text }}</p>
-                    {% endif %}
-                    {% if form.tag.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.tag.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Game -->
-                <div>
-                    <label for="{{ form.game.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.game.label }} <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.game }}
-                    {% if form.game.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.game.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Description -->
-                <div>
-                    <label for="{{ form.description.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.description.label }}
-                    </label>
-                    {{ form.description }}
-                    {% if form.description.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.description.help_text }}</p>
-                    {% endif %}
-                    {% if form.description.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert">{{ form.description.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </fieldset>
-
-        <!-- Team Images -->
-        <fieldset class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <legend class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true">image</span>
-                Team Images
-            </legend>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Logo Upload -->
-                <div>
-                    <label for="{{ form.logo.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.logo.label }}
-                    </label>
-                    <div class="relative">
-                        <div id="logo-preview" 
-                             class="w-full h-48 bg-background-dark border-2 border-dashed border-card-border-dark rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors focus-within:ring-2 focus-within:ring-primary/50"
-                             role="button"
-                             tabindex="0"
-                             aria-label="Upload team logo">
-                            <div class="text-center">
-                                <span class="material-symbols-outlined text-gray-500 text-5xl mb-2" aria-hidden="true">upload</span>
-                                <p class="text-gray-400 text-sm">Click to upload logo</p>
-                                <p class="text-gray-500 text-xs mt-1">Square image recommended</p>
-                            </div>
-                        </div>
-                        {{ form.logo }}
-                    </div>
-                    {% if form.logo.help_text %}
-                    <p class="text-gray-500 text-sm mt-1" id="{{ form.logo.id_for_label }}-help">{{ form.logo.help_text }}</p>
-                    {% endif %}
-                    {% if form.logo.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert" id="{{ form.logo.id_for_label }}-error">{{ form.logo.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Banner Upload -->
-                <div>
-                    <label class="block text-gray-300 font-medium mb-2">
-                        {{ form.banner.label }}
-                    </label>
-                    <div class="relative">
-                        <div id="banner-preview" class="w-full h-48 bg-background-dark border-2 border-dashed border-card-border-dark rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
-                            <div class="text-center">
-                                <span class="material-symbols-outlined text-gray-500 text-5xl mb-2">upload</span>
-                                <p class="text-gray-400 text-sm">Click to upload banner</p>
-                                <p class="text-gray-500 text-xs mt-1">Wide image recommended</p>
-                            </div>
-                        </div>
-                        {{ form.banner }}
-                    </div>
-                    {% if form.banner.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.banner.help_text }}</p>
-                    {% endif %}
-                    {% if form.banner.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.banner.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </fieldset>
-
-        <!-- Team Settings -->
-        <fieldset class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <legend class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true">settings</span>
-                Team Settings
-            </legend>
-            
-            <div class="space-y-4">
-                <!-- Max Members -->
-                <div>
-                    <label for="{{ form.max_members.id_for_label }}" class="block text-gray-300 font-medium mb-2">
-                        {{ form.max_members.label }}
-                    </label>
-                    {{ form.max_members }}
-                    {% if form.max_members.help_text %}
-                    <p class="text-gray-500 text-sm mt-1">{{ form.max_members.help_text }}</p>
-                    {% endif %}
-                    {% if form.max_members.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.max_members.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Checkboxes -->
-                <div class="space-y-3" role="group" aria-label="Team visibility and recruitment settings">
-                    <!-- Requires Approval -->
-                    <div class="flex items-start gap-3">
-                        {{ form.requires_approval }}
-                        <div class="flex-1">
-                            <label for="{{ form.requires_approval.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
-                                {{ form.requires_approval.label }}
-                            </label>
-                            <p class="text-gray-500 text-sm" id="{{ form.requires_approval.id_for_label }}-help">Applications must be approved by captain or co-captain</p>
-                        </div>
-                    </div>
-
-                    <!-- Is Recruiting -->
-                    <div class="flex items-start gap-3">
-                        {{ form.is_recruiting }}
-                        <div class="flex-1">
-                            <label for="{{ form.is_recruiting.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
-                                {{ form.is_recruiting.label }}
-                            </label>
-                            <p class="text-gray-500 text-sm" id="{{ form.is_recruiting.id_for_label }}-help">Show recruiting badge and allow applications</p>
-                        </div>
-                    </div>
-
-                    <!-- Is Public -->
-                    <div class="flex items-start gap-3">
-                        {{ form.is_public }}
-                        <div class="flex-1">
-                            <label for="{{ form.is_public.id_for_label }}" class="text-gray-300 font-medium cursor-pointer">
-                                {{ form.is_public.label }}
-                            </label>
-                            <p class="text-gray-500 text-sm" id="{{ form.is_public.id_for_label }}-help">Team will be visible in public listings</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-
-        <!-- Social Links -->
-        <fieldset class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <legend class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined" aria-hidden="true">link</span>
-                Social Links
-            </legend>
-            
-            <div class="space-y-4">
-                <!-- Discord -->
-                <div>
-                    <label for="{{ form.discord_server.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm" aria-hidden="true">forum</span>
-                        {{ form.discord_server.label }}
-                    </label>
-                    {{ form.discord_server }}
-                    {% if form.discord_server.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert">{{ form.discord_server.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Twitter -->
-                <div>
-                    <label for="{{ form.twitter_url.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm" aria-hidden="true">tag</span>
-                        {{ form.twitter_url.label }}
-                    </label>
-                    {{ form.twitter_url }}
-                    {% if form.twitter_url.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert">{{ form.twitter_url.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Twitch -->
-                <div>
-                    <label for="{{ form.twitch_url.id_for_label }}" class="block text-gray-300 font-medium mb-2 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm" aria-hidden="true">videocam</span>
-                        {{ form.twitch_url.label }}
-                    </label>
-                    {{ form.twitch_url }}
-                    {% if form.twitch_url.errors %}
-                    <p class="text-red-400 text-sm mt-1" role="alert">{{ form.twitch_url.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </fieldset>
-
-        <!-- Form Actions -->
-        <div class="flex flex-col sm:flex-row items-center justify-end gap-3 md:gap-4">
-            <a href="{% url 'teams:list' %}" 
-               class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
-               aria-label="Cancel and return to teams list">
-                Cancel
-            </a>
-            <button type="submit" 
-                    class="w-full sm:w-auto px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
-                    aria-label="Create team">
-                <span class="material-symbols-outlined" aria-hidden="true">add</span>
-                Create Team
-            </button>
-        </div>
-    </form>
-</div>
+{% block extra_css %}
+<style>
+  .tc-card {
+    background: rgba(17,17,17,0.95);
+    border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 16px;
+    box-shadow: 0 0 40px rgba(220,38,38,0.06), 0 16px 48px rgba(0,0,0,0.5);
+  }
+  .tc-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: #DC2626;
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(220,38,38,0.15);
+    margin-bottom: 1.25rem;
+  }
+  .tc-section-title span {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1.1rem; line-height: 1;
+    text-transform: none; letter-spacing: 0;
+  }
+  .tc-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: #888; margin-bottom: 6px; display: block;
+  }
+  .tc-input {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9375rem;
+    height: 46px;
+    padding: 0 1rem 0 2.75rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Spline Sans', sans-serif;
+    box-sizing: border-box;
+  }
+  .tc-input:focus {
+    border-color: rgba(220,38,38,0.6);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+  .tc-input::placeholder { color: #444; }
+  .tc-input-no-icon {
+    padding-left: 1rem;
+  }
+  .tc-textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9375rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Spline Sans', sans-serif;
+    resize: vertical; min-height: 100px;
+    box-sizing: border-box;
+  }
+  .tc-textarea:focus {
+    border-color: rgba(220,38,38,0.6);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+  .tc-textarea::placeholder { color: #444; }
+  .tc-select {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9375rem;
+    height: 46px;
+    padding: 0 1rem 0 2.75rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Spline Sans', sans-serif;
+    box-sizing: border-box;
+    appearance: none;
+    cursor: pointer;
+  }
+  .tc-select:focus {
+    border-color: rgba(220,38,38,0.6);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+  .tc-select option { background: #111; color: #fff; }
+  .tc-input-icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1.1rem; color: #555; pointer-events: none;
+    text-transform: none; letter-spacing: 0; line-height: 1;
+  }
+  .tc-select-arrow {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1rem; color: #555; pointer-events: none;
+    text-transform: none; letter-spacing: 0; line-height: 1;
+  }
+  .tc-error {
+    color: #f87171; font-size: 0.75rem; margin-top: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .tc-error-icon {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 0.85rem; line-height: 1;
+    text-transform: none; letter-spacing: 0; flex-shrink: 0;
+  }
+  .tc-help { color: #555; font-size: 0.75rem; margin-top: 4px; }
+  .tc-upload-zone {
+    width: 100%; height: 160px;
+    background: rgba(0,0,0,0.3);
+    border: 2px dashed rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    overflow: hidden;
+  }
+  .tc-upload-zone:hover {
+    border-color: rgba(220,38,38,0.5);
+    background: rgba(220,38,38,0.04);
+  }
+  .tc-upload-icon {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 2.5rem; line-height: 1;
+    text-transform: none; letter-spacing: 0;
+    color: #444; margin-bottom: 8px;
+  }
+  .tc-toggle-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+  }
+  .tc-toggle-row input[type="checkbox"] {
+    width: 16px; height: 16px; margin-top: 2px;
+    accent-color: #DC2626; cursor: pointer; flex-shrink: 0;
+  }
+  .tc-toggle-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.875rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: #ccc; cursor: pointer;
+  }
+  .tc-toggle-desc { color: #555; font-size: 0.75rem; margin-top: 2px; }
+  .tc-btn-primary {
+    height: 48px; padding: 0 2rem;
+    background: linear-gradient(135deg, #DC2626, #b91c1c);
+    border: 1px solid rgba(220,38,38,0.5);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(220,38,38,0.25);
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tc-btn-primary:hover {
+    background: linear-gradient(135deg, #ef4444, #DC2626);
+    box-shadow: 0 0 30px rgba(220,38,38,0.4);
+    transform: translateY(-1px);
+  }
+  .tc-btn-primary span {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1.1rem; line-height: 1;
+    text-transform: none; letter-spacing: 0;
+  }
+  .tc-btn-cancel {
+    height: 48px; padding: 0 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #888;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none;
+  }
+  .tc-btn-cancel:hover {
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.18);
+    color: #ccc;
+  }
+  .tc-btn-cancel span {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1.1rem; line-height: 1;
+    text-transform: none; letter-spacing: 0;
+  }
+  .tc-non-field-error {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 16px; border-radius: 10px;
+    background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3);
+    color: #fca5a5; font-size: 0.875rem; margin-bottom: 1.5rem;
+  }
+  .tc-non-field-error span {
+    font-family: 'Material Symbols Outlined';
+    font-feature-settings: 'liga' 1;
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    font-size: 1.1rem; line-height: 1;
+    text-transform: none; letter-spacing: 0; flex-shrink: 0; margin-top: 1px;
+  }
+  /* Hide the actual file inputs */
+  #{{ form.logo.id_for_label }},
+  #{{ form.banner.id_for_label }} {
+    display: none;
+  }
+  /* Override any global styles that might break form widgets */
+  .tc-card input[type="text"],
+  .tc-card input[type="url"],
+  .tc-card input[type="number"],
+  .tc-card select,
+  .tc-card textarea {
+    background: rgba(0,0,0,0.4) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    font-family: 'Spline Sans', sans-serif !important;
+  }
+</style>
 {% endblock %}
 
-{% block extra_js %}
+{% block content %}
+<div style="max-width:760px;margin:0 auto;padding-bottom:3rem;">
+
+  <!-- Page Header -->
+  <div style="margin-bottom:2rem;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1.5rem;line-height:1;text-transform:none;letter-spacing:0;color:#DC2626;">shield</span>
+      <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#fff;margin:0;">Create Your Team</h1>
+    </div>
+    <p style="color:#555;font-size:0.875rem;margin:0 0 0 34px;">Build your competitive gaming squad and start dominating</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="tc-non-field-error">
+      <span>error</span>
+      <div>{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+    </div>
+    {% endif %}
+
+    <!-- ── BASIC INFORMATION ── -->
+    <div class="tc-card" style="padding:1.75rem;margin-bottom:1.25rem;">
+      <div class="tc-section-title">
+        <span>info</span>Basic Information
+      </div>
+
+      <!-- Team Name -->
+      <div style="margin-bottom:1rem;">
+        <label class="tc-label" for="{{ form.name.id_for_label }}">Team Name <span style="color:#DC2626;">*</span></label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">shield</span>
+          <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}"
+            class="tc-input" placeholder="Enter your team name" value="{{ form.name.value|default:'' }}" required>
+        </div>
+        {% if form.name.help_text %}<div class="tc-help">{{ form.name.help_text }}</div>{% endif %}
+        {% if form.name.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.name.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Team Tag -->
+      <div style="margin-bottom:1rem;">
+        <label class="tc-label" for="{{ form.tag.id_for_label }}">Team Tag <span style="color:#DC2626;">*</span></label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">tag</span>
+          <input type="text" name="{{ form.tag.html_name }}" id="{{ form.tag.id_for_label }}"
+            class="tc-input" placeholder="e.g. EYT" value="{{ form.tag.value|default:'' }}" required
+            style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        {% if form.tag.help_text %}<div class="tc-help">{{ form.tag.help_text }}</div>{% endif %}
+        {% if form.tag.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.tag.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Game -->
+      <div style="margin-bottom:1rem;">
+        <label class="tc-label" for="{{ form.game.id_for_label }}">Game <span style="color:#DC2626;">*</span></label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">sports_esports</span>
+          {{ form.game }}
+          <span class="tc-select-arrow">expand_more</span>
+        </div>
+        {% if form.game.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.game.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="tc-label" for="{{ form.description.id_for_label }}">Description</label>
+        <textarea name="{{ form.description.html_name }}" id="{{ form.description.id_for_label }}"
+          class="tc-textarea" placeholder="Tell players what your team is about...">{{ form.description.value|default:'' }}</textarea>
+        {% if form.description.help_text %}<div class="tc-help">{{ form.description.help_text }}</div>{% endif %}
+        {% if form.description.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.description.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── TEAM IMAGES ── -->
+    <div class="tc-card" style="padding:1.75rem;margin-bottom:1.25rem;">
+      <div class="tc-section-title">
+        <span>image</span>Team Images
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+
+        <!-- Logo -->
+        <div>
+          <label class="tc-label">Team Logo</label>
+          <div class="tc-upload-zone" id="logo-preview" onclick="document.getElementById('{{ form.logo.id_for_label }}').click()" tabindex="0"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('{{ form.logo.id_for_label }}').click();}">
+            <span class="tc-upload-icon">add_photo_alternate</span>
+            <div style="color:#555;font-size:0.8rem;text-align:center;">
+              <div>Click to upload logo</div>
+              <div style="font-size:0.7rem;margin-top:2px;">Square image recommended</div>
+            </div>
+          </div>
+          {{ form.logo }}
+          {% if form.logo.help_text %}<div class="tc-help">{{ form.logo.help_text }}</div>{% endif %}
+          {% if form.logo.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.logo.errors.0 }}</div>{% endif %}
+        </div>
+
+        <!-- Banner -->
+        <div>
+          <label class="tc-label">Team Banner</label>
+          <div class="tc-upload-zone" id="banner-preview" onclick="document.getElementById('{{ form.banner.id_for_label }}').click()" tabindex="0"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('{{ form.banner.id_for_label }}').click();}">
+            <span class="tc-upload-icon">panorama</span>
+            <div style="color:#555;font-size:0.8rem;text-align:center;">
+              <div>Click to upload banner</div>
+              <div style="font-size:0.7rem;margin-top:2px;">Wide image recommended</div>
+            </div>
+          </div>
+          {{ form.banner }}
+          {% if form.banner.help_text %}<div class="tc-help">{{ form.banner.help_text }}</div>{% endif %}
+          {% if form.banner.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.banner.errors.0 }}</div>{% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── TEAM SETTINGS ── -->
+    <div class="tc-card" style="padding:1.75rem;margin-bottom:1.25rem;">
+      <div class="tc-section-title">
+        <span>tune</span>Team Settings
+      </div>
+
+      <!-- Max Members -->
+      <div style="margin-bottom:1.25rem;">
+        <label class="tc-label" for="{{ form.max_members.id_for_label }}">Max Members</label>
+        <div style="position:relative;max-width:200px;">
+          <span class="tc-input-icon">group</span>
+          <input type="number" name="{{ form.max_members.html_name }}" id="{{ form.max_members.id_for_label }}"
+            class="tc-input" value="{{ form.max_members.value|default:'' }}" min="1" max="50">
+        </div>
+        {% if form.max_members.help_text %}<div class="tc-help">{{ form.max_members.help_text }}</div>{% endif %}
+        {% if form.max_members.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.max_members.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Toggle rows -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="tc-toggle-row">
+          <input type="checkbox" name="{{ form.requires_approval.html_name }}" id="{{ form.requires_approval.id_for_label }}"
+            {% if form.requires_approval.value %}checked{% endif %}>
+          <div>
+            <label class="tc-toggle-label" for="{{ form.requires_approval.id_for_label }}">Requires Approval</label>
+            <div class="tc-toggle-desc">Applications must be approved by captain or co-captain</div>
+          </div>
+        </div>
+        <div class="tc-toggle-row">
+          <input type="checkbox" name="{{ form.is_recruiting.html_name }}" id="{{ form.is_recruiting.id_for_label }}"
+            {% if form.is_recruiting.value %}checked{% endif %}>
+          <div>
+            <label class="tc-toggle-label" for="{{ form.is_recruiting.id_for_label }}">Open Recruiting</label>
+            <div class="tc-toggle-desc">Show recruiting badge and allow applications</div>
+          </div>
+        </div>
+        <div class="tc-toggle-row">
+          <input type="checkbox" name="{{ form.is_public.html_name }}" id="{{ form.is_public.id_for_label }}"
+            {% if form.is_public.value %}checked{% endif %}>
+          <div>
+            <label class="tc-toggle-label" for="{{ form.is_public.id_for_label }}">Public Team</label>
+            <div class="tc-toggle-desc">Team will be visible in public listings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SOCIAL LINKS ── -->
+    <div class="tc-card" style="padding:1.75rem;margin-bottom:2rem;">
+      <div class="tc-section-title">
+        <span>link</span>Social Links
+      </div>
+
+      <!-- Discord -->
+      <div style="margin-bottom:1rem;">
+        <label class="tc-label" for="{{ form.discord_server.id_for_label }}">Discord Server</label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">forum</span>
+          <input type="url" name="{{ form.discord_server.html_name }}" id="{{ form.discord_server.id_for_label }}"
+            class="tc-input" placeholder="https://discord.gg/..." value="{{ form.discord_server.value|default:'' }}">
+        </div>
+        {% if form.discord_server.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.discord_server.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Twitter -->
+      <div style="margin-bottom:1rem;">
+        <label class="tc-label" for="{{ form.twitter_url.id_for_label }}">Twitter / X</label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">alternate_email</span>
+          <input type="url" name="{{ form.twitter_url.html_name }}" id="{{ form.twitter_url.id_for_label }}"
+            class="tc-input" placeholder="https://twitter.com/..." value="{{ form.twitter_url.value|default:'' }}">
+        </div>
+        {% if form.twitter_url.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.twitter_url.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Twitch -->
+      <div>
+        <label class="tc-label" for="{{ form.twitch_url.id_for_label }}">Twitch Channel</label>
+        <div style="position:relative;">
+          <span class="tc-input-icon">videocam</span>
+          <input type="url" name="{{ form.twitch_url.html_name }}" id="{{ form.twitch_url.id_for_label }}"
+            class="tc-input" placeholder="https://twitch.tv/..." value="{{ form.twitch_url.value|default:'' }}">
+        </div>
+        {% if form.twitch_url.errors %}<div class="tc-error"><span class="tc-error-icon">error</span>{{ form.twitch_url.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- ── ACTIONS ── -->
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;">
+      <a href="{% url 'teams:list' %}" class="tc-btn-cancel">
+        <span>close</span>Cancel
+      </a>
+      <button type="submit" class="tc-btn-primary">
+        <span>shield</span>Create Team
+      </button>
+    </div>
+
+  </form>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Logo upload preview
-    const logoInput = document.getElementById('{{ form.logo.id_for_label }}');
-    const logoPreview = document.getElementById('logo-preview');
-    
-    if (logoInput && logoPreview) {
-        // Click handler
-        logoPreview.addEventListener('click', function() {
-            logoInput.click();
-        });
-        
-        // Keyboard handler (Enter or Space)
-        logoPreview.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                logoInput.click();
-            }
-        });
-        
-        // File change handler with screen reader announcement
-        logoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    logoPreview.innerHTML = `<img src="${e.target.result}" alt="Logo preview" class="w-full h-full object-contain">`;
-                    logoPreview.setAttribute('aria-label', 'Team logo uploaded: ' + file.name);
-                    
-                    // Announce to screen readers
-                    const announcement = document.createElement('div');
-                    announcement.setAttribute('role', 'status');
-                    announcement.setAttribute('aria-live', 'polite');
-                    announcement.className = 'sr-only';
-                    announcement.textContent = 'Logo uploaded successfully';
-                    document.body.appendChild(announcement);
-                    setTimeout(() => announcement.remove(), 1000);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-    
-    // Banner upload preview
-    const bannerInput = document.getElementById('{{ form.banner.id_for_label }}');
-    const bannerPreview = document.getElementById('banner-preview');
-    
-    if (bannerInput && bannerPreview) {
-        // Click handler
-        bannerPreview.addEventListener('click', function() {
-            bannerInput.click();
-        });
-        
-        // Keyboard handler (Enter or Space)
-        bannerPreview.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                bannerInput.click();
-            }
-        });
-        
-        // File change handler with screen reader announcement
-        bannerInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    bannerPreview.innerHTML = `<img src="${e.target.result}" alt="Banner preview" class="w-full h-full object-cover">`;
-                    bannerPreview.setAttribute('aria-label', 'Team banner uploaded: ' + file.name);
-                    
-                    // Announce to screen readers
-                    const announcement = document.createElement('div');
-                    announcement.setAttribute('role', 'status');
-                    announcement.setAttribute('aria-live', 'polite');
-                    announcement.className = 'sr-only';
-                    announcement.textContent = 'Banner uploaded successfully';
-                    document.body.appendChild(announcement);
-                    setTimeout(() => announcement.remove(), 1000);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-    
-    // Auto-uppercase team tag
-    const tagInput = document.getElementById('{{ form.tag.id_for_label }}');
-    if (tagInput) {
-        tagInput.addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase();
-        });
-    }
-});
+(function() {
+  function setupUpload(inputId, previewId, isLogo) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    if (!input || !preview) return;
+    input.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        preview.innerHTML = '<img src="' + ev.target.result + '" alt="Preview" style="width:100%;height:100%;object-fit:' + (isLogo ? 'contain' : 'cover') + ';border-radius:8px;">';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  setupUpload('{{ form.logo.id_for_label }}', 'logo-preview', true);
+  setupUpload('{{ form.banner.id_for_label }}', 'banner-preview', false);
+
+  // Style the game select rendered by Django
+  const gameSelect = document.getElementById('{{ form.game.id_for_label }}');
+  if (gameSelect) {
+    gameSelect.className = 'tc-select';
+  }
+})();
 </script>
 {% endblock %}

@@ -81,7 +81,7 @@
                         <div>
                             <p class="stat-label text-xs">PLAYERS</p>
                             <p class="stat-value text-sm">
-                                {{ tournament.participants_count }}/{{ tournament.max_participants }}
+                                {{ tournament.get_current_registrations }}/{{ tournament.max_participants }}
                             </p>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
             <div class="mb-4">
                 <div class="progress-gaming h-2">
                     <div class="progress-gaming-bar" 
-                         style="width: {% widthratio tournament.participants_count tournament.max_participants 100 %}%;"></div>
+                         style="width: {% if tournament.max_participants > 0 %}{% widthratio tournament.get_current_registrations tournament.max_participants 100 %}{% else %}0{% endif %}%;"></div>
                 </div>
             </div>
 

@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block title %}Gaming Venues - EYTGaming{% endblock %}
+{% block meta_description %}Find and book gaming venues, esports arenas, and gaming lounges across Nigeria on EYTGaming.{% endblock %}
+{% block og_title %}Gaming Venues - EYTGaming{% endblock %}
+{% block og_description %}Find and book gaming venues, esports arenas, and gaming lounges across Nigeria.{% endblock %}
+{% block twitter_title %}Gaming Venues - EYTGaming{% endblock %}
+{% block twitter_description %}Find and book gaming venues, esports arenas, and gaming lounges across Nigeria.{% endblock %}
 
 {% block extra_css %}
 <!-- Venue Components CSS -->
@@ -165,19 +170,86 @@
 {% block body %}
 <div class="min-h-screen bg-deep-black py-8 px-4">
     <div class="max-w-7xl mx-auto">
-        <!-- Page Header with Gradient Text -->
-        <div class="mb-12 text-center">
-            <h1 class="font-barlow text-5xl md:text-6xl font-bold uppercase tracking-tight gradient-text mb-4">
-                Gaming Venues
-            </h1>
-            <p class="font-inter text-gray-400 text-lg">
-                Discover the perfect arena for your next tournament
-            </p>
+        <!-- Back Button and Navigation -->
+        <div class="mb-6">
+            <a href="{% url 'dashboard:home' %}" class="inline-flex items-center gap-2 text-gray-400 hover:text-electric-red transition-colors group">
+                <span class="material-symbols-outlined group-hover:neon-red-glow">arrow_back</span>
+                <span class="font-inter">Back to Dashboard</span>
+            </a>
         </div>
 
+        <!-- Page Header with Gradient Text and Quick Nav -->
+        <div class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <div class="text-center md:text-left">
+                    <h1 class="font-barlow text-5xl md:text-6xl font-bold uppercase tracking-tight gradient-text mb-4">
+                        Gaming Venues
+                    </h1>
+                    <p class="font-inter text-gray-400 text-lg">
+                        Discover the perfect arena for your next tournament
+                    </p>
+                </div>
+                
+                <!-- Quick Navigation Links -->
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="{% url 'dashboard:home' %}" class="text-gray-400 hover:text-electric-red transition-colors p-2" title="Dashboard">
+                        <span class="material-symbols-outlined">dashboard</span>
+                    </a>
+                    <a href="{% url 'tournaments:list' %}" class="text-gray-400 hover:text-electric-red transition-colors p-2" title="Tournaments">
+                        <span class="material-symbols-outlined">emoji_events</span>
+                    </a>
+                    <a href="{% url 'teams:list' %}" class="text-gray-400 hover:text-electric-red transition-colors p-2" title="Teams">
+                        <span class="material-symbols-outlined">groups</span>
+                    </a>
+                    <a href="{% url 'store:product_list' %}" class="text-gray-400 hover:text-electric-red transition-colors p-2" title="Store">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Become an Organizer / List Your Venue banner -->
+        {% if not user.is_authenticated or user.role == 'player' %}
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+                    background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(17,17,17,.9));
+                    border:1px solid rgba(220,38,38,.3);border-radius:10px;
+                    padding:1rem 1.5rem;margin-bottom:1.5rem;">
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <span style="font-family:'Material Symbols Outlined';font-size:28px;color:#DC2626;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+              location_on
+            </span>
+            <div>
+              <p style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.06em;color:#fff;margin:0 0 2px;">
+                Own a gaming venue or esports arena?
+              </p>
+              <p style="font-size:.8rem;color:#9ca3af;margin:0;">
+                Become an organizer and list your venue to reach thousands of gamers.
+              </p>
+            </div>
+          </div>
+          <a href="{% url 'accounts:become_organizer' %}"
+             style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
+                    background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;
+                    border-radius:6px;font-family:'Barlow Condensed',sans-serif;
+                    font-size:.85rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.05em;text-decoration:none;white-space:nowrap;
+                    border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.25);
+                    transition:all .2s;"
+             onmouseover="this.style.boxShadow='0 0 20px rgba(220,38,38,.5)'"
+             onmouseout="this.style.boxShadow='0 0 12px rgba(220,38,38,.25)'">
+            <span style="font-family:'Material Symbols Outlined';font-size:15px;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+              star
+            </span>
+            Become an Organizer
+          </a>
+        </div>
+        {% endif %}
+
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Skewed Filter Panel -->
-            <aside class="lg:col-span-1 filter-panel-mobile" role="complementary" aria-label="Venue filters">
+            <!-- Skewed Filter Panel -->            <aside class="lg:col-span-1 filter-panel-mobile" role="complementary" aria-label="Venue filters">
                 <!-- Mobile Filter Toggle Button -->
                 <button 
                     type="button" 

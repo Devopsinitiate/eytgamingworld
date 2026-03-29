@@ -28,12 +28,17 @@ def payment_methods_list(request):
         user=request.user,
         is_active=True
     )
-    
+
+    recent_payments = Payment.objects.filter(
+        user=request.user
+    ).order_by('-created_at')[:5]
+
     context = {
         'payment_methods': payment_methods,
+        'recent_payments': recent_payments,
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
     }
-    
+
     return render(request, 'payments/payment_methods.html', context)
 
 
@@ -43,18 +48,25 @@ def add_payment_method(request):
     """Add a new payment method"""
     if request.method == 'POST':
         try:
-            payment_method_id = request.POST.get('payment_method_id')
-            set_as_default = request.POST.get('set_as_default') == 'true'
-            
+            # Support both JSON body (from fetch) and form POST
+            content_type = request.content_type or ''
+            if 'application/json' in content_type:
+                data = json.loads(request.body)
+                payment_method_id = data.get('payment_method_id')
+                set_as_default = data.get('set_default', False)
+            else:
+                payment_method_id = request.POST.get('payment_method_id')
+                set_as_default = request.POST.get('set_as_default') == 'true'
+
             if not payment_method_id:
                 return JsonResponse({'success': False, 'error': 'Payment method ID is required'}, status=400)
-            
+
             payment_method = StripeService.add_payment_method(
                 user=request.user,
                 payment_method_id=payment_method_id,
                 set_as_default=set_as_default
             )
-            
+
             if payment_method:
                 log_audit_action(
                     user=request.user,
@@ -67,6 +79,8 @@ def add_payment_method(request):
                 return JsonResponse({'success': True})
             else:
                 return JsonResponse({'success': False, 'error': 'Failed to add payment method'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid request body'}, status=400)
         except Exception as e:
             logger.error(f"Error adding payment method: {e}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)

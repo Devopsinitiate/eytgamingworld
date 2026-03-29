@@ -15,6 +15,7 @@ from .forms import (CoachProfileForm, AvailabilityFormSet, BookingForm,
                    SessionReviewForm, PackageForm)
 import stripe
 from django.conf import settings
+from store.managers import PaystackPaymentProcessor, PaymentProcessorError
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -111,10 +112,22 @@ class CoachProfileCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
     template_name = 'coaching/coach_form.html'
     
     def test_func(self):
-        return self.request.user.can_coach() and not hasattr(self.request.user, 'coach_profile')
+        # Any authenticated user without an existing coach profile can apply
+        return True
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and hasattr(request.user, 'coach_profile'):
+            messages.info(request, 'You already have a coach profile.')
+            return redirect(reverse('coaching:coach_edit', kwargs={'pk': request.user.coach_profile.pk}))
+        return super().dispatch(request, *args, **kwargs)
     
     def form_valid(self, form):
         form.instance.user = self.request.user
+        # Promote user role to coach if they aren't already coach/admin
+        user = self.request.user
+        if user.role not in ('coach', 'admin'):
+            user.role = 'coach'
+            user.save(update_fields=['role'])
         messages.success(self.request, 'Coach profile created! Add your availability and games.')
         return super().form_valid(form)
     
@@ -170,15 +183,25 @@ def book_session(request, coach_pk):
     if request.method == 'POST':
         form = BookingForm(request.POST, coach=coach)
         if form.is_valid():
-            # Create Stripe payment intent
             try:
                 session_obj = form.save(commit=False)
                 session_obj.coach = coach
                 session_obj.student = request.user
                 session_obj.status = 'pending'
                 
+                # Ensure nullable fields have safe defaults
+                if session_obj.topics is None:
+                    session_obj.topics = []
+                if not session_obj.student_notes:
+                    session_obj.student_notes = ''
+                
+                # Set scheduled times from cleaned data (parsed from ISO datetime slot)
+                session_obj.scheduled_start = form.cleaned_data['scheduled_start']
+                session_obj.scheduled_end = form.cleaned_data['scheduled_end']
+                
                 # Calculate price
-                duration_hours = session_obj.duration_minutes / 60
+                from decimal import Decimal
+                duration_hours = Decimal(session_obj.duration_minutes) / Decimal(60)
                 game_expertise = coach.game_expertise.filter(
                     game=session_obj.game
                 ).first()
@@ -186,26 +209,32 @@ def book_session(request, coach_pk):
                 rate = game_expertise.effective_rate if game_expertise else coach.hourly_rate
                 session_obj.price = rate * duration_hours
                 
-                # Create Stripe payment intent
-                intent = stripe.PaymentIntent.create(
-                    amount=int(session_obj.price * 100),  # Convert to cents
-                    currency='usd',
+                # Initialize Paystack transaction
+                processor = PaystackPaymentProcessor()
+                payment_intent = processor.create_payment_intent(
+                    amount=session_obj.price,
+                    currency='NGN',
                     metadata={
+                        'email': request.user.email,
                         'coach_id': str(coach.id),
                         'student_id': str(request.user.id),
                         'game_id': str(session_obj.game.id),
                     }
                 )
                 
-                session_obj.payment_intent_id = intent.id
+                # Store Paystack reference (not Stripe intent ID)
+                session_obj.payment_intent_id = payment_intent['reference']
                 session_obj.save()
                 
-                # Redirect to payment
                 return redirect('coaching:session_payment', pk=session_obj.pk)
                 
-            except stripe.error.StripeError as e:
+            except PaymentProcessorError as e:
                 messages.error(request, f'Payment error: {str(e)}')
                 return redirect('coaching:book_session', coach_pk=coach_pk)
+        else:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"BookingForm invalid: {form.errors.as_json()}")
     else:
         form = BookingForm(coach=coach)
     
@@ -217,7 +246,7 @@ def book_session(request, coach_pk):
 
 @login_required
 def session_payment(request, pk):
-    """Handle session payment"""
+    """Handle session payment via Paystack"""
     session = get_object_or_404(CoachingSession, pk=pk)
     
     if session.student != request.user:
@@ -227,48 +256,55 @@ def session_payment(request, pk):
         messages.info(request, 'This session is already paid for.')
         return redirect('coaching:session_detail', pk=pk)
     
-    # Get Stripe publishable key
     context = {
         'session': session,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-        'payment_intent_client_secret': session.payment_intent_id,
+        'paystack_public_key': settings.PAYSTACK_PUBLIC_KEY,
+        'reference': session.payment_intent_id,
+        'amount_kobo': int(session.price * 100),  # Paystack uses kobo
+        'callback_url': f"{settings.SITE_URL}/coaching/session/{pk}/paystack-callback/",
     }
     
     return render(request, 'coaching/session_payment.html', context)
 
 
 @login_required
-def confirm_payment(request, pk):
-    """Confirm payment and update session"""
+def paystack_callback(request, pk):
+    """Verify Paystack payment after redirect/callback"""
     session = get_object_or_404(CoachingSession, pk=pk)
     
     if session.student != request.user:
         return HttpResponseForbidden()
     
-    if request.method == 'POST':
-        # Verify payment with Stripe
-        try:
-            intent = stripe.PaymentIntent.retrieve(session.payment_intent_id)
+    reference = request.GET.get('reference') or session.payment_intent_id
+    
+    if not reference:
+        messages.error(request, 'Payment reference missing.')
+        return redirect('coaching:session_payment', pk=pk)
+    
+    try:
+        processor = PaystackPaymentProcessor()
+        if processor.confirm_payment(reference):
+            session.is_paid = True
+            session.status = 'confirmed'
+            session.payment_intent_id = reference
+            session.save()
             
-            if intent.status == 'succeeded':
-                session.is_paid = True
-                session.status = 'confirmed'
-                session.save()
-                
-                messages.success(request, 'Payment successful! Your session is confirmed.')
-                
-                # Send confirmation email (via Celery task)
+            messages.success(request, 'Payment successful! Your session is confirmed.')
+            
+            try:
                 from .tasks import send_session_confirmation
                 send_session_confirmation.delay(session.id)
-                
-                return redirect('coaching:session_detail', pk=pk)
-            else:
-                messages.error(request, 'Payment not completed. Please try again.')
-                
-        except stripe.error.StripeError as e:
-            messages.error(request, f'Error verifying payment: {str(e)}')
-    
-    return redirect('coaching:session_payment', pk=pk)
+            except Exception:
+                pass
+            
+            return redirect('coaching:session_detail', pk=pk)
+        else:
+            messages.error(request, 'Payment not confirmed. Please try again.')
+            return redirect('coaching:session_payment', pk=pk)
+            
+    except PaymentProcessorError as e:
+        messages.error(request, f'Error verifying payment: {str(e)}')
+        return redirect('coaching:session_payment', pk=pk)
 
 
 class SessionListView(LoginRequiredMixin, ListView):

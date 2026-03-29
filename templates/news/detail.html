@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} — EYTGaming{% endblock %}
+{% block meta_description %}{{ article.excerpt|truncatewords:30 }}{% endblock %}
+{% block og_title %}{{ article.title }}{% endblock %}
+{% block og_description %}{{ article.excerpt|truncatewords:30 }}{% endblock %}
+
+{% block body %}
+<main class="min-h-screen bg-black text-white">
+
+  <!-- Hero -->
+  <div class="relative w-full" style="min-height:340px;background:#0a0a0a;">
+    {% if article.image %}
+    <img src="{{ article.image.url }}" alt="{{ article.title }}"
+         style="width:100%;height:340px;object-fit:cover;opacity:0.35;display:block;">
+    {% endif %}
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,#000 100%);"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:2rem 1.5rem;max-width:860px;margin:0 auto;">
+      <!-- Category badge -->
+      <span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.7rem;font-weight:700;
+                   text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;
+                   background:{% if article.category == 'tournament' %}#DC2626{% elif article.category == 'announcement' %}#06B6D4{% else %}#374151{% endif %};
+                   color:{% if article.category == 'announcement' %}#000{% else %}#fff{% endif %};">
+        {{ article.get_category_display }}
+      </span>
+      <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.8rem,5vw,3rem);
+                 font-weight:900;text-transform:uppercase;letter-spacing:-.01em;
+                 color:#fff;margin:0 0 12px 0;line-height:1.1;">
+        {{ article.title }}
+      </h1>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <time style="color:#9ca3af;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;">
+          {{ article.published_date|date:"F j, Y" }}
+        </time>
+        {% if article.author %}
+        <span style="color:#6b7280;font-size:.85rem;">by {{ article.author.get_display_name }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Article body -->
+  <div style="max-width:860px;margin:0 auto;padding:2.5rem 1.5rem;">
+
+    <!-- Excerpt lead -->
+    <p style="font-size:1.15rem;color:#d1d5db;line-height:1.7;margin-bottom:2rem;
+              border-left:3px solid #DC2626;padding-left:1rem;">
+      {{ article.excerpt }}
+    </p>
+
+    <!-- Full content -->
+    <div style="color:#e5e7eb;line-height:1.8;font-size:1rem;">
+      {{ article.content|linebreaks }}
+    </div>
+
+    <!-- Back link -->
+    <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid #1f2937;">
+      <a href="{% url 'home' %}#news"
+         style="display:inline-flex;align-items:center;gap:8px;color:#DC2626;
+                font-weight:700;text-transform:uppercase;font-size:.85rem;
+                letter-spacing:.05em;text-decoration:none;">
+        <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                     font-size:18px;line-height:1;display:inline-block;text-transform:none;
+                     background:none;-webkit-background-clip:unset;background-clip:unset;
+                     -webkit-text-fill-color:#DC2626;">arrow_back</span>
+        Back to News
+      </a>
+    </div>
+
+    <!-- Related articles -->
+    {% if related %}
+    <div style="margin-top:3rem;">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;
+                 text-transform:uppercase;color:#fff;margin-bottom:1.5rem;
+                 border-bottom:2px solid #DC2626;padding-bottom:.5rem;">
+        Related Intel
+      </h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.25rem;">
+        {% for rel in related %}
+        <a href="{{ rel.get_absolute_url }}"
+           style="display:block;background:#111;border:1px solid #1f2937;border-radius:8px;
+                  overflow:hidden;text-decoration:none;transition:border-color .2s;"
+           onmouseover="this.style.borderColor='#DC2626'" onmouseout="this.style.borderColor='#1f2937'">
+          {% if rel.image %}
+          <img src="{{ rel.image.url }}" alt="{{ rel.title }}"
+               style="width:100%;height:140px;object-fit:cover;display:block;">
+          {% else %}
+          <div style="width:100%;height:140px;background:#1f2937;display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Material Symbols Outlined';font-size:40px;color:#4b5563;
+                         background:none;-webkit-background-clip:unset;background-clip:unset;
+                         -webkit-text-fill-color:#4b5563;">article</span>
+          </div>
+          {% endif %}
+          <div style="padding:12px;">
+            <p style="font-size:.75rem;color:#6b7280;text-transform:uppercase;
+                      letter-spacing:.05em;margin:0 0 6px 0;">
+              {{ rel.published_date|date:"M d, Y" }}
+            </p>
+            <p style="font-size:.9rem;font-weight:700;color:#fff;margin:0;
+                      text-transform:uppercase;letter-spacing:.02em;line-height:1.3;">
+              {{ rel.title|truncatewords:8 }}
+            </p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

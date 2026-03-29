@@ -54,7 +54,7 @@
     </p>
     
     <!-- CTA Buttons -->
-    <div class="hero-ctas flex flex-col sm:flex-row gap-4 justify-center items-center">
+    <div class="hero-ctas flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
       {% if user.is_authenticated %}
         <a 
           href="{% url 'dashboard:home' %}" 
@@ -98,8 +98,8 @@
       {% endif %}
     </div>
     
-    <!-- Scroll Indicator -->
-    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce" aria-hidden="true">
+    <!-- Scroll Indicator - Positioned between CTA buttons and bottom -->
+    <div class="mt-8 mb-8 animate-bounce" aria-hidden="true">
       <div class="flex flex-col items-center text-gray-400">
         <span class="text-xs uppercase tracking-widest mb-2">Scroll Down</span>
         <span class="material-symbols-outlined text-3xl">keyboard_arrow_down</span>

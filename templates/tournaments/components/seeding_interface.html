@@ -1,0 +1,384 @@
+{% load static %}
+
+<!-- Seeding Management Interface -->
+<div id="seeding-interface" class="seeding-container">
+  <!-- Header with stats and actions -->
+  <div class="seeding-header">
+    <div class="seeding-stats">
+      <div class="stat-item">
+        <span class="stat-label">Seeded:</span>
+        <strong id="seeded-count" class="stat-value">0</strong>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Unseeded:</span>
+        <strong id="unseeded-count" class="stat-value">0</strong>
+      </div>
+    </div>
+    <div class="seeding-actions">
+      <button id="auto-seed-btn" class="btn-secondary">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        Auto-Seed
+      </button>
+      <button id="save-seeds-btn" class="btn-primary">
+        <span class="material-symbols-outlined">save</span>
+        Save Changes
+      </button>
+    </div>
+  </div>
+  
+  <!-- Conflict warning banner (hidden by default) -->
+  <div id="seed-conflicts" class="alert alert-warning" style="display: none;">
+    <span class="material-symbols-outlined">warning</span>
+    <div class="alert-content">
+      <strong>Warning:</strong> Duplicate seeds detected: <span id="conflict-details"></span>
+    </div>
+  </div>
+  
+  <!-- Seeded participants section -->
+  <div class="seeded-section">
+    <h4 class="section-title">
+      <span class="material-symbols-outlined">format_list_numbered</span>
+      Seeded Participants
+    </h4>
+    <div id="seeded-list" class="participant-list sortable">
+      <!-- Participant rows will be rendered here by JavaScript -->
+    </div>
+  </div>
+  
+  <!-- Unseeded participants section -->
+  <div class="unseeded-section">
+    <h4 class="section-title">
+      <span class="material-symbols-outlined">group</span>
+      Unseeded Participants
+    </h4>
+    <div id="unseeded-list" class="participant-list">
+      <!-- Unseeded participant rows will be rendered here by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Seeding Interface Styles -->
+<style>
+.seeding-container {
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+  border: 2px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.seeding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.seeding-stats {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #DC2626;
+  text-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.seeding-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+}
+
+.btn-primary:focus,
+.btn-secondary:focus {
+  outline: 2px solid #DC2626;
+  outline-offset: 2px;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-secondary {
+  background: rgba(220, 38, 38, 0.1);
+  color: #DC2626;
+  border: 2px solid rgba(220, 38, 38, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-primary .material-symbols-outlined,
+.btn-secondary .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 2px solid rgba(245, 158, 11, 0.3);
+  color: #F59E0B;
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  color: #3B82F6;
+}
+
+.alert .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content strong {
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+
+.seeded-section, .unseeded-section {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #DC2626;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.participant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 3rem;
+}
+
+.participant-list.sortable {
+  border: 2px dashed rgba(220, 38, 38, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.participant-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+  border: 2px solid rgba(220, 38, 38, 0.2);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: move;
+}
+
+.participant-row:hover {
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+  transform: translateX(4px);
+}
+
+.participant-row:focus-within {
+  border-color: #DC2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.participant-row.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.drag-handle {
+  color: #6B7280;
+  font-size: 1.25rem;
+  cursor: grab;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.seed-input {
+  width: 4rem;
+  padding: 0.5rem;
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.375rem;
+  color: #DC2626;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.seed-input:focus {
+  outline: none;
+  border-color: #DC2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.seed-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.participant-name {
+  flex: 1;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  color: #FFFFFF;
+  font-size: 1rem;
+}
+
+.participant-status {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6B7280;
+  padding: 0.25rem 0.75rem;
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  border-radius: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .seeding-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .seeding-stats {
+    justify-content: space-around;
+  }
+  
+  .seeding-actions {
+    width: 100%;
+  }
+  
+  .btn-primary, .btn-secondary {
+    flex: 1;
+  }
+  
+  .participant-row {
+    flex-wrap: wrap;
+  }
+  
+  .seed-input {
+    width: 3rem;
+  }
+}
+
+/* Empty state */
+.participant-list:empty::after {
+  content: 'No participants';
+  display: block;
+  text-align: center;
+  padding: 2rem;
+  color: #6B7280;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+}
+
+.participant-list.sortable:empty::after {
+  content: 'Drag participants here to assign seeds';
+}
+</style>

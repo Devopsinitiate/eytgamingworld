@@ -2,11 +2,14 @@
 {% load static %}
 
 {% block title %}EYTGaming - Gear Up. Dominate. Evolve.{% endblock %}
+{% block meta_description %}EYTGaming — Nigeria's premier esports platform. Join tournaments, find coaches, build teams, and book gaming venues. Elevate your game today.{% endblock %}
+{% block og_title %}EYTGaming - Gear Up. Dominate. Evolve.{% endblock %}
+{% block og_description %}Nigeria's premier esports platform. Join tournaments, find coaches, build teams, and book gaming venues.{% endblock %}
+{% block twitter_title %}EYTGaming - Gear Up. Dominate. Evolve.{% endblock %}
+{% block twitter_description %}Nigeria's premier esports platform. Join tournaments, find coaches, build teams, and book gaming venues.{% endblock %}
 
-{% block extra_head %}
-<!-- Landing Page Specific Meta Tags -->
-<meta name="description" content="EYTGaming - Elite esports platform for tournaments, coaching, and performance tracking. Join the gamer army and dominate the competition.">
-<meta name="keywords" content="esports, gaming, tournaments, coaching, EYTGaming, competitive gaming">
+{% block extra_meta %}
+<meta name="keywords" content="esports, gaming, tournaments, coaching, EYTGaming, competitive gaming, Nigeria esports">
 {% endblock %}
 
 {% block navigation %}
@@ -26,11 +29,20 @@
   <!-- Games Section -->
   {% include "partials/games_section.html" %}
   
+  <!-- Live Tournaments Section -->
+  {% include "partials/tournaments_teaser.html" %}
+  
   <!-- Media Highlights Section -->
   {% include "partials/media_highlights.html" %}
   
+  <!-- Elite Coaches Section -->
+  {% include "partials/coaches_teaser.html" %}
+  
   <!-- News Section -->
   {% include "partials/news_section.html" %}
+  
+  <!-- Gaming Venues Section -->
+  {% include "partials/venues_teaser.html" %}
   
   <!-- Merch Teaser Section -->
   {% include "partials/merch_teaser.html" %}

@@ -96,7 +96,23 @@ class RateLimitMiddleware:
         # Stricter limits for checkout endpoints
         if '/store/checkout/' in path or '/store/payment/' in path:
             return 10
-        
+
+        # Exempt notification endpoints (polling, unread count, recent, etc.)
+        if path.startswith('/notifications/'):
+            return 10000  # effectively unlimited
+
+        # Exempt Django Debug Toolbar requests
+        if path.startswith('/__debug__/'):
+            return 10000
+
+        # Exempt static/media files
+        if path.startswith('/static/') or path.startswith('/media/'):
+            return 10000
+
+        # Exempt admin panel
+        if path.startswith('/admin/'):
+            return 10000
+
         # Default limit for other endpoints
         return 100
     

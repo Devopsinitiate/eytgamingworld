@@ -59,6 +59,13 @@ urlpatterns = [
     path('<slug:slug>/api/bracket/', api_views.tournament_bracket_api, name='api_bracket'),
     path('<slug:slug>/api/cache/invalidate/', api_views.invalidate_tournament_cache, name='api_cache_invalidate'),
     
+    # Unified polling endpoint (consolidates all updates into single request)
+    path('api/tournament/<slug:slug>/unified-updates/', api_views.tournament_unified_updates_api, name='api_unified_updates'),
+    
+    # Manual seeding management endpoints
+    path('<slug:slug>/api/participants/seed/', api_views.seed_participants_api, name='api_seed_participants'),
+    path('<slug:slug>/api/participants/auto-seed/', api_views.auto_seed_api, name='api_auto_seed'),
+    
     # Real-time updates endpoints
     path('<slug:slug>/live-updates/', tournament_live_updates, name='live_updates'),
     

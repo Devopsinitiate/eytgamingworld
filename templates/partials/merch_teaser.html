@@ -1,78 +1,357 @@
 {% load static %}
 
-{# Merch Teaser Section - Featured Products with Spotlight Effect #}
-<section id="merch" class="merch-teaser py-20 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
-  {# Spotlight Effect Background #}
+<section id="merch" class="merch-teaser py-10 bg-gradient-to-b from-black to-gray-900 relative overflow-hidden">
   <div class="spotlight-effect" aria-hidden="true"></div>
-  
-  <div class="container mx-auto px-4 relative z-10">
-    {# Section Title #}
-    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+
+  <div class="container mx-auto px-4 relative" style="z-index:10;isolation:isolate;">
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
       GEAR UP
     </h2>
-    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
       Represent the EYT Army
     </p>
-    
-    {# Products Grid - Responsive: 1 col mobile, 2 col tablet, 4 col desktop #}
-    <div class="merch-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-      {% for product in featured_products %}
-      <div class="merch-card group bg-gray-900 rounded-lg overflow-hidden border border-gray-800 hover:border-red-600 transition-all duration-300">
-        {# Product Image Wrapper #}
-        <div class="merch-image-wrapper relative overflow-hidden bg-gray-800">
-          {% if product.image %}
-          <img 
-            src="{{ product.image.url }}" 
-            alt="{{ product.name }}" 
-            class="merch-image w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-            loading="lazy"
-          >
-          {% else %}
-          <div class="merch-image w-full h-64 flex items-center justify-center">
-            <span class="material-symbols-outlined text-gray-600 text-6xl">shopping_bag</span>
-          </div>
-          {% endif %}
-          
-          {# Hover Overlay #}
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-        </div>
-        
-        {# Product Info #}
-        <div class="p-4">
-          <h3 class="merch-name text-lg font-bold uppercase tracking-tight text-white mb-2 group-hover:text-red-500 transition-colors">
-            {{ product.name }}
-          </h3>
-          <p class="merch-price text-2xl font-bold text-red-500">
-            ${{ product.price }}
-          </p>
-        </div>
-      </div>
-      {% empty %}
-      {# Empty State - No Products #}
-      <div class="col-span-full text-center py-12">
-        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
-          shopping_bag
-        </span>
-        <p class="text-gray-500 text-xl">
-          No featured products available yet. Check back soon!
-        </p>
-      </div>
-      {% endfor %}
-    </div>
-    
-    {# Shop CTA Button #}
+
     {% if featured_products %}
-    <div class="text-center">
-      <a 
-        href="#store" 
-        class="cta-primary inline-flex items-center gap-2 rounded-md transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300"
-      >
+
+    <!-- Slideshow wrapper — isolation:isolate creates its own stacking context
+         so inner z-index values are not capped by parent CSS rules -->
+    <div id="merchSlideshow" style="position:relative;padding:0 48px;isolation:isolate;">
+
+      <!-- Prev button -->
+      <button id="merchPrev" aria-label="Previous product" type="button"
+        style="position:absolute;left:0;top:45%;transform:translateY(-50%);
+               z-index:30;pointer-events:auto !important;
+               background:#1a1a1a;border:2px solid #374151;border-radius:50%;
+               width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+               cursor:pointer !important;outline:none;flex-shrink:0;">
+        <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                     font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;
+                     display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;
+                     -webkit-font-feature-settings:'liga';font-feature-settings:'liga';
+                     -webkit-font-smoothing:antialiased;color:#ffffff;
+                     background:none;-webkit-background-clip:unset;background-clip:unset;
+                     -webkit-text-fill-color:#ffffff;pointer-events:none;">chevron_left</span>
+      </button>
+
+      <!-- Viewport -->
+      <div id="merchViewport" style="overflow:hidden;width:100%;display:block;position:relative;z-index:1;">
+        <div id="merchTrack" style="display:flex;flex-wrap:nowrap;transition:transform 0.45s ease;will-change:transform;">
+          {% for product in featured_products %}
+          <div class="merch-slide" style="flex:0 0 auto;box-sizing:border-box;padding:0 8px;">
+            <div style="background:#111827;border-radius:8px;overflow:hidden;
+                        border:1px solid #374151;transition:border-color 0.3s;">
+              <!-- Image -->
+              <div style="overflow:hidden;background:#1f2937;position:relative;">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                     style="width:100%;height:180px;object-fit:cover;display:block;
+                            transition:transform 0.3s;">
+                {% else %}
+                <div style="width:100%;height:180px;display:flex;align-items:center;
+                            justify-content:center;background:#1f2937;">
+                  <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                               font-size:64px;line-height:1;letter-spacing:normal;text-transform:none;
+                               display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;
+                               -webkit-font-feature-settings:'liga';font-feature-settings:'liga';
+                               -webkit-font-smoothing:antialiased;color:#4b5563;
+                               background:none;-webkit-background-clip:unset;background-clip:unset;
+                               -webkit-text-fill-color:#4b5563;">shopping_bag</span>
+                </div>
+                {% endif %}
+              </div>
+              <!-- Info -->
+              <div style="padding:16px;background:#111827;">
+                <h3 style="font-size:0.95rem;font-weight:700;text-transform:uppercase;
+                           letter-spacing:0.05em;color:#ffffff;margin:0 0 8px 0;
+                           background:none;-webkit-background-clip:unset;
+                           background-clip:unset;-webkit-text-fill-color:#ffffff;">
+                  {{ product.name }}
+                </h3>
+                <!-- Price: use CSS class only — no inline color to avoid brand-consistency-fix.css override -->
+                <p class="merch-slide-price">&#8358;{{ product.price }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Next button -->
+      <button id="merchNext" aria-label="Next product" type="button"
+        style="position:absolute;right:0;top:45%;transform:translateY(-50%);
+               z-index:30;pointer-events:auto !important;
+               background:#1a1a1a;border:2px solid #374151;border-radius:50%;
+               width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+               cursor:pointer !important;outline:none;flex-shrink:0;">
+        <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                     font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;
+                     display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;
+                     -webkit-font-feature-settings:'liga';font-feature-settings:'liga';
+                     -webkit-font-smoothing:antialiased;color:#ffffff;
+                     background:none;-webkit-background-clip:unset;background-clip:unset;
+                     -webkit-text-fill-color:#ffffff;pointer-events:none;">chevron_right</span>
+      </button>
+
+      <!-- Dots -->
+      <div id="merchDots" style="display:flex;justify-content:center;gap:8px;margin-top:20px;position:relative;z-index:30;">
+        {% for product in featured_products %}
+        <button type="button" data-idx="{{ forloop.counter0 }}" aria-label="Slide {{ forloop.counter }}"
+          class="merch-dot{% if forloop.first %} merch-dot-active{% endif %}"
+          style="width:10px;height:10px;border-radius:50%;border:none;padding:0;
+                 cursor:pointer !important;pointer-events:auto !important;
+                 transition:background 0.2s,transform 0.2s;">
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-10">
+      <a href="/store/"
+         class="cta-primary inline-flex items-center gap-2 rounded-md transform skew-x-[-12deg] hover:skew-x-0 transition-all duration-300">
         <span class="skew-x-[12deg] inline-flex items-center gap-2">
-          <span class="material-symbols-outlined">shopping_cart</span>
+          <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                       font-size:20px;line-height:1;display:inline-block;
+                       background:none;-webkit-background-clip:unset;background-clip:unset;
+                       -webkit-text-fill-color:#ffffff;color:#ffffff;">shopping_cart</span>
           Shop the Gear
         </span>
       </a>
     </div>
+
+    {% else %}
+    <div style="text-align:center;padding:48px 0;">
+      <span style="font-family:'Material Symbols Outlined';font-weight:400;font-style:normal;
+                   font-size:64px;line-height:1;display:block;color:#4b5563;margin-bottom:16px;
+                   background:none;-webkit-background-clip:unset;background-clip:unset;
+                   -webkit-text-fill-color:#4b5563;" aria-hidden="true">shopping_bag</span>
+      <p style="color:#6b7280;font-size:1.25rem;">No featured products available yet. Check back soon!</p>
+    </div>
     {% endif %}
+
   </div>
 </section>
+
+<style>
+  /* Price — pure CSS class, no inline color values that brand-consistency-fix.css can intercept */
+  .merch-slide-price {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    display: block;
+    color: #dc2626;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: currentColor !important;
+  }
+
+  /* Dot states */
+  .merch-dot {
+    background: #374151;
+    transform: scale(1);
+  }
+  .merch-dot-active,
+  .merch-dot.active {
+    background: #DC2626 !important;
+    transform: scale(1.3) !important;
+  }
+
+  /* Ensure slideshow buttons are always clickable */
+  #merchPrev,
+  #merchNext,
+  #merchDots button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+</style>
+
+<script>
+(function () {
+  var autoTimer = null;
+  var initialized = false;
+
+  /* Reliably get the viewport element's rendered width.
+     On desktop the container has a Tailwind max-width cap, so we must
+     read the actual rendered rect — never fall back to window.innerWidth. */
+  function getVpW() {
+    var vp = document.getElementById('merchViewport');
+    if (!vp) return 0;
+    /* Force a layout flush then read the rect */
+    var rect = vp.getBoundingClientRect();
+    if (rect.width > 0) return rect.width;
+    /* offsetWidth as secondary */
+    if (vp.offsetWidth > 0) return vp.offsetWidth;
+    return 0;
+  }
+
+  function initSlideshow() {
+    if (initialized) return;
+
+    var track    = document.getElementById('merchTrack');
+    var viewport = document.getElementById('merchViewport');
+    var prevBtn  = document.getElementById('merchPrev');
+    var nextBtn  = document.getElementById('merchNext');
+    var dotsWrap = document.getElementById('merchDots');
+
+    if (!track || !viewport) return;
+    var w = getVpW();
+    if (w === 0) return; /* not laid out yet — caller will retry */
+
+    initialized = true;
+
+    var slides = track.querySelectorAll('.merch-slide');
+    var dots   = dotsWrap ? dotsWrap.querySelectorAll('button') : [];
+    var total  = slides.length;
+    if (total === 0) return;
+
+    var current = 0;
+
+    function visibleCount() {
+      var win = window.innerWidth;
+      if (win >= 1024) return Math.min(3, total);
+      if (win >= 640)  return Math.min(2, total);
+      return 1;
+    }
+
+    /* Always read live viewport width — never use window.innerWidth as fallback */
+    function slideW() {
+      var vpw = getVpW();
+      return vpw / visibleCount();
+    }
+
+    function setSizes() {
+      var sw = slideW();
+      for (var i = 0; i < slides.length; i++) {
+        slides[i].style.width = sw + 'px';
+      }
+    }
+
+    function maxIdx() { return Math.max(0, total - visibleCount()); }
+
+    function updateDots(idx) {
+      for (var i = 0; i < dots.length; i++) {
+        if (i === idx) {
+          dots[i].style.background = '#DC2626';
+          dots[i].style.transform  = 'scale(1.3)';
+        } else {
+          dots[i].style.background = '#374151';
+          dots[i].style.transform  = 'scale(1)';
+        }
+      }
+    }
+
+    function goTo(idx) {
+      current = Math.max(0, Math.min(idx, maxIdx()));
+      track.setAttribute('data-current', current);
+      track.style.transform = 'translateX(-' + (current * slideW()) + 'px)';
+      updateDots(current);
+    }
+
+    function next() { goTo(current >= maxIdx() ? 0 : current + 1); }
+    function prev() { goTo(current <= 0 ? maxIdx() : current - 1); }
+
+    function startAuto() {
+      stopAuto();
+      if (maxIdx() > 0) autoTimer = setInterval(next, 3500);
+    }
+    function stopAuto() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    setSizes();
+    goTo(0);
+    startAuto();
+
+    if (prevBtn) {
+      prevBtn.onclick = function (e) {
+        e.preventDefault(); e.stopPropagation();
+        stopAuto(); prev(); startAuto();
+      };
+    }
+    if (nextBtn) {
+      nextBtn.onclick = function (e) {
+        e.preventDefault(); e.stopPropagation();
+        stopAuto(); next(); startAuto();
+      };
+    }
+
+    for (var d = 0; d < dots.length; d++) {
+      (function (dot, idx) {
+        dot.onclick = function (e) {
+          e.preventDefault(); e.stopPropagation();
+          stopAuto(); goTo(idx); startAuto();
+        };
+      })(dots[d], parseInt(dots[d].getAttribute('data-idx'), 10));
+    }
+
+    /* Touch swipe */
+    var touchX = 0;
+    track.addEventListener('touchstart', function (e) {
+      touchX = e.touches[0].clientX; stopAuto();
+    }, { passive: true });
+    track.addEventListener('touchend', function (e) {
+      var diff = touchX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { diff > 0 ? next() : prev(); }
+      startAuto();
+    }, { passive: true });
+
+    /* On resize: recalculate sizes and reposition */
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { setSizes(); goTo(current); }, 100);
+    });
+  }
+
+  /* Retry until the viewport has a real width (handles late-rendering containers) */
+  function tryInit() {
+    if (initialized) return;
+    if (getVpW() > 0) {
+      initSlideshow();
+    }
+  }
+
+  function boot() {
+    /* First attempt immediately */
+    tryInit();
+    /* If not ready yet, keep retrying every 50ms for up to 3 seconds */
+    if (!initialized) {
+      var attempts = 0;
+      var timer = setInterval(function () {
+        attempts++;
+        tryInit();
+        if (initialized || attempts >= 60) clearInterval(timer);
+      }, 50);
+    }
+    /* Also hook into window.load for a guaranteed final attempt */
+    window.addEventListener('load', function () {
+      if (!initialized) initSlideshow();
+      /* Force a re-measure after load in case fonts shifted layout */
+      else {
+        var vp = document.getElementById('merchViewport');
+        var track = document.getElementById('merchTrack');
+        if (vp && track) {
+          var slides = track.querySelectorAll('.merch-slide');
+          var vpw = getVpW();
+          if (vpw > 0) {
+            var vc = window.innerWidth >= 1024 ? Math.min(3, slides.length)
+                   : window.innerWidth >= 640  ? Math.min(2, slides.length) : 1;
+            var sw = vpw / vc;
+            for (var i = 0; i < slides.length; i++) slides[i].style.width = sw + 'px';
+            /* Re-trigger goTo to fix transform after resize */
+            var cur = parseInt(track.getAttribute('data-current') || '0', 10);
+            track.style.transform = 'translateX(-' + (cur * sw) + 'px)';
+          }
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+}());
+</script>

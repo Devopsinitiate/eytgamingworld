@@ -1,13 +1,13 @@
 {% load static %}
 
 {# News Section - Latest Updates and Announcements #}
-<section id="news" class="news-section py-20 bg-black relative overflow-hidden">
+<section id="news" class="news-section py-10 bg-black relative overflow-hidden">
   <div class="container mx-auto px-4">
     {# Section Title #}
-    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
       LATEST INTEL
     </h2>
-    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
       News, Tournaments & Updates
     </p>
     
@@ -21,11 +21,11 @@
           <img 
             src="{{ article.image.url }}" 
             alt="{{ article.title }}" 
-            class="news-image w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+            class="news-image w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
           >
           {% else %}
-          <div class="news-image w-full h-48 bg-gray-800 flex items-center justify-center">
+          <div class="news-image w-full h-32 bg-gray-800 flex items-center justify-center">
             <span class="material-symbols-outlined text-gray-600 text-6xl">article</span>
           </div>
           {% endif %}
@@ -89,7 +89,7 @@
     
     {# View All News Button (Optional) #}
     {% if news_articles %}
-    <div class="text-center mt-12">
+    <div class="text-center mt-6">
       <a 
         href="#news" 
         class="cta-secondary inline-block rounded-md"

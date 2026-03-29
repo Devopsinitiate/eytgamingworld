@@ -1,0 +1,247 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Fault Condition** - Rate Limit Trigger from Multiple Polling Intervals
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate excessive polling causes rate limit errors
+  - **Scoped PBT Approach**: Monitor tournament detail page over 10-minute period to capture concrete failing cases
+  - Test implementation details from Fault Condition in design:
+    - Open tournament detail page in browser
+    - Monitor network requests for 10 minutes
+    - Count active setInterval calls (expect 5+ on unfixed code)
+    - Measure requests per minute (expect 8-10 on unfixed code)
+    - Observe for 429 "Too Many Requests" errors
+    - Test concurrent request patterns
+    - Test hidden tab behavior (verify polling continues at full rate)
+  - The test assertions should match the Expected Behavior Properties from design:
+    - ASSERT requestsPerMinute <= 1 (will fail on unfixed code showing 8-10)
+    - ASSERT serverResponseStatus != 429 (will fail when rate limits hit)
+    - ASSERT activePollingIntervals == 1 (will fail showing 5+)
+    - ASSERT hiddenTabPollingPaused == true (will fail showing continued polling)
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found:
+    - Number of concurrent setInterval calls
+    - Actual requests per minute
+    - Time until first 429 error
+    - Hidden tab polling behavior
+    - Specific endpoints being called redundantly
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Real-Time Update Functionality
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for all real-time update components:
+    - Statistics updates: Observe how participant counts, match counts, capacity updates appear
+    - Registration status: Observe how registration card reflects capacity changes, urgency indicators
+    - Timeline progress: Observe how phase transitions and countdown timers update
+    - Participant display: Observe how new registrations and check-in status appear
+    - Interactive features: Test registration, check-in, seed assignment functionality
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements:
+    - FOR ALL tournament states: statistics display matches actual tournament data
+    - FOR ALL registration changes: registration card reflects current state accurately
+    - FOR ALL timeline events: timeline shows correct phase and countdown values
+    - FOR ALL participant updates: participant list shows current registrations and check-ins
+    - FOR ALL countdown timers: timers display accurate second-by-second countdown
+    - FOR ALL user interactions: registration, check-in, and other features work correctly
+  - Property-based testing generates many test cases for stronger guarantees across different tournament configurations
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
+
+- [x] 3. Implement unified polling architecture
+
+  - [x] 3.1 Create UnifiedPollingManager class
+    - Create new file `static/js/modules/unified-polling-manager.js`
+    - Implement core class structure with constructor accepting tournamentSlug and options
+    - Implement single setInterval coordination mechanism (base interval: 60 seconds)
+    - Implement component registration system (registerComponent, unregisterComponent methods)
+    - Implement event-based notification system for distributing updates to components
+    - Implement request deduplication to prevent concurrent requests
+    - Add configuration options: baseInterval, enableBackoff, enableVisibilityDetection
+    - _Bug_Condition: isBugCondition(pageState) where activePollingIntervals >= 5 AND requestsPerMinute >= 8_
+    - _Expected_Behavior: Single coordinated polling mechanism with requestsPerMinute <= 1_
+    - _Preservation: All components continue receiving updates via callback system_
+    - _Requirements: 2.1, 2.2, 2.3_
+
+  - [x] 3.2 Implement page visibility detection
+    - Add Page Visibility API integration to UnifiedPollingManager
+    - Implement handlePageVisibilityChange method
+    - Visible tab behavior: poll at base interval (60 seconds)
+    - Hidden tab behavior: pause polling or increase interval to 5 minutes
+    - Tab becomes visible: resume normal polling and fetch immediate update
+    - Add feature detection for Page Visibility API with fallback to focus/blur events
+    - Test visibility state changes and verify polling adjusts appropriately
+    - _Bug_Condition: pageState.pageVisibility == 'hidden' AND polling continues at full rate_
+    - _Expected_Behavior: Polling pauses or slows significantly when tab is hidden_
+    - _Preservation: Updates resume immediately when tab becomes visible_
+    - _Requirements: 2.4_
+
+  - [x] 3.3 Implement exponential backoff algorithm
+    - Add calculateBackoffDelay method to UnifiedPollingManager
+    - Implement exponential backoff: baseDelay * 2^attemptNumber, capped at 10 minutes
+    - Add jitter (random 0-10% of delay) to prevent thundering herd
+    - Implement handleRateLimitError method to trigger backoff on 429 responses
+    - Reset backoff counter to 0 after successful request
+    - Backoff sequence: 60s → 120s → 240s → 480s → 600s (capped)
+    - Test backoff behavior with simulated 429 errors
+    - _Bug_Condition: serverResponseStatus == 429 AND hasBackoffStrategy == false_
+    - _Expected_Behavior: Progressive delay increase after rate limit errors_
+    - _Preservation: Normal polling resumes after successful request_
+    - _Requirements: 2.5_
+
+  - [x] 3.4 Create unified API endpoint
+    - Create new view `TournamentUnifiedUpdatesView` in `tournaments/views.py`
+    - Implement endpoint `/api/tournament/<slug>/unified-updates/`
+    - Return consolidated JSON response with sections: statistics, registration, timeline, participants, matches
+    - Use select_related and prefetch_related to optimize database queries
+    - Implement 30-second cache using Django's cache framework
+    - Add timestamp field to response for freshness tracking
+    - Register endpoint in `tournaments/urls.py`
+    - Test endpoint returns all required data sections
+    - _Bug_Condition: Multiple separate endpoints called independently_
+    - _Expected_Behavior: Single endpoint returns all data in one request_
+    - _Preservation: All data previously available from separate endpoints is included_
+    - _Requirements: 2.2, 2.3_
+
+  - [x] 3.5 Implement fetchUnifiedUpdates method
+    - Add fetchUnifiedUpdates method to UnifiedPollingManager
+    - Implement fetch call to `/api/tournament/{slug}/unified-updates/`
+    - Handle 404 response with graceful fallback to legacy polling
+    - Handle 429 response by triggering exponential backoff
+    - Handle network errors with retry logic
+    - Implement distributeUpdates method to route data to registered components
+    - Add request deduplication to prevent overlapping fetches
+    - Test successful fetch and data distribution
+    - Test error handling and fallback scenarios
+    - _Bug_Condition: Multiple concurrent requests to different endpoints_
+    - _Expected_Behavior: Single coordinated request with error handling_
+    - _Preservation: Components receive same data structure via callbacks_
+    - _Requirements: 2.1, 2.2, 2.3, 2.5_
+
+  - [x] 3.6 Modify TournamentDetailPage to use unified manager
+    - Open `static/js/tournament-detail.js`
+    - Import UnifiedPollingManager module
+    - Remove startStatisticsUpdates method with its setInterval call
+    - Remove startRealTimeUpdates method with its setInterval call
+    - Create new initUnifiedPolling method
+    - Instantiate UnifiedPollingManager with configuration (baseInterval: 60000, enableBackoff: true, enableVisibilityDetection: true)
+    - Register component callbacks for statistics, registration, timeline updates
+    - Call pollingManager.start() to begin coordinated polling
+    - Remove individual polling intervals from cleanup methods
+    - Add pollingManager.stop() to cleanup/destroy methods
+    - Test page initialization with unified polling
+    - _Bug_Condition: Multiple independent setInterval calls in TournamentDetailPage_
+    - _Expected_Behavior: Single polling manager coordinates all updates_
+    - _Preservation: All update methods continue to work via callbacks_
+    - _Requirements: 2.1, 2.2, 2.3_
+
+  - [x] 3.7 Update StatisticsDashboard component
+    - Locate StatisticsDashboard class in `static/js/tournament-detail.js`
+    - Remove startRealTimeUpdates method with its setInterval call
+    - Keep updateStatistics method but modify to accept data parameter
+    - Update method signature: updateStatistics(newStats)
+    - Ensure existing update logic and UI rendering remains unchanged
+    - Test statistics updates via polling manager callback
+    - _Bug_Condition: Independent polling interval in StatisticsDashboard_
+    - _Expected_Behavior: Receives updates via callback from polling manager_
+    - _Preservation: Statistics display and animations work identically_
+    - _Requirements: 3.1_
+
+  - [x] 3.8 Update StickyRegistrationCard component
+    - Locate StickyRegistrationCard class in `static/js/tournament-detail.js`
+    - Remove fetchRegistrationUpdates setInterval call
+    - Keep update methods but modify to accept data parameter
+    - Update method signature: updateRegistrationStatus(registrationData)
+    - Ensure capacity indicators, urgency messages, button states work unchanged
+    - Test registration card updates via polling manager callback
+    - _Bug_Condition: Independent polling interval in StickyRegistrationCard_
+    - _Expected_Behavior: Receives updates via callback from polling manager_
+    - _Preservation: Registration status and interactive features work identically_
+    - _Requirements: 3.2, 3.6_
+
+  - [x] 3.9 Update TournamentTimeline component
+    - Locate TournamentTimeline class in `static/js/tournament-detail.js`
+    - Remove updateTimeline setInterval call
+    - Keep timeline update methods but modify to accept data parameter
+    - Update method signature: updateTimelineProgress(timelineData)
+    - Ensure phase transitions and progress indicators work unchanged
+    - Test timeline updates via polling manager callback
+    - _Bug_Condition: Independent polling interval in TournamentTimeline_
+    - _Expected_Behavior: Receives updates via callback from polling manager_
+    - _Preservation: Timeline progression and phase display work identically_
+    - _Requirements: 3.3_
+
+  - [x] 3.10 Handle countdown timers efficiently
+    - Locate countdown timer logic in TournamentTimeline class
+    - Separate countdown display logic from data fetching
+    - Implement initCountdownTimers method that updates UI locally every second
+    - Remove API requests from countdown timer intervals
+    - When countdown reaches zero, trigger immediate poll via pollingManager.fetchUnifiedUpdates()
+    - Store countdown intervals in array for cleanup
+    - Add cleanup logic to clear countdown intervals on component destroy
+    - Test countdown displays accurate second-by-second updates without API calls
+    - _Bug_Condition: Countdown timers making requests every second_
+    - _Expected_Behavior: Countdown updates UI locally, triggers poll only at completion_
+    - _Preservation: Countdown accuracy and display format unchanged_
+    - _Requirements: 3.4_
+
+  - [x] 3.11 Implement backward compatibility and fallbacks
+    - Add graceful degradation for missing unified endpoint (404 fallback to legacy)
+    - Add feature detection for Page Visibility API with focus/blur fallback
+    - Add configuration option to disable new features if needed (useLegacyEndpoints flag)
+    - Ensure components work with or without unified polling manager
+    - Test fallback scenarios: unified endpoint unavailable, Page Visibility API unsupported
+    - Test progressive enhancement: components function independently if polling manager fails
+    - _Bug_Condition: N/A (enhancement for robustness)_
+    - _Expected_Behavior: System degrades gracefully when features unavailable_
+    - _Preservation: All functionality works even with fallback modes_
+    - _Requirements: 3.6_
+
+  - [x] 3.12 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Coordinated Polling Prevents Rate Limits
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1 on FIXED code
+    - Verify assertions now pass:
+      - ASSERT requestsPerMinute <= 1 (should now pass with ~1 request/min)
+      - ASSERT serverResponseStatus != 429 (should now pass with no rate limit errors)
+      - ASSERT activePollingIntervals == 1 (should now pass with single manager)
+      - ASSERT hiddenTabPollingPaused == true (should now pass with visibility detection)
+    - Monitor for 30 minutes to ensure no rate limit errors occur
+    - Verify unified endpoint is being called instead of multiple separate endpoints
+    - Verify exponential backoff works if 429 is simulated
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - _Requirements: Expected Behavior Properties from design (2.1, 2.2, 2.3, 2.4, 2.5)_
+
+  - [x] 3.13 Verify preservation tests still pass
+    - **Property 2: Preservation** - Real-Time Update Functionality Maintained
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2 on FIXED code
+    - Verify all component update behaviors still work:
+      - Statistics updates display correctly with same accuracy and timing
+      - Registration status reflects changes with same indicators and button states
+      - Timeline progression shows phase transitions with same accuracy
+      - Participant list updates show registrations and check-ins correctly
+      - Countdown timers display accurate second-by-second countdown
+      - Interactive features (registration, check-in, seed assignment) work identically
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix across various tournament states
+    - _Requirements: Preservation Requirements from design (3.1, 3.2, 3.3, 3.4, 3.5, 3.6)_
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Run all exploration tests and verify they now pass (rate limit prevention confirmed)
+  - Run all preservation tests and verify they still pass (no regressions)
+  - Run unit tests for UnifiedPollingManager class methods
+  - Run integration tests for full page load and component coordination
+  - Test long-running session (30+ minutes) without rate limit errors
+  - Test tab visibility changes during active updates
+  - Test recovery from simulated network failures and rate limit errors
+  - Test backward compatibility with legacy endpoints
+  - Verify all interactive features work correctly
+  - Ask the user if questions arise or if additional testing is needed

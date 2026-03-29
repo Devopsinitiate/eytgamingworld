@@ -1189,6 +1189,13 @@ class PaystackPaymentProcessor(PaymentProcessor):
                 'metadata': metadata or {}
             }
             
+            # Paystack requires email — extract from metadata if provided
+            if metadata and metadata.get('email'):
+                transaction_data['email'] = metadata['email']
+            else:
+                # Fallback: use a placeholder (Paystack requires this field)
+                transaction_data['email'] = metadata.get('email', 'noreply@eytgaming.com') if metadata else 'noreply@eytgaming.com'
+            
             # Initialize transaction
             response = self._make_request(
                 'POST',

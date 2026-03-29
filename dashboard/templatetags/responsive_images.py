@@ -98,6 +98,7 @@ def responsive_avatar(image_field, alt_text="", css_class="", lazy=True, img_id=
         class="responsive-image avatar {css_class}"
         loading="{'lazy' if lazy else 'eager'}"
         decoding="async"
+        onerror="this.onerror=null;this.style.display='none';var p=document.createElement('div');p.className='avatar-placeholder';p.setAttribute('role','img');p.setAttribute('aria-label',this.alt||'Avatar');this.parentNode.insertBefore(p,this);"
     />
 </picture>'''
     else:
@@ -110,6 +111,7 @@ def responsive_avatar(image_field, alt_text="", css_class="", lazy=True, img_id=
         class="responsive-image avatar {css_class}"
         loading="{'lazy' if lazy else 'eager'}"
         decoding="async"
+        onerror="this.onerror=null;this.style.display='none';var p=document.createElement('div');p.className='avatar-placeholder';p.setAttribute('role','img');p.setAttribute('aria-label',this.alt||'Avatar');this.parentNode.insertBefore(p,this);"
     />'''
     
     return mark_safe(html)

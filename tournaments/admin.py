@@ -12,6 +12,8 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.contenttypes.models import ContentType
 from .models import Tournament, Participant, Bracket, Match, MatchDispute, Payment
 
 
@@ -21,6 +23,13 @@ class ParticipantInline(admin.TabularInline):
     fields = ['user', 'team', 'status', 'checked_in', 'seed', 'final_placement']
     readonly_fields = ['registered_at']
     raw_id_fields = ['user', 'team']
+    
+    def get_readonly_fields(self, request, obj=None):
+        """Make seed readonly if tournament has started"""
+        readonly = list(self.readonly_fields)
+        if obj and obj.status in ['in_progress', 'completed']:
+            readonly.append('seed')
+        return readonly
 
 
 class MatchInline(admin.TabularInline):
@@ -199,6 +208,7 @@ class ParticipantAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'team__name', 
                      'tournament__name']
     raw_id_fields = ['tournament', 'user', 'team']
+    ordering = ['tournament', 'seed', 'registered_at']
     
     fieldsets = (
         ('Participant Info', {
@@ -221,7 +231,8 @@ class ParticipantAdmin(admin.ModelAdmin):
     
     readonly_fields = ['registered_at', 'check_in_time']
     
-    actions = ['check_in_participants', 'confirm_participants', 'disqualify_participants']
+    actions = ['check_in_participants', 'confirm_participants', 'disqualify_participants', 
+               'assign_sequential_seeds']
     
     def match_record(self, obj):
         return f"{obj.matches_won}W - {obj.matches_lost}L ({obj.win_rate}%)"
@@ -244,6 +255,28 @@ class ParticipantAdmin(admin.ModelAdmin):
         updated = queryset.update(status='disqualified')
         self.message_user(request, f'{updated} participants disqualified.')
     disqualify_participants.short_description = 'Disqualify selected participants'
+    
+    def assign_sequential_seeds(self, request, queryset):
+        """Bulk action to assign sequential seeds to selected participants"""
+        count = 0
+        for index, participant in enumerate(queryset, start=1):
+            old_seed = participant.seed
+            participant.seed = index
+            participant.save()
+            
+            # Create audit log entry
+            LogEntry.objects.create(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(Participant).pk,
+                object_id=participant.id,
+                object_repr=str(participant),
+                action_flag=CHANGE,
+                change_message=f"Bulk seeded: {old_seed} → {index}"
+            )
+            count += 1
+        
+        self.message_user(request, f'{count} participants seeded sequentially.')
+    assign_sequential_seeds.short_description = 'Assign sequential seeds (1, 2, 3...)'
 
 
 @admin.register(Bracket)

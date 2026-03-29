@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Players Directory — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+.pd-page { background:#0A0A0A; min-height:100vh; }
+.pd-hero { background:linear-gradient(135deg,#1a0000 0%,#0d0d0d 60%,#1a0000 100%);
+           border-bottom:1px solid #1f1f1f; padding:3rem 0 2rem; }
+.pd-hero-title { font-family:'Barlow Condensed',sans-serif; font-size:2.8rem;
+                 font-weight:900; text-transform:uppercase; letter-spacing:.05em;
+                 color:#fff; line-height:1; }
+.pd-hero-title span { color:#dc2626; }
+.pd-search { display:flex; gap:.5rem; max-width:480px; }
+.pd-search input { flex:1; background:#111; border:1px solid #2a2a2a; border-radius:8px;
+                   color:#fff; padding:.65rem 1rem; font-size:.9rem; outline:none; }
+.pd-search input:focus { border-color:#dc2626; }
+.pd-search button { background:#dc2626; border:none; border-radius:8px; color:#fff;
+                    padding:.65rem 1.1rem; cursor:pointer; font-weight:700;
+                    font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+                    text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+.pd-search button:hover { background:#b91c1c; }
+.pd-filter-bar { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.pd-filter-select { background:#111; border:1px solid #2a2a2a; border-radius:6px;
+                    color:#9ca3af; padding:.45rem .85rem; font-size:.8rem; outline:none;
+                    cursor:pointer; }
+.pd-filter-select:focus { border-color:#dc2626; color:#fff; }
+.pd-filter-select option { background:#111; }
+.pd-chip { display:inline-flex; align-items:center; gap:4px; padding:4px 10px;
+           border-radius:4px; font-size:.72rem; font-weight:700; text-transform:uppercase;
+           letter-spacing:.05em; background:rgba(220,38,38,.15); color:#dc2626;
+           border:1px solid rgba(220,38,38,.3); text-decoration:none; }
+.pd-chip:hover { background:rgba(220,38,38,.25); }
+.pd-count { color:#555; font-size:.82rem; }
+
+/* Player cards */
+.pd-card { background:#111; border:1px solid #1f1f1f; border-radius:10px;
+           overflow:hidden; text-decoration:none; display:block;
+           transition:border-color .2s, transform .2s; }
+.pd-card:hover { border-color:#dc2626; transform:translateY(-3px); }
+.pd-card-banner { height:60px; background:linear-gradient(135deg,#1a0000,#0d0d0d);
+                  position:relative; overflow:hidden; }
+.pd-card-banner img { width:100%; height:100%; object-fit:cover; opacity:.5; }
+.pd-card-avatar { width:64px; height:64px; border-radius:50%; border:3px solid #dc2626;
+                  overflow:hidden; background:#1a1a1a; margin:-32px auto 0;
+                  position:relative; z-index:2; display:block; }
+.pd-card-avatar img { width:100%; height:100%; object-fit:cover; }
+.pd-card-avatar-init { width:100%; height:100%; background:linear-gradient(135deg,#dc2626,#7f1d1d);
+                       display:flex; align-items:center; justify-content:center;
+                       font-family:'Barlow Condensed',sans-serif; font-size:1.6rem;
+                       font-weight:700; color:#fff; }
+.pd-card-body { padding:.85rem 1rem 1rem; text-align:center; }
+.pd-card-name { font-family:'Barlow Condensed',sans-serif; font-size:1.05rem; font-weight:800;
+                text-transform:uppercase; color:#fff; letter-spacing:.04em;
+                white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pd-card-role { font-size:.72rem; color:#6b7280; text-transform:uppercase;
+                letter-spacing:.05em; margin-top:2px; }
+.pd-card-level { display:inline-flex; align-items:center; gap:4px; margin-top:.5rem;
+                 font-size:.72rem; font-weight:700; color:#dc2626;
+                 text-transform:uppercase; letter-spacing:.05em; }
+.pd-card-games { display:flex; flex-wrap:wrap; justify-content:center; gap:4px; margin-top:.5rem; }
+.pd-game-tag { font-size:.65rem; padding:2px 7px; border-radius:3px;
+               background:#1a1a1a; color:#9ca3af; border:1px solid #2a2a2a; }
+.pd-card-stats { display:flex; justify-content:center; gap:1rem; margin-top:.65rem;
+                 padding-top:.65rem; border-top:1px solid #1a1a1a; }
+.pd-stat { text-align:center; }
+.pd-stat-val { font-family:'Barlow Condensed',sans-serif; font-size:1.1rem;
+               font-weight:800; color:#fff; }
+.pd-stat-lbl { font-size:.62rem; color:#555; text-transform:uppercase; letter-spacing:.04em; }
+
+/* Pagination */
+.pd-page-btn { display:inline-flex; align-items:center; justify-content:center;
+               width:36px; height:36px; border-radius:6px; background:#111;
+               border:1px solid #2a2a2a; color:#9ca3af; text-decoration:none;
+               font-size:.85rem; font-weight:700; transition:all .15s; }
+.pd-page-btn:hover, .pd-page-btn.active { background:#dc2626; border-color:#dc2626; color:#fff; }
+.pd-page-btn.disabled { opacity:.35; pointer-events:none; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="pd-page">
+
+  {# Hero #}
+  <div class="pd-hero">
+    <div class="container mx-auto px-4">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+        <div>
+          <div class="pd-hero-title">PLAYER <span>DIRECTORY</span></div>
+          <p style="color:#6b7280;font-size:.88rem;margin-top:.35rem;">
+            {% if q %}
+              <span style="color:#dc2626;">{{ total_count }} result{{ total_count|pluralize }}</span> for "{{ q }}"
+            {% else %}
+              Browse {{ total_count }} registered player{{ total_count|pluralize }} on EYTGaming
+            {% endif %}
+          </p>
+        </div>
+        <a href="{% url 'home' %}" style="display:inline-flex;align-items:center;gap:6px;
+           color:#6b7280;font-size:.82rem;text-decoration:none;font-weight:600;
+           text-transform:uppercase;letter-spacing:.05em;">
+          <span style="font-family:'Material Symbols Outlined';font-size:16px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">arrow_back</span>
+          Back to Home
+        </a>
+      </div>
+
+      {# Search + Filters #}
+      <form method="get" action="{% url 'core:player_directory' %}">
+        <div style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;">
+          <div class="pd-search">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search by username or name…" autocomplete="off" autofocus>
+            <button type="submit">Search</button>
+          </div>
+          <div class="pd-filter-bar">
+            <select name="game" class="pd-filter-select" onchange="this.form.submit()">
+              <option value="">All Games</option>
+              {% for game in games %}
+              <option value="{{ game.slug }}" {% if game_slug == game.slug %}selected{% endif %}>{{ game.name }}</option>
+              {% endfor %}
+            </select>
+            <select name="skill" class="pd-filter-select" onchange="this.form.submit()">
+              <option value="">All Skill Levels</option>
+              {% for val, label in skill_choices %}
+              <option value="{{ val }}" {% if skill == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if q or game_slug or skill %}
+            <a href="{% url 'core:player_directory' %}" class="pd-chip">
+              <span style="font-family:'Material Symbols Outlined';font-size:12px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">close</span>
+              Clear
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {# Grid #}
+  <div class="container mx-auto px-4 py-8">
+
+    {% if players_page.object_list %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">
+      {% for user in players_page.object_list %}
+      {% if user.username %}
+      <a href="{% url 'dashboard:profile_view' username=user.username %}" class="pd-card">
+        {# Banner #}
+        <div class="pd-card-banner">
+          {% if user.banner %}
+          <img src="{{ user.banner.url }}" alt="">
+          {% endif %}
+        </div>
+        {# Avatar #}
+        <div class="pd-card-avatar">
+          {% if user.avatar %}
+          <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}">
+          {% else %}
+          <div class="pd-card-avatar-init">{{ user.get_display_name|first|upper }}</div>
+          {% endif %}
+        </div>
+        <div class="pd-card-body">
+          <div class="pd-card-name">{{ user.get_display_name }}</div>
+          <div class="pd-card-role">
+            {{ user.get_skill_level_display }}
+            {% if user.country %} · {{ user.country }}{% endif %}
+          </div>
+          <div class="pd-card-level">
+            <span style="font-family:'Material Symbols Outlined';font-size:13px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">bolt</span>
+            LVL {{ user.level }}
+          </div>
+          {# Game tags #}
+          {% with gps=user.game_profiles.all %}
+          {% if gps %}
+          <div class="pd-card-games">
+            {% for gp in gps|slice:":3" %}
+            <span class="pd-game-tag">{{ gp.game.name }}</span>
+            {% endfor %}
+            {% if gps.count > 3 %}
+            <span class="pd-game-tag">+{{ gps.count|add:"-3" }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endwith %}
+          {# Stats #}
+          <div class="pd-card-stats">
+            <div class="pd-stat">
+              <div class="pd-stat-val">{{ user.total_points }}</div>
+              <div class="pd-stat-lbl">Points</div>
+            </div>
+            <div class="pd-stat">
+              <div class="pd-stat-val">{{ user.level }}</div>
+              <div class="pd-stat-lbl">Level</div>
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    {# Pagination #}
+    {% if players_page.has_other_pages %}
+    <div style="display:flex;justify-content:center;align-items:center;gap:.4rem;margin-top:2.5rem;flex-wrap:wrap;">
+      {% if players_page.has_previous %}
+      <a href="?page={{ players_page.previous_page_number }}&q={{ q }}&game={{ game_slug }}&skill={{ skill }}" class="pd-page-btn">‹</a>
+      {% else %}
+      <span class="pd-page-btn disabled">‹</span>
+      {% endif %}
+
+      {% for num in players_page.paginator.page_range %}
+        {% if players_page.number == num %}
+        <span class="pd-page-btn active">{{ num }}</span>
+        {% elif num > players_page.number|add:"-3" and num < players_page.number|add:"3" %}
+        <a href="?page={{ num }}&q={{ q }}&game={{ game_slug }}&skill={{ skill }}" class="pd-page-btn">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if players_page.has_next %}
+      <a href="?page={{ players_page.next_page_number }}&q={{ q }}&game={{ game_slug }}&skill={{ skill }}" class="pd-page-btn">›</a>
+      {% else %}
+      <span class="pd-page-btn disabled">›</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div style="text-align:center;padding:5rem 1rem;">
+      <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;margin-bottom:1rem;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">group</span>
+      <p style="color:#6b7280;font-size:1.1rem;">No players found{% if q %} for "{{ q }}"{% endif %}.</p>
+      {% if q or game_slug or skill %}
+      <a href="{% url 'core:player_directory' %}" style="display:inline-block;margin-top:1rem;color:#dc2626;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;">Clear filters →</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1322 @@
+/* ==========================================
+   MANAGE PARTICIPANT GAMING DESIGN STYLES
+   ========================================== */
+
+/* Font Imports with font-display: swap for optimal loading (Requirement 10.6) */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+/* ==========================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ========================================== */
+
+:root {
+  /* Color Palette */
+  --color-deep-black: #0A0A0A;
+  --color-gunmetal-gray: #1F2937;
+  --color-electric-red: #DC2626;
+  --color-neon-cyan: #06B6D4;
+  --color-neon-green: #10B981;
+  --color-neon-yellow: #F59E0B;
+  --color-gray-muted: #6B7280;
+  
+  /* Glow Effects */
+  --glow-red: 0 0 20px rgba(220, 38, 38, 0.3);
+  --glow-red-intense: 0 0 30px rgba(220, 38, 38, 0.5);
+  --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.3);
+  --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+  --glow-yellow: 0 0 20px rgba(245, 158, 11, 0.3);
+  
+  /* Typography */
+  --font-gaming: 'Barlow Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-numeric: 'Space Grotesk', 'SF Pro Display', system-ui, sans-serif;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+/* ==========================================
+   BASE BACKGROUND STYLING
+   ========================================== */
+
+.gaming-page-container {
+  background-color: var(--color-deep-black);
+  min-height: 100vh;
+  background-image: 
+    linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+/* Optional scanline effect for retro gaming feel */
+.gaming-page-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* ==========================================
+   TYPOGRAPHY FOUNDATION
+   ========================================== */
+
+.gaming-heading {
+  font-family: var(--font-gaming);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.gaming-heading-primary {
+  font-size: 2rem;
+  color: var(--color-electric-red);
+  text-shadow: var(--glow-red);
+}
+
+.gaming-heading-secondary {
+  font-size: 1.5rem;
+  color: #FFFFFF;
+}
+
+.gaming-text-numeric {
+  font-family: var(--font-numeric);
+  font-weight: 700;
+}
+
+/* ==========================================
+   ANIMATION KEYFRAMES
+   ========================================== */
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow: var(--glow-red);
+  }
+  50% {
+    box-shadow: var(--glow-red-intense);
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ==========================================
+   GPU ACCELERATION OPTIMIZATIONS
+   ========================================== */
+
+/*
+ * GPU Acceleration Strategy:
+ * 
+ * 1. All animations use ONLY transform and opacity properties
+ *    - These properties are GPU-accelerated and don't trigger layout/paint
+ *    - Avoid animating: width, height, top, left, margin, padding
+ * 
+ * 2. will-change property applied to animated elements
+ *    - Tells browser to optimize for upcoming animations
+ *    - Applied to: transform, opacity, background-position
+ *    - Automatically removed after animations complete (via animation-fill-mode)
+ * 
+ * 3. Animation performance checklist:
+ *    ✓ fadeInUp: Uses transform (translateY) and opacity
+ *    ✓ modalSlideIn/Out: Uses transform (scale, translateY) and opacity
+ *    ✓ ripple: Uses transform (scale) and opacity
+ *    ✓ statusPulse: Uses opacity only
+ *    ✓ neonPulse: Uses box-shadow (acceptable for glow effects)
+ *    ✓ gradientFlow: Uses background-position (acceptable for gradient animation)
+ * 
+ * 4. Transition optimizations:
+ *    - Replaced "transition: all" with specific properties
+ *    - Only transition properties that actually change
+ *    - Reduces unnecessary GPU work
+ */
+
+/* ==========================================
+   BROWSER COMPATIBILITY FALLBACKS
+   ========================================== */
+
+/* Fallback for browsers that don't support CSS transforms */
+@supports not (transform: skewY(-1deg)) {
+  .gaming-stat-card {
+    transform: none;
+  }
+  
+  .gaming-stat-card:hover {
+    transform: none;
+  }
+  
+  .gaming-btn-primary {
+    transform: none;
+  }
+  
+  .gaming-btn-primary:hover {
+    transform: none;
+  }
+  
+  /* Maintain functionality without skew effects */
+  .gaming-stat-card,
+  .gaming-btn-primary {
+    border-width: 2px; /* Emphasize borders when transforms unavailable */
+  }
+}
+
+/* Fallback for browsers that don't support CSS custom properties (variables) */
+@supports not (--css: variables) {
+  .gaming-page-container {
+    background-color: #0A0A0A;
+  }
+  
+  .gaming-stat-card {
+    background: rgba(31, 41, 55, 0.6);
+    border: 2px solid rgba(220, 38, 38, 0.3);
+  }
+  
+  .gaming-btn-primary {
+    background: #DC2626;
+    color: #FFFFFF;
+  }
+  
+  .gaming-heading-primary {
+    color: #DC2626;
+  }
+  
+  .gaming-stat-value {
+    color: #DC2626;
+  }
+}
+
+/* Vendor prefixes for better browser support */
+.gaming-stat-card,
+.gaming-btn-primary {
+  -webkit-transform: skewY(-1deg);
+  -moz-transform: skewY(-1deg);
+  -ms-transform: skewY(-1deg);
+  -o-transform: skewY(-1deg);
+}
+
+.gaming-stat-card:hover {
+  -webkit-transform: skewY(0deg) translateY(-4px);
+  -moz-transform: skewY(0deg) translateY(-4px);
+  -ms-transform: skewY(0deg) translateY(-4px);
+  -o-transform: skewY(0deg) translateY(-4px);
+}
+
+.gaming-btn-primary {
+  -webkit-transform: skewX(-12deg);
+  -moz-transform: skewX(-12deg);
+  -ms-transform: skewX(-12deg);
+  -o-transform: skewX(-12deg);
+}
+
+.gaming-btn-primary:hover {
+  -webkit-transform: skewX(0deg) translateY(-2px);
+  -moz-transform: skewX(0deg) translateY(-2px);
+  -ms-transform: skewX(0deg) translateY(-2px);
+  -o-transform: skewX(0deg) translateY(-2px);
+}
+
+/* Vendor prefixes for transitions */
+.gaming-stat-card,
+.gaming-btn-primary,
+.gaming-btn-ghost,
+.gaming-btn-action,
+.gaming-input,
+.gaming-search-bar {
+  -webkit-transition: all var(--transition-normal);
+  -moz-transition: all var(--transition-normal);
+  -ms-transition: all var(--transition-normal);
+  -o-transition: all var(--transition-normal);
+}
+
+/* Vendor prefixes for animations */
+@-webkit-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+  }
+}
+
+@-moz-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -moz-transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    -moz-transform: translateY(0);
+  }
+}
+
+/* Vendor prefixes for box-shadow (for older browsers) */
+.gaming-stat-card,
+.gaming-table-container,
+.gaming-modal {
+  -webkit-box-shadow: var(--glow-red);
+  -moz-box-shadow: var(--glow-red);
+}
+
+/* Vendor prefixes for border-radius */
+.gaming-stat-card,
+.gaming-table-container,
+.gaming-modal,
+.gaming-btn-primary,
+.gaming-btn-ghost,
+.gaming-btn-action,
+.gaming-input,
+.gaming-search-bar {
+  -webkit-border-radius: 0.5rem;
+  -moz-border-radius: 0.5rem;
+}
+
+.gaming-status-dot,
+.gaming-seed-badge {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+}
+
+/* ==========================================
+   STAT CARDS COMPONENT
+   ========================================== */
+
+.gaming-stats-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.gaming-stat-card {
+  background: rgba(31, 41, 55, 0.6);
+  border: 2px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.5rem;
+  padding: var(--spacing-lg);
+  transform: skewY(-1deg);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  box-shadow: var(--glow-red);
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+  flex: 1;
+  min-width: 200px;
+}
+
+.gaming-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--color-electric-red),
+    var(--color-neon-cyan),
+    var(--color-electric-red)
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  will-change: opacity;
+}
+
+.gaming-stat-card:hover {
+  transform: skewY(0deg) translateY(-4px);
+  box-shadow: var(--glow-red-intense);
+  border-color: rgba(220, 38, 38, 0.6);
+}
+
+.gaming-stat-card:hover::before {
+  opacity: 1;
+  animation: gradientFlow 3s ease infinite;
+  will-change: background-position;
+}
+
+.gaming-stat-value {
+  font-family: var(--font-numeric);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-electric-red);
+  line-height: 1;
+  margin-bottom: var(--spacing-sm);
+}
+
+.gaming-stat-label {
+  font-family: var(--font-gaming);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: var(--color-gray-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================
+   PARTICIPANT TABLE COMPONENT
+   ========================================== */
+
+.gaming-table-container {
+  background: rgba(31, 41, 55, 0.6);
+  border: 2px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.gaming-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gaming-table thead {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.gaming-table th {
+  font-family: var(--font-gaming);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-electric-red);
+  padding: var(--spacing-md);
+  text-align: left;
+  letter-spacing: 0.05em;
+}
+
+.gaming-table tbody tr {
+  border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+  transition: background-color var(--transition-fast);
+  will-change: background-color;
+}
+
+.gaming-table tbody tr:hover {
+  background-color: rgba(220, 38, 38, 0.08);
+}
+
+.gaming-table td {
+  padding: var(--spacing-md);
+  color: #FFFFFF;
+}
+
+/* ==========================================
+   STATUS INDICATORS
+   ========================================== */
+
+.gaming-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.gaming-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.gaming-status-dot.checked-in {
+  background-color: var(--color-neon-green);
+  box-shadow: var(--glow-green);
+  animation: statusPulse 2s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.gaming-status-dot.pending {
+  background-color: var(--color-neon-yellow);
+  box-shadow: var(--glow-yellow);
+  animation: statusPulse 2s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.gaming-status-dot.confirmed {
+  background-color: var(--color-neon-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.gaming-status-dot.withdrawn {
+  background-color: var(--color-gray-muted);
+}
+
+.gaming-status-dot.disqualified {
+  background-color: var(--color-electric-red);
+  box-shadow: var(--glow-red);
+}
+
+/* ==========================================
+   SEED BADGES
+   ========================================== */
+
+.gaming-seed-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--color-electric-red);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: var(--glow-red);
+}
+
+/* ==========================================
+   SEARCH BAR AND TOOLBAR
+   ========================================== */
+
+.gaming-search-bar {
+  background: rgba(31, 31, 31, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.5rem;
+  padding: var(--spacing-md);
+  color: #FFFFFF;
+  font-family: var(--font-gaming);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  width: 100%;
+}
+
+.gaming-search-bar:focus {
+  outline: none;
+  border-color: var(--color-electric-red);
+  box-shadow: var(--glow-red);
+}
+
+.gaming-search-bar::placeholder {
+  color: var(--color-gray-muted);
+}
+
+/* Search icon styling */
+.gaming-search-icon {
+  color: var(--color-electric-red);
+  transition: color var(--transition-fast);
+}
+
+.gaming-search-container:focus-within .gaming-search-icon {
+  color: var(--color-electric-red);
+  filter: drop-shadow(var(--glow-red));
+}
+
+/* ==========================================
+   GAMING BUTTONS
+   ========================================== */
+
+.gaming-btn-primary {
+  background: var(--color-electric-red);
+  color: #FFFFFF;
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: italic;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: 0.375rem;
+  transform: skewX(-12deg);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), background var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow-red);
+  min-width: 44px;
+  min-height: 44px;
+  will-change: transform;
+}
+
+.gaming-btn-primary:hover {
+  transform: skewX(0deg) translateY(-2px);
+  box-shadow: var(--glow-red-intense);
+  background: #B91C1C;
+}
+
+.gaming-btn-primary:active {
+  transform: skewX(0deg) translateY(0);
+}
+
+/* Ripple effect - JavaScript triggered */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Ensure buttons can contain ripple effect */
+.gaming-btn-primary,
+.gaming-btn-ghost,
+.gaming-btn-action {
+  position: relative;
+  overflow: hidden;
+}
+
+.gaming-btn-ghost {
+  background: transparent;
+  color: var(--color-electric-red);
+  border: 1px solid var(--color-electric-red);
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 0.375rem;
+  transition: background var(--transition-normal), box-shadow var(--transition-normal);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.gaming-btn-ghost:hover {
+  background: rgba(220, 38, 38, 0.1);
+  box-shadow: var(--glow-red);
+}
+
+.gaming-btn-action {
+  background: rgba(220, 38, 38, 0.2);
+  color: var(--color-electric-red);
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-electric-red);
+  border-radius: 0.25rem;
+  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.gaming-btn-action:hover {
+  background: var(--color-electric-red);
+  color: #FFFFFF;
+  box-shadow: var(--glow-red);
+}
+
+/* ==========================================
+   MODAL COMPONENTS
+   ========================================== */
+
+.gaming-modal-backdrop,
+#seed-modal,
+#add-participant-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn var(--transition-normal);
+  will-change: opacity;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(20px)) {
+  .gaming-modal-backdrop,
+  #seed-modal,
+  #add-participant-modal {
+    background: rgba(0, 0, 0, 0.95); /* Increased opacity for solid background */
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.gaming-modal-backdrop.closing {
+  animation: fadeOut var(--transition-normal);
+}
+
+.gaming-modal {
+  background: var(--color-gunmetal-gray);
+  border: 2px solid var(--color-electric-red);
+  border-radius: 0.5rem;
+  padding: var(--spacing-xl);
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--glow-red-intense);
+  animation: modalSlideIn var(--transition-normal);
+  will-change: transform, opacity;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalSlideOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+}
+
+.gaming-modal.closing {
+  animation: modalSlideOut var(--transition-normal);
+}
+
+/* Apply gaming styles to modal action buttons */
+#seed-modal button[type="submit"],
+#add-participant-modal button[type="submit"],
+#seed-modal .bg-\[\#b91c1c\],
+#add-participant-modal .bg-\[\#b91c1c\] {
+  background: var(--color-electric-red);
+  color: #FFFFFF;
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: italic;
+  transform: skewX(-12deg);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), background var(--transition-normal);
+  box-shadow: var(--glow-red);
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+#seed-modal button[type="submit"]:hover,
+#add-participant-modal button[type="submit"]:hover,
+#seed-modal .bg-\[\#b91c1c\]:hover,
+#add-participant-modal .bg-\[\#b91c1c\]:hover {
+  transform: skewX(0deg) translateY(-2px);
+  box-shadow: var(--glow-red-intense);
+  background: #B91C1C;
+}
+
+/* Apply gaming styles to modal cancel buttons */
+#seed-modal button[type="button"],
+#add-participant-modal button[type="button"],
+#seed-modal .bg-gray-700,
+#add-participant-modal .bg-gray-700 {
+  background: transparent;
+  color: var(--color-gray-muted);
+  border: 1px solid var(--color-gray-muted);
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: background var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+#seed-modal button[type="button"]:hover,
+#add-participant-modal button[type="button"]:hover,
+#seed-modal .bg-gray-700:hover,
+#add-participant-modal .bg-gray-700:hover {
+  background: rgba(107, 114, 128, 0.1);
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.gaming-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.gaming-modal-title {
+  font-family: var(--font-gaming);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: var(--color-electric-red);
+  font-weight: 700;
+}
+
+.gaming-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--color-gray-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.gaming-modal-close:hover {
+  color: var(--color-electric-red);
+}
+
+.gaming-modal-body {
+  margin-bottom: var(--spacing-lg);
+}
+
+.gaming-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* ==========================================
+   GAMING INPUT FIELDS
+   ========================================== */
+
+.gaming-input {
+  background: rgba(31, 31, 31, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 0.375rem;
+  padding: var(--spacing-md);
+  color: #FFFFFF;
+  font-family: var(--font-gaming);
+  width: 100%;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  min-height: 44px;
+}
+
+.gaming-input:focus {
+  outline: none;
+  border-color: var(--color-electric-red);
+  box-shadow: var(--glow-red);
+}
+
+.gaming-input::placeholder {
+  color: var(--color-gray-muted);
+}
+
+.gaming-label {
+  font-family: var(--font-gaming);
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  color: var(--color-gray-muted);
+  margin-bottom: var(--spacing-sm);
+  display: block;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================
+   FOCUS INDICATORS (ACCESSIBILITY)
+   ========================================== */
+
+/* Primary focus indicators for gaming-styled elements */
+.gaming-btn-primary:focus,
+.gaming-btn-ghost:focus,
+.gaming-btn-action:focus,
+.gaming-input:focus,
+.gaming-search-bar:focus {
+  outline: 2px solid var(--color-electric-red);
+  outline-offset: 2px;
+}
+
+/* Focus indicators for standard interactive elements */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus {
+  outline: 2px solid var(--color-electric-red);
+  outline-offset: 2px;
+}
+
+/* Focus indicators for checkboxes and radio buttons */
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+  outline: 2px solid var(--color-electric-red);
+  outline-offset: 2px;
+  box-shadow: var(--glow-red);
+}
+
+/* Ensure modal close buttons have visible focus */
+.gaming-modal-close:focus {
+  outline: 2px solid var(--color-electric-red);
+  outline-offset: 2px;
+}
+
+/* Focus for table sort buttons */
+th button:focus {
+  outline: 2px solid var(--color-electric-red);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+/* Tablet: 768px - 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .gaming-stat-card {
+    padding: var(--spacing-md);
+  }
+  
+  .gaming-stat-value {
+    font-size: 2rem;
+  }
+}
+
+/* Mobile: < 768px */
+@media (max-width: 767px) {
+  .gaming-page-container {
+    background-size: 30px 30px;
+  }
+  
+  .gaming-heading-primary {
+    font-size: 1.5rem;
+  }
+  
+  /* Stack stat cards vertically on mobile (Requirement 8.1) */
+  .gaming-stats-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .gaming-stat-card {
+    padding: var(--spacing-md);
+    transform: skewY(0deg);
+    width: 100%;
+  }
+  
+  .gaming-stat-card:hover {
+    transform: skewY(0deg);
+  }
+  
+  .gaming-stat-value {
+    font-size: 1.75rem;
+  }
+  
+  /* Enable horizontal scrolling for participant table (Requirement 8.2) */
+  .gaming-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Make search bar full width on mobile (Requirement 8.3) */
+  .gaming-search-bar {
+    width: 100%;
+  }
+  
+  .gaming-search-container {
+    width: 100%;
+  }
+  
+  .gaming-btn-primary {
+    width: 100%;
+    transform: skewX(0deg);
+  }
+  
+  .gaming-btn-primary:hover {
+    transform: skewX(0deg);
+  }
+  
+  .gaming-modal {
+    width: 95%;
+    padding: var(--spacing-lg);
+  }
+  
+  /* ==========================================
+     MOBILE ANIMATION OPTIMIZATIONS
+     Requirements: 8.5, 8.6
+     ========================================== */
+  
+  /* Reduce animation complexity on mobile (Requirement 8.5) */
+  
+  /* Disable complex gradient animations on mobile for performance */
+  .gaming-stat-card::before {
+    animation: none !important;
+    will-change: auto;
+  }
+  
+  /* Simplify status pulse animation - reduce frequency */
+  .gaming-status-dot.checked-in,
+  .gaming-status-dot.pending {
+    animation-duration: 3s; /* Slower pulse = less GPU work */
+  }
+  
+  /* Disable scanline effect on mobile */
+  .gaming-page-container::before {
+    display: none;
+  }
+  
+  /* Simplify hover effects - remove elevation transforms */
+  .gaming-stat-card:hover {
+    transform: skewY(0deg); /* Remove translateY for simpler animation */
+  }
+  
+  .gaming-btn-primary:hover {
+    transform: skewX(0deg); /* Remove translateY for simpler animation */
+  }
+  
+  /* Disable will-change on mobile to reduce memory usage */
+  .gaming-stat-card,
+  .gaming-btn-primary,
+  .gaming-table tbody tr,
+  .gaming-status-dot.checked-in,
+  .gaming-status-dot.pending,
+  .gaming-modal-backdrop,
+  .gaming-modal,
+  .gaming-fade-in-up {
+    will-change: auto;
+  }
+  
+  /* Scale gaming visual effects for smaller viewports (Requirement 8.6) */
+  
+  /* Reduce glow intensity on mobile */
+  :root {
+    --glow-red: 0 0 10px rgba(220, 38, 38, 0.2);
+    --glow-red-intense: 0 0 15px rgba(220, 38, 38, 0.3);
+    --glow-cyan: 0 0 10px rgba(6, 182, 212, 0.2);
+    --glow-green: 0 0 10px rgba(16, 185, 129, 0.2);
+    --glow-yellow: 0 0 10px rgba(245, 158, 11, 0.2);
+  }
+  
+  /* Reduce border glow on cards and containers */
+  .gaming-stat-card,
+  .gaming-table-container,
+  .gaming-modal {
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.15);
+  }
+  
+  /* Simplify seed badge glow */
+  .gaming-seed-badge {
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.15);
+  }
+  
+  /* Reduce status indicator glows */
+  .gaming-status-dot.checked-in {
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.15);
+  }
+  
+  .gaming-status-dot.pending {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
+  }
+  
+  .gaming-status-dot.confirmed {
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.15);
+  }
+  
+  .gaming-status-dot.disqualified {
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.15);
+  }
+  
+  /* Simplify button glows */
+  .gaming-btn-primary,
+  .gaming-btn-ghost:hover,
+  .gaming-btn-action:hover {
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.15);
+  }
+  
+  /* Reduce backdrop blur for better mobile performance */
+  .gaming-modal-backdrop,
+  #seed-modal,
+  #add-participant-modal {
+    backdrop-filter: blur(10px); /* Reduced from 20px */
+  }
+  
+  /* Simplify modal animations */
+  .gaming-modal {
+    animation-duration: 0.2s; /* Faster animation = less GPU time */
+  }
+  
+  .gaming-modal-backdrop {
+    animation-duration: 0.2s;
+  }
+  
+  /* Reduce transition durations for snappier feel on mobile */
+  .gaming-stat-card,
+  .gaming-btn-primary,
+  .gaming-btn-ghost,
+  .gaming-btn-action,
+  .gaming-input,
+  .gaming-search-bar {
+    transition-duration: 0.15s;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY - REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .gaming-stat-card::before {
+    animation: none;
+  }
+  
+  .gaming-status-dot.checked-in,
+  .gaming-status-dot.pending {
+    animation: none;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY - HIGH CONTRAST MODE
+   ========================================== */
+
+@media (prefers-contrast: high) {
+  /* Remove decorative glows in high contrast mode */
+  .gaming-stat-card,
+  .gaming-table-container,
+  .gaming-modal {
+    box-shadow: none;
+    border-width: 3px; /* Thicker borders for better visibility */
+    border-color: var(--color-electric-red);
+  }
+  
+  .gaming-status-dot.checked-in,
+  .gaming-status-dot.pending,
+  .gaming-status-dot.confirmed,
+  .gaming-status-dot.disqualified {
+    box-shadow: none;
+    border: 2px solid currentColor; /* Add border for better definition */
+  }
+  
+  .gaming-btn-primary,
+  .gaming-btn-ghost,
+  .gaming-btn-action {
+    box-shadow: none;
+    border-width: 2px;
+  }
+  
+  .gaming-seed-badge {
+    box-shadow: none;
+    border: 2px solid var(--color-electric-red);
+  }
+  
+  /* Increase text contrast */
+  .gaming-stat-label,
+  .gaming-label,
+  .gaming-modal-close {
+    color: #FFFFFF; /* Increase from gray to white */
+  }
+  
+  /* Remove semi-transparency for better contrast */
+  .gaming-stat-card,
+  .gaming-table-container {
+    background: var(--color-gunmetal-gray); /* Solid background */
+  }
+  
+  .gaming-search-bar,
+  .gaming-input {
+    background: #1F1F1F; /* Solid dark background */
+  }
+  
+  /* Enhance focus indicators in high contrast */
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus,
+  [tabindex]:focus {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+  
+  /* Remove background patterns that reduce contrast */
+  .gaming-page-container {
+    background-image: none;
+  }
+  
+  .gaming-page-container::before {
+    display: none; /* Remove scanline effect */
+  }
+  
+  /* Disable gradient animations that reduce contrast */
+  .gaming-stat-card::before {
+    display: none;
+  }
+  
+  /* Ensure text shadows don't reduce readability */
+  .gaming-heading-primary {
+    text-shadow: none;
+  }
+}
+
+/* ==========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================== */
+
+/* Lazy Loading Avatar Placeholders (Requirement 10.3) */
+.avatar-loading {
+  background: linear-gradient(
+    90deg,
+    rgba(31, 41, 55, 0.6) 0%,
+    rgba(220, 38, 38, 0.1) 50%,
+    rgba(31, 41, 55, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  animation: avatarShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes avatarShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.avatar-loaded {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.avatar-error {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+/* Viewport-Based Glow Optimization (Requirement 10.5) */
+/* Disable glow effects for elements outside viewport */
+.glow-disabled {
+  box-shadow: none !important;
+}
+
+.glow-disabled .gaming-status-dot {
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Reduce will-change for off-screen elements to save memory */
+.glow-disabled {
+  will-change: auto !important;
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+.gaming-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+  will-change: transform, opacity;
+}
+
+.gaming-text-center {
+  text-align: center;
+}
+
+.gaming-flex {
+  display: flex;
+}
+
+.gaming-flex-col {
+  flex-direction: column;
+}
+
+.gaming-gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gaming-gap-md {
+  gap: var(--spacing-md);
+}
+
+.gaming-gap-lg {
+  gap: var(--spacing-lg);
+}
+
+.gaming-mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.gaming-mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.gaming-mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.gaming-mt-sm {
+  margin-top: var(--spacing-sm);
+}
+
+.gaming-mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.gaming-mt-lg {
+  margin-top: var(--spacing-lg);
+}

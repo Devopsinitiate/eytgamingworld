@@ -4,12 +4,17 @@
  * Requirements: 4.2, 8.1, 12.1, 12.4
  */
 
+import { UnifiedPollingManager } from './modules/unified-polling-manager.js';
+
 class TournamentDetailPage {
     constructor() {
         this.tournamentSlug = this.getTournamentSlug();
         this.currentTab = 'details';
         this.updateInterval = null;
         this.components = {};
+        
+        // Initialize unified polling manager
+        this.pollingManager = null;
 
         this.init();
     }
@@ -401,14 +406,19 @@ class TournamentDetailPage {
     }
 
     /**
-     * Start statistics updates with performance optimization
+     * DEPRECATED: Start statistics updates with performance optimization
+     * Replaced by unified polling manager
      */
     startStatisticsUpdates() {
+        console.warn('startStatisticsUpdates is deprecated - using unified polling manager instead');
+        // Legacy code commented out - now handled by UnifiedPollingManager
+        /*
         if (this.statisticsUpdateInterval) return;
 
         this.statisticsUpdateInterval = setInterval(() => {
             this.updateStatisticsEfficiently();
         }, 30000);
+        */
     }
 
     /**
@@ -982,6 +992,12 @@ class TournamentDetailPage {
      */
     destroy() {
         console.log('🧹 Cleaning up Tournament Detail Page');
+
+        // Stop unified polling manager
+        if (this.pollingManager) {
+            this.pollingManager.stop();
+            this.pollingManager = null;
+        }
 
         // Destroy all components
         Object.values(this.components).forEach(component => {
@@ -2000,11 +2016,64 @@ class TournamentDetailPage {
             statusElement.classList.contains('status-check_in');
 
         if (status) {
-            this.startRealTimeUpdates();
+            this.initUnifiedPolling();
         }
     }
+    
+    /**
+     * Initialize unified polling manager to consolidate all update requests
+     */
+    initUnifiedPolling() {
+        // Create unified polling manager instance
+        this.pollingManager = new UnifiedPollingManager(this.tournamentSlug, {
+            baseInterval: 60000, // 60 seconds
+            enableBackoff: true,
+            enableVisibilityDetection: true
+        });
+        
+        // Register callbacks for different data types
+        this.pollingManager.registerComponent('statistics', (data) => {
+            if (data.statistics) {
+                this.updateStatistics(data.statistics);
+            }
+        });
+        
+        this.pollingManager.registerComponent('registration', (data) => {
+            if (data.registration) {
+                this.updateRegistrationCard(data.registration);
+            }
+        });
+        
+        this.pollingManager.registerComponent('timeline', (data) => {
+            if (data.timeline) {
+                this.updateTimelineProgress(data.timeline.current_phase);
+            }
+        });
+        
+        this.pollingManager.registerComponent('matches', (data) => {
+            if (data.matches) {
+                this.updateMatches(data.matches.recent);
+            }
+        });
+        
+        this.pollingManager.registerComponent('participants', (data) => {
+            if (data.participants) {
+                this.updateParticipants(data.participants);
+            }
+        });
+        
+        // Start unified polling
+        this.pollingManager.start();
+        
+        console.log('✅ Unified polling manager initialized');
+    }
 
+    // DEPRECATED: Replaced by unified polling manager
+    // This method is kept for backward compatibility but is no longer used
     startRealTimeUpdates() {
+        console.warn('startRealTimeUpdates is deprecated - using unified polling manager instead');
+        // Legacy code commented out - now handled by UnifiedPollingManager
+        /*
         // Initialize connection management
         this.connectionStatus = 'connected';
         this.retryCount = 0;
@@ -2027,6 +2096,7 @@ class TournamentDetailPage {
 
         // Initial fetch
         this.fetchUpdates();
+        */
     }
 
     async fetchUpdates() {
@@ -3294,6 +3364,12 @@ class StatisticsDashboard {
     }
 
     startRealTimeUpdates() {
+        // DEPRECATED: Independent polling removed - now handled by UnifiedPollingManager
+        // Statistics updates are now received via callback from the unified polling system
+        console.log('📊 Statistics Dashboard ready to receive updates from unified polling');
+        
+        // Legacy code commented out - updates now come from UnifiedPollingManager
+        /*
         if (!this.options.tournamentSlug) return;
 
         // Update immediately
@@ -3305,6 +3381,7 @@ class StatisticsDashboard {
         }, this.options.updateInterval);
 
         console.log(`🔄 Real-time updates started (${this.options.updateInterval}ms interval)`);
+        */
     }
 
     async fetchUpdates() {
@@ -3436,12 +3513,23 @@ class StatisticsDashboard {
  * Enhanced Tab Navigation Component Class
  */
 class TabNavigation {
-    constructor(element) {
+    constructor(element, options = {}) {
+        console.log('🎮 Initializing TabNavigation component');
         this.element = element;
+        this.options = options;
         this.tabButtons = element.querySelectorAll('.gaming-tab-item, .tab-nav-item');
         this.tabPanes = document.querySelectorAll('.tab-pane');
         this.currentTab = 'details';
         this.loadingTabs = new Set();
+
+        console.log('📋 Tab buttons found:', this.tabButtons.length);
+        console.log('📄 Tab panes found:', this.tabPanes.length);
+        console.log('⚙️ Options:', this.options);
+
+        if (this.tabButtons.length === 0) {
+            console.error('❌ No tab buttons found! Check selectors: .gaming-tab-item, .tab-nav-item');
+            return;
+        }
 
         this.init();
     }
@@ -3457,9 +3545,16 @@ class TabNavigation {
     }
 
     setupEventListeners() {
-        this.tabButtons.forEach(button => {
+        console.log('🎯 Setting up tab navigation event listeners');
+        console.log('📊 Found tab buttons:', this.tabButtons.length);
+        
+        this.tabButtons.forEach((button, index) => {
+            console.log(`🔘 Setting up button ${index}:`, button.dataset.tab);
+            
             button.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Tab clicked:', button.dataset.tab);
                 const tabId = button.getAttribute('data-tab');
                 this.switchTab(tabId);
             });
@@ -3477,6 +3572,8 @@ class TabNavigation {
                 }
             });
         });
+        
+        console.log('✅ Tab navigation event listeners set up');
     }
 
     setupAccessibility() {
@@ -3582,6 +3679,8 @@ class TabNavigation {
     switchTab(tabId) {
         if (this.currentTab === tabId) return;
 
+        console.log('🔄 Switching to tab:', tabId);
+
         // Show loading state if tab content needs to be loaded
         if (this.shouldLoadTabContent(tabId)) {
             this.showLoadingState(tabId);
@@ -3607,6 +3706,11 @@ class TabNavigation {
 
         // Track tab switch for analytics
         this.trackTabSwitch(tabId);
+
+        // Call onTabChange callback if provided
+        if (this.options && typeof this.options.onTabChange === 'function') {
+            this.options.onTabChange(tabId);
+        }
     }
 
     setActiveTab(tabId, updateTabIndex = true) {
@@ -3927,10 +4031,17 @@ class TournamentTimeline {
         this.initProgressCalculation();
         this.initAccessibility();
 
+        // DEPRECATED: Independent polling removed - now handled by UnifiedPollingManager
+        // Timeline updates are now received via callback from the unified polling system
+        console.log('⏱️ Tournament Timeline ready to receive updates from unified polling');
+        
+        // Legacy code commented out - updates now come from UnifiedPollingManager
+        /*
         // Update timeline every minute
         this.updateInterval = setInterval(() => {
             this.updateTimeline();
         }, 60000);
+        */
     }
 
     initPhaseInteractions() {
@@ -4150,9 +4261,10 @@ class TournamentTimeline {
     }
 
     handlePhaseTransition() {
-        // Refresh the page or update the timeline when a phase transition occurs
-        if (window.tournamentDetailPage) {
-            window.tournamentDetailPage.fetchUpdates();
+        // Trigger immediate poll via unified polling manager when phase transition occurs
+        if (window.tournamentDetailPage && window.tournamentDetailPage.pollingManager) {
+            console.log('⏱️ Phase transition detected, triggering immediate poll');
+            window.tournamentDetailPage.pollingManager.fetchUnifiedUpdates();
         }
     }
 
@@ -4553,12 +4665,19 @@ class StickyRegistrationCard {
     }
 
     initRealTimeUpdates() {
+        // DEPRECATED: Independent polling removed - now handled by UnifiedPollingManager
+        // Registration updates are now received via callback from the unified polling system
+        console.log('🎫 Registration Card ready to receive updates from unified polling');
+        
+        // Legacy code commented out - updates now come from UnifiedPollingManager
+        /*
         if (this.tournamentStatus !== 'registration') return;
 
         // Start real-time updates for registration data
         this.updateInterval = setInterval(() => {
             this.fetchRegistrationUpdates();
         }, 30000); // Update every 30 seconds
+        */
 
         // Listen for real-time events from the main page
         document.addEventListener('tournament-stats-updated', (event) => {
@@ -4825,7 +4944,62 @@ class StickyRegistrationCard {
 
 // Initialize the tournament detail page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 DOM Content Loaded - Initializing Tournament Detail Page');
     window.tournamentDetailPage = new TournamentDetailPage();
+    
+    // Fallback: Direct tab button initialization if main initialization fails
+    setTimeout(() => {
+        const tabButtons = document.querySelectorAll('.gaming-tab-item');
+        console.log('🔍 Fallback check - Tab buttons found:', tabButtons.length);
+        
+        if (tabButtons.length > 0) {
+            tabButtons.forEach((button, index) => {
+                // Check if button already has click listener
+                const hasListener = button.onclick !== null || button.getAttribute('data-listener-attached') === 'true';
+                
+                if (!hasListener) {
+                    console.log(`⚠️ Adding fallback listener to button ${index}:`, button.dataset.tab);
+                    
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const tabId = this.getAttribute('data-tab');
+                        console.log('🖱️ Fallback click handler - Tab:', tabId);
+                        
+                        // Remove active class from all buttons
+                        tabButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                            btn.setAttribute('aria-selected', 'false');
+                        });
+                        
+                        // Add active class to clicked button
+                        this.classList.add('active');
+                        this.setAttribute('aria-selected', 'true');
+                        
+                        // Hide all tab panes
+                        document.querySelectorAll('.tab-pane').forEach(pane => {
+                            pane.classList.remove('active');
+                            pane.style.display = 'none';
+                            pane.setAttribute('aria-hidden', 'true');
+                        });
+                        
+                        // Show selected tab pane
+                        const targetPane = document.getElementById(`${tabId}-tab`);
+                        if (targetPane) {
+                            targetPane.classList.add('active');
+                            targetPane.style.display = 'block';
+                            targetPane.setAttribute('aria-hidden', 'false');
+                            console.log('✅ Fallback - Tab switched to:', tabId);
+                        } else {
+                            console.error('❌ Fallback - Tab pane not found:', `${tabId}-tab`);
+                        }
+                    });
+                    
+                    button.setAttribute('data-listener-attached', 'true');
+                }
+            });
+        }
+    }, 1000); // Wait 1 second for main initialization
 });
 
 // Clean up when page is unloaded

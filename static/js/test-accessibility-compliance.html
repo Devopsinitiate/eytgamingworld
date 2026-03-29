@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Compliance Test - Task 10.3</title>
+  <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      background: #0A0A0A;
+      color: #FFFFFF;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(31, 41, 55, 0.6);
+      border: 2px solid rgba(220, 38, 38, 0.3);
+      border-radius: 8px;
+    }
+    
+    .result {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    
+    .pass { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+    .fail { background: rgba(220, 38, 38, 0.2); color: #DC2626; }
+    
+    h1, h2 { 
+      font-family: 'Barlow Condensed', sans-serif;
+      text-transform: uppercase;
+      color: #DC2626;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Task 10.3: Accessibility Compliance Test</h1>
+    
+    <div class="test-section">
+      <h2>Test 1: Touch Target Sizes</h2>
+      <p>All interactive elements must be at least 44px × 44px</p>
+      
+      <button class="gaming-btn-primary" id="test-btn-primary">Primary Button</button>
+      <button class="gaming-btn-ghost" id="test-btn-ghost">Ghost Button</button>
+      <button class="gaming-btn-action" id="test-btn-action">Action</button>
+      
+      <div style="margin-top: 10px;">
+        <input type="text" class="gaming-search-bar" id="test-search" placeholder="Search...">
+      </div>
+      
+      <div id="touch-results" style="margin-top: 15px;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Test 2: Color Contrast Ratios</h2>
+      <p>Text must meet WCAG 2.1 AA standards (4.5:1 normal, 3:1 large)</p>
+      
+      <div class="gaming-stat-card" style="max-width: 250px; margin: 10px 0;">
+        <div class="gaming-stat-value" id="test-stat-value">42</div>
+        <div class="gaming-stat-label" id="test-stat-label">Total Registered</div>
+      </div>
+      
+      <div style="margin: 10px 0;">
+        <span class="gaming-status-indicator">
+          <span class="gaming-status-dot checked-in"></span>
+          <span id="test-status-text">Checked In</span>
+        </span>
+      </div>
+      
+      <div id="contrast-results" style="margin-top: 15px;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Test 3: Screen Reader Support</h2>
+      <p>ARIA live regions must be present for status announcements</p>
+      
+      <button class="gaming-btn-primary" id="test-announce">
+        Test Screen Reader Announcement
+      </button>
+      
+      <div id="aria-results" style="margin-top: 15px;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Test Summary</h2>
+      <div id="summary"></div>
+    </div>
+  </div>
+
+  <script src="verify-accessibility.js"></script>
+  <script src="gaming-modal-handler.js"></script>
+  <script>
+    // Wait for page to load
+    window.addEventListener('load', () => {
+      setTimeout(runTests, 200);
+    });
+    
+    function runTests() {
+      const results = {
+        touchTargets: [],
+        contrast: [],
+        aria: []
+      };
+      
+      // Test 1: Touch Targets
+      console.log('Testing touch targets...');
+      const touchElements = [
+        { id: 'test-btn-primary', name: 'Primary Button' },
+        { id: 'test-btn-ghost', name: 'Ghost Button' },
+        { id: 'test-btn-action', name: 'Action Button' },
+        { id: 'test-search', name: 'Search Bar' }
+      ];
+      
+      touchElements.forEach(({ id, name }) => {
+        const el = document.getElementById(id);
+        const rect = el.getBoundingClientRect();
+        const pass = rect.width >= 44 && rect.height >= 44;
+        results.touchTargets.push({
+          name,
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+          pass
+        });
+      });
+      
+      // Test 2: Color Contrast
+      console.log('Testing color contrast...');
+      const contrastElements = [
+        { id: 'test-stat-value', name: 'Stat Value (large)', isLarge: true },
+        { id: 'test-stat-label', name: 'Stat Label', isLarge: false },
+        { id: 'test-btn-primary', name: 'Button Text', isLarge: false },
+        { id: 'test-status-text', name: 'Status Text', isLarge: false }
+      ];
+      
+      contrastElements.forEach(({ id, name, isLarge }) => {
+        const el = document.getElementById(id);
+        const result = testContrast(el, name, isLarge);
+        results.contrast.push(result);
+      });
+      
+      // Test 3: ARIA Support
+      console.log('Testing ARIA support...');
+      setTimeout(() => {
+        const liveRegion = document.getElementById('aria-live-announcer');
+        const hasLiveRegion = liveRegion !== null;
+        const hasRole = hasLiveRegion && liveRegion.hasAttribute('role');
+        const hasLive = hasLiveRegion && liveRegion.hasAttribute('aria-live');
+        const hasAtomic = hasLiveRegion && liveRegion.hasAttribute('aria-atomic');
+        
+        results.aria.push({
+          name: 'ARIA Live Region Exists',
+          pass: hasLiveRegion
+        });
+        
+        if (hasLiveRegion) {
+          results.aria.push({
+            name: 'Has role="status"',
+            pass: hasRole
+          });
+          results.aria.push({
+            name: 'Has aria-live="polite"',
+            pass: hasLive
+          });
+          results.aria.push({
+            name: 'Has aria-atomic="true"',
+            pass: hasAtomic
+          });
+        }
+        
+        displayResults(results);
+      }, 500);
+      
+      // Test announcement button
+      document.getElementById('test-announce').addEventListener('click', () => {
+        if (typeof announceToScreenReader === 'function') {
+          announceToScreenReader('Test announcement: Participant status changed to Checked In');
+          const feedback = document.createElement('div');
+          feedback.className = 'result pass';
+          feedback.textContent = '✓ Announcement sent to screen readers';
+          document.getElementById('aria-results').appendChild(feedback);
+          setTimeout(() => feedback.remove(), 3000);
+        }
+      });
+    }
+    
+    function displayResults(results) {
+      // Display touch target results
+      const touchDiv = document.getElementById('touch-results');
+      touchDiv.innerHTML = '<h3>Results:</h3>';
+      results.touchTargets.forEach(r => {
+        const div = document.createElement('div');
+        div.className = `result ${r.pass ? 'pass' : 'fail'}`;
+        div.textContent = `${r.pass ? '✓' : '✗'} ${r.name}: ${r.width}px × ${r.height}px`;
+        touchDiv.appendChild(div);
+      });
+      
+      // Display contrast results
+      const contrastDiv = document.getElementById('contrast-results');
+      contrastDiv.innerHTML = '<h3>Results:</h3>';
+      results.contrast.forEach(r => {
+        const div = document.createElement('div');
+        div.className = `result ${r.pass ? 'pass' : 'fail'}`;
+        div.textContent = `${r.pass ? '✓' : '✗'} ${r.description}: ${r.ratio}:1 (required: ${r.required}:1)`;
+        contrastDiv.appendChild(div);
+      });
+      
+      // Display ARIA results
+      const ariaDiv = document.getElementById('aria-results');
+      ariaDiv.innerHTML = '<h3>Results:</h3>';
+      results.aria.forEach(r => {
+        const div = document.createElement('div');
+        div.className = `result ${r.pass ? 'pass' : 'fail'}`;
+        div.textContent = `${r.pass ? '✓' : '✗'} ${r.name}`;
+        ariaDiv.appendChild(div);
+      });
+      
+      // Display summary
+      const touchPassed = results.touchTargets.filter(r => r.pass).length;
+      const contrastPassed = results.contrast.filter(r => r.pass).length;
+      const ariaPassed = results.aria.filter(r => r.pass).length;
+      
+      const touchTotal = results.touchTargets.length;
+      const contrastTotal = results.contrast.length;
+      const ariaTotal = results.aria.length;
+      
+      const allPassed = (touchPassed === touchTotal) && 
+                        (contrastPassed === contrastTotal) && 
+                        (ariaPassed === ariaTotal);
+      
+      const summaryDiv = document.getElementById('summary');
+      summaryDiv.innerHTML = `
+        <div class="result ${allPassed ? 'pass' : 'fail'}" style="font-size: 18px; font-weight: bold;">
+          <div>Touch Targets: ${touchPassed}/${touchTotal} passed</div>
+          <div>Color Contrast: ${contrastPassed}/${contrastTotal} passed</div>
+          <div>ARIA Support: ${ariaPassed}/${ariaTotal} passed</div>
+          <div style="margin-top: 15px; font-size: 24px;">
+            ${allPassed ? '✓ WCAG 2.1 AA COMPLIANT' : '✗ COMPLIANCE ISSUES FOUND'}
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

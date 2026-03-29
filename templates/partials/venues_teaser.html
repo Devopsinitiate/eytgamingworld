@@ -1,0 +1,105 @@
+{% load static %}
+
+<section id="venues" class="py-10 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
+  <div class="container mx-auto px-4">
+
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
+      GAMING VENUES
+    </h2>
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
+      Find Your Battleground
+    </p>
+
+    {% if home_venues %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for venue in home_venues %}
+      <a href="{% url 'venues:detail' venue.slug %}"
+         style="display:block;background:#111;border:1px solid #1f2937;border-radius:10px;
+                overflow:hidden;text-decoration:none;transition:border-color .25s,transform .25s;"
+         onmouseover="this.style.borderColor='#DC2626';this.style.transform='translateY(-4px)'"
+         onmouseout="this.style.borderColor='#1f2937';this.style.transform='translateY(0)'">
+
+        <!-- Photo -->
+        <div style="height:110px;background:#1a1a1a;overflow:hidden;position:relative;">
+          {% if venue.photo %}
+          <img src="{{ venue.photo.url }}" alt="{{ venue.name }}"
+               style="width:100%;height:100%;object-fit:cover;opacity:.8;">
+          {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+                      background:linear-gradient(135deg,#1a1a1a,#0d1a2d);">
+            <span style="font-family:'Material Symbols Outlined';font-size:48px;color:#374151;
+                         background:none;-webkit-background-clip:unset;background-clip:unset;
+                         -webkit-text-fill-color:#374151;">location_on</span>
+          </div>
+          {% endif %}
+
+          <!-- Venue type badge -->
+          <span style="position:absolute;top:10px;left:10px;padding:3px 10px;border-radius:4px;
+                       font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                       background:rgba(0,0,0,.75);color:#9ca3af;">
+            {{ venue.get_venue_type_display }}
+          </span>
+
+          {% if venue.is_verified %}
+          <span style="position:absolute;top:10px;right:10px;padding:3px 8px;border-radius:4px;
+                       font-size:.65rem;font-weight:700;background:#16a34a;color:#fff;">
+            ✓ Verified
+          </span>
+          {% endif %}
+        </div>
+
+        <div style="padding:14px 16px;">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;
+                     text-transform:uppercase;color:#fff;margin:0 0 6px 0;
+                     background:none;-webkit-background-clip:unset;background-clip:unset;
+                     -webkit-text-fill-color:#fff;">
+            {{ venue.name|truncatechars:40 }}
+          </h3>
+
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <span style="font-family:'Material Symbols Outlined';font-size:14px;color:#6b7280;
+                         background:none;-webkit-background-clip:unset;background-clip:unset;
+                         -webkit-text-fill-color:#6b7280;">location_on</span>
+            <span style="font-size:.8rem;color:#9ca3af;">{{ venue.city }}, {{ venue.country }}</span>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:.75rem;color:#9ca3af;">
+              <span style="font-family:'Material Symbols Outlined';font-size:14px;
+                           background:none;-webkit-background-clip:unset;background-clip:unset;
+                           -webkit-text-fill-color:#9ca3af;">computer</span>
+              {{ venue.setup_stations }} stations
+            </span>
+            {% if venue.hourly_rate %}
+            <span style="font-size:.85rem;font-weight:700;color:#DC2626;">
+              ₦{{ venue.hourly_rate|floatformat:0 }}/hr
+            </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="{% url 'venues:list' %}"
+         class="cta-secondary inline-block rounded-md">
+        Explore All Venues
+      </a>
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:48px 0;">
+      <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;
+                   margin-bottom:16px;background:none;-webkit-background-clip:unset;
+                   background-clip:unset;-webkit-text-fill-color:#374151;">location_on</span>
+      <p style="color:#6b7280;font-size:1.1rem;">No venues listed yet.</p>
+      <a href="{% url 'venues:list' %}" style="display:inline-block;margin-top:16px;
+         color:#DC2626;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;">
+        Browse Venues →
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

@@ -551,30 +551,64 @@ nav[aria-label="Breadcrumb"] a {
 .gaming-tab-nav {
     display: flex;
     gap: 0.5rem;
-    border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+    border-bottom: 2px solid rgba(220, 38, 38, 0.35);
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    isolation: isolate;
+    background: rgba(10,10,10,0.6);
+    border-radius: 8px 8px 0 0;
+    padding: 0.25rem 0.25rem 0;
 }
 
 .gaming-tab-item {
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    font-size: 0.9rem;
     color: #6B7280;
     border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-    cursor: pointer;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 101 !important;
+    background: transparent;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.gaming-tab-item * {
+    pointer-events: none;
 }
 
 .gaming-tab-item:hover {
     color: #DC2626;
+    background: rgba(220, 38, 38, 0.08);
+}
+
+.gaming-tab-item:active {
+    transform: scale(0.98);
 }
 
 .gaming-tab-item.active {
     color: #DC2626;
     border-bottom-color: #DC2626;
+    background: rgba(220, 38, 38, 0.06);
     text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+    box-shadow: inset 0 -2px 0 #DC2626;
 }
 
 /* Neon Glow Effects */
@@ -818,29 +852,17 @@ nav[aria-label="Breadcrumb"] a {
 {% block extra_head %}
 {% endblock %}
 
-{% block extra_meta %}
-<!-- Open Graph Meta Tags for Social Sharing -->
-<meta property="og:title" content="{{ tournament_display.name|safe_default:'Tournament' }} - EYTGaming">
-<meta property="og:description" content="{{ tournament.description|truncatewords:30|safe_default:'Join this exciting tournament on EYTGaming!' }}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
-{% if template_flags.has_banner %}
-<meta property="og:image" content="{{ request.build_absolute_uri }}{{ tournament.banner.url }}">
-{% else %}
-<meta property="og:image" content="{{ request.build_absolute_uri }}{% static 'images/EYTLOGO.jpg' %}">
-{% endif %}
-<meta property="og:site_name" content="EYTGaming">
+{% block meta_description %}{{ tournament.meta_description|default:tournament.description|truncatewords:25|default:'Join this exciting tournament on EYTGaming!' }}{% endblock %}
+{% block meta_robots %}index, follow{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block og_title %}{{ tournament_display.name|safe_default:'Tournament' }} — EYTGaming{% endblock %}
+{% block og_description %}{{ tournament.description|truncatewords:30|safe_default:'Join this exciting tournament on EYTGaming!' }}{% endblock %}
+{% block og_image %}{% if template_flags.has_banner %}{{ request.build_absolute_uri }}{{ tournament.banner.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/EYTLOGO.jpg' %}{% endif %}{% endblock %}
+{% block twitter_title %}{{ tournament_display.name|safe_default:'Tournament' }} — EYTGaming{% endblock %}
+{% block twitter_description %}{{ tournament.description|truncatewords:30|safe_default:'Join this exciting tournament on EYTGaming!' }}{% endblock %}
+{% block twitter_image %}{% if template_flags.has_banner %}{{ request.build_absolute_uri }}{{ tournament.banner.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/EYTLOGO.jpg' %}{% endif %}{% endblock %}
 
-<!-- Twitter Card Meta Tags -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ tournament_display.name|safe_default:'Tournament' }} - EYTGaming">
-<meta name="twitter:description" content="{{ tournament.description|truncatewords:30|safe_default:'Join this exciting tournament on EYTGaming!' }}">
-{% if template_flags.has_banner %}
-<meta name="twitter:image" content="{{ request.build_absolute_uri }}{{ tournament.banner.url }}">
-{% else %}
-<meta name="twitter:image" content="{{ request.build_absolute_uri }}{% static 'images/EYTLOGO.jpg' %}">
-{% endif %}
-{% endblock %}
+{% block extra_meta %}{% endblock %}
 
 {% block body %}
 <div class="min-h-screen bg-background-dark">
@@ -851,10 +873,10 @@ nav[aria-label="Breadcrumb"] a {
                 <a href="{% url 'tournaments:list' %}" 
                    class="text-gray-400 hover:text-[#DC2626] transition-colors flex items-center gap-1 min-h-[44px] min-w-[44px] px-2"
                    style="pointer-events: auto; cursor: pointer; position: relative; z-index: 51;">
-                    <span class="material-symbols-outlined text-[#DC2626]" aria-hidden="true">emoji_events</span>
+                    <span class="material-symbols-outlined text-[#DC2626]" aria-hidden="true" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">emoji_events</span>
                     <span class="gaming-subheader">TOURNAMENTS</span>
                 </a>
-                <span class="material-symbols-outlined text-gray-600 text-sm" aria-hidden="true">chevron_right</span>
+                <span class="material-symbols-outlined text-gray-600 text-sm" aria-hidden="true" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;font-size:14px;text-transform:none;letter-spacing:0;vertical-align:middle;">chevron_right</span>
                 <span class="text-white font-medium gaming-body truncate max-w-[200px] sm:max-w-[400px]">{{ tournament_display.name|safe_default:"Tournament Name" }}</span>
             </div>
         </div>
@@ -1242,29 +1264,29 @@ nav[aria-label="Breadcrumb"] a {
             <!-- Main Content Area -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Enhanced Tab Navigation System -->
-                <div class="tab-navigation">
-                    <div class="gaming-tab-nav" role="tablist" aria-label="Tournament information tabs">
-                        <button id="details-tab-button" class="gaming-tab-item active" data-tab="details" role="tab" aria-selected="true" tabindex="0">
-                            <span class="material-symbols-outlined">info</span>
+                <div class="tab-navigation" style="pointer-events: auto !important; position: relative; z-index: 100 !important;">
+                    <div class="gaming-tab-nav" role="tablist" aria-label="Tournament information tabs" style="pointer-events: auto !important; position: relative; z-index: 100 !important;">
+                        <button id="details-tab-button" class="gaming-tab-item active" data-tab="details" role="tab" aria-selected="true" tabindex="0" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">info</span>
                             Details
                         </button>
                         {% if tournament.status == 'in_progress' or tournament.status == 'completed' or tournament.brackets.exists %}
-                        <button id="bracket-tab-button" class="gaming-tab-item" data-tab="bracket" role="tab" aria-selected="false" tabindex="-1">
-                            <span class="material-symbols-outlined">account_tree</span>
+                        <button id="bracket-tab-button" class="gaming-tab-item" data-tab="bracket" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">account_tree</span>
                             Bracket
                         </button>
                         {% endif %}
-                        <button id="participants-tab-button" class="gaming-tab-item" data-tab="participants" role="tab" aria-selected="false" tabindex="-1">
-                            <span class="material-symbols-outlined">group</span>
+                        <button id="participants-tab-button" class="gaming-tab-item" data-tab="participants" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">group</span>
                             Participants
                         </button>
-                        <button id="rules-tab-button" class="gaming-tab-item" data-tab="rules" role="tab" aria-selected="false" tabindex="-1">
-                            <span class="material-symbols-outlined">gavel</span>
+                        <button id="rules-tab-button" class="gaming-tab-item" data-tab="rules" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">gavel</span>
                             Rules
                         </button>
                         {% if tournament.prize_pool > 0 %}
-                        <button id="prizes-tab-button" class="gaming-tab-item" data-tab="prizes" role="tab" aria-selected="false" tabindex="-1">
-                            <span class="material-symbols-outlined">emoji_events</span>
+                        <button id="prizes-tab-button" class="gaming-tab-item" data-tab="prizes" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">emoji_events</span>
                             Prizes
                         </button>
                         {% endif %}
@@ -2450,6 +2472,11 @@ nav[aria-label="Breadcrumb"] a {
 
                     </div>
                 </div>
+
+                <!-- Manual Seeding Interface -->
+                {% if tournament.seeding_method == 'manual' %}
+                    {% include 'tournaments/components/seeding_interface.html' %}
+                {% endif %}
                 {% endif %}
 
                 <!-- Tournament Info -->
@@ -2587,12 +2614,54 @@ nav[aria-label="Breadcrumb"] a {
 {% endblock %}
 
 {% block extra_js %}
+<!-- Tab Navigation Inline Fix -->
+<script>
+(function() {
+    function initTabs() {
+        var buttons = document.querySelectorAll('.gaming-tab-item');
+        var panes = document.querySelectorAll('.tab-pane');
+        if (!buttons.length) return;
+
+        function showTab(tabId) {
+            buttons.forEach(function(b) {
+                var active = b.getAttribute('data-tab') === tabId;
+                b.classList.toggle('active', active);
+                b.setAttribute('aria-selected', active ? 'true' : 'false');
+                b.setAttribute('tabindex', active ? '0' : '-1');
+            });
+            panes.forEach(function(p) {
+                var active = p.id === tabId + '-tab';
+                p.classList.toggle('active', active);
+                p.style.setProperty('display', active ? 'block' : 'none', 'important');
+                p.setAttribute('aria-hidden', active ? 'false' : 'true');
+            });
+        }
+
+        buttons.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showTab(this.getAttribute('data-tab'));
+            });
+        });
+
+        // Ensure initial state is correct
+        showTab('details');
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTabs);
+    } else {
+        initTabs();
+    }
+})();
+</script>
+
 <!-- Performance Optimization Scripts -->
 <script src="{% static 'js/modules/performance-optimizer.js' %}" defer></script>
 
 <!-- Existing Scripts -->
 <script src="{% static 'js/modules/console-error-handler.js' %}" defer></script>
-<script src="{% static 'js/tournament-detail.js' %}" defer></script>
+<script src="{% static 'js/tournament-detail.js' %}" type="module"></script>
 <script src="{% static 'js/mobile-optimization.js' %}" defer></script>
 
 <!-- Performance Configuration -->
@@ -2652,6 +2721,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Manual Seeding Manager -->
+{% if user == tournament.organizer and tournament.seeding_method == 'manual' %}
+<script type="module">
+import { SeedingManager } from '{% static "js/modules/seeding-manager.js" %}';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const seedingInterface = document.getElementById('seeding-interface');
+    if (seedingInterface) {
+        const manager = new SeedingManager('{{ tournament.slug }}', '{{ tournament.status }}');
+    }
+});
+</script>
+{% endif %}
 
 <!-- Render time indicator -->
 <!-- Debug: Page rendered at {{ now|date:"Y-m-d H:i:s" }} -->

@@ -5,332 +5,251 @@
 
 {% block extra_css %}
 <style>
-    .payment-form {
-        max-width: 400px;
-    }
-    
-    .stripe-element {
-        background: #1f2937;
-        border: 1px solid #374151;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        color: #d1d5db;
-    }
-    
-    .stripe-element--focus {
-        border-color: #b91c1c;
-        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
-    }
-    
-    .stripe-element--invalid {
-        border-color: #ef4444;
-    }
-    
-    .payment-summary {
-        background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
-    }
+body { background: #0A0A0A; }
+.payment-card { background: #111; border: 1px solid #1f1f1f; border-radius: 12px; }
+.summary-card { background: linear-gradient(135deg, #1a0000 0%, #0f0f0f 100%); border: 1px solid #DC2626; border-radius: 12px; }
+.info-card { background: #111; border: 1px solid #1f1f1f; border-radius: 12px; }
+.pay-btn {
+    background: #DC2626; color: #fff; border: none; border-radius: 8px;
+    padding: 14px 24px; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em;
+    text-transform: uppercase; width: 100%; cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pay-btn:hover:not(:disabled) { background: #b91c1c; box-shadow: 0 0 20px rgba(220,38,38,0.4); }
+.pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.section-label {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem;
+    font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #DC2626; margin-bottom: 16px;
+}
+.divider { border-color: #1f1f1f; margin: 16px 0; }
+.security-badge { display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 0.8rem; }
+.ms-icon {
+    font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal;
+    font-size: 18px; line-height: 1; letter-spacing: normal; text-transform: none;
+    white-space: nowrap; word-wrap: normal; direction: ltr;
+    -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.amount-display {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 2rem;
+    font-weight: 800; color: #DC2626; letter-spacing: 0.02em;
+}
+.spinner {
+    width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.back-btn {
+    display: inline-flex; align-items: center; gap: 6px; color: #9ca3af;
+    font-size: 0.9rem; text-decoration: none; transition: color 0.2s;
+    padding: 8px 12px; border: 1px solid #1f1f1f; border-radius: 8px; background: #111;
+}
+.back-btn:hover { color: #fff; border-color: #DC2626; }
+.row-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 0.9rem; }
+.row-item .lbl { color: #9ca3af; }
+.row-item .val { color: #fff; font-weight: 500; }
+.coach-avatar {
+    width: 48px; height: 48px; border-radius: 50%; overflow: hidden;
+    background: rgba(220,38,38,0.2); display: flex; align-items: center;
+    justify-content: center; font-weight: 700; color: #DC2626; font-size: 1.2rem; flex-shrink: 0;
+}
+.star-icon {
+    font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal;
+    font-size: 16px; line-height: 1; letter-spacing: normal; text-transform: none;
+    white-space: nowrap; word-wrap: normal; direction: ltr;
+    -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased; color: #facc15;
+}
+@media (max-width: 768px) {
+    .payment-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div style="max-width:900px;margin:0 auto;padding:24px 16px;">
+
     <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-4 mb-4">
-            <a href="{% url 'coaching:book_session' coach_pk=session.coach.pk %}" 
-               class="p-2 bg-card-dark border border-card-border-dark rounded-lg hover:border-primary transition-colors">
-                <span class="material-symbols-outlined text-gray-400">arrow_back</span>
-            </a>
-            <div>
-                <h1 class="text-white text-2xl font-bold">Complete Payment</h1>
-                <p class="text-gray-400">Secure your coaching session</p>
-            </div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:32px;">
+        <a href="{% url 'coaching:book_session' coach_pk=session.coach.pk %}" class="back-btn">
+            <span class="ms-icon" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+            Back
+        </a>
+        <div>
+            <h1 style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin:0;">
+                Complete Payment
+            </h1>
+            <p style="color:#6b7280;font-size:0.85rem;margin:4px 0 0;">Secure your coaching session with Paystack</p>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Payment Form -->
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <h2 class="text-white text-lg font-semibold mb-6">Payment Information</h2>
-            
-            <form id="payment-form" class="payment-form">
-                {% csrf_token %}
-                
-                <!-- Card Element -->
-                <div class="mb-6">
-                    <label class="block text-white font-medium mb-2">Card Information</label>
-                    <div id="card-element" class="stripe-element">
-                        <!-- Stripe Elements will create form elements here -->
-                    </div>
-                    <div id="card-errors" class="text-red-400 text-sm mt-2" role="alert"></div>
+    <div class="payment-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+        <!-- Left: Payment Action -->
+        <div>
+            <div class="payment-card" style="padding:28px;">
+                <div class="section-label">Payment Details</div>
+
+                <div style="text-align:center;padding:20px 0 24px;">
+                    <p style="color:#9ca3af;font-size:0.85rem;margin:0 0 4px;">Total Amount</p>
+                    <div class="amount-display">&#8358;{{ session.price|floatformat:2 }}</div>
+                    <p style="color:#6b7280;font-size:0.75rem;margin:4px 0 0;">Coaching session fee</p>
                 </div>
-                
-                <!-- Billing Information -->
-                <div class="space-y-4 mb-6">
-                    <div>
-                        <label class="block text-white font-medium mb-2">Cardholder Name</label>
-                        <input type="text" id="cardholder-name" required
-                               class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                               placeholder="Full name on card">
+
+                <hr class="divider">
+
+                <div style="margin-bottom:24px;">
+                    <div class="row-item">
+                        <span class="lbl">Coach</span>
+                        <span class="val">{{ session.coach.user.get_display_name }}</span>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-white font-medium mb-2">Country</label>
-                            <select id="country" required
-                                    class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                                <option value="US">United States</option>
-                                <option value="CA">Canada</option>
-                                <option value="GB">United Kingdom</option>
-                                <option value="AU">Australia</option>
-                                <!-- Add more countries as needed -->
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-white font-medium mb-2">ZIP Code</label>
-                            <input type="text" id="postal-code" required
-                                   class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                   placeholder="12345">
-                        </div>
+                    <div class="row-item">
+                        <span class="lbl">Game</span>
+                        <span class="val">{{ session.game.name }}</span>
+                    </div>
+                    <div class="row-item">
+                        <span class="lbl">Duration</span>
+                        <span class="val">{{ session.duration_minutes }} min</span>
+                    </div>
+                    <div class="row-item">
+                        <span class="lbl">Date</span>
+                        <span class="val">{{ session.scheduled_start|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="row-item">
+                        <span class="lbl">Time</span>
+                        <span class="val">{{ session.scheduled_start|date:"g:i A" }}</span>
                     </div>
                 </div>
-                
-                <!-- Terms -->
-                <div class="mb-6">
-                    <label class="flex items-start gap-3">
-                        <input type="checkbox" id="terms-checkbox" required
-                               class="mt-1 w-4 h-4 text-primary bg-background-dark border-card-border-dark rounded focus:ring-primary/50">
-                        <span class="text-gray-300 text-sm">
-                            I agree to the <a href="#" class="text-primary hover:underline">Terms of Service</a> 
-                            and <a href="#" class="text-primary hover:underline">Cancellation Policy</a>
-                        </span>
-                    </label>
-                </div>
-                
-                <!-- Submit Button -->
-                <button type="submit" id="submit-button" 
-                        class="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span id="button-text">Complete Payment</span>
-                    <span id="spinner" class="hidden">
-                        <span class="material-symbols-outlined animate-spin">progress_activity</span>
+
+                <button id="pay-btn" class="pay-btn" onclick="payWithPaystack()">
+                    <span id="btn-text" style="display:flex;align-items:center;gap:6px;">
+                        <span class="ms-icon" style="font-size:20px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">lock</span>
+                        Pay &#8358;{{ session.price|floatformat:2 }}
+                    </span>
+                    <span id="btn-spinner" style="display:none;align-items:center;gap:8px;">
+                        <span class="spinner"></span>
                         Processing...
                     </span>
                 </button>
-            </form>
-        </div>
 
-        <!-- Session Summary -->
-        <div class="space-y-6">
-            <!-- Payment Summary -->
-            <div class="payment-summary rounded-lg p-6 text-white">
-                <h3 class="text-lg font-semibold mb-4">Session Summary</h3>
-                
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span>Coach</span>
-                        <span class="font-medium">{{ session.coach.user.get_display_name }}</span>
+                <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;">
+                    <div class="security-badge">
+                        <span class="ms-icon" style="color:#22c55e;">lock</span>
+                        <span>256-bit SSL encryption</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span>Game</span>
-                        <span class="font-medium">{{ session.game.name }}</span>
+                    <div class="security-badge">
+                        <span class="ms-icon" style="color:#22c55e;">verified</span>
+                        <span>Secured by Paystack</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span>Date & Time</span>
-                        <span class="font-medium">{{ session.scheduled_start|date:"M d, Y g:i A" }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>Duration</span>
-                        <span class="font-medium">{{ session.duration_minutes }} minutes</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span>Session Type</span>
-                        <span class="font-medium">{{ session.get_session_type_display }}</span>
-                    </div>
-                    
-                    <hr class="border-white/20 my-4">
-                    
-                    <div class="flex items-center justify-between text-lg font-bold">
-                        <span>Total</span>
-                        <span>${{ session.price }}</span>
+                    <div class="security-badge">
+                        <span class="ms-icon" style="color:#22c55e;">shield</span>
+                        <span>PCI DSS compliant</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Coach Info -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h3 class="text-white font-semibold mb-4">Your Coach</h3>
-                
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-full overflow-hidden bg-primary/20">
+        <!-- Right: Session & Coach Info -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+            <div class="summary-card" style="padding:24px;">
+                <div class="section-label">Session Summary</div>
+                <div class="row-item" style="padding:8px 0;">
+                    <span class="lbl">Session Type</span>
+                    <span class="val">{{ session.get_session_type_display }}</span>
+                </div>
+                <div class="row-item" style="padding:8px 0;">
+                    <span class="lbl">Date &amp; Time</span>
+                    <span class="val">{{ session.scheduled_start|date:"M d, Y g:i A" }}</span>
+                </div>
+                <div class="row-item" style="padding:8px 0;">
+                    <span class="lbl">Duration</span>
+                    <span class="val">{{ session.duration_minutes }} minutes</span>
+                </div>
+                <hr class="divider">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Total</span>
+                    <span class="amount-display" style="font-size:1.5rem;">&#8358;{{ session.price|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <div class="info-card" style="padding:24px;">
+                <div class="section-label">Your Coach</div>
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                    <div class="coach-avatar">
                         {% if session.coach.user.avatar %}
-                        <img src="{{ session.coach.user.avatar.url }}" alt="{{ session.coach.user.get_display_name }}" class="w-full h-full object-cover">
+                        <img src="{{ session.coach.user.avatar.url }}" alt="{{ session.coach.user.get_display_name }}" style="width:100%;height:100%;object-fit:cover;">
                         {% else %}
-                        <div class="w-full h-full bg-primary flex items-center justify-center text-white font-bold">
-                            {{ session.coach.user.get_display_name|first|upper }}
-                        </div>
+                        {{ session.coach.user.get_display_name|first|upper }}
                         {% endif %}
                     </div>
                     <div>
-                        <h4 class="text-white font-semibold">{{ session.coach.user.get_display_name }}</h4>
-                        <div class="flex items-center gap-1">
-                            <div class="flex items-center text-yellow-400">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= session.coach.average_rating %}
-                                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    {% else %}
-                                    <span class="material-symbols-outlined text-sm">star</span>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <span class="text-gray-400 text-sm">{{ session.coach.average_rating|floatformat:1 }}</span>
+                        <div style="color:#fff;font-weight:600;font-size:1rem;">{{ session.coach.user.get_display_name }}</div>
+                        <div style="display:flex;align-items:center;gap:2px;margin-top:2px;">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= session.coach.average_rating %}
+                                <span class="star-icon" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+                                {% else %}
+                                <span class="star-icon" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">star</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span style="color:#9ca3af;font-size:0.8rem;margin-left:4px;">{{ session.coach.average_rating|floatformat:1 }}</span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="space-y-2 text-sm">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Experience</span>
-                        <span class="text-white">{{ session.coach.get_experience_level_display }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Sessions Taught</span>
-                        <span class="text-white">{{ session.coach.total_sessions }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-400">Platform</span>
-                        <span class="text-white">{{ session.coach.get_platform_display }}</span>
-                    </div>
+                <div class="row-item">
+                    <span class="lbl">Experience</span>
+                    <span class="val">{{ session.coach.get_experience_level_display }}</span>
+                </div>
+                <div class="row-item">
+                    <span class="lbl">Sessions Taught</span>
+                    <span class="val">{{ session.coach.total_sessions }}</span>
+                </div>
+                <div class="row-item">
+                    <span class="lbl">Platform</span>
+                    <span class="val">{{ session.coach.get_platform_display }}</span>
                 </div>
             </div>
 
-            <!-- Security Info -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h3 class="text-white font-semibold mb-4">Secure Payment</h3>
-                
-                <div class="space-y-3 text-sm text-gray-400">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-green-400">lock</span>
-                        <span>256-bit SSL encryption</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-green-400">verified</span>
-                        <span>PCI DSS compliant</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-green-400">shield</span>
-                        <span>Powered by Stripe</span>
-                    </div>
-                </div>
-                
-                <p class="text-gray-400 text-xs mt-4">
-                    Your payment information is secure and never stored on our servers.
-                </p>
-            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Stripe
-    const stripe = Stripe('{{ stripe_public_key }}');
-    const elements = stripe.elements({
-        appearance: {
-            theme: 'night',
-            variables: {
-                colorPrimary: '#b91c1c',
-                colorBackground: '#1f2937',
-                colorText: '#d1d5db',
-                colorDanger: '#ef4444',
-                fontFamily: 'system-ui, sans-serif',
-                spacingUnit: '4px',
-                borderRadius: '8px',
-            }
-        }
-    });
+function payWithPaystack() {
+    var btn = document.getElementById('pay-btn');
+    var btnText = document.getElementById('btn-text');
+    var btnSpinner = document.getElementById('btn-spinner');
 
-    // Create card element
-    const cardElement = elements.create('card', {
-        style: {
-            base: {
-                fontSize: '16px',
-                color: '#d1d5db',
-                '::placeholder': {
-                    color: '#9ca3af',
-                },
-            },
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'flex';
+
+    var handler = PaystackPop.setup({
+        key: '{{ paystack_public_key }}',
+        email: '{{ request.user.email }}',
+        amount: {{ amount_kobo }},
+        currency: 'NGN',
+        ref: '{{ reference }}',
+        callback: function(response) {
+            window.location.href = '{% url "coaching:paystack_callback" pk=session.pk %}?reference=' + response.reference;
         },
-    });
-
-    cardElement.mount('#card-element');
-
-    // Handle real-time validation errors from the card Element
-    cardElement.on('change', function(event) {
-        const displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
+        onClose: function() {
+            btn.disabled = false;
+            btnText.style.display = 'flex';
+            btnSpinner.style.display = 'none';
         }
     });
 
-    // Handle form submission
-    const form = document.getElementById('payment-form');
-    const submitButton = document.getElementById('submit-button');
-    const buttonText = document.getElementById('button-text');
-    const spinner = document.getElementById('spinner');
-
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        // Disable submit button and show spinner
-        submitButton.disabled = true;
-        buttonText.classList.add('hidden');
-        spinner.classList.remove('hidden');
-
-        // Get form data
-        const cardholderName = document.getElementById('cardholder-name').value;
-        const country = document.getElementById('country').value;
-        const postalCode = document.getElementById('postal-code').value;
-
-        // Confirm payment with Stripe
-        const {error, paymentIntent} = await stripe.confirmCardPayment(
-            '{{ payment_intent_client_secret }}',
-            {
-                payment_method: {
-                    card: cardElement,
-                    billing_details: {
-                        name: cardholderName,
-                        address: {
-                            country: country,
-                            postal_code: postalCode,
-                        }
-                    }
-                }
-            }
-        );
-
-        if (error) {
-            // Show error to customer
-            const errorElement = document.getElementById('card-errors');
-            errorElement.textContent = error.message;
-
-            // Re-enable submit button
-            submitButton.disabled = false;
-            buttonText.classList.remove('hidden');
-            spinner.classList.add('hidden');
-        } else {
-            // Payment succeeded
-            if (paymentIntent.status === 'succeeded') {
-                // Redirect to confirmation page
-                window.location.href = '{% url "coaching:confirm_payment" pk=session.pk %}';
-            }
-        }
-    });
-});
+    handler.openIframe();
+}
 </script>
 {% endblock %}

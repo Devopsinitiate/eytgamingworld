@@ -209,15 +209,6 @@ nav[aria-label="Breadcrumb"] .material-symbols-outlined {
         z-index: 1 !important;
     }
     
-    /* Ensure all page containers have lower z-index than mobile nav */
-    body > div:not(.mobile-bottom-nav):not(#mobile-menu),
-    main,
-    .container,
-    .mx-auto {
-        position: relative;
-        z-index: 1 !important;
-    }
-    
     /* Force mobile navigation elements to be on top */
     .mobile-bottom-nav,
     .mobile-bottom-nav *,

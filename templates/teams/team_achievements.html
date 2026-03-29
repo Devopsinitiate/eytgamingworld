@@ -190,20 +190,20 @@
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2">
                     {% if team.tournaments_played < 10 %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ team.tournaments_played|floatformat:0|add:"0"|mul:10 }}%"></div>
+                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 10 100 %}%"></div>
                     {% elif team.tournaments_played < 50 %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ team.tournaments_played|floatformat:0|add:"0"|mul:2 }}%"></div>
+                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 50 100 %}%"></div>
                     {% else %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ team.tournaments_played|floatformat:0 }}%"></div>
+                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 100 100 %}%"></div>
                     {% endif %}
                 </div>
                 <p class="text-gray-400 text-xs mt-2">
                     {% if team.tournaments_played < 10 %}
-                    {{ 10|add:team.tournaments_played|mul:-1 }} more tournaments to "Experienced"
+                    {{ team.tournaments_played }}/10 tournaments to "Experienced"
                     {% elif team.tournaments_played < 50 %}
-                    {{ 50|add:team.tournaments_played|mul:-1 }} more tournaments to "Veterans"
+                    {{ team.tournaments_played }}/50 tournaments to "Veterans"
                     {% elif team.tournaments_played < 100 %}
-                    {{ 100|add:team.tournaments_played|mul:-1 }} more tournaments to "Legends"
+                    {{ team.tournaments_played }}/100 tournaments to "Legends"
                     {% else %}
                     All tournament milestones achieved!
                     {% endif %}
@@ -223,7 +223,7 @@
                     {% if team.is_full %}
                     Full roster achieved! 🎉
                     {% else %}
-                    {{ team.max_members|add:team.member_count|mul:-1 }} more members to unlock "Full Roster"
+                    {{ team.member_count }}/{{ team.max_members }} members — keep recruiting to unlock "Full Roster"
                     {% endif %}
                 </p>
             </div>

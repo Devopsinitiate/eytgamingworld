@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CYBER-ARENA | Tournament Brackets</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#00edb4",
+              "on-primary": "#00654b",
+              "surface-container-high": "#1c2028",
+              "error-container": "#9f0519",
+              "surface-variant": "#22262f",
+              "secondary-container": "#006875",
+              "on-tertiary": "#290067",
+              "on-secondary-fixed": "#003a42",
+              "on-primary-fixed-variant": "#00664c",
+              "surface-container": "#161a21",
+              "secondary": "#00e3fd",
+              "on-tertiary-container": "#f8f1ff",
+              "tertiary-fixed": "#bda1ff",
+              "surface-container-highest": "#22262f",
+              "primary-fixed": "#00fdc1",
+              "on-error": "#490006",
+              "secondary-dim": "#00d4ec",
+              "on-surface-variant": "#a9abb3",
+              "on-secondary-fixed-variant": "#005964",
+              "background": "#0b0e14",
+              "primary-container": "#00fdc1",
+              "secondary-fixed-dim": "#00d7f0",
+              "inverse-on-surface": "#52555c",
+              "primary": "#aaffdc",
+              "on-secondary": "#004d57",
+              "surface-container-low": "#10131a",
+              "surface-container-lowest": "#000000",
+              "on-surface": "#ecedf6",
+              "tertiary": "#ac89ff",
+              "on-primary-container": "#005c44",
+              "on-background": "#ecedf6",
+              "inverse-surface": "#f9f9ff",
+              "outline": "#73757d",
+              "inverse-primary": "#006c51",
+              "on-error-container": "#ffa8a3",
+              "tertiary-dim": "#874cff",
+              "surface": "#0b0e14",
+              "error": "#ff716c",
+              "outline-variant": "#45484f",
+              "surface-dim": "#0b0e14",
+              "on-tertiary-fixed": "#1f0052",
+              "on-primary-fixed": "#004734",
+              "tertiary-container": "#7000ff",
+              "on-tertiary-fixed-variant": "#4700a7",
+              "secondary-fixed": "#26e6ff",
+              "primary-dim": "#00edb4",
+              "surface-bright": "#282c36",
+              "tertiary-fixed-dim": "#b190ff",
+              "surface-tint": "#aaffdc",
+              "on-secondary-container": "#e8fbff",
+              "error-dim": "#d7383b"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Manrope"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bracket-line {
+            background: linear-gradient(to right, #45484f 0%, rgba(69, 72, 79, 0) 100%);
+            height: 1px;
+        }
+        .bracket-line-vertical {
+            background: #45484f;
+            width: 1px;
+        }
+        .glass-card {
+            background: rgba(34, 38, 47, 0.4);
+            backdrop-filter: blur(12px);
+        }
+        /* Custom scrollbar for horizontal bracket */
+        ::-webkit-scrollbar {
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #aaffdc;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<nav class="bg-[#0b0e14] dark:bg-[#0b0e14] docked full-width top-0 border-b-0 sticky z-50">
+<div class="bg-[#22262f] shadow-[0_1px_0_0_rgba(170,255,220,0.1)] flex justify-between items-center w-full px-6 py-4 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-black italic tracking-tighter text-[#aaffdc] dark:text-[#aaffdc]">CYBER-ARENA</span>
+<div class="hidden md:flex gap-6 font-['Space_Grotesk'] uppercase tracking-widest text-sm font-bold">
+<a class="text-[#ecedf6] hover:text-[#00e3fd] transition-colors hover:bg-[#aaffdc]/10 transition-all duration-200" href="#">Schedule</a>
+<a class="text-[#ecedf6] hover:text-[#00e3fd] transition-colors hover:bg-[#aaffdc]/10 transition-all duration-200" href="#">Standings</a>
+<a class="text-[#aaffdc] border-b-2 border-[#aaffdc] pb-1 hover:bg-[#aaffdc]/10 transition-all duration-200" href="#">Brackets</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-surface-container px-3 py-1 border-b border-primary">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-xs font-label uppercase tracking-wider w-48" placeholder="SEARCH TEAMS..." type="text"/>
+</div>
+<button class="p-2 text-[#aaffdc] hover:bg-[#aaffdc]/10 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-[#aaffdc] hover:bg-[#aaffdc]/10 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="min-h-screen">
+<!-- Tournament Overview Header -->
+<section class="relative py-12 px-6 overflow-hidden">
+<div class="absolute inset-0 bg-surface-container-lowest opacity-40"></div>
+<div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-primary/10 to-transparent skew-x-12 translate-x-1/2"></div>
+<div class="relative z-10 max-w-[1920px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+<div class="lg:col-span-7">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em]">Live Tournament</span>
+<span class="text-secondary font-label text-xs tracking-widest uppercase">Season 4 World Circuit</span>
+</div>
+<h1 class="font-headline text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-6 italic">
+                        Neon <span class="text-primary">Vortex</span> Invitational
+                    </h1>
+</div>
+<div class="lg:col-span-5 grid grid-cols-3 gap-1 border-l border-outline-variant/30 pl-8">
+<div class="space-y-1">
+<p class="font-label text-[10px] text-outline uppercase tracking-widest">Prize Pool</p>
+<p class="font-headline text-2xl font-bold text-on-surface">$250,000</p>
+</div>
+<div class="space-y-1">
+<p class="font-label text-[10px] text-outline uppercase tracking-widest">Current Stage</p>
+<p class="font-headline text-2xl font-bold text-secondary">Upper Semis</p>
+</div>
+<div class="space-y-1">
+<p class="font-label text-[10px] text-outline uppercase tracking-widest">Teams Active</p>
+<p class="font-headline text-2xl font-bold text-primary">8 / 16</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bracket View Control -->
+<div class="px-6 py-4 flex gap-4 border-t border-outline-variant/15 overflow-x-auto whitespace-nowrap">
+<button class="bg-primary text-on-primary-fixed font-label font-bold text-xs uppercase tracking-widest px-6 py-2.5">Upper Bracket</button>
+<button class="border border-outline-variant/30 text-outline hover:text-secondary hover:border-secondary font-label font-bold text-xs uppercase tracking-widest px-6 py-2.5 transition-all">Lower Bracket</button>
+<button class="border border-outline-variant/30 text-outline hover:text-secondary hover:border-secondary font-label font-bold text-xs uppercase tracking-widest px-6 py-2.5 transition-all">Grand Finals</button>
+</div>
+<!-- Bracket Canvas -->
+<section class="p-6 md:p-12 overflow-x-auto bg-surface-container-low">
+<div class="min-w-[1400px] flex gap-12">
+<!-- Round 1 (1/8 Finals) -->
+<div class="flex flex-col justify-around gap-8">
+<h3 class="font-label text-xs text-outline-variant font-black uppercase tracking-[0.3em] mb-4 text-center">Round of 16</h3>
+<!-- Match 1 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px]">
+<div class="flex justify-between items-center bg-surface-bright/5 p-3 group cursor-pointer hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt335pgyuoZ03ZLnMmz5SQGJikF3sFCVt5ZZ2J5lMd86ZKbUkkadBGgffqeq17JrF-0cDFQtOOY-yUZtKJTCo2lHF3QrTauYro9m02eMKrMAvaKt_hjrM5ZD3u5KtdIESrso1He75GWibRHLH-RzQuKFSirDSn98CWX2NKA3dQwwfXiwKOtg366V6zl7AAAj6tXC-CqPFodDKrnpt_nMvsP_MxnicldUAv44WI72cIyOkn9pU3mj0j3zNT88Lz_1Z20gMj0JXv"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Vortex Alpha</span>
+</div>
+<span class="font-headline font-bold text-primary">2</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChyGFffuykJHhKviTVXkxu452ge10EoBjAf_FaKOf-6upHzRQDi-qrl8-WtCeXaLVl9QP10MgsfwJWPrfjdH4YTdi1BDcKW-XP-2aykLcb9vbpOSzJyLjBC5AtOG6BIu74hsaPuUoUiRhOfyixMtGxtlShuSJj8MYIPkxLvgmRbTah_T55-7GhyENZtjrq7bVOGb1M5vGEsgbiK0fCHnduerr-WZO5j2uQKqaxNF5OAsnH_9bFAarOYwAw9JOfalRutrMKyz4n"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/50">Titan Slayers</span>
+</div>
+<span class="font-headline font-bold text-on-surface/50">0</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 h-[76px] bracket-line-vertical"></div>
+</div>
+<!-- Match 2 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px]">
+<div class="flex justify-between items-center p-3 group cursor-pointer hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiUiSPC6MsrGvddmetPU6TjHueKlULXGSPoYCxV65rPnjKM_tpQRnZVO6oMvowSLSBy8RYR4MiF6CdPe3EPrTa0nMippiertXNGqaCksLZxpCQ9DglF4gY8slIpS152ygR5dgMiL2Q47Npd4-ZqpVS7snE9lyAQtWCeYZP9bet3yZ6IBqzWwfwoMdliDfA6o4F3T3qLg7Yiph4IFD28cf0dNQDdH2WwOnINnsynLUdZBKesF-jeay3OWYN0EzBRu6d0VigOyjY"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/50">Null Vector</span>
+</div>
+<span class="font-headline font-bold text-on-surface/50">1</span>
+</div>
+<div class="flex justify-between items-center bg-surface-bright/5 p-3 group cursor-pointer hover:bg-primary/5 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByNNw-dSo1Ti8_9O6aUSv3XGVkZlITXT2sBZvxBr-CxSCeghbDVviddadkhl7qh5ZWXvhMH9mKAZ2azI7biEwdjK_Kv47nyGe_NF1cJDZYI4afnMn5dFEZnqqwTo2IAs0iLHjAbcWqr5fLoPVlLoemwTugNs7aBOajaHLKPmp5GSYgNTQHvxOXna0YMgQGfHp4Y-9hzF4F8cVIOuPVnsWWa2JC9xjVChwioY_Xm6MMTT7A74b-BBt2BpG11FjXIMYsUQ8tzNWa"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Cyber Ghost</span>
+</div>
+<span class="font-headline font-bold text-primary">2</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] bottom-1/2 h-[76px] bracket-line-vertical"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 w-6 bracket-line"></div>
+</div>
+<!-- Match 3 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px]">
+<div class="flex justify-between items-center bg-surface-bright/5 p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG_4gUhzdstqBgpUOKa2hvGZhhLC37hTs6ABEUsWa5ZEtWiPWQSr3oLpfSXVYd0aN7iFis6Ukrb6Q2VDPdaVGG0ssDHq-mwn0ckNjj3emJO4lXjALYjUm9-CkfPAX_xeuXu31tj3L8mYEH0p8SYNPv66zd5DCUBnvgjlYaUE44Ej634ATIvtwTY80DgJ-sHGqgxetpVtEiwxKCTdKpp8J7sL__q9kJdFXhcSZjodAGYB7v80DdslcgQoi-kDis7giXuwSjxNkS"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Iron Reign</span>
+</div>
+<span class="font-headline font-bold text-primary">2</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoy2R0WNQA9sQMV4kIt7aAL055j0qQgtBsZrhv9ApLoi2_kLigalDfJfkj6gvYlsGEUhvfGyRz7quo83tVPe3u8VWXT4d1bJu8FVYfBFeaub2w98ZJeG79SG5k8qq5fx3C2ImeowQ9HS6el6Enzz5yq_qQO9QHfALpgtiydMLlvSMtKCvRIc9UkJVaXT1YsVneArgp3rMGblad4m4i2i8sx4Qkypp8MKAA7vtYHOracPtAQ-i5_V8tiKEZj7RtBYzYEeIEQPul"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/50">Glitch Mob</span>
+</div>
+<span class="font-headline font-bold text-on-surface/50">1</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 h-[76px] bracket-line-vertical"></div>
+</div>
+<!-- Match 4 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px]">
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T7" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOCH-AMQZJO45k3nKEBFew-btOWmlHtSJ8-jKUl0MKckBWR5-6fc9IRQ0nB9zLF0g9y8vYlOuA8qD0TuX7xkwicSgIZwrjtTkA6qgIbOym4EFpH_xWRewIiAfJgohlhtkMRvDa_63w84SzDahbN9s-r2kX_qAa5exwNg9dZxSDFSnM2gTqTRRk3BFak6_LrnAuUNkpuMGGPj3UNPIqYyQlP00M48xltBphGB3VVRHLMZrs-TxS0EtQSbyuGGOLUt6HmlPFXTlX"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/50">Pulse One</span>
+</div>
+<span class="font-headline font-bold text-on-surface/50">0</span>
+</div>
+<div class="flex justify-between items-center bg-surface-bright/5 p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMVZ74MvhPWR3gw-0ZVHH3f1cGta2tjCZ6LxutyOaa6-eDIJFh6wa0sRR2c7LOVJrHH-6mFC5EmbnU5l77XNEMnblILb-sW3AwvSHxE9hGFdAM8oynoGk4mtg1XUphwZpT9hc9ZF0ae-6jlOXPeFxHMA5DmEnLanvTwhvOmQaMTVwpvQgx-aTJD1NWdKs7YSkraHZ_cxlwX-sbdteo1KD_puIZqsd1ecCywYZSoJNKcyxarZpE9d4SCMQAnnt1PxKz2l8UK1d-"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Solaris</span>
+</div>
+<span class="font-headline font-bold text-primary">2</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] bottom-1/2 h-[76px] bracket-line-vertical"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 w-6 bracket-line"></div>
+</div>
+</div>
+<!-- Round 2 (Quarter-Finals) -->
+<div class="flex flex-col justify-around gap-8">
+<h3 class="font-label text-xs text-outline-variant font-black uppercase tracking-[0.3em] mb-4 text-center">Quarter-Finals</h3>
+<!-- Quarter Match 1 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px] border border-primary/20">
+<div class="absolute -top-6 left-0 flex items-center gap-2">
+<span class="text-[10px] text-secondary font-bold uppercase tracking-widest">Live Now</span>
+<div class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></div>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center border border-primary/30">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgfCEgJVtaPUwT-aohbkMVWbr6S3PEs42xit7OpKrayErGmK0Zipil_CfaxtU0Vxg3teWajtO4eYpKu8AMwzqZNuPr81mim2ZRmEmJeP8SmWvPXxr5RZrqHEl4_FtcTw0fmSl-cPsIawSjRVjebguvU8wKClXFy9XS1EkbzcE9OgTLu8fQwPtEwZsP4mtJiVUgzhLObFS1Ew_J8KgyTIPEdTwNsZ41C0stSrS9Lj3HST0Fa4J-t3CNzZRon1ee7ZOk5EX9-wPo"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Vortex Alpha</span>
+</div>
+<span class="font-headline font-bold text-primary">1</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqk22nIdYOkRPPMB8j1E5fRywI92Gj-BMq97xgUYbIC4iIdAszeO_czxcb-9DfasQJGVER2xICY0A88XqLjWnLNhicxQEef1is_5WKB4T4kOUwgv2zol6d0PX6My8jXN1urCMACBkV6rlN5xjzDEyYiUFMPzijMZOntzmszcntWlnY5t5UWZ2gu8M2cjLYMaeR8wna6zWIW2ax5xkMJ-cKyu9m1IK8JiL0hkSZP-9MMPLTUwpwNhdG6Kb61ibYcG5gf0F586_H"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Cyber Ghost</span>
+</div>
+<span class="font-headline font-bold text-on-surface">1</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 h-[152px] bracket-line-vertical"></div>
+</div>
+<!-- Quarter Match 2 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px]">
+<div class="absolute -top-6 left-0">
+<span class="text-[10px] text-outline font-bold uppercase tracking-widest">Upcoming · 18:00 UTC</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd3n5ZLGaAxJJs1zfo9dV6QWkmosISOm-YEEILOrzscOUHw3BdzTGS_Nvm5cVbqDLZ9Z7fUlJ8DGLI-eT54MKbyWOcM2iepjj59kW2h_-SR1xV5_jW57SXMU4t9Du9aWPX4IXFhsc4tLRKPLgFl6n7T50Vdscukju-oQ0cEgjy3G0K9tc0ruCppsXIHgh7544PWZ9rbuGxXU6pVjFxZrd1Kxrq-ZFwDrw5_TJIEyvydWi89ofntwZqxObfnGm31PiStMtIh2Kw"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Iron Reign</span>
+</div>
+<span class="font-headline font-bold text-on-surface/20">—</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center">
+<img alt="" class="w-4 h-4" data-alt="Abstract esports team logo T8" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjC2_6EUDiSRqThWq1zAGfgc2nPa3hRG-WdOQh-K5nWaDDBv_Vxh6rSBmYXXPuOjvGWog8-xUd2f7os_hPuZebAdOZY70xzZcVh3FUhby6v2OdfOhbJBD-knjL9BHk_Bbo0AH-JTVB9SMLJFWUJRg3-ckz9Kl0IcoSLCCwG75d20M9i_uQT95AZ4P6x7FFbfmMjMSSir-vQ_SJNuBV0QIKF2BPlvOHR7PY8PS_9lFiC8S8m2-mxyXHvDw_t0-7jB3Fp6lXr7FK"/>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight">Solaris</span>
+</div>
+<span class="font-headline font-bold text-on-surface/20">—</span>
+</div>
+</div>
+<!-- Connector -->
+<div class="absolute left-full top-1/2 w-6 bracket-line"></div>
+<div class="absolute left-[calc(100%+24px)] bottom-1/2 h-[152px] bracket-line-vertical"></div>
+<div class="absolute left-[calc(100%+24px)] top-1/2 w-6 bracket-line"></div>
+</div>
+</div>
+<!-- Round 3 (Semi-Finals) -->
+<div class="flex flex-col justify-around">
+<h3 class="font-label text-xs text-outline-variant font-black uppercase tracking-[0.3em] mb-4 text-center">Semi-Finals</h3>
+<!-- Semi Match 1 -->
+<div class="relative">
+<div class="glass-card w-64 p-0 space-y-[2.5px] border-l-2 border-secondary">
+<div class="absolute -top-6 left-0">
+<span class="text-[10px] text-outline font-bold uppercase tracking-widest">Tomorrow · 14:00 UTC</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer bg-surface-container-highest">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center border border-outline-variant/30">
+<span class="text-[10px] font-bold text-outline">Q1</span>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/40 italic">TBD (Q1 Winner)</span>
+</div>
+<span class="font-headline font-bold text-on-surface/10">—</span>
+</div>
+<div class="flex justify-between items-center p-3 group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 bg-surface-container flex items-center justify-center border border-outline-variant/30">
+<span class="text-[10px] font-bold text-outline">Q2</span>
+</div>
+<span class="font-headline text-sm font-bold uppercase tracking-tight text-on-surface/40 italic">TBD (Q2 Winner)</span>
+</div>
+<span class="font-headline font-bold text-on-surface/10">—</span>
+</div>
+</div>
+<!-- Connector to Finals -->
+<div class="absolute left-full top-1/2 w-12 bracket-line"></div>
+</div>
+</div>
+<!-- Grand Final -->
+<div class="flex flex-col justify-around">
+<h3 class="font-label text-xs text-primary font-black uppercase tracking-[0.5em] mb-4 text-center">Grand Final</h3>
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary via-secondary to-primary opacity-20 blur group-hover:opacity-40 transition-opacity"></div>
+<div class="relative glass-card w-80 p-0 space-y-[2.5px] border border-primary/40 shadow-2xl shadow-primary/10">
+<div class="bg-gradient-to-r from-primary to-secondary p-4 text-on-primary-fixed flex items-center justify-between">
+<span class="font-headline font-black italic tracking-wider">CHAMPIONSHIP MATCH</span>
+<span class="material-symbols-outlined text-xl">trophy</span>
+</div>
+<div class="p-4 space-y-4 bg-surface-container-highest">
+<div class="flex items-center justify-between opacity-30">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-background border border-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined">question_mark</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold uppercase">Upper Bracket</span>
+<span class="text-[10px] uppercase font-label">Finalist</span>
+</div>
+</div>
+<span class="font-headline text-2xl font-black">0</span>
+</div>
+<div class="h-px bg-outline-variant/20"></div>
+<div class="flex items-center justify-between opacity-30">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-background border border-outline-variant/30 flex items-center justify-center">
+<span class="material-symbols-outlined">question_mark</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold uppercase">Lower Bracket</span>
+<span class="text-[10px] uppercase font-label">Finalist</span>
+</div>
+</div>
+<span class="font-headline text-2xl font-black">0</span>
+</div>
+</div>
+<div class="bg-surface-bright/10 p-3 text-center">
+<p class="text-[10px] font-label font-bold tracking-[0.2em] text-outline uppercase">OCT 24 · 20:00 UTC · LAS VEGAS ARENA</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar / Details Panel -->
+<section class="p-6 md:p-12 max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface-container p-8 space-y-6">
+<h4 class="font-headline text-2xl font-bold uppercase italic tracking-tight text-primary">Live Match Intel</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+<span class="text-xs font-label uppercase text-outline">Map Pool</span>
+<span class="text-xs font-headline font-bold">Inferno, Mirage, Overpass</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+<span class="text-xs font-label uppercase text-outline">Current Map</span>
+<span class="text-xs font-headline font-bold text-secondary">Mirage (Map 2)</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+<span class="text-xs font-label uppercase text-outline">Viewers</span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-error rounded-full"></span>
+<span class="text-xs font-headline font-bold">142.5K</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-fixed font-headline font-black py-4 uppercase tracking-widest hover:brightness-110 transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Watch Live Broadcast
+                </button>
+</div>
+<div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-1 bg-outline-variant/10 p-1">
+<div class="bg-surface-container p-6 flex flex-col justify-between">
+<div>
+<h5 class="text-xs font-label uppercase text-outline tracking-widest mb-4">Top Performer</h5>
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 bg-surface-variant relative">
+<img alt="" class="w-full h-full object-cover grayscale" data-alt="Cyber-styled esports player avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6vz6Cu1IAfle27OTznrO_iTirhiOCjAMBSF8-GwY0jsA5LqtfAB56cWq-45eGvDZphfRciLrQG0cabJCwlYqJOGljbcB-NVFnQvBWvUD5VNSpM3jZansgdbiQTgzgMg_qcVmJ6FK9RYvXAkS9TXEKsN6b1kNxn4m3iqwZlHJghk0LNVVE0xyrVjkvEBJN3YRzo0Ycf8e0hy6Bnk6XN5HKOJ_6kXdeNS0FqcU8CFbsDoXmj254OMUtZXNGV0tzWyIxAP6faYyx"/>
+<div class="absolute bottom-0 right-0 bg-primary text-[8px] font-black px-1 leading-none py-0.5 text-on-primary">MVP</div>
+</div>
+<div>
+<p class="font-headline text-xl font-black uppercase italic">PHOENIX</p>
+<p class="text-[10px] font-label text-secondary uppercase tracking-widest">Vortex Alpha</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4 mt-6">
+<div>
+<p class="text-[8px] font-label text-outline uppercase tracking-widest">K/D/A</p>
+<p class="font-headline text-lg font-bold">24/11/8</p>
+</div>
+<div class="w-px h-8 bg-outline-variant/20"></div>
+<div>
+<p class="text-[8px] font-label text-outline uppercase tracking-widest">ADR</p>
+<p class="font-headline text-lg font-bold">114.2</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-6">
+<h5 class="text-xs font-label uppercase text-outline tracking-widest mb-4">Bracket Statistics</h5>
+<div class="space-y-4">
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-label uppercase font-bold">
+<span>Upper Bracket Progress</span>
+<span>75%</span>
+</div>
+<div class="h-1 w-full bg-surface-variant">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-label uppercase font-bold">
+<span>Lower Bracket Progress</span>
+<span>40%</span>
+</div>
+<div class="h-1 w-full bg-surface-variant">
+<div class="h-full bg-secondary w-2/5"></div>
+</div>
+</div>
+<div class="mt-8">
+<p class="text-[10px] font-label text-on-surface/40 leading-relaxed uppercase tracking-wider italic">
+                                Total matches completed: 22 / 31<br/>
+                                Average match duration: 42m 15s<br/>
+                                Most banned map: Overpass (14)
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#0b0e14] dark:bg-[#0b0e14] border-t border-[#outline_variant]/15 py-12 px-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 w-full max-w-[1920px] mx-auto">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="text-lg font-bold text-[#ecedf6] font-headline tracking-tighter italic">CYBER-ARENA</span>
+<p class="font-['Manrope'] text-xs uppercase tracking-tight text-[#ecedf6]/60">© 2024 KINETIC CYBER-EDITORIAL. ALL RIGHTS RESERVED.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8 font-['Manrope'] text-xs uppercase tracking-tight">
+<a class="text-[#ecedf6]/60 hover:text-[#00e3fd] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[#ecedf6]/60 hover:text-[#00e3fd] transition-colors" href="#">Terms of Service</a>
+<a class="text-[#ecedf6]/60 hover:text-[#00e3fd] transition-colors" href="#">Cookie Settings</a>
+</div>
+<div class="flex gap-4">
+<button class="w-10 h-10 border border-outline-variant/30 flex items-center justify-center text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">public</span>
+</button>
+<button class="w-10 h-10 border border-outline-variant/30 flex items-center justify-center text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">forum</span>
+</button>
+</div>
+</div>
+</footer>
+</body></html>

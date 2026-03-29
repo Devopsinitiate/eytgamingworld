@@ -117,11 +117,13 @@ class BookingForm(forms.ModelForm):
     
     date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-        help_text='Select a date for your session'
+        help_text='Select a date for your session',
+        required=False  # We derive this from the datetime slot
     )
-    time = forms.TimeField(
-        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-        help_text='Select a time'
+    time = forms.CharField(
+        widget=forms.HiddenInput(),
+        help_text='Select a time',
+        required=True
     )
     
     class Meta:
@@ -182,38 +184,63 @@ class BookingForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        date = cleaned_data.get('date')
-        time = cleaned_data.get('time')
-        
-        if date and time:
-            # Combine date and time
-            scheduled_start = timezone.make_aware(
-                timezone.datetime.combine(date, time)
-            )
-            
-            # Check if in the past
-            if scheduled_start <= timezone.now():
-                raise forms.ValidationError('Cannot book sessions in the past')
-            
-            # Check if coach is available
-            weekday = date.weekday()
-            is_available = self.coach.availability.filter(
-                weekday=weekday,
-                start_time__lte=time,
-                end_time__gte=time,
-                is_active=True
-            ).exists()
-            
-            if not is_available:
-                raise forms.ValidationError('Coach is not available at this time')
-            
-            # Set scheduled times
-            duration = cleaned_data.get('duration_minutes', 60)
-            cleaned_data['scheduled_start'] = scheduled_start
-            cleaned_data['scheduled_end'] = scheduled_start + timezone.timedelta(
-                minutes=duration
-            )
-        
+        time_value = cleaned_data.get('time')
+        date_value = cleaned_data.get('date')
+
+        if not time_value:
+            raise forms.ValidationError('Please select a time slot.')
+
+        # The slot picker sends a full ISO datetime string (e.g. "2026-03-18T14:00:00+00:00")
+        # Parse it directly into a scheduled_start datetime
+        try:
+            from django.utils.dateparse import parse_datetime
+            from datetime import datetime as dt_class
+            import re
+
+            # Try parsing as ISO datetime first
+            scheduled_start = parse_datetime(time_value)
+
+            if scheduled_start is None:
+                # Fallback: try combining date + time if separate values
+                if date_value:
+                    time_obj = dt_class.strptime(time_value, '%H:%M').time()
+                    scheduled_start = timezone.make_aware(
+                        timezone.datetime.combine(date_value, time_obj)
+                    )
+                else:
+                    raise forms.ValidationError('Invalid date/time selection.')
+
+            # Ensure timezone-aware
+            if timezone.is_naive(scheduled_start):
+                scheduled_start = timezone.make_aware(scheduled_start)
+
+        except (ValueError, TypeError):
+            raise forms.ValidationError('Invalid date/time format. Please select a slot from the calendar.')
+
+        # Check if in the past
+        if scheduled_start <= timezone.now():
+            raise forms.ValidationError('Cannot book sessions in the past.')
+
+        date = scheduled_start.date()
+        time = scheduled_start.time()
+
+        # Check if coach is available
+        weekday = date.weekday()
+        is_available = self.coach.availability.filter(
+            weekday=weekday,
+            start_time__lte=time,
+            end_time__gte=time,
+            is_active=True
+        ).exists()
+
+        if not is_available:
+            raise forms.ValidationError('Coach is not available at this time.')
+
+        # Set scheduled times
+        duration = cleaned_data.get('duration_minutes', 60)
+        cleaned_data['scheduled_start'] = scheduled_start
+        cleaned_data['scheduled_end'] = scheduled_start + timezone.timedelta(minutes=duration)
+
         return cleaned_data
 
 

@@ -4,51 +4,221 @@
 {% block title %}Notification Preferences - EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
 <style>
+    /* Gaming Design Variables */
+    :root {
+        --electric-red: #DC2626;
+        --deep-black: #0A0A0A;
+        --gunmetal-gray: #1F2937;
+        --neon-cyan: #06B6D4;
+    }
+
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
+    
     body {
-        font-family: 'Spline Sans', sans-serif;
+        font-family: 'Space Grotesk', sans-serif;
+        background: var(--deep-black);
+    }
+
+    /* Gaming Header */
+    .gaming-header {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: linear-gradient(135deg, var(--electric-red) 0%, #FF6B6B 50%, var(--neon-cyan) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Neon Glow Effects */
+    .neon-red-glow {
+        text-shadow: 0 0 10px rgba(220, 38, 38, 0.5), 0 0 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .neon-card {
+        background: var(--gunmetal-gray);
+        border: 2px solid rgba(220, 38, 38, 0.3);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.2), inset 0 0 20px rgba(220, 38, 38, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .neon-card:hover {
+        border-color: var(--electric-red);
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.4), inset 0 0 30px rgba(220, 38, 38, 0.1);
+    }
+
+    /* Skewed Button */
+    .skewed-button {
+        transform: skewX(-12deg);
+        background: var(--electric-red);
+        border: 1px solid var(--electric-red);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .skewed-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .skewed-button:hover {
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), 0 0 50px rgba(220, 38, 38, 0.3);
+        transform: skewX(-12deg) translateY(-2px);
+    }
+
+    .skewed-button:hover::before {
+        left: 100%;
+    }
+
+    .skewed-button-text {
+        transform: skewX(12deg);
+    }
+
+    /* Toggle Switch Gaming Style */
+    .gaming-toggle {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 28px;
+    }
+
+    .gaming-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .gaming-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #374151;
+        transition: 0.4s;
+        border-radius: 28px;
+        border: 2px solid rgba(220, 38, 38, 0.3);
+    }
+
+    .gaming-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    input:checked + .gaming-slider {
+        background-color: var(--electric-red);
+        border-color: var(--electric-red);
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+    }
+
+    input:checked + .gaming-slider:before {
+        transform: translateX(24px);
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    /* Gaming Checkbox */
+    .gaming-checkbox {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(220, 38, 38, 0.5);
+        border-radius: 4px;
+        background: #1F2937;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .gaming-checkbox:checked {
+        background: var(--electric-red);
+        border-color: var(--electric-red);
+        box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    .gaming-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Success Message Gaming Style */
+    .success-banner {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+        border: 2px solid rgba(34, 197, 94, 0.5);
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-gray-900 py-6 lg:py-10">
+<div class="min-h-screen bg-deep-black py-6 lg:py-10">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{% url 'dashboard:home' %}" class="inline-flex items-center gap-2 text-gray-400 hover:text-electric-red transition-colors group">
+                <span class="material-symbols-outlined group-hover:neon-red-glow">arrow_back</span>
+                <span class="font-space-grotesk">Back to Dashboard</span>
+            </a>
+        </div>
+
         <!-- Breadcrumbs -->
         <div class="flex flex-wrap gap-2 mb-6">
-            <a href="/" class="text-gray-400 text-base font-medium hover:text-white transition">
+            <a href="/" class="text-gray-400 text-base font-medium hover:text-electric-red transition">
                 Home
             </a>
             <span class="text-gray-400 text-base font-medium">/</span>
-            <a href="{% url 'notifications:list' %}" class="text-gray-400 text-base font-medium hover:text-white transition">
+            <a href="{% url 'notifications:list' %}" class="text-gray-400 text-base font-medium hover:text-electric-red transition">
                 Notifications
             </a>
             <span class="text-gray-400 text-base font-medium">/</span>
-            <span class="text-white text-base font-medium">Preferences</span>
+            <span class="text-electric-red text-base font-medium">Preferences</span>
         </div>
 
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-white text-4xl font-black leading-tight tracking-tight mb-2">
+        <div class="mb-12 text-center">
+            <h1 class="gaming-header text-5xl md:text-6xl mb-4">
                 Notification Preferences
             </h1>
-            <p class="text-gray-400 text-base font-normal leading-normal">
-                Customize how and when you receive notifications from EYTGaming.
+            <p class="text-gray-400 text-lg font-space-grotesk">
+                Customize how and when you receive notifications from EYTGaming
             </p>
         </div>
 
         <!-- Success Message -->
-        <div id="success-message" class="hidden mb-6 p-4 bg-green-600/20 border border-green-600/50 rounded-lg">
+        <div id="success-message" class="hidden mb-6 p-4 success-banner rounded-lg">
             <div class="flex items-center gap-2 text-green-400">
                 <span class="material-symbols-outlined">check_circle</span>
-                <span class="font-medium">Preferences saved successfully!</span>
+                <span class="font-bold">Preferences saved successfully!</span>
             </div>
         </div>
 
@@ -56,153 +226,153 @@
             {% csrf_token %}
             
             <!-- In-App Notifications -->
-            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div class="neon-card rounded-xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-red-600 text-2xl">app_badging</span>
-                    <h2 class="text-white text-xl font-bold">In-App Notifications</h2>
+                    <span class="material-symbols-outlined text-electric-red text-3xl neon-red-glow">app_badging</span>
+                    <h2 class="text-white text-2xl font-bold font-barlow uppercase tracking-wide">In-App Notifications</h2>
                 </div>
                 
                 <div class="space-y-4">
                     <div class="flex items-center justify-between py-3">
                         <div class="flex-1">
-                            <p class="text-white font-medium">Enable In-App Notifications</p>
+                            <p class="text-white font-semibold">Enable In-App Notifications</p>
                             <p class="text-gray-400 text-sm mt-1">Show notifications within the platform</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="in_app_enabled" class="sr-only peer" {% if prefs.in_app_enabled %}checked{% endif %}>
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        <label class="gaming-toggle">
+                            <input type="checkbox" name="in_app_enabled" {% if prefs.in_app_enabled %}checked{% endif %}>
+                            <span class="gaming-slider"></span>
                         </label>
                     </div>
                 </div>
             </div>
 
             <!-- Email Notifications -->
-            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div class="neon-card rounded-xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-red-600 text-2xl">email</span>
-                    <h2 class="text-white text-xl font-bold">Email Notifications</h2>
+                    <span class="material-symbols-outlined text-electric-red text-3xl neon-red-glow">email</span>
+                    <h2 class="text-white text-2xl font-bold font-barlow uppercase tracking-wide">Email Notifications</h2>
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between py-3 border-b border-gray-700">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-700/50">
                         <div class="flex-1">
-                            <p class="text-white font-medium">Enable Email Notifications</p>
+                            <p class="text-white font-semibold">Enable Email Notifications</p>
                             <p class="text-gray-400 text-sm mt-1">Receive notifications via email</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="email_enabled" class="sr-only peer" {% if prefs.email_enabled %}checked{% endif %}>
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        <label class="gaming-toggle">
+                            <input type="checkbox" name="email_enabled" {% if prefs.email_enabled %}checked{% endif %}>
+                            <span class="gaming-slider"></span>
                         </label>
                     </div>
 
                     <div class="pl-4 space-y-3">
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Tournament Updates</label>
-                            <input type="checkbox" name="email_tournament_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_tournament_updates %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Tournament Updates</label>
+                            <input type="checkbox" name="email_tournament_updates" class="gaming-checkbox" {% if prefs.email_tournament_updates %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Coaching Reminders</label>
-                            <input type="checkbox" name="email_coaching_reminders" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_coaching_reminders %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Coaching Reminders</label>
+                            <input type="checkbox" name="email_coaching_reminders" class="gaming-checkbox" {% if prefs.email_coaching_reminders %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Team Activity</label>
-                            <input type="checkbox" name="email_team_activity" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_team_activity %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Team Activity</label>
+                            <input type="checkbox" name="email_team_activity" class="gaming-checkbox" {% if prefs.email_team_activity %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Payment Receipts</label>
-                            <input type="checkbox" name="email_payment_receipts" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_payment_receipts %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Payment Receipts</label>
+                            <input type="checkbox" name="email_payment_receipts" class="gaming-checkbox" {% if prefs.email_payment_receipts %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Security Alerts</label>
-                            <input type="checkbox" name="email_security_alerts" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_security_alerts %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Security Alerts</label>
+                            <input type="checkbox" name="email_security_alerts" class="gaming-checkbox" {% if prefs.email_security_alerts %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Marketing & Promotions</label>
-                            <input type="checkbox" name="email_marketing" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.email_marketing %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Marketing & Promotions</label>
+                            <input type="checkbox" name="email_marketing" class="gaming-checkbox" {% if prefs.email_marketing %}checked{% endif %}>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Push Notifications -->
-            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div class="neon-card rounded-xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-red-600 text-2xl">notifications_active</span>
-                    <h2 class="text-white text-xl font-bold">Push Notifications</h2>
+                    <span class="material-symbols-outlined text-electric-red text-3xl neon-red-glow">notifications_active</span>
+                    <h2 class="text-white text-2xl font-bold font-barlow uppercase tracking-wide">Push Notifications</h2>
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between py-3 border-b border-gray-700">
+                    <div class="flex items-center justify-between py-3 border-b border-gray-700/50">
                         <div class="flex-1">
-                            <p class="text-white font-medium">Enable Push Notifications</p>
+                            <p class="text-white font-semibold">Enable Push Notifications</p>
                             <p class="text-gray-400 text-sm mt-1">Receive push notifications on your devices</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="push_enabled" class="sr-only peer" {% if prefs.push_enabled %}checked{% endif %}>
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        <label class="gaming-toggle">
+                            <input type="checkbox" name="push_enabled" {% if prefs.push_enabled %}checked{% endif %}>
+                            <span class="gaming-slider"></span>
                         </label>
                     </div>
 
                     <div class="pl-4 space-y-3">
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Tournament Updates</label>
-                            <input type="checkbox" name="push_tournament_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_tournament_updates %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Tournament Updates</label>
+                            <input type="checkbox" name="push_tournament_updates" class="gaming-checkbox" {% if prefs.push_tournament_updates %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Coaching Reminders</label>
-                            <input type="checkbox" name="push_coaching_reminders" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_coaching_reminders %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Coaching Reminders</label>
+                            <input type="checkbox" name="push_coaching_reminders" class="gaming-checkbox" {% if prefs.push_coaching_reminders %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Team Activity</label>
-                            <input type="checkbox" name="push_team_activity" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_team_activity %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Team Activity</label>
+                            <input type="checkbox" name="push_team_activity" class="gaming-checkbox" {% if prefs.push_team_activity %}checked{% endif %}>
                         </div>
                         <div class="flex items-center justify-between py-2">
-                            <label class="text-gray-300 text-sm">Match Updates</label>
-                            <input type="checkbox" name="push_match_updates" class="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-600" {% if prefs.push_match_updates %}checked{% endif %}>
+                            <label class="text-gray-300 text-sm font-medium">Match Updates</label>
+                            <input type="checkbox" name="push_match_updates" class="gaming-checkbox" {% if prefs.push_match_updates %}checked{% endif %}>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Quiet Hours -->
-            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+            <div class="neon-card rounded-xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-red-600 text-2xl">bedtime</span>
-                    <h2 class="text-white text-xl font-bold">Quiet Hours</h2>
+                    <span class="material-symbols-outlined text-electric-red text-3xl neon-red-glow">bedtime</span>
+                    <h2 class="text-white text-2xl font-bold font-barlow uppercase tracking-wide">Quiet Hours</h2>
                 </div>
                 
                 <div class="space-y-4">
                     <div class="flex items-center justify-between py-3">
                         <div class="flex-1">
-                            <p class="text-white font-medium">Enable Quiet Hours</p>
+                            <p class="text-white font-semibold">Enable Quiet Hours</p>
                             <p class="text-gray-400 text-sm mt-1">Pause non-urgent notifications during specified hours</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="quiet_hours_enabled" class="sr-only peer" {% if prefs.quiet_hours_enabled %}checked{% endif %}>
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        <label class="gaming-toggle">
+                            <input type="checkbox" name="quiet_hours_enabled" {% if prefs.quiet_hours_enabled %}checked{% endif %}>
+                            <span class="gaming-slider"></span>
                         </label>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-gray-300 text-sm mb-2">Start Time</label>
-                            <input type="time" name="quiet_hours_start" value="{{ prefs.quiet_hours_start|default:'22:00' }}" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-600 focus:border-transparent">
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Start Time</label>
+                            <input type="time" name="quiet_hours_start" value="{{ prefs.quiet_hours_start|default:'22:00' }}" class="w-full bg-gunmetal-gray border-2 border-electric-red/30 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-electric-red focus:border-electric-red transition-all">
                         </div>
                         <div>
-                            <label class="block text-gray-300 text-sm mb-2">End Time</label>
-                            <input type="time" name="quiet_hours_end" value="{{ prefs.quiet_hours_end|default:'08:00' }}" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-600 focus:border-transparent">
+                            <label class="block text-gray-300 text-sm font-medium mb-2">End Time</label>
+                            <input type="time" name="quiet_hours_end" value="{{ prefs.quiet_hours_end|default:'08:00' }}" class="w-full bg-gunmetal-gray border-2 border-electric-red/30 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-electric-red focus:border-electric-red transition-all">
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Save Button -->
-            <div class="flex justify-end gap-4">
-                <a href="{% url 'notifications:list' %}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition">
+            <div class="flex flex-col sm:flex-row justify-end gap-4">
+                <a href="{% url 'notifications:list' %}" class="px-8 py-3 bg-gunmetal-gray hover:bg-gray-700 text-white font-bold rounded-lg transition-all border-2 border-gray-600 hover:border-electric-red text-center">
                     Cancel
                 </a>
-                <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
-                    Save Preferences
+                <button type="submit" class="skewed-button px-8 py-3 text-white font-bold rounded-lg">
+                    <span class="skewed-button-text block font-barlow uppercase tracking-wide">Save Preferences</span>
                 </button>
             </div>
         </form>

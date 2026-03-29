@@ -103,12 +103,21 @@
                 <h3 class="nav-section-title">TRAINING</h3>
                 <div class="nav-group" role="group" aria-label="Training navigation">
                     <a href="{% url 'coaching:coach_list' %}"
-                        class="nav-item-gaming {% if 'coaching' in request.path %}active{% endif %}">
+                        class="nav-item-gaming {% if 'coaching' in request.path and 'session' not in request.path %}active{% endif %}">
                         <span class="nav-icon-wrapper">
                             <span class="material-symbols-outlined nav-icon">sports_esports</span>
                         </span>
                         <span class="nav-label">Coaching</span>
                     </a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'coaching:session_list' %}"
+                        class="nav-item-gaming {% if 'coaching' in request.path and 'session' in request.path %}active{% endif %}">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">event_note</span>
+                        </span>
+                        <span class="nav-label">My Sessions</span>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -153,6 +162,18 @@
             <div class="nav-section mb-8">
                 <h3 class="nav-section-title">SYSTEM</h3>
                 <div class="nav-group" role="group" aria-label="System navigation">
+                    <a href="{% url 'home' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">home</span>
+                        </span>
+                        <span class="nav-label">Home Page</span>
+                    </a>
+                    <a href="{% url 'about' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">info</span>
+                        </span>
+                        <span class="nav-label">About</span>
+                    </a>
                     {% if user.is_authenticated %}
                     <a href="{% url 'payments:payment_methods' %}" class="nav-item-gaming nav-item-subtle">
                         <span class="nav-icon-wrapper">
@@ -187,6 +208,12 @@
                     </a>
                     {% endif %}
                 </div>
+            </div>
+
+            <!-- Legal links -->
+            <div style="padding:12px 0 4px;border-top:1px solid #1f1f1f;display:flex;gap:16px;flex-wrap:wrap;">
+                <a href="{% url 'privacy' %}" style="color:#4b5563;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;">Privacy</a>
+                <a href="{% url 'terms' %}" style="color:#4b5563;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;">Terms</a>
             </div>
         </div>
     </div>

@@ -2221,14 +2221,6 @@ img[loading="lazy"].loaded {
     @apply relative;
 }
 
-.tab-pane {
-    @apply hidden;
-}
-
-.tab-pane.active {
-    @apply block;
-}
-
 /* Content Cards */
 .content-card {
     @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-lg p-6;

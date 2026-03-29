@@ -1,227 +1,169 @@
 {% load static %}
 
-{# Footer Component - Social Links and Legal Information #}
-<footer class="footer py-12 bg-gradient-to-t from-black to-gray-900 border-t-2 border-red-600/30">
-  <div class="container mx-auto px-4">
-    
-    {# Newsletter Signup Section #}
-    <div class="newsletter-section mb-12 max-w-2xl mx-auto">
-      <div class="text-center mb-6">
-        <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Space Grotesk', sans-serif;">
-          Stay Updated
-        </h3>
-        <p class="text-gray-400 text-sm">
-          Subscribe to our newsletter for exclusive deals, new products, and esports updates
+<footer style="background:#0A0A0A;border-top:1px solid #1f1f1f;position:relative;overflow:hidden;">
+
+  <!-- Red top accent line -->
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#DC2626,#ef4444,#DC2626,transparent);"></div>
+
+  <!-- Subtle grid bg -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(220,38,38,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(220,38,38,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+
+  <div style="max-width:1200px;margin:0 auto;padding:60px 24px 32px;position:relative;">
+
+    <!-- Top grid: brand + links + newsletter -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;margin-bottom:48px;" class="ft-grid">
+
+      <!-- Brand column -->
+      <div>
+        <a href="{% url 'home' %}" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:16px;">
+          <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" style="height:40px;width:auto;border-radius:6px;box-shadow:0 0 12px rgba(220,38,38,.4);">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;">EYTGAMING</span>
+        </a>
+        <p style="color:#6b7280;font-size:.875rem;line-height:1.6;margin:0 0 20px;">
+          The premier esports platform for competitive gamers. Tournaments, coaching, teams — all in one place.
         </p>
-      </div>
-      
-      {# Newsletter Form #}
-      <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3">
-        {% csrf_token %}
-        <div class="flex-1">
-          <input 
-            type="email" 
-            id="newsletter-email" 
-            name="email" 
-            placeholder="Enter your email address"
-            required
-            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors"
-            aria-label="Email address for newsletter"
-          >
+        <!-- Social icons -->
+        <div style="display:flex;gap:10px;">
+          <a href="{{ discord_url|default:'#' }}" target="_blank" rel="noopener" aria-label="Discord"
+             style="width:36px;height:36px;border-radius:8px;background:#111;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;color:#6b7280;text-decoration:none;transition:all .2s;"
+             onmouseover="this.style.borderColor='#DC2626';this.style.color='#fff';this.style.boxShadow='0 0 10px rgba(220,38,38,.3)';"
+             onmouseout="this.style.borderColor='#1f1f1f';this.style.color='#6b7280';this.style.boxShadow='none';">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;line-height:1;text-transform:none;letter-spacing:0;">forum</span>
+          </a>
+          <a href="{{ twitter_url|default:'#' }}" target="_blank" rel="noopener" aria-label="X / Twitter"
+             style="width:36px;height:36px;border-radius:8px;background:#111;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;color:#6b7280;text-decoration:none;transition:all .2s;"
+             onmouseover="this.style.borderColor='#DC2626';this.style.color='#fff';this.style.boxShadow='0 0 10px rgba(220,38,38,.3)';"
+             onmouseout="this.style.borderColor='#1f1f1f';this.style.color='#6b7280';this.style.boxShadow='none';">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;line-height:1;text-transform:none;letter-spacing:0;">tag</span>
+          </a>
+          <a href="{{ twitch_url|default:'#' }}" target="_blank" rel="noopener" aria-label="Twitch"
+             style="width:36px;height:36px;border-radius:8px;background:#111;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;color:#6b7280;text-decoration:none;transition:all .2s;"
+             onmouseover="this.style.borderColor='#DC2626';this.style.color='#fff';this.style.boxShadow='0 0 10px rgba(220,38,38,.3)';"
+             onmouseout="this.style.borderColor='#1f1f1f';this.style.color='#6b7280';this.style.boxShadow='none';">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;line-height:1;text-transform:none;letter-spacing:0;">live_tv</span>
+          </a>
+          <a href="{{ youtube_url|default:'#' }}" target="_blank" rel="noopener" aria-label="YouTube"
+             style="width:36px;height:36px;border-radius:8px;background:#111;border:1px solid #1f1f1f;display:flex;align-items:center;justify-content:center;color:#6b7280;text-decoration:none;transition:all .2s;"
+             onmouseover="this.style.borderColor='#DC2626';this.style.color='#fff';this.style.boxShadow='0 0 10px rgba(220,38,38,.3)';"
+             onmouseout="this.style.borderColor='#1f1f1f';this.style.color='#6b7280';this.style.boxShadow='none';">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;line-height:1;text-transform:none;letter-spacing:0;">play_circle</span>
+          </a>
         </div>
-        <button 
-          type="submit" 
-          class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_rgba(236,19,19,0.5)] uppercase tracking-wide"
-          style="font-family: 'Space Grotesk', sans-serif;"
-        >
-          Subscribe
-        </button>
-      </form>
-      
-      {# Success/Error Messages #}
-      <div id="newsletter-message" class="mt-4 text-center hidden">
-        <p class="text-sm"></p>
       </div>
+
+      <!-- Quick links column -->
+      <div>
+        <h4 style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#DC2626;margin:0 0 16px;">Platform</h4>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;">
+          {% url 'tournaments:list' as t_url %}
+          {% url 'teams:list' as tm_url %}
+          {% url 'coaching:coach_list' as c_url %}
+          {% url 'store:product_list' as s_url %}
+          {% url 'core:leaderboard' as lb_url %}
+          {% url 'about' as ab_url %}
+          <li><a href="{{ t_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Tournaments</a></li>
+          <li><a href="{{ tm_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Teams</a></li>
+          <li><a href="{{ c_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Coaching</a></li>
+          <li><a href="{{ s_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Store</a></li>
+          <li><a href="{{ lb_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Leaderboard</a></li>
+          <li><a href="{{ ab_url }}" style="color:#9ca3af;font-size:.875rem;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">About</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter column -->
+      <div>
+        <h4 style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#DC2626;margin:0 0 8px;">Stay in the Game</h4>
+        <p style="color:#6b7280;font-size:.8rem;margin:0 0 14px;line-height:1.5;">Get tournament alerts, coaching deals, and esports news.</p>
+        <form id="newsletter-form" style="display:flex;flex-direction:column;gap:8px;">
+          {% csrf_token %}
+          <input type="email" id="newsletter-email" name="email" placeholder="your@email.com" required
+            style="width:100%;padding:10px 14px;background:#111;border:1px solid #2a2a2a;border-radius:6px;color:#fff;font-size:.875rem;outline:none;box-sizing:border-box;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#DC2626';" onblur="this.style.borderColor='#2a2a2a';"
+            aria-label="Email for newsletter">
+          <button type="submit"
+            style="padding:10px 16px;background:linear-gradient(135deg,#DC2626,#b91c1c);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .2s;box-shadow:0 0 12px rgba(220,38,38,.25);"
+            onmouseover="this.style.boxShadow='0 0 20px rgba(220,38,38,.5)';"
+            onmouseout="this.style.boxShadow='0 0 12px rgba(220,38,38,.25)';">
+            Subscribe
+          </button>
+        </form>
+        <div id="newsletter-message" class="hidden" style="margin-top:8px;font-size:.8rem;"></div>
+      </div>
+
     </div>
-    
-    {# Divider Line #}
-    <div class="footer-divider h-px bg-gradient-to-r from-transparent via-red-600/50 to-transparent mb-8"></div>
-    
-    {# Social Icons Row #}
-    <div class="social-icons flex justify-center gap-8 mb-8">
-      {# Discord #}
-      <a 
-        href="{{ discord_url|default:'#' }}" 
-        class="social-icon text-gray-400 hover:text-indigo-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Join our Discord server"
-      >
-        <span class="material-symbols-outlined text-4xl">forum</span>
-      </a>
-      
-      {# X (Twitter) #}
-      <a 
-        href="{{ twitter_url|default:'#' }}" 
-        class="social-icon text-gray-400 hover:text-white transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Follow us on X (Twitter)"
-      >
-        <span class="material-symbols-outlined text-4xl">tag</span>
-      </a>
-      
-      {# Twitch #}
-      <a 
-        href="{{ twitch_url|default:'#' }}" 
-        class="social-icon text-gray-400 hover:text-purple-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Watch us on Twitch"
-      >
-        <span class="material-symbols-outlined text-4xl">live_tv</span>
-      </a>
-      
-      {# YouTube #}
-      <a 
-        href="{{ youtube_url|default:'#' }}" 
-        class="social-icon text-gray-400 hover:text-red-500 transition-all duration-300 transform hover:scale-110 hover:drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Subscribe on YouTube"
-      >
-        <span class="material-symbols-outlined text-4xl">play_circle</span>
-      </a>
-    </div>
-    
-    {# Divider Line #}
-    <div class="footer-divider h-px bg-gradient-to-r from-transparent via-red-600/50 to-transparent mb-8"></div>
-    
-    {# Legal & Copyright Section #}
-    <div class="footer-legal text-center">
-      {# Copyright Text #}
-      <p class="text-gray-400 text-sm mb-3">
-        © {{ current_year|default:"2024" }} EYTGaming. All rights reserved.
+
+    <!-- Divider -->
+    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(220,38,38,.3),transparent);margin-bottom:24px;"></div>
+
+    <!-- Bottom bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <p style="color:#4b5563;font-size:.8rem;margin:0;">
+        &copy; {{ current_year|default:"2026" }} EYTGaming. All rights reserved.
       </p>
-      
-      {# Legal Links #}
-      <div class="legal-links flex justify-center items-center gap-4 text-sm">
-        <a 
-          href="#" 
-          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
-        >
-          Privacy Policy
-        </a>
-        
-        <span class="separator text-gray-600">•</span>
-        
-        <a 
-          href="#" 
-          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
-        >
-          Terms of Service
-        </a>
-        
-        <span class="separator text-gray-600">•</span>
-        
-        <a 
-          href="#" 
-          class="legal-link text-gray-500 hover:text-red-500 transition-colors uppercase tracking-wide"
-        >
-          Contact
-        </a>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <a href="{% url 'privacy' %}" style="color:#9ca3af;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Privacy Policy</a>
+        <a href="{% url 'terms' %}" style="color:#9ca3af;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Terms of Service</a>
+        <a href="{% url 'about' %}" style="color:#9ca3af;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#9ca3af';">Contact</a>
+        <button id="back-to-top"
+          style="display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;padding:0;transition:color .15s;"
+          onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';"
+          aria-label="Back to top">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:16px;line-height:1;text-transform:none;letter-spacing:0;">arrow_upward</span>
+          Top
+        </button>
       </div>
     </div>
-    
-    {# Back to Top Button (Optional Enhancement) #}
-    <div class="text-center mt-8">
-      <button 
-        id="back-to-top" 
-        class="inline-flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group"
-        aria-label="Back to top"
-      >
-        <span class="text-xs uppercase tracking-widest">Back to Top</span>
-        <span class="material-symbols-outlined text-2xl transform group-hover:-translate-y-1 transition-transform">
-          keyboard_arrow_up
-        </span>
-      </button>
-    </div>
-    
+
   </div>
 </footer>
 
-{# Back to Top JavaScript #}
+<style>
+@media (max-width: 768px) {
+  .ft-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+}
+</style>
+
 <script>
-  (function() {
-    const backToTopBtn = document.getElementById('back-to-top');
-    
-    if (backToTopBtn) {
-      backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
+(function() {
+  const btn = document.getElementById('back-to-top');
+  if (btn) btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  const form = document.getElementById('newsletter-form');
+  const msg  = document.getElementById('newsletter-message');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('newsletter-email');
+      const submitBtn  = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Subscribing...';
+      msg.classList.add('hidden');
+      try {
+        const csrf = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+        const res  = await fetch('/store/newsletter/subscribe/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+          body: JSON.stringify({ email: emailInput.value.trim() })
         });
-      });
-    }
-    
-    // Newsletter Form Submission
-    const newsletterForm = document.getElementById('newsletter-form');
-    const newsletterMessage = document.getElementById('newsletter-message');
-    
-    if (newsletterForm) {
-      newsletterForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const emailInput = document.getElementById('newsletter-email');
-        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
-        const email = emailInput.value.trim();
-        
-        // Disable form during submission
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Subscribing...';
-        newsletterMessage.classList.add('hidden');
-        
-        try {
-          // Get CSRF token
-          const csrfToken = newsletterForm.querySelector('[name="csrfmiddlewaretoken"]').value;
-          
-          // Send AJAX request
-          const response = await fetch('/store/newsletter/subscribe/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ email: email })
-          });
-          
-          const data = await response.json();
-          
-          // Show message
-          const messageP = newsletterMessage.querySelector('p');
-          newsletterMessage.classList.remove('hidden');
-          
-          if (data.success) {
-            messageP.textContent = data.message;
-            messageP.className = 'text-sm text-green-400';
-            emailInput.value = ''; // Clear input on success
-          } else {
-            messageP.textContent = data.error || 'An error occurred. Please try again.';
-            messageP.className = 'text-sm text-red-400';
-          }
-          
-        } catch (error) {
-          console.error('Newsletter subscription error:', error);
-          const messageP = newsletterMessage.querySelector('p');
-          messageP.textContent = 'An error occurred. Please try again.';
-          messageP.className = 'text-sm text-red-400';
-          newsletterMessage.classList.remove('hidden');
-        } finally {
-          // Re-enable form
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Subscribe';
+        const data = await res.json();
+        msg.classList.remove('hidden');
+        if (data.success) {
+          msg.textContent = data.message;
+          msg.style.color = '#22c55e';
+          emailInput.value = '';
+        } else {
+          msg.textContent = data.error || 'An error occurred. Please try again.';
+          msg.style.color = '#ef4444';
         }
-      });
-    }
-  })();
+      } catch {
+        msg.classList.remove('hidden');
+        msg.textContent = 'An error occurred. Please try again.';
+        msg.style.color = '#ef4444';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Subscribe';
+      }
+    });
+  }
+})();
 </script>

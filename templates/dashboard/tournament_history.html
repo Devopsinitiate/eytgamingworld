@@ -31,27 +31,143 @@
         border-color: #374151 !important;
     }
     
-    /* Stats cards styling */
-    .stats-card {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    /* ── Stat Cards ── */
+    .gs-stat-card {
+        background: #111318;
+        border: 1px solid #1f2937;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
     }
-    
-    /* Tournament history table styling */
-    .tournament-table {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .gs-stat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(185,28,28,0.06) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
-    
-    .tournament-table th {
-        background-color: #1f2937 !important;
-        color: #ffffff !important;
-        border-color: #374151 !important;
+    .gs-stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(185,28,28,0.5);
+        box-shadow: 0 0 18px rgba(185,28,28,0.18), 0 4px 20px rgba(0,0,0,0.4);
     }
-    
-    .tournament-table td {
-        border-color: #374151 !important;
-        color: #e5e7eb !important;
+    .gs-stat-card:hover::before { opacity: 1; }
+    .gs-stat-card .gs-icon {
+        transition: transform 0.2s ease;
+    }
+    .gs-stat-card:hover .gs-icon { transform: scale(1.15); }
+
+    /* ── Filter Panel ── */
+    .gs-filter-panel {
+        background: #111318;
+        border: 1px solid #1f2937;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: border-color 0.2s ease;
+    }
+    .gs-filter-panel:focus-within {
+        border-color: rgba(185,28,28,0.35);
+    }
+
+    /* ── Table Container ── */
+    .gs-table-wrap {
+        background: #111318;
+        border: 1px solid #1f2937;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    /* ── Table Rows ── */
+    .gs-row {
+        border-left: 3px solid transparent;
+        transition: background 0.18s ease, border-color 0.18s ease;
+    }
+    .gs-row:hover {
+        background: rgba(185,28,28,0.07) !important;
+        border-left-color: #b91c1c;
+    }
+
+    /* ── Action Buttons ── */
+    .gs-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+    .gs-btn .material-symbols-outlined {
+        font-size: 1rem;
+        transition: transform 0.15s ease;
+    }
+    .gs-btn:hover .material-symbols-outlined { transform: scale(1.2); }
+    .gs-btn-primary {
+        color: #ef4444;
+    }
+    .gs-btn-primary:hover {
+        background: rgba(185,28,28,0.15);
+        color: #f87171;
+    }
+    .gs-btn-ghost {
+        color: #9ca3af;
+    }
+    .gs-btn-ghost:hover {
+        background: rgba(255,255,255,0.06);
+        color: #e5e7eb;
+    }
+
+    /* ── Back Button ── */
+    .gs-back-btn {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        color: #9ca3af;
+        transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+    .gs-back-btn:hover {
+        color: #ef4444;
+        background: rgba(185,28,28,0.12);
+        transform: translateX(-2px);
+    }
+
+    /* ── Pagination ── */
+    .gs-page-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #374151;
+        background: #111318;
+        color: #9ca3af;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .gs-page-btn:hover {
+        background: rgba(185,28,28,0.12);
+        border-color: rgba(185,28,28,0.4);
+        color: #f87171;
+    }
+    .gs-page-btn-active {
+        background: rgba(185,28,28,0.15);
+        border-color: #b91c1c;
+        color: #ef4444;
+        pointer-events: none;
+    }
+
+    /* ── Apply Filters Button ── */
+    .gs-apply-btn {
+        transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .gs-apply-btn:hover {
+        background: #991b1b !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(185,28,28,0.35);
     }
 </style>
 {% endblock %}
@@ -62,7 +178,7 @@
         <!-- Page Header -->
         <div class="flex items-center gap-4 mb-8">
             <a href="{% url 'dashboard:profile_view' username=request.user.username %}" 
-               class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+               class="gs-back-btn">
                 <span class="material-symbols-outlined">arrow_back</span>
             </a>
             <div>
@@ -73,34 +189,34 @@
 
         <!-- Summary Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-primary text-2xl">tournament</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Total Tournaments</h3>
+                    <span class="material-symbols-outlined text-primary text-2xl gs-icon">tournament</span>
+                    <h3 class="text-lg font-bold text-white">Total Tournaments</h3>
                 </div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_tournaments }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Competitions entered</p>
+                <div class="text-3xl font-bold text-white">{{ total_tournaments }}</div>
+                <p class="text-sm text-gray-400 mt-1">Competitions entered</p>
             </div>
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-green-600 text-2xl">emoji_events</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Tournament Wins</h3>
+                    <span class="material-symbols-outlined text-green-400 text-2xl gs-icon">emoji_events</span>
+                    <h3 class="text-lg font-bold text-white">Tournament Wins</h3>
                 </div>
-                <div class="text-3xl font-bold text-green-600">{{ tournament_wins }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">First place finishes</p>
+                <div class="text-3xl font-bold text-green-400">{{ tournament_wins }}</div>
+                <p class="text-sm text-gray-400 mt-1">First place finishes</p>
             </div>
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-yellow-600 text-2xl">military_tech</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Top 3 Finishes</h3>
+                    <span class="material-symbols-outlined text-yellow-400 text-2xl gs-icon">military_tech</span>
+                    <h3 class="text-lg font-bold text-white">Top 3 Finishes</h3>
                 </div>
-                <div class="text-3xl font-bold text-yellow-600">{{ top_3_finishes }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Podium placements</p>
+                <div class="text-3xl font-bold text-yellow-400">{{ top_3_finishes }}</div>
+                <p class="text-sm text-gray-400 mt-1">Podium placements</p>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
+        <div class="gs-filter-panel mb-8">
             <div class="flex items-center gap-3 mb-6">
                 <span class="material-symbols-outlined text-primary text-2xl">filter_list</span>
                 <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Filter Tournaments</h2>
@@ -143,7 +259,7 @@
 
                 <!-- Submit Button -->
                 <div class="flex items-end">
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <button type="submit" class="gs-apply-btn w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium">
                         <span class="material-symbols-outlined text-base">search</span>
                         Apply Filters
                     </button>
@@ -152,7 +268,7 @@
         </div>
 
         <!-- Tournament List -->
-        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="gs-table-wrap">
             {% if participations %}
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center gap-3">
@@ -184,9 +300,9 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-[#111318] divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="bg-[#111318] divide-y divide-gray-800">
                             {% for participation in participations %}
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <tr class="gs-row">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div>
@@ -237,13 +353,13 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center gap-2">
                                             <a href="{% url 'dashboard:tournament_detail_history' participation.tournament.id %}" 
-                                               class="flex items-center gap-1 px-3 py-1 text-primary hover:bg-primary/10 rounded-lg transition-colors">
-                                                <span class="material-symbols-outlined text-sm">visibility</span>
+                                               class="gs-btn gs-btn-primary">
+                                                <span class="material-symbols-outlined">visibility</span>
                                                 Details
                                             </a>
                                             <a href="{% url 'tournaments:detail' participation.tournament.slug %}" 
-                                               class="flex items-center gap-1 px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                                                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                               class="gs-btn gs-btn-ghost">
+                                                <span class="material-symbols-outlined">open_in_new</span>
                                                 Tournament
                                             </a>
                                         </div>
@@ -256,36 +372,36 @@
 
                 <!-- Pagination -->
                 {% if page_obj.has_other_pages %}
-                    <div class="bg-white dark:bg-[#111318] px-6 py-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+                    <div class="bg-[#111318] px-6 py-4 flex items-center justify-between border-t border-gray-800">
                         <div class="flex-1 flex justify-between sm:hidden">
                             {% if page_obj.has_previous %}
                                 <a href="?page={{ page_obj.previous_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
-                                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                    <span class="material-symbols-outlined text-sm mr-1">chevron_left</span>
+                                   class="gs-page-btn">
+                                    <span class="material-symbols-outlined text-sm">chevron_left</span>
                                     Previous
                                 </a>
                             {% endif %}
                             {% if page_obj.has_next %}
                                 <a href="?page={{ page_obj.next_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
-                                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                   class="gs-page-btn">
                                     Next
-                                    <span class="material-symbols-outlined text-sm ml-1">chevron_right</span>
+                                    <span class="material-symbols-outlined text-sm">chevron_right</span>
                                 </a>
                             {% endif %}
                         </div>
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
-                                <p class="text-sm text-gray-700 dark:text-gray-300">
-                                    Showing page <span class="font-medium">{{ page_obj.number }}</span> of 
-                                    <span class="font-medium">{{ page_obj.paginator.num_pages }}</span>
+                                <p class="text-sm text-gray-400">
+                                    Showing page <span class="font-medium text-white">{{ page_obj.number }}</span> of 
+                                    <span class="font-medium text-white">{{ page_obj.paginator.num_pages }}</span>
                                     ({{ page_obj.paginator.count }} total tournaments)
                                 </p>
                             </div>
                             <div>
-                                <nav class="relative z-0 inline-flex rounded-lg shadow-sm -space-x-px" aria-label="Pagination">
+                                <nav class="relative z-0 inline-flex gap-1" aria-label="Pagination">
                                     {% if page_obj.has_previous %}
                                         <a href="?page={{ page_obj.previous_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
-                                           class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                           class="gs-page-btn">
                                             <span class="material-symbols-outlined text-sm">chevron_left</span>
                                             Previous
                                         </a>
@@ -293,12 +409,10 @@
                                     
                                     {% for num in page_obj.paginator.page_range %}
                                         {% if page_obj.number == num %}
-                                            <span class="relative inline-flex items-center px-4 py-2 border border-primary bg-primary/10 text-sm font-medium text-primary">
-                                                {{ num }}
-                                            </span>
+                                            <span class="gs-page-btn gs-page-btn-active">{{ num }}</span>
                                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                                             <a href="?page={{ num }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
-                                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="gs-page-btn">
                                                 {{ num }}
                                             </a>
                                         {% endif %}
@@ -306,7 +420,7 @@
                                     
                                     {% if page_obj.has_next %}
                                         <a href="?page={{ page_obj.next_page_number }}{% if selected_game %}&game={{ selected_game }}{% endif %}{% if selected_date_range != 'all' %}&date_range={{ selected_date_range }}{% endif %}{% if selected_placement %}&placement={{ selected_placement }}{% endif %}" 
-                                           class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                           class="gs-page-btn">
                                             Next
                                             <span class="material-symbols-outlined text-sm">chevron_right</span>
                                         </a>

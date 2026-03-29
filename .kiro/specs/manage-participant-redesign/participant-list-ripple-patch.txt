@@ -1,0 +1,95 @@
+INTEGRATION PATCH FOR RIPPLE EFFECT
+====================================
+
+This file shows the minimal changes needed to add ripple effect to participant_list.html
+
+CHANGE 1: Add JavaScript file reference
+----------------------------------------
+Location: End of file, before {% endblock %}
+Action: Add this line after the existing <script> block
+
+    <!-- Gaming Ripple Effect -->
+    <script src="{% static 'js/gaming-ripple-effect.js' %}"></script>
+
+{% endblock %}
+
+
+CHANGE 2 (Optional): Add gaming CSS for full aesthetic
+-------------------------------------------------------
+Location: {% block extra_css %} section
+Action: Add this line at the top of the extra_css block
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/manage-participant-gaming.css' %}">
+<!-- existing styles -->
+{% endblock %}
+
+
+CHANGE 3 (Optional): Update button classes to use gaming styles
+----------------------------------------------------------------
+Location: Various buttons throughout the template
+Action: Replace existing button classes with gaming classes
+
+Example 1 - Add Participant Button:
+BEFORE:
+<button onclick="showAddParticipantModal()"
+    class="flex h-12 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#b91c1c] text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-4 transition-colors hover:bg-[#b91c1c]/90">
+
+AFTER:
+<button onclick="showAddParticipantModal()" class="gaming-btn-primary">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+    <span class="truncate">Add Participant</span>
+</button>
+
+Example 2 - Seed Assignment Button:
+BEFORE:
+<button onclick="assignSeed({{ participant.id }})" 
+    class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors">
+
+AFTER:
+<button onclick="assignSeed({{ participant.id }})" class="gaming-btn-action">
+    <span class="material-symbols-outlined text-sm">tag</span>
+    Seed
+</button>
+
+Example 3 - Check In Button:
+BEFORE:
+<button type="submit" 
+    class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors">
+
+AFTER:
+<button type="submit" class="gaming-btn-action">
+    <span class="material-symbols-outlined text-sm">login</span>
+    Check In
+</button>
+
+
+MINIMAL INTEGRATION (Ripple effect only, no visual changes)
+------------------------------------------------------------
+If you only want the ripple effect without changing the visual appearance:
+
+1. Add the JavaScript file (CHANGE 1 above)
+2. Keep existing button classes
+3. The ripple effect will automatically apply to all buttons with onclick attributes and submit buttons
+
+The JavaScript automatically detects buttons and adds the ripple effect, even if they don't use gaming CSS classes.
+
+
+TESTING
+-------
+After integration:
+1. Load the participant list page
+2. Click any button (Add Participant, Seed, Check In, etc.)
+3. Verify a white ripple appears at the click position
+4. Verify the ripple fades out and disappears
+5. Test on different button sizes and positions
+6. Test with keyboard navigation (ripple should not appear on Enter key press)
+
+
+VERIFICATION
+------------
+Open browser console and check:
+- No JavaScript errors
+- gaming-ripple-effect.js is loaded
+- Clicking buttons creates <span class="ripple-effect"> elements
+- Ripple elements are removed after animation completes

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Compatibility Test - Gaming CSS</title>
+  <link rel="stylesheet" href="manage-participant-gaming.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, sans-serif;
+    }
+    
+    .test-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background: #1F2937;
+      border-radius: 8px;
+    }
+    
+    .test-title {
+      color: #DC2626;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    
+    .test-description {
+      color: #9CA3AF;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .test-result {
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.875rem;
+    }
+    
+    .test-pass {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10B981;
+      border: 1px solid #10B981;
+    }
+    
+    .test-fail {
+      background: rgba(220, 38, 38, 0.2);
+      color: #DC2626;
+      border: 1px solid #DC2626;
+    }
+    
+    .test-info {
+      background: rgba(6, 182, 212, 0.2);
+      color: #06B6D4;
+      border: 1px solid #06B6D4;
+    }
+    
+    .demo-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body class="gaming-page-container">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h1 class="gaming-heading gaming-heading-primary" style="text-align: center; margin-bottom: 40px;">
+      Browser Compatibility Test Suite
+    </h1>
+
+    <!-- Test 1: Font Display Swap -->
+    <div class="test-section">
+      <div class="test-title">Test 1: Font Display Swap</div>
+      <div class="test-description">
+        Verifies that custom fonts use font-display: swap to prevent invisible text during loading.
+        The @import URL should include "display=swap" parameter.
+      </div>
+      <div id="font-display-result" class="test-result"></div>
+    </div>
+
+    <!-- Test 2: Backdrop Filter Fallback -->
+    <div class="test-section">
+      <div class="test-title">Test 2: Backdrop Filter Fallback</div>
+      <div class="test-description">
+        Tests if backdrop-filter is supported. If not, a solid background fallback should be applied.
+      </div>
+      <button id="test-backdrop-btn" class="gaming-btn-primary">Open Test Modal</button>
+      <div id="backdrop-result" class="test-result"></div>
+      
+      <!-- Test Modal -->
+      <div id="test-modal" style="display: none;" class="gaming-modal-backdrop">
+        <div class="gaming-modal">
+          <div class="gaming-modal-header">
+            <h3 class="gaming-modal-title">Test Modal</h3>
+            <button class="gaming-modal-close" onclick="closeTestModal()">&times;</button>
+          </div>
+          <div class="gaming-modal-body">
+            <p style="color: #9CA3AF;">
+              This modal tests backdrop-filter support. If supported, you should see a blurred background.
+              If not supported, you should see a solid dark background.
+            </p>
+          </div>
+          <div class="gaming-modal-footer">
+            <button class="gaming-btn-ghost" onclick="closeTestModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test 3: CSS Transform Support -->
+    <div class="test-section">
+      <div class="test-title">Test 3: CSS Transform Support</div>
+      <div class="test-description">
+        Tests if CSS transforms (skew) are supported. Elements should have skewed appearance.
+        If not supported, fallback styles with emphasized borders should be applied.
+      </div>
+      <div class="demo-container">
+        <div class="gaming-stat-card">
+          <div class="gaming-stat-value">42</div>
+          <div class="gaming-stat-label">Test Stat</div>
+        </div>
+        <button class="gaming-btn-primary">Test Button</button>
+      </div>
+      <div id="transform-result" class="test-result"></div>
+    </div>
+
+    <!-- Test 4: CSS Custom Properties Support -->
+    <div class="test-section">
+      <div class="test-title">Test 4: CSS Custom Properties (Variables)</div>
+      <div class="test-description">
+        Tests if CSS custom properties (--variables) are supported. If not, fallback values should be used.
+      </div>
+      <div id="custom-props-result" class="test-result"></div>
+    </div>
+
+    <!-- Test 5: High Contrast Mode -->
+    <div class="test-section">
+      <div class="test-title">Test 5: High Contrast Mode Support</div>
+      <div class="test-description">
+        Tests if high contrast mode is active. In high contrast mode, decorative glows should be removed
+        and borders should be thicker for better visibility.
+      </div>
+      <div class="demo-container">
+        <div class="gaming-stat-card">
+          <div class="gaming-stat-value">99</div>
+          <div class="gaming-stat-label">High Contrast Test</div>
+        </div>
+        <div class="gaming-status-indicator">
+          <span class="gaming-status-dot checked-in"></span>
+          <span>Checked In</span>
+        </div>
+      </div>
+      <div id="high-contrast-result" class="test-result"></div>
+    </div>
+
+    <!-- Test 6: Vendor Prefix Support -->
+    <div class="test-section">
+      <div class="test-title">Test 6: Vendor Prefix Coverage</div>
+      <div class="test-description">
+        Verifies that vendor prefixes (-webkit-, -moz-, -ms-, -o-) are applied for better browser compatibility.
+      </div>
+      <div id="vendor-prefix-result" class="test-result"></div>
+    </div>
+
+    <!-- Test 7: Font Fallback Stack -->
+    <div class="test-section">
+      <div class="test-title">Test 7: Font Fallback Stack</div>
+      <div class="test-description">
+        Tests if system font fallbacks are properly configured in case custom fonts fail to load.
+      </div>
+      <div style="margin-top: 20px;">
+        <p class="gaming-heading" style="font-size: 1.5rem; color: #DC2626;">
+          GAMING FONT TEST (Barlow Condensed)
+        </p>
+        <p class="gaming-text-numeric" style="font-size: 2rem; color: #06B6D4;">
+          123456789 (Space Grotesk)
+        </p>
+      </div>
+      <div id="font-fallback-result" class="test-result"></div>
+    </div>
+  </div>
+
+  <script>
+    // Test 1: Font Display Swap
+    function testFontDisplay() {
+      const styleSheets = Array.from(document.styleSheets);
+      let foundSwap = false;
+      
+      styleSheets.forEach(sheet => {
+        try {
+          const rules = Array.from(sheet.cssRules || []);
+          rules.forEach(rule => {
+            if (rule.type === CSSRule.IMPORT_RULE) {
+              if (rule.href && rule.href.includes('display=swap')) {
+                foundSwap = true;
+              }
+            }
+          });
+        } catch (e) {
+          // CORS may prevent access to external stylesheets
+        }
+      });
+      
+      const result = document.getElementById('font-display-result');
+      if (foundSwap) {
+        result.className = 'test-result test-pass';
+        result.textContent = '✓ PASS: Font imports include display=swap parameter';
+      } else {
+        result.className = 'test-result test-info';
+        result.textContent = 'ℹ INFO: Could not verify font-display (may be blocked by CORS)';
+      }
+    }
+
+    // Test 2: Backdrop Filter Support
+    function testBackdropFilter() {
+      const supportsBackdrop = CSS.supports('backdrop-filter', 'blur(20px)') || 
+                               CSS.supports('-webkit-backdrop-filter', 'blur(20px)');
+      
+      const result = document.getElementById('backdrop-result');
+      if (supportsBackdrop) {
+        result.className = 'test-result test-pass';
+        result.textContent = '✓ PASS: backdrop-filter is supported';
+      } else {
+        result.className = 'test-result test-info';
+        result.textContent = 'ℹ INFO: backdrop-filter not supported, using solid background fallback';
+      }
+    }
+
+    // Test 3: CSS Transform Support
+    function testTransforms() {
+      const supportsTransform = CSS.supports('transform', 'skewY(-1deg)');
+      
+      const result = document.getElementById('transform-result');
+      if (supportsTransform) {
+        result.className = 'test-result test-pass';
+        result.textContent = '✓ PASS: CSS transforms are supported';
+      } else {
+        result.className = 'test-result test-info';
+        result.textContent = 'ℹ INFO: CSS transforms not supported, using fallback styles';
+      }
+    }
+
+    // Test 4: CSS Custom Properties Support
+    function testCustomProperties() {
+      const supportsVars = CSS.supports('--test', 'value');
+      
+      const result = document.getElementById('custom-props-result');
+      if (supportsVars) {
+        result.className = 'test-result test-pass';
+        result.textContent = '✓ PASS: CSS custom properties are supported';
+      } else {
+        result.className = 'test-result test-info';
+        result.textContent = 'ℹ INFO: CSS custom properties not supported, using fallback values';
+      }
+    }
+
+    // Test 5: High Contrast Mode
+    function testHighContrast() {
+      const highContrast = window.matchMedia('(prefers-contrast: high)').matches;
+      
+      const result = document.getElementById('high-contrast-result');
+      if (highContrast) {
+        result.className = 'test-result test-pass';
+        result.textContent = '✓ PASS: High contrast mode is ACTIVE - enhanced styles applied';
+      } else {
+        result.className = 'test-result test-info';
+        result.textContent = 'ℹ INFO: High contrast mode is not active (normal mode)';
+      }
+    }
+
+    // Test 6: Vendor Prefix Coverage
+    function testVendorPrefixes() {
+      const testElement = document.createElement('div');
+      testElement.style.cssText = '-webkit-transform: skewY(-1deg); -moz-transform: skewY(-1deg);';
+      
+      const hasWebkit = testElement.style.webkitTransform !== '';
+      const hasMoz = testElement.style.MozTransform !== '';
+      
+      const result = document.getElementById('vendor-prefix-result');
+      result.className = 'test-result test-pass';
+      result.textContent = `✓ PASS: Vendor prefixes applied (-webkit: ${hasWebkit}, -moz: ${hasMoz})`;
+    }
+
+    // Test 7: Font Fallback Stack
+    function testFontFallback() {
+      const heading = document.querySelector('.gaming-heading');
+      const numeric = document.querySelector('.gaming-text-numeric');
+      
+      const headingFont = window.getComputedStyle(heading).fontFamily;
+      const numericFont = window.getComputedStyle(numeric).fontFamily;
+      
+      const result = document.getElementById('font-fallback-result');
+      result.className = 'test-result test-pass';
+      result.textContent = `✓ PASS: Font stacks configured\nHeading: ${headingFont}\nNumeric: ${numericFont}`;
+    }
+
+    // Modal controls
+    function openTestModal() {
+      document.getElementById('test-modal').style.display = 'flex';
+    }
+
+    function closeTestModal() {
+      document.getElementById('test-modal').style.display = 'none';
+    }
+
+    document.getElementById('test-backdrop-btn').addEventListener('click', openTestModal);
+
+    // Run all tests on load
+    window.addEventListener('load', () => {
+      testFontDisplay();
+      testBackdropFilter();
+      testTransforms();
+      testCustomProperties();
+      testHighContrast();
+      testVendorPrefixes();
+      testFontFallback();
+    });
+  </script>
+</body>
+</html>

@@ -38,11 +38,12 @@
     .match-card {
         background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
         backdrop-filter: blur(10px);
-        border: 2px solid rgba(220, 38, 38, 0.3);
-        border-radius: 0.75rem;
+        border: 2px solid rgba(220, 38, 38, 0.4);
+        border-radius: 0.5rem;
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .match-card::before {
@@ -52,7 +53,7 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+        background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.15), transparent);
         transition: left 0.5s ease;
     }
 
@@ -61,9 +62,9 @@
     }
 
     .match-card:hover {
-        border-color: rgba(220, 38, 38, 0.6);
+        border-color: rgba(220, 38, 38, 0.8);
         transform: translateY(-2px);
-        box-shadow: 0 0 30px rgba(220, 38, 38, 0.2);
+        box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
     }
 
     /* ==========================================
@@ -72,29 +73,31 @@
     .participant-slot {
         transition: all 0.3s ease;
         position: relative;
-        background: rgba(31, 31, 31, 0.5);
-        border: 1px solid rgba(220, 38, 38, 0.1);
+        background: rgba(31, 31, 31, 0.6);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        font-weight: 600;
     }
 
     .participant-slot.winner {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
-        border-left: 4px solid #10B981;
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.15) 100%);
+        border-left: 3px solid #10B981;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        font-weight: 700;
     }
 
     .participant-slot.loser {
-        background: rgba(55, 65, 81, 0.3);
-        opacity: 0.6;
+        background: rgba(55, 65, 81, 0.4);
+        opacity: 0.7;
     }
 
     /* ==========================================
    GAMING ROUND HEADERS
    ========================================== */
     .round-header {
-        background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(10, 10, 10, 0.95) 100%);
-        border: 2px solid rgba(220, 38, 38, 0.3);
-        border-radius: 0.75rem;
-        box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(10, 10, 10, 0.95) 100%);
+        border: 2px solid rgba(220, 38, 38, 0.4);
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 12px rgba(220, 38, 38, 0.2);
     }
 
     .round-header h3 {
@@ -103,7 +106,8 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: #DC2626;
-        text-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        text-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        font-size: 1.125rem;
     }
 
     /* ==========================================
@@ -215,8 +219,8 @@
    GAMING PARTICIPANT DISPLAY
    ========================================== */
     .participant-avatar {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
         display: flex;
@@ -225,11 +229,13 @@
         color: white;
         font-family: 'Barlow Condensed', sans-serif;
         font-weight: 900;
-        font-size: 0.875rem;
-        box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        font-size: 0.75rem;
+        box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+        border: 2px solid rgba(220, 38, 38, 0.3);
     }
 
-    .participant-slot .font-semibold {
+    .participant-slot .font-semibold,
+    .participant-slot .font-bold {
         font-family: 'Barlow Condensed', sans-serif;
         font-weight: 700;
         letter-spacing: 0.02em;
@@ -240,11 +246,12 @@
    ========================================== */
     .score-display {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        min-width: 2.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        min-width: 2rem;
         text-align: center;
         text-shadow: 0 0 10px currentColor;
+        letter-spacing: -0.02em;
     }
 
     /* ==========================================
@@ -413,34 +420,68 @@
     <!-- Navigation Header -->
     <div class="bracket-navigation py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'tournaments:detail' tournament.slug %}"
-                        class="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
-                        <span class="material-symbols-outlined mr-2">arrow_back</span>
-                        Back to Tournament
+            <!-- Top Row: Back Button and Quick Nav -->
+            <div class="flex items-center justify-between mb-4">
+                <a href="{% url 'tournaments:detail' tournament.slug %}"
+                    class="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+                    <span class="material-symbols-outlined mr-2">arrow_back</span>
+                    Back to Tournament
+                </a>
+                
+                <!-- Quick Navigation Icons (hidden on mobile) -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{% url 'dashboard:home' %}" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Dashboard">
+                        <span class="material-symbols-outlined">dashboard</span>
                     </a>
-                    <div class="h-6 w-px bg-gray-600"></div>
-                    <div>
-                        <h1 class="text-xl font-bold text-white">{{ tournament.name }}</h1>
-                        <p class="text-sm text-gray-400">Interactive Tournament Bracket</p>
-                    </div>
+                    <a href="{% url 'tournaments:list' %}" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Tournaments">
+                        <span class="material-symbols-outlined">emoji_events</span>
+                    </a>
+                    <a href="{% url 'teams:list' %}" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Teams">
+                        <span class="material-symbols-outlined">groups</span>
+                    </a>
+                    <a href="{% url 'store:product_list' %}" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Store">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bottom Row: Title and Controls -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-white">{{ tournament.name }}</h1>
+                    <p class="text-sm text-gray-400">Interactive Tournament Bracket</p>
                 </div>
 
                 <!-- Zoom Controls -->
                 <div class="zoom-controls flex items-center space-x-2 px-4 py-2 rounded-lg">
-                    <button id="zoom-out" class="p-2 text-gray-400 hover:text-white transition-colors">
+                    <a href="{% url 'tournaments:bracket_partial' tournament.slug %}" 
+                       class="px-4 py-2 bg-primary/20 text-primary border border-primary/50 rounded-lg hover:bg-primary/30 transition-all font-medium text-sm flex items-center"
+                       title="Full Screen Bracket View"
+                       target="_blank">
+                        <span class="material-symbols-outlined text-sm mr-2">open_in_full</span>
+                        <span class="hidden md:inline">Full Screen View</span>
+                    </a>
+                    <div class="h-6 w-px bg-gray-600 mx-2"></div>
+                    <button id="zoom-out" class="p-2 text-gray-400 hover:text-white transition-colors" title="Zoom Out (-)">
                         <span class="material-symbols-outlined">zoom_out</span>
                     </button>
                     <span id="zoom-level" class="text-sm text-gray-300 font-medium min-w-[3rem] text-center">100%</span>
-                    <button id="zoom-in" class="p-2 text-gray-400 hover:text-white transition-colors">
+                    <button id="zoom-in" class="p-2 text-gray-400 hover:text-white transition-colors" title="Zoom In (+)">
                         <span class="material-symbols-outlined">zoom_in</span>
                     </button>
                     <div class="h-6 w-px bg-gray-600 mx-2"></div>
-                    <button id="reset-zoom" class="px-3 py-1 text-sm text-gray-300 hover:text-white transition-colors">
+                    <button id="reset-zoom" class="px-3 py-1 text-sm text-gray-300 hover:text-white transition-colors" title="Reset Zoom (0)">
                         Reset
                     </button>
-                    <button id="fullscreen" class="p-2 text-gray-400 hover:text-white transition-colors">
+                    <button id="fullscreen" class="p-2 text-gray-400 hover:text-white transition-colors" title="Fullscreen (F)">
                         <span class="material-symbols-outlined">fullscreen</span>
                     </button>
                 </div>
@@ -452,42 +493,75 @@
         {% if not brackets %}
         <!-- No Bracket Yet -->
         <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-white/10 p-12 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gray-700/50 rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-2xl text-gray-400">tournament</span>
+            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-4xl text-primary">tournament</span>
             </div>
-            <h3 class="text-xl font-semibold text-white mb-2">Bracket Not Generated Yet</h3>
-            <p class="text-gray-400 mb-6 max-w-md mx-auto">
+            <h3 class="text-2xl font-bold text-white mb-3">Bracket Not Generated Yet</h3>
+            <p class="text-gray-400 mb-8 max-w-md mx-auto">
                 The tournament bracket will be automatically generated once registration closes and all participants are
                 confirmed.
             </p>
 
             <!-- Tournament Status -->
-            <div class="bg-gray-900/50 rounded-lg p-4 mb-6 max-w-sm mx-auto">
-                <div class="flex items-center justify-between text-sm">
+            <div class="bg-gray-900/50 rounded-lg p-6 mb-8 max-w-sm mx-auto">
+                <div class="flex items-center justify-between text-sm mb-3">
                     <span class="text-gray-400">Registered Players:</span>
                     <span class="text-white font-semibold">{{ tournament.total_registered }}/{{
                         tournament.max_participants }}</span>
                 </div>
-                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
-                    <div class="bg-primary h-2 rounded-full transition-all"
+                <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div class="bg-gradient-to-r from-primary to-primary/80 h-3 rounded-full transition-all duration-500"
                         style="width: {{ tournament.registration_progress }}%"></div>
                 </div>
+                <p class="text-xs text-gray-500 mt-3">
+                    {% if tournament.registration_progress < 100 %}
+                        {{ tournament.max_participants|add:"-"|add:tournament.total_registered }} more players needed
+                    {% else %}
+                        Registration complete! Bracket generation pending.
+                    {% endif %}
+                </p>
             </div>
 
             {% if user == tournament.organizer or user.role == 'admin' %}
             <div class="space-y-3">
                 <a href="{% url 'tournaments:generate_bracket' tournament.slug %}"
-                    class="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition shadow-lg font-semibold">
-                    <span class="material-symbols-outlined mr-2">auto_awesome</span>
+                    class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary to-primary/80 text-white rounded-lg hover:shadow-2xl hover:shadow-primary/50 transition-all font-bold text-lg">
+                    <span class="material-symbols-outlined mr-3 text-2xl">auto_awesome</span>
                     Generate Bracket Now
                 </a>
                 <p class="text-xs text-gray-500">
                     As tournament organizer, you can generate the bracket manually
                 </p>
             </div>
+            {% else %}
+            <div class="flex items-center justify-center space-x-6 text-sm text-gray-400">
+                <div class="flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-primary">schedule</span>
+                    <span>Waiting for organizer</span>
+                </div>
+            </div>
             {% endif %}
         </div>
         {% else %}
+        <!-- Match Filter Section -->
+        <div class="mb-6 flex flex-wrap items-center gap-3">
+            <button class="filter-btn active px-4 py-2 rounded-lg bg-primary/20 text-primary border border-primary/50 font-medium text-sm transition-all hover:bg-primary/30" data-filter="all">
+                All Matches
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="live">
+                <span class="material-symbols-outlined text-xs mr-1">radio_button_checked</span>
+                Live
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="completed">
+                <span class="material-symbols-outlined text-xs mr-1">check_circle</span>
+                Completed
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="pending">
+                <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                Pending
+            </button>
+        </div>
+        
         <!-- Interactive Bracket Display -->
         {% for bracket in brackets %}
         <div class="mb-12">
@@ -523,15 +597,15 @@
             <!-- Bracket Container with Horizontal Scroll -->
             <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <div id="bracket-container" class="p-8 min-w-max" style="transform-origin: top left;">
-                        <div class="flex space-x-12 relative">
+                    <div id="bracket-container" class="p-6 min-w-max" style="transform-origin: top left;">
+                        <div class="flex space-x-8 relative">
                             {% for round_num, matches in matches_by_bracket|get_item:bracket.id|dict_items %}
                             <!-- Round Column -->
-                            <div class="flex flex-col space-y-6 min-w-[280px] relative">
+                            <div class="flex flex-col space-y-4 min-w-[260px] relative">
                                 <!-- Round Header -->
-                                <div class="text-center mb-6">
-                                    <div class="round-header rounded-lg p-3 mx-4">
-                                        <h3 class="text-lg font-bold text-white">
+                                <div class="text-center mb-4">
+                                    <div class="round-header rounded-lg p-2 mx-2">
+                                        <h3 class="text-base font-black text-white">
                                             {% if round_num == bracket.total_rounds %}
                                             🏆 Grand Finals
                                             {% elif round_num == bracket.total_rounds|add:"-1" %}
@@ -542,17 +616,17 @@
                                             Round {{ round_num }}
                                             {% endif %}
                                         </h3>
-                                        <p class="text-sm text-gray-300 mt-1">{{ matches|length }} match{{ matches|length|pluralize:"es" }}</p>
+                                        <p class="text-xs text-gray-300 mt-1 font-semibold">{{ matches|length }} match{{ matches|length|pluralize:"es" }}</p>
                                     </div>
                                 </div>
 
                                 <!-- Matches in Round -->
                                 {% for match in matches %}
-                                <div class="match-card rounded-xl p-6 relative" data-match-id="{{ match.id }}">
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="{{ match.id }}">
                                     <!-- Match Header -->
-                                    <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center justify-between mb-3">
                                         <div class="flex items-center space-x-2">
-                                            <span class="text-xs font-medium text-gray-400">Match {{ match.match_number }}</span>
+                                            <span class="text-xs font-bold text-gray-400">Match {{ match.match_number }}</span>
                                             {% if match.scheduled_time %}
                                             <div class="match-time text-gray-300">
                                                 {{ match.scheduled_time|date:"M d, g:i A" }}
@@ -588,17 +662,17 @@
                                     </div>
 
                                     <!-- Participant 1 -->
-                                    <div class="participant-slot rounded-lg p-4 mb-2 
+                                    <div class="participant-slot rounded-md p-3 mb-2 
                                         {% if match.winner == match.participant1 %}winner
                                         {% elif match.status == 'completed' %}loser{% endif %}">
                                         <div class="flex items-center justify-between">
-                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
                                                 {% if match.participant1 %}
                                                 <div class="participant-avatar">
                                                     {{ match.participant1.display_name|first|upper }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="font-semibold text-white truncate">
+                                                    <div class="font-bold text-white truncate text-sm">
                                                         {{ match.participant1.display_name }}
                                                     </div>
                                                     {% if match.participant1.team %}
@@ -609,13 +683,13 @@
                                                 </div>
                                                 {% if match.winner == match.participant1 %}
                                                 <span
-                                                    class="material-symbols-outlined text-green-400">emoji_events</span>
+                                                    class="material-symbols-outlined text-green-400 text-lg">emoji_events</span>
                                                 {% endif %}
                                                 {% else %}
                                                 <div class="participant-avatar bg-gray-600">
                                                     <span class="material-symbols-outlined text-xs">person</span>
                                                 </div>
-                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
                                                 {% endif %}
                                             </div>
                                             {% if match.status == 'completed' %}
@@ -629,16 +703,16 @@
                                     </div>
 
                                     <!-- VS Divider -->
-                                    <div class="text-center py-2">
-                                        <div class="inline-flex items-center space-x-2 text-xs font-bold text-gray-400">
-                                            <div class="w-8 h-px bg-gray-600"></div>
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
                                             <span>VS</span>
-                                            <div class="w-8 h-px bg-gray-600"></div>
+                                            <div class="w-6 h-px bg-gray-600"></div>
                                         </div>
                                     </div>
 
                                     <!-- Participant 2 -->
-                                    <div class="participant-slot rounded-lg p-4 mb-4 
+                                    <div class="participant-slot rounded-md p-3 mb-3 
                                         {% if match.winner == match.participant2 %}winner
                                         {% elif match.status == 'completed' %}loser{% endif %}">
                                         <div class="flex items-center justify-between">
@@ -680,17 +754,16 @@
 
                                     <!-- Match Actions -->
                                     {% if user.is_authenticated and match.is_ready and match.status != 'completed' %}
-                                    {% if user == tournament.organizer or user.role == 'admin' or
-                                    match.participant1.user == user or match.participant2.user == user %}
-                                    <div class="pt-4 border-t border-gray-700">
-                                        <a href="{% url 'tournaments:match_report' match.pk %}"
-                                            class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
-                                            <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
-                                            Report Score
-                                        </a>
-                                    </div>
+                                        {% if user == tournament.organizer or user.role == 'admin' or match.participant1.user == user or match.participant2.user == user %}
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="{% url 'tournaments:match_report' match.pk %}"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        {% endif %}
                                     {% endif %}
-                                    
                                 </div>
                                 {% empty %}
                                 <div class="text-center text-gray-400 py-8">
@@ -811,7 +884,10 @@
 
         // Match card interactions
         document.querySelectorAll('.match-card').forEach(card => {
-            card.addEventListener('click', function () {
+            card.addEventListener('click', function (e) {
+                // Don't trigger if clicking on a link
+                if (e.target.tagName === 'A' || e.target.closest('a')) return;
+                
                 const matchId = this.dataset.matchId;
                 // Add click animation
                 this.style.transform = 'scale(0.98)';
@@ -819,8 +895,54 @@
                     this.style.transform = '';
                 }, 150);
 
-                // You can add match detail modal or navigation here
                 console.log('Match clicked:', matchId);
+            });
+        });
+
+        // Match Filter Functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const matchCards = document.querySelectorAll('.match-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const filter = this.dataset.filter;
+
+                // Update active button
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                    b.classList.add('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+                });
+                this.classList.add('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                this.classList.remove('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+
+                // Filter matches
+                matchCards.forEach(card => {
+                    const statusBadge = card.querySelector('.match-status-badge');
+                    if (!statusBadge) return;
+
+                    let shouldShow = false;
+                    if (filter === 'all') {
+                        shouldShow = true;
+                    } else if (filter === 'live' && statusBadge.classList.contains('status-live')) {
+                        shouldShow = true;
+                    } else if (filter === 'completed' && statusBadge.classList.contains('status-completed')) {
+                        shouldShow = true;
+                    } else if (filter === 'pending' && (statusBadge.classList.contains('status-pending') || statusBadge.classList.contains('status-ready'))) {
+                        shouldShow = true;
+                    }
+
+                    if (shouldShow) {
+                        card.style.display = '';
+                        card.style.opacity = '1';
+                    } else {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            if (card.style.opacity === '0') {
+                                card.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                });
             });
         });
 
@@ -842,7 +964,9 @@
         // Auto-scroll to current round (if any live matches)
         const liveMatch = document.querySelector('.status-live');
         if (liveMatch) {
-            liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
         }
 
         // Touch gestures for mobile
@@ -874,6 +998,9 @@
                 }
             }
         });
+
+        // Show keyboard shortcuts hint
+        console.log('Keyboard shortcuts: +/- to zoom, 0 to reset, F for fullscreen, Ctrl+Scroll to zoom');
     });
 
     // Fullscreen change handler

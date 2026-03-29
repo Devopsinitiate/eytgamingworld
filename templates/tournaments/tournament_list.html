@@ -2,6 +2,12 @@
 {% load tz %}
 
 {% block title %}Tournaments - EYTGaming{% endblock %}
+{% block meta_robots %}index, follow{% endblock %}
+{% block meta_description %}Browse and join esports tournaments on EYTGaming. Compete in online and local gaming events across Nigeria.{% endblock %}
+{% block og_title %}Tournaments - EYTGaming{% endblock %}
+{% block og_description %}Browse and join esports tournaments. Compete in online and local gaming events across Nigeria.{% endblock %}
+{% block twitter_title %}Tournaments - EYTGaming{% endblock %}
+{% block twitter_description %}Browse and join esports tournaments. Compete in online and local gaming events across Nigeria.{% endblock %}
 
 {% block content %}
 <!-- Include Skeleton Loaders -->
@@ -24,6 +30,46 @@
 
     <!-- Gaming Filters -->
     {% include "tournaments/components/filters_gaming.html" %}
+
+    <!-- Become an Organizer banner -->
+    {% if not user.can_organize_tournaments %}
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+                background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(17,17,17,.9));
+                border:1px solid rgba(220,38,38,.3);border-radius:10px;
+                padding:1rem 1.5rem;margin-bottom:1.5rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <span style="font-family:'Material Symbols Outlined';font-size:28px;color:#DC2626;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+          emoji_events
+        </span>
+        <div>
+          <p style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:.06em;color:#fff;margin:0 0 2px;">
+            Want to run your own tournament?
+          </p>
+          <p style="font-size:.8rem;color:#9ca3af;margin:0;">
+            Apply to become an organizer and start hosting competitive events.
+          </p>
+        </div>
+      </div>
+      <a href="{% url 'accounts:become_organizer' %}"
+         style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;
+                background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;
+                border-radius:6px;font-family:'Barlow Condensed',sans-serif;
+                font-size:.85rem;font-weight:700;text-transform:uppercase;
+                letter-spacing:.05em;text-decoration:none;white-space:nowrap;
+                border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.25);
+                transition:all .2s;"
+         onmouseover="this.style.boxShadow='0 0 20px rgba(220,38,38,.5)'"
+         onmouseout="this.style.boxShadow='0 0 12px rgba(220,38,38,.25)'">
+        <span style="font-family:'Material Symbols Outlined';font-size:15px;
+                     font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+          star
+        </span>
+        Become an Organizer
+      </a>
+    </div>
+    {% endif %}
 
     <!-- Featured Tournaments -->
     {% if featured_tournaments %}

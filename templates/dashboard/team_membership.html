@@ -6,47 +6,168 @@
 {% block extra_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    /* ── Back Button ── */
+    .gs-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        color: #9ca3af;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
     }
-    
-    /* Force dark theme overrides for match history page */
-    .bg-white,
-    .bg-gray-50 {
-        background-color: #111318 !important;
-        color: #ffffff !important;
+    .gs-back-btn:hover {
+        color: #ef4444;
+        background: rgba(185,28,28,0.12);
+        transform: translateX(-2px);
     }
-    
-    .text-gray-900 {
-        color: #ffffff !important;
+
+    /* ── Stat Cards ── */
+    .gs-stat-card {
+        background: #111318;
+        border: 1px solid #1f2937;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    
-    .text-gray-600 {
-        color: #9ca3af !important;
+    .gs-stat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(185,28,28,0.06) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
-    
-    .border-gray-200 {
-        border-color: #374151 !important;
+    .gs-stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(185,28,28,0.45);
+        box-shadow: 0 0 18px rgba(185,28,28,0.18), 0 4px 20px rgba(0,0,0,0.4);
     }
-    
-    /* Match history cards styling */
-    .match-card {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .gs-stat-card:hover::before { opacity: 1; }
+    .gs-stat-card .gs-icon {
+        transition: transform 0.2s ease;
     }
-    
-    /* Team membership styling */
-    .team-card {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .gs-stat-card:hover .gs-icon { transform: scale(1.15); }
+
+    /* ── Section Container ── */
+    .gs-section {
+        background: #111318;
+        border: 1px solid #1f2937;
+        border-radius: 0.75rem;
+        overflow: hidden;
     }
-    
-    /* Match results styling */
-    .match-result {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .gs-section-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* ── Row Hover ── */
+    .gs-row {
+        border-left: 3px solid transparent;
+        transition: background 0.18s ease, border-color 0.18s ease;
+    }
+    .gs-row:hover {
+        background: rgba(185,28,28,0.07);
+        border-left-color: #b91c1c;
+    }
+
+    /* ── Team Logo Placeholder ── */
+    .gs-team-logo {
+        border-radius: 0.5rem;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .gs-team-logo-placeholder {
+        border-radius: 0.5rem;
+        background: #1f2937;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-weight: 700;
+        color: #9ca3af;
+    }
+
+    /* ── Badges ── */
+    .gs-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.65rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .gs-badge-tag      { background: rgba(255,255,255,0.06); color: #9ca3af; }
+    .gs-badge-captain  { background: rgba(185,28,28,0.15);   color: #f87171; }
+    .gs-badge-status   { background: rgba(255,255,255,0.06); color: #9ca3af; }
+
+    /* ── Mini Stat ── */
+    .gs-mini-stat {
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid #1f2937;
+        transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .gs-row:hover .gs-mini-stat {
+        border-color: rgba(185,28,28,0.2);
+        background: rgba(185,28,28,0.04);
+    }
+
+    /* ── Invite Message ── */
+    .gs-invite-msg {
+        margin-top: 1rem;
+        margin-left: 5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(185,28,28,0.06);
+        border-left: 3px solid #b91c1c;
+        border-radius: 0 0.5rem 0.5rem 0;
+    }
+
+    /* ── Buttons ── */
+    .gs-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .gs-btn .material-symbols-outlined {
+        font-size: 1rem;
+        transition: transform 0.15s ease;
+    }
+    .gs-btn:hover .material-symbols-outlined { transform: scale(1.15); }
+    .gs-btn-primary {
+        background: #b91c1c;
+        color: #fff;
+    }
+    .gs-btn-primary:hover {
+        background: #991b1b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(185,28,28,0.35);
+    }
+    .gs-btn-ghost {
+        background: transparent;
+        border: 1px solid #374151;
+        color: #9ca3af;
+    }
+    .gs-btn-ghost:hover {
+        border-color: rgba(185,28,28,0.4);
+        background: rgba(185,28,28,0.1);
+        color: #f87171;
+        transform: translateY(-1px);
     }
 </style>
 {% endblock %}
@@ -54,98 +175,90 @@
 {% block content %}
 <main class="flex-1 p-8">
     <div class="max-w-7xl mx-auto">
+
         <!-- Page Header -->
         <div class="flex items-center gap-4 mb-8">
-            <a href="{% url 'dashboard:profile_view' username=request.user.username %}" 
-               class="p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                <span class="material-symbols-outlined">arrow_back</span>
+            <a href="{% url 'dashboard:profile_view' username=request.user.username %}" class="gs-back-btn">
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_back</span>
             </a>
             <div>
-                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Match History</h1>
-                <p class="text-gray-600 dark:text-gray-400 text-base mt-2">Manage your team memberships and view your competitive history</p>
+                <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">Match History</h1>
+                <p class="text-gray-400 text-base mt-1">Manage your team memberships and view your competitive history</p>
             </div>
         </div>
 
         <!-- Summary Statistics -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-primary text-2xl">group</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Active Teams</h3>
+                    <span class="material-symbols-outlined text-primary text-2xl gs-icon">group</span>
+                    <h3 class="text-base font-bold text-white">Active Teams</h3>
                 </div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_active_teams }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Current memberships</p>
+                <div class="text-3xl font-bold text-white">{{ total_active_teams }}</div>
+                <p class="text-sm text-gray-400 mt-1">Current memberships</p>
             </div>
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-yellow-600 text-2xl">mail</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Pending Invites</h3>
+                    <span class="material-symbols-outlined text-yellow-400 text-2xl gs-icon">mail</span>
+                    <h3 class="text-base font-bold text-white">Pending Invites</h3>
                 </div>
-                <div class="text-3xl font-bold text-yellow-600">{{ total_pending_invites }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Awaiting response</p>
+                <div class="text-3xl font-bold text-yellow-400">{{ total_pending_invites }}</div>
+                <p class="text-sm text-gray-400 mt-1">Awaiting response</p>
             </div>
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-green-600 text-2xl">tournament</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Team Tournaments</h3>
+                    <span class="material-symbols-outlined text-green-400 text-2xl gs-icon">tournament</span>
+                    <h3 class="text-base font-bold text-white">Team Tournaments</h3>
                 </div>
-                <div class="text-3xl font-bold text-green-600">{{ total_team_tournaments }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Competitions entered</p>
+                <div class="text-3xl font-bold text-green-400">{{ total_team_tournaments }}</div>
+                <p class="text-sm text-gray-400 mt-1">Competitions entered</p>
             </div>
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div class="gs-stat-card">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-purple-600 text-2xl">emoji_events</span>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Tournament Wins</h3>
+                    <span class="material-symbols-outlined text-purple-400 text-2xl gs-icon">emoji_events</span>
+                    <h3 class="text-base font-bold text-white">Tournament Wins</h3>
                 </div>
-                <div class="text-3xl font-bold text-purple-600">{{ total_team_wins }}</div>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Team victories</p>
+                <div class="text-3xl font-bold text-purple-400">{{ total_team_wins }}</div>
+                <p class="text-sm text-gray-400 mt-1">Team victories</p>
             </div>
         </div>
 
         <!-- Pending Invitations -->
         {% if pending_invitations %}
-        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-yellow-600 text-2xl">mail</span>
-                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Pending Invitations</h2>
-                </div>
+        <div class="gs-section mb-8">
+            <div class="gs-section-header">
+                <span class="material-symbols-outlined text-yellow-400 text-2xl">mail</span>
+                <h2 class="text-white text-xl font-bold">Pending Invitations</h2>
             </div>
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="divide-y divide-gray-800">
                 {% for invitation in pending_invitations %}
-                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
+                <div class="gs-row px-6 py-6">
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-4">
                             {% if invitation.team.logo %}
-                            <img src="{{ invitation.team.logo.url }}" alt="{{ invitation.team.name }}" class="w-16 h-16 rounded-lg object-cover">
+                            <img src="{{ invitation.team.logo.url }}" alt="{{ invitation.team.name }}" class="gs-team-logo w-16 h-16">
                             {% else %}
-                            <div class="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <span class="text-gray-500 dark:text-gray-400 font-bold text-lg">{{ invitation.team.tag }}</span>
-                            </div>
+                            <div class="gs-team-logo-placeholder w-16 h-16 text-lg">{{ invitation.team.tag }}</div>
                             {% endif %}
                             <div>
-                                <h3 class="font-bold text-xl text-gray-900 dark:text-white">{{ invitation.team.name }}</h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    Invited by {{ invitation.invited_by.get_display_name }} • {{ invitation.team.game.name }}
+                                <h3 class="font-bold text-xl text-white">{{ invitation.team.name }}</h3>
+                                <p class="text-sm text-gray-400 mt-0.5">
+                                    Invited by {{ invitation.invited_by.get_display_name }} · {{ invitation.team.game.name }}
                                 </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem;">schedule</span>
                                     Expires {{ invitation.expires_at|date:"M d, Y" }}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex space-x-3">
-                            <a href="{% url 'teams:detail' invitation.team.slug %}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                                <span class="material-symbols-outlined text-base">visibility</span>
-                                View Team
-                            </a>
-                        </div>
+                        <a href="{% url 'teams:detail' invitation.team.slug %}" class="gs-btn gs-btn-primary">
+                            <span class="material-symbols-outlined">visibility</span>
+                            View Team
+                        </a>
                     </div>
                     {% if invitation.message %}
-                    <div class="mt-4 ml-20 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-primary">
-                        <p class="text-sm text-gray-600 dark:text-gray-400 italic">
-                            "{{ invitation.message }}"
-                        </p>
+                    <div class="gs-invite-msg">
+                        <p class="text-sm text-gray-400 italic">"{{ invitation.message }}"</p>
                     </div>
                     {% endif %}
                 </div>
@@ -155,85 +268,77 @@
         {% endif %}
 
         <!-- Active Teams -->
-        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800 mb-8">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary text-2xl">group</span>
-                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Active Teams</h2>
-                </div>
+        <div class="gs-section mb-8">
+            <div class="gs-section-header">
+                <span class="material-symbols-outlined text-primary text-2xl">group</span>
+                <h2 class="text-white text-xl font-bold">Active Teams</h2>
             </div>
             {% if team_stats %}
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="divide-y divide-gray-800">
                 {% for stat in team_stats %}
-                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-start space-x-4 flex-1">
+                <div class="gs-row px-6 py-6">
+                    <div class="flex items-start justify-between gap-6 flex-wrap">
+                        <div class="flex items-start gap-4 flex-1 min-w-0">
                             {% if stat.membership.team.logo %}
-                            <img src="{{ stat.membership.team.logo.url }}" alt="{{ stat.membership.team.name }}" class="w-20 h-20 rounded-lg object-cover">
+                            <img src="{{ stat.membership.team.logo.url }}" alt="{{ stat.membership.team.name }}" class="gs-team-logo w-20 h-20">
                             {% else %}
-                            <div class="w-20 h-20 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <span class="text-gray-500 dark:text-gray-400 font-bold text-xl">{{ stat.membership.team.tag }}</span>
-                            </div>
+                            <div class="gs-team-logo-placeholder w-20 h-20 text-xl">{{ stat.membership.team.tag }}</div>
                             {% endif %}
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-3 mb-2">
-                                    <h3 class="font-bold text-xl text-gray-900 dark:text-white">{{ stat.membership.team.name }}</h3>
-                                    <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full font-medium">{{ stat.membership.team.tag }}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <h3 class="font-bold text-xl text-white">{{ stat.membership.team.name }}</h3>
+                                    <span class="gs-badge gs-badge-tag">{{ stat.membership.team.tag }}</span>
                                     {% if stat.membership.role == 'captain' %}
-                                    <span class="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">Captain</span>
+                                    <span class="gs-badge gs-badge-captain">Captain</span>
                                     {% elif stat.membership.role == 'co_captain' %}
-                                    <span class="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">Co-Captain</span>
+                                    <span class="gs-badge gs-badge-captain">Co-Captain</span>
                                     {% endif %}
                                 </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">sports_esports</span>
-                                    {{ stat.membership.team.game.name }} • Joined {{ stat.membership.joined_at|date:"M d, Y" }}
+                                <p class="text-sm text-gray-400 mb-4 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem;">sports_esports</span>
+                                    {{ stat.membership.team.game.name }} · Joined {{ stat.membership.joined_at|date:"M d, Y" }}
                                 </p>
-                                
-                                <!-- Team Statistics -->
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mt-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.total_tournaments }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">Tournaments</div>
+                                <div class="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                    <div class="gs-mini-stat">
+                                        <div class="text-xl font-bold text-white">{{ stat.total_tournaments }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Tournaments</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-green-600">{{ stat.tournaments_won }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">Wins</div>
+                                    <div class="gs-mini-stat">
+                                        <div class="text-xl font-bold text-green-400">{{ stat.tournaments_won }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Wins</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-blue-600">{{ stat.top_3_finishes }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">Top 3</div>
+                                    <div class="gs-mini-stat">
+                                        <div class="text-xl font-bold text-blue-400">{{ stat.top_3_finishes }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Top 3</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ stat.total_matches }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">Matches</div>
+                                    <div class="gs-mini-stat">
+                                        <div class="text-xl font-bold text-white">{{ stat.total_matches }}</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Matches</div>
                                     </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-bold text-purple-600">{{ stat.win_rate }}%</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">Win Rate</div>
+                                    <div class="gs-mini-stat">
+                                        <div class="text-xl font-bold text-purple-400">{{ stat.win_rate }}%</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Win Rate</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="ml-6">
-                            <a href="{% url 'teams:detail' stat.membership.team.slug %}" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                                <span class="material-symbols-outlined text-base">visibility</span>
-                                View Team
-                            </a>
-                        </div>
+                        <a href="{% url 'teams:detail' stat.membership.team.slug %}" class="gs-btn gs-btn-primary shrink-0">
+                            <span class="material-symbols-outlined">visibility</span>
+                            View Team
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="px-6 py-16 text-center">
-                <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-gray-400 text-4xl">group</span>
+                <div class="w-20 h-20 mx-auto mb-5 bg-gray-800 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gray-500 text-4xl">group</span>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No active teams</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">Get started by joining or creating a team to compete in tournaments together.</p>
-                <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                    <span class="material-symbols-outlined text-base">search</span>
+                <h3 class="text-white font-bold text-xl mb-2">No active teams</h3>
+                <p class="text-gray-400 mb-6 max-w-md mx-auto">Get started by joining or creating a team to compete in tournaments together.</p>
+                <a href="{% url 'teams:list' %}" class="gs-btn gs-btn-primary">
+                    <span class="material-symbols-outlined">search</span>
                     Browse Teams
                 </a>
             </div>
@@ -242,53 +347,41 @@
 
         <!-- Team History -->
         {% if team_history %}
-        <div class="bg-white dark:bg-[#111318] rounded-xl border border-gray-200 dark:border-gray-800">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-2xl">history</span>
-                    <h2 class="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight">Team History</h2>
-                </div>
+        <div class="gs-section">
+            <div class="gs-section-header">
+                <span class="material-symbols-outlined text-gray-400 text-2xl">history</span>
+                <h2 class="text-white text-xl font-bold">Team History</h2>
             </div>
-            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="divide-y divide-gray-800">
                 {% for membership in team_history %}
-                <div class="px-6 py-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
+                <div class="gs-row px-6 py-6">
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-4">
                             {% if membership.team.logo %}
-                            <img src="{{ membership.team.logo.url }}" alt="{{ membership.team.name }}" class="w-16 h-16 rounded-lg object-cover opacity-75">
+                            <img src="{{ membership.team.logo.url }}" alt="{{ membership.team.name }}" class="gs-team-logo w-16 h-16 opacity-60">
                             {% else %}
-                            <div class="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center opacity-75">
-                                <span class="text-gray-500 dark:text-gray-400 font-bold text-lg">{{ membership.team.tag }}</span>
-                            </div>
+                            <div class="gs-team-logo-placeholder w-16 h-16 text-lg opacity-60">{{ membership.team.tag }}</div>
                             {% endif %}
                             <div>
-                                <h3 class="font-bold text-lg text-gray-700 dark:text-gray-300">{{ membership.team.name }}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">sports_esports</span>
+                                <h3 class="font-bold text-lg text-gray-300">{{ membership.team.name }}</h3>
+                                <p class="text-sm text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem;">sports_esports</span>
                                     {{ membership.team.game.name }}
                                 </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">schedule</span>
-                                    Joined {{ membership.joined_at|date:"M d, Y" }} • Left {{ membership.left_at|date:"M d, Y" }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm">timer</span>
-                                    Duration: {% widthratio membership.left_at|timeuntil:membership.joined_at 86400 1 %} days
+                                <p class="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem;">schedule</span>
+                                    Joined {{ membership.joined_at|date:"M d, Y" }} · Left {{ membership.left_at|date:"M d, Y" }}
                                 </p>
                             </div>
                         </div>
-                        <div>
-                            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm rounded-full font-medium">
-                                {{ membership.get_status_display }}
-                            </span>
-                        </div>
+                        <span class="gs-badge gs-badge-status">{{ membership.get_status_display }}</span>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
+
     </div>
 </main>
 {% endblock %}
-

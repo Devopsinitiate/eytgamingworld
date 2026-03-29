@@ -14,6 +14,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_POST
 from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_protect, csrf_exempt, ensure_csrf_cookie
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -170,6 +171,7 @@ def product_list(request):
     return render(request, 'store/product_list.html', context)
 
 
+@ensure_csrf_cookie
 @require_http_methods(["GET"])
 def product_detail(request, slug):
     """
@@ -1270,16 +1272,20 @@ def paystack_initialize(request):
         
         processor = PaystackPaymentProcessor()
         
-        # Create payment intent
+        # Clear any stale reference from a previous attempt before creating a new one
+        request.session.pop('paystack_reference', None)
+        
+        # Create payment intent — include user email so Paystack uses the real address
         metadata = {
             'user_id': str(request.user.id),
             'cart_id': str(cart.id),
-            'order_type': 'store_purchase'
+            'order_type': 'store_purchase',
+            'email': request.user.email,
         }
         
         payment_intent = processor.create_payment_intent(
             amount=total,
-            currency='NGN',  # Paystack primarily uses NGN
+            currency='NGN',
             metadata=metadata
         )
         
@@ -1692,7 +1698,6 @@ def remove_from_wishlist(request):
 # Product Review Views
 # ============================================================================
 
-@login_required
 @csrf_protect
 @require_POST
 def submit_review(request, product_slug):
@@ -1705,6 +1710,12 @@ def submit_review(request, product_slug):
     
     Requirements: 12.1, 12.2, 12.3, 12.4, 12.5
     """
+    # Return JSON 401 for unauthenticated AJAX requests instead of redirect
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'error': 'You must be logged in to submit a review'
+        }, status=401)
     try:
         from .models import ProductReview, OrderItem
         
@@ -1734,48 +1745,27 @@ def submit_review(request, product_slug):
                 'error': 'Rating must be between 1 and 5'
             }, status=400)
         
-        # Validate order_id if provided
+        # Validate order_id if provided (optional — purchase not required)
         order = None
         if order_id:
             try:
                 order = Order.objects.select_related('user').get(
                     id=order_id,
                     user=request.user,
-                    status__in=['delivered', 'processing', 'shipped']
                 )
             except Order.DoesNotExist:
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Order not found'
-                }, status=404)
-        else:
-            # Find an order where user purchased this product (optimized query)
-            from .models import OrderItem
-            order_items = OrderItem.objects.filter(
-                order__user=request.user,
-                product=product,
-                order__status__in=['delivered', 'processing', 'shipped']
-            ).select_related('order', 'product').order_by('-order__created_at')
-            
-            if not order_items.exists():
-                return JsonResponse({
-                    'success': False,
-                    'error': 'You must purchase this product before reviewing it'
-                }, status=403)
-            
-            order = order_items.first().order
-        
-        # Check if user already reviewed this product for this order
+                pass  # order not found, proceed without linking
+
+        # Check if user already reviewed this product
         existing_review = ProductReview.objects.filter(
             product=product,
             user=request.user,
-            order=order
         ).first()
-        
+
         if existing_review:
             return JsonResponse({
                 'success': False,
-                'error': 'You have already reviewed this product for this order'
+                'error': 'You have already reviewed this product'
             }, status=400)
         
         # Create review (comment will be sanitized in model's save method)

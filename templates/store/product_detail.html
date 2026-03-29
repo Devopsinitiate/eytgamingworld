@@ -2,70 +2,66 @@
 {% load static %}
 
 {% block title %}{{ product.name }} - Store - EYTGaming{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:25|default:'Shop gaming gear and merchandise on EYTGaming Store.' }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} - EYTGaming Store{% endblock %}
+{% block og_description %}{{ product.description|truncatewords:25|default:'Shop gaming gear and merchandise on EYTGaming Store.' }}{% endblock %}
+{% block twitter_title %}{{ product.name }} - EYTGaming Store{% endblock %}
+{% block twitter_description %}{{ product.description|truncatewords:25|default:'Shop gaming gear and merchandise on EYTGaming Store.' }}{% endblock %}
+
+{% block extra_meta %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
 <link rel="stylesheet" href="{% static 'css/product-detail-fix.css' %}">
 <style>
-    /* Additional page-specific styles */
-    body {
-        background: linear-gradient(135deg, #0a0a0a 0%, #121212 100%);
-    }
+body { background: #0A0A0A; }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="container mx-auto px-4 py-8 store-product-detail">
-    <!-- Debug information -->
-    <!-- <div style="position: fixed; top: 10px; right: 10px; background: #dc2626; color: white; padding: 10px; z-index: 9999; font-size: 12px; border-radius: 4px;">
-        Debug: Product Detail Page Loaded
-    </div> -->
-    
+
     <!-- Breadcrumb -->
     <div class="breadcrumb">
         <a href="{% url 'store:product_list' %}">Store</a>
-        <span class="material-symbols-outlined" style="font-size: 1rem;">chevron_right</span>
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#555;">chevron_right</span>
         <a href="{% url 'store:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
-        <span class="material-symbols-outlined" style="font-size: 1rem;">chevron_right</span>
-        <span>{{ product.name }}</span>
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#555;">chevron_right</span>
+        <span style="color:#888;">{{ product.name }}</span>
     </div>
 
-    <!-- Product Detail -->
+    <!-- Product Detail Card -->
     <div class="product-detail-container">
         <div class="grid grid-cols-1 lg:grid-cols-2">
-            <!-- Product Images -->
+
+            <!-- Images -->
             <div class="product-images">
                 <div class="main-image-container">
                     {% if images %}
-                        <img 
-                            id="mainImage"
-                            src="{{ images.0.image.url }}" 
-                            alt="{{ images.0.alt_text }}"
-                            class="main-image"
-                        >
+                        <img id="mainImage" src="{{ images.0.image.url }}" alt="{{ images.0.alt_text }}" class="main-image">
                     {% else %}
-                        <img 
-                            id="mainImage"
-                            src="{% static 'images/placeholder-product.png' %}" 
-                            alt="{{ product.name }}"
-                            class="main-image"
-                        >
+                        <img id="mainImage" src="{% static 'images/placeholder-product.png' %}" alt="{{ product.name }}" class="main-image">
                     {% endif %}
                 </div>
 
                 {% if images|length > 1 %}
-                <div class="image-thumbnails">
-                    {% for image in images %}
-                    <div class="thumbnail {% if forloop.first %}active{% endif %}" 
-                         onclick="changeImage('{{ image.image.url }}', this)">
-                        <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" loading="lazy">
+                <div class="image-thumbnails-scroll-container">
+                    <div class="image-thumbnails-scroll">
+                        {% for image in images %}
+                        <div class="thumbnail {% if forloop.first %}active{% endif %}"
+                             onclick="changeImage('{{ image.image.url }}', this)">
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" loading="lazy">
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Product Info -->
+            <!-- Info -->
             <div class="product-info-section">
                 <div class="product-category">{{ product.category.name }}</div>
                 <h1 class="product-title">{{ product.name }}</h1>
@@ -75,18 +71,18 @@
                 {% if has_stock %}
                     {% if product.is_in_stock %}
                     <div class="product-stock in-stock">
-                        <span class="material-symbols-outlined">check_circle</span>
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">check_circle</span>
                         In Stock
                     </div>
                     {% elif product.is_low_stock %}
                     <div class="product-stock low-stock">
-                        <span class="material-symbols-outlined">warning</span>
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">warning</span>
                         Only {{ product.stock_quantity }} left
                     </div>
                     {% endif %}
                 {% else %}
                 <div class="product-stock out-of-stock">
-                    <span class="material-symbols-outlined">cancel</span>
+                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">cancel</span>
                     Out of Stock
                 </div>
                 {% endif %}
@@ -100,18 +96,16 @@
                 <!-- Variants -->
                 {% if variants %}
                 <div class="variant-section">
-                    <label class="variant-label">Select Option:</label>
+                    <label class="variant-label">Select Option</label>
                     <div class="variant-options">
                         {% for variant in variants %}
-                        <div class="variant-option {% if not variant.is_in_stock %}disabled{% endif %}" 
+                        <div class="variant-option {% if not variant.is_in_stock %}disabled{% endif %}"
                              data-variant-id="{{ variant.id }}"
                              data-price="{{ variant.final_price }}"
                              data-in-stock="{{ variant.is_in_stock }}"
                              onclick="selectVariant(this)">
                             {{ variant.name }}
-                            {% if not variant.is_in_stock %}
-                            <span style="font-size: 0.75rem;">(Out of Stock)</span>
-                            {% endif %}
+                            {% if not variant.is_in_stock %}<span style="font-size:0.7rem;opacity:0.7;">(Out of Stock)</span>{% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -120,15 +114,15 @@
 
                 <!-- Quantity -->
                 <div class="quantity-section">
-                    <label class="quantity-label">Quantity:</label>
+                    <label class="quantity-label">Quantity</label>
                     <div class="quantity-controls">
                         <div class="quantity-input">
                             <button class="quantity-btn" onclick="decrementQuantity()" id="decrementBtn">
-                                <span class="material-symbols-outlined">remove</span>
+                                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;">remove</span>
                             </button>
                             <div class="quantity-value" id="quantityValue">1</div>
                             <button class="quantity-btn" onclick="incrementQuantity()" id="incrementBtn">
-                                <span class="material-symbols-outlined">add</span>
+                                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;">add</span>
                             </button>
                         </div>
                     </div>
@@ -136,164 +130,114 @@
 
                 <!-- Add to Cart -->
                 <div class="add-to-cart-section">
-                    <button 
-                        class="btn-add-to-cart" 
-                        onclick="addToCart()"
-                        id="addToCartBtn"
-                        {% if not has_stock %}disabled{% endif %}
-                    >
-                        <span class="material-symbols-outlined">shopping_cart</span>
-                        {% if has_stock %}
-                        Add to Cart
-                        {% else %}
-                        Out of Stock
-                        {% endif %}
+                    <button class="btn-add-to-cart" onclick="addToCart()" id="addToCartBtn" {% if not has_stock %}disabled{% endif %}>
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;">shopping_cart</span>
+                        {% if has_stock %}Add to Cart{% else %}Out of Stock{% endif %}
                     </button>
-                    <a href="{% url 'store:product_list' %}" class="btn-back">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                        Back to Store
-                    </a>
+                    <div style="display:flex;gap:0.75rem;">
+                        <a href="{% url 'store:cart' %}" class="btn-back">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">shopping_bag</span>
+                            View Cart
+                        </a>
+                        <a href="{% url 'store:product_list' %}" class="btn-back">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">arrow_back</span>
+                            Back to Store
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Reviews Section -->
-    <div class="product-detail-container mt-8">
+    <div class="product-detail-container">
         <div class="product-info-section">
-            <h2 class="text-3xl font-bold text-white mb-6">Customer Reviews</h2>
-            
+
+            <!-- Section Header -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(220,38,38,0.15);">
+                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.75rem;color:#DC2626;">reviews</span>
+                <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:1.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#fff;margin:0;">Customer Reviews</h2>
+            </div>
+
             <!-- Rating Summary -->
-            <div class="flex items-center gap-6 mb-8 pb-6 border-b border-gray-700">
-                <div class="text-center">
-                    <div class="text-5xl font-bold text-primary mb-2">
-                        {% if product.average_rating %}
-                            {{ product.average_rating }}
-                        {% else %}
-                            -
-                        {% endif %}
+            <div style="display:flex;align-items:center;gap:2rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid #1f1f1f;">
+                <div style="text-align:center;">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:3.5rem;font-weight:800;color:#DC2626;line-height:1;text-shadow:0 0 20px rgba(220,38,38,0.4);">
+                        {% if product.average_rating %}{{ product.average_rating }}{% else %}&mdash;{% endif %}
                     </div>
-                    <div class="flex items-center justify-center gap-1 mb-2">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:2px;margin:6px 0;">
                         {% if product.average_rating %}
                             {% for i in "12345" %}
-                                <span class="material-symbols-outlined text-yellow-400">
-                                    {% if product.average_rating >= forloop.counter %}star{% else %}star_border{% endif %}
-                                </span>
+                                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' {% if product.average_rating >= forloop.counter %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:{% if product.average_rating >= forloop.counter %}#fbbf24{% else %}#444{% endif %};">star</span>
                             {% endfor %}
                         {% else %}
                             {% for i in "12345" %}
-                                <span class="material-symbols-outlined text-gray-600">star_border</span>
+                                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#444;">star</span>
                             {% endfor %}
                         {% endif %}
                     </div>
-                    <div class="text-gray-400 text-sm">
-                        {{ product.review_count }} review{{ product.review_count|pluralize }}
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#666;">
+                        {{ product.review_count }} Review{{ product.review_count|pluralize }}
                     </div>
                 </div>
-                
+
                 {% if user.is_authenticated %}
-                <button onclick="showReviewForm()" class="btn-add-to-cart" style="flex: none; min-width: auto;">
-                    <span class="material-symbols-outlined">rate_review</span>
+                <button onclick="showReviewForm()" class="btn-add-to-cart" style="width:auto;min-width:160px;">
+                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">rate_review</span>
                     Write a Review
                 </button>
                 {% endif %}
             </div>
-            
-            <!-- Review Form (Hidden by default) -->
+
+            <!-- Review Form -->
             {% if user.is_authenticated %}
-            <div id="reviewForm" class="mb-8 p-6 bg-gray-900/60 rounded-xl border border-gray-700/50" style="display: none;">
-                <h3 class="text-xl font-semibold text-white mb-4">Write Your Review</h3>
-                
-                <div class="mb-4">
+            <div id="reviewForm" style="display:none;margin-bottom:2rem;">
+                <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;margin-bottom:1rem;">Write Your Review</h3>
+
+                <div style="margin-bottom:1rem;">
                     <label class="variant-label">Rating *</label>
-                    <div class="flex gap-2">
+                    <div style="display:flex;gap:6px;">
                         {% for i in "12345" %}
                         <button type="button" class="star-rating" data-rating="{{ forloop.counter }}" onclick="setRating({{ forloop.counter }})">
-                            <span class="material-symbols-outlined text-3xl text-gray-500">star_border</span>
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2rem;color:#555;transition:color 0.2s;">star</span>
                         </button>
                         {% endfor %}
                     </div>
                     <input type="hidden" id="ratingValue" value="">
                 </div>
-                
-                <div class="mb-4">
+
+                <div style="margin-bottom:1rem;">
                     <label class="variant-label">Your Review (Optional)</label>
-                    <textarea 
-                        id="reviewComment" 
-                        rows="4" 
-                        class="w-full p-3 bg-gray-800/70 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
-                        placeholder="Share your thoughts about this product..."
-                    ></textarea>
+                    <textarea id="reviewComment" rows="4" placeholder="Share your thoughts about this product..."></textarea>
                 </div>
-                
-                <div class="flex gap-3">
-                    <button onclick="submitReview()" class="btn-add-to-cart" style="flex: none; min-width: auto; padding: 0.75rem 1.5rem;">
-                        <span class="material-symbols-outlined">send</span>
+
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                    <button onclick="submitReview()" class="btn-review-submit">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">send</span>
                         Submit Review
                     </button>
-                    <button onclick="hideReviewForm()" class="btn-back" style="flex: none; min-width: auto; padding: 0.75rem 1.5rem;">
-                        Cancel
-                    </button>
+                    <button onclick="hideReviewForm()" class="btn-review-cancel">Cancel</button>
                 </div>
             </div>
             {% endif %}
-            
+
             <!-- Reviews List -->
             <div id="reviewsList">
-                <div class="text-center py-8">
-                    <span class="material-symbols-outlined text-gray-600 text-6xl">hourglass_empty</span>
-                    <p class="text-gray-400 mt-2">Loading reviews...</p>
+                <div style="text-align:center;padding:3rem 0;">
+                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:3.5rem;color:#333;">hourglass_empty</span>
+                    <p style="color:#555;margin-top:0.75rem;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.1em;">Loading reviews...</p>
                 </div>
             </div>
-            
+
             <!-- Pagination -->
-            <div id="reviewsPagination" class="mt-6 flex justify-center gap-2"></div>
+            <div id="reviewsPagination" style="margin-top:1.5rem;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;"></div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Professional review styling integrated with new design system */
-    .review-card {
-        background: rgba(20, 20, 20, 0.6);
-        border: 1px solid rgba(220, 38, 38, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-    }
-    
-    .review-card:hover {
-        border-color: rgba(220, 38, 38, 0.2);
-        background: rgba(25, 25, 25, 0.7);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    }
-    
-    .star-rating {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .star-rating:hover .material-symbols-outlined,
-    .star-rating.active .material-symbols-outlined {
-        color: #fbbf24 !important;
-        text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-    }
-    
-    .star-rating.active .material-symbols-outlined {
-        font-variation-settings: 'FILL' 1;
-    }
-</style>
-
+<form id="csrfForm" style="display:none">{% csrf_token %}</form>
 <script>
-    // Product data
-    const productId = '{{ product.id }}';
+    const productId   = '{{ product.id }}';
     const productSlug = '{{ product.slug }}';
     const productPrice = parseFloat('{{ product.price }}');
     let selectedVariantId = null;
@@ -302,45 +246,27 @@
     let selectedRating = 0;
     let currentReviewPage = 1;
 
-    // Change main image
     function changeImage(imageUrl, thumbnail) {
         document.getElementById('mainImage').src = imageUrl;
-        
-        // Update active thumbnail
         document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
         thumbnail.classList.add('active');
     }
 
-    // Select variant
     function selectVariant(element) {
-        if (element.classList.contains('disabled')) {
-            return;
-        }
-
-        // Update selected variant
+        if (element.classList.contains('disabled')) return;
         document.querySelectorAll('.variant-option').forEach(v => v.classList.remove('selected'));
         element.classList.add('selected');
-        
         selectedVariantId = element.dataset.variantId;
         const variantPrice = parseFloat(element.dataset.price);
-        
-        // Update price display
-        document.querySelector('.product-price').textContent = '$' + variantPrice.toFixed(2);
+        document.querySelector('.product-price').textContent = '₦' + variantPrice.toFixed(2);
     }
 
-    // Quantity controls
     function incrementQuantity() {
-        if (currentQuantity < maxQuantity) {
-            currentQuantity++;
-            updateQuantityDisplay();
-        }
+        if (currentQuantity < maxQuantity) { currentQuantity++; updateQuantityDisplay(); }
     }
 
     function decrementQuantity() {
-        if (currentQuantity > 1) {
-            currentQuantity--;
-            updateQuantityDisplay();
-        }
+        if (currentQuantity > 1) { currentQuantity--; updateQuantityDisplay(); }
     }
 
     function updateQuantityDisplay() {
@@ -349,264 +275,177 @@
         document.getElementById('incrementBtn').disabled = currentQuantity >= maxQuantity;
     }
 
-    // Add to cart
     async function addToCart() {
         const btn = document.getElementById('addToCartBtn');
-        const originalText = btn.innerHTML;
-        
-        // Check if variant is required but not selected
+        const originalHTML = btn.innerHTML;
         const hasVariants = document.querySelectorAll('.variant-option').length > 0;
-        if (hasVariants && !selectedVariantId) {
-            showAlert('Please select an option', 'error');
-            return;
-        }
-        
-        // Disable button and show loading
+        if (hasVariants && !selectedVariantId) { showAlert('Please select an option', 'error'); return; }
         btn.disabled = true;
-        btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Adding...';
-        
+        btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-feature-settings:\'liga\' 1;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;">hourglass_empty</span> Adding...';
         try {
             const response = await fetch('{% url "store:add_to_cart" %}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    variant_id: selectedVariantId,
-                    quantity: currentQuantity
-                })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ product_id: productId, variant_id: selectedVariantId, quantity: currentQuantity })
             });
-            
             const data = await response.json();
-            
             if (data.success) {
                 showAlert('Added to cart successfully!', 'success');
-                
-                // Update cart count in header if it exists
                 const cartCount = document.getElementById('cartCount');
-                if (cartCount) {
-                    cartCount.textContent = data.cart_summary.item_count;
-                }
-                
-                // Reset quantity
+                if (cartCount) cartCount.textContent = data.cart_summary.item_count;
                 currentQuantity = 1;
                 updateQuantityDisplay();
             } else {
                 showAlert(data.error || 'Failed to add to cart', 'error');
             }
-        } catch (error) {
-            console.error('Error adding to cart:', error);
+        } catch (e) {
             showAlert('An error occurred. Please try again.', 'error');
         } finally {
-            // Re-enable button
             btn.disabled = false;
-            btn.innerHTML = originalText;
+            btn.innerHTML = originalHTML;
         }
     }
 
-    // Show alert message
     function showAlert(message, type) {
         const container = document.getElementById('alertContainer');
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type}`;
-        alert.innerHTML = `
-            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
-            ${message}
-        `;
-        
+        const iconName = type === 'success' ? 'check_circle' : 'error';
+        const el = document.createElement('div');
+        el.className = 'alert alert-' + type;
+        el.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-feature-settings:\'liga\' 1;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">' + iconName + '</span> ' + message;
         container.innerHTML = '';
-        container.appendChild(alert);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            alert.remove();
-        }, 5000);
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 5000);
     }
 
-    // Get CSRF token from cookie
     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
+        // Try hidden CSRF input (always fresh from Django template)
+        const csrfInput = document.querySelector('#csrfForm [name="csrfmiddlewaretoken"]');
+        if (csrfInput && name === 'csrftoken') return csrfInput.value;
+        // Try meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag && name === 'csrftoken') return metaTag.getAttribute('content');
+        // Fallback to cookie
+        let val = null;
+        if (document.cookie) {
+            document.cookie.split(';').forEach(c => {
+                c = c.trim();
+                if (c.startsWith(name + '=')) val = decodeURIComponent(c.substring(name.length + 1));
+            });
         }
-        return cookieValue;
+        return val;
     }
 
-    // Initialize
-    updateQuantityDisplay();
-    loadReviews(1);
-    
-    // Debug script to verify page functionality
-    console.log('Product detail page loaded successfully');
-    console.log('Product name:', '{{ product.name }}');
-    console.log('Product price:', '{{ product.price }}');
-    
-    // Simple DOM ready check
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded and ready');
-        // Add visual confirmation
-        const debugDiv = document.querySelector('div[style*="Debug: Product Detail Page Loaded"]');
-        if (debugDiv) {
-            debugDiv.style.background = '#22c55e';
-            debugDiv.textContent = 'Debug: Page Fully Loaded ✓';
-        }
-    });
-    
-    // Review Functions
     function showReviewForm() {
-        document.getElementById('reviewForm').style.display = 'block';
-        document.getElementById('reviewForm').scrollIntoView({ behavior: 'smooth' });
+        const f = document.getElementById('reviewForm');
+        f.style.display = 'block';
+        f.scrollIntoView({ behavior: 'smooth' });
     }
-    
+
     function hideReviewForm() {
         document.getElementById('reviewForm').style.display = 'none';
         selectedRating = 0;
-        document.querySelectorAll('.star-rating').forEach(star => star.classList.remove('active'));
+        document.querySelectorAll('.star-rating span').forEach(s => { s.style.color = '#555'; s.style.fontVariationSettings = "'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24"; });
+        document.querySelectorAll('.star-rating').forEach(s => s.classList.remove('active'));
         document.getElementById('reviewComment').value = '';
     }
-    
+
     function setRating(rating) {
         selectedRating = rating;
-        document.querySelectorAll('.star-rating').forEach((star, index) => {
-            if (index < rating) {
+        document.querySelectorAll('.star-rating').forEach((star, idx) => {
+            const span = star.querySelector('span');
+            if (idx < rating) {
                 star.classList.add('active');
+                span.style.color = '#fbbf24';
+                span.style.fontVariationSettings = "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24";
+                span.style.textShadow = '0 0 8px rgba(251,191,36,0.4)';
             } else {
                 star.classList.remove('active');
+                span.style.color = '#555';
+                span.style.fontVariationSettings = "'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24";
+                span.style.textShadow = 'none';
             }
         });
     }
-    
+
     async function submitReview() {
-        if (selectedRating === 0) {
-            showAlert('Please select a rating', 'error');
-            return;
-        }
-        
+        if (selectedRating === 0) { showAlert('Please select a rating', 'error'); return; }
         const comment = document.getElementById('reviewComment').value.trim();
-        
         try {
             const response = await fetch(`/store/product/${productSlug}/review/submit/`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    rating: selectedRating,
-                    comment: comment
-                })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ rating: selectedRating, comment: comment })
             });
-            
             const data = await response.json();
-            
             if (data.success) {
                 showAlert('Review submitted successfully!', 'success');
                 hideReviewForm();
                 loadReviews(1);
-                
-                // Update rating display
-                if (data.product_stats.average_rating) {
-                    location.reload(); // Reload to update rating stars
-                }
+                if (data.product_stats && data.product_stats.average_rating) location.reload();
             } else {
                 showAlert(data.error || 'Failed to submit review', 'error');
             }
-        } catch (error) {
-            console.error('Error submitting review:', error);
+        } catch (e) {
             showAlert('An error occurred. Please try again.', 'error');
         }
     }
-    
+
     async function loadReviews(page) {
         currentReviewPage = page;
         const reviewsList = document.getElementById('reviewsList');
-        
         try {
             const response = await fetch(`/store/product/${productSlug}/reviews/?page=${page}`);
             const data = await response.json();
-            
             if (data.success) {
                 if (data.reviews.length === 0) {
                     reviewsList.innerHTML = `
-                        <div class="text-center py-8">
-                            <span class="material-symbols-outlined text-gray-600 text-6xl">rate_review</span>
-                            <p class="text-gray-400 mt-2">No reviews yet. Be the first to review this product!</p>
-                        </div>
-                    `;
+                        <div style="text-align:center;padding:3rem 0;">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:3.5rem;color:#333;">rate_review</span>
+                            <p style="color:#555;margin-top:0.75rem;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.1em;">No reviews yet. Be the first!</p>
+                        </div>`;
                 } else {
                     reviewsList.innerHTML = data.reviews.map(review => `
                         <div class="review-card">
-                            <div class="flex items-start justify-between mb-3">
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;">
                                 <div>
-                                    <div class="text-white font-semibold mb-1">${review.user}</div>
-                                    <div class="flex items-center gap-1 mb-1">
-                                        ${[1,2,3,4,5].map(i => `
-                                            <span class="material-symbols-outlined text-sm ${i <= review.rating ? 'text-yellow-400' : 'text-gray-600'}">
-                                                ${i <= review.rating ? 'star' : 'star_border'}
-                                            </span>
-                                        `).join('')}
+                                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;margin-bottom:4px;">${review.user}</div>
+                                    <div style="display:flex;align-items:center;gap:2px;margin-bottom:4px;">
+                                        ${[1,2,3,4,5].map(i => `<span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' ${i <= review.rating ? 1 : 0},'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:0.9rem;color:${i <= review.rating ? '#fbbf24' : '#444'};">star</span>`).join('')}
                                     </div>
-                                    <div class="text-gray-400 text-sm">${review.created_at}</div>
+                                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:#555;">${review.created_at}</div>
                                 </div>
                             </div>
-                            ${review.comment ? `<p class="text-gray-300 leading-relaxed">${review.comment}</p>` : ''}
-                        </div>
-                    `).join('');
+                            ${review.comment ? `<p style="color:#aaa;font-size:0.9375rem;line-height:1.6;margin:0;">${review.comment}</p>` : ''}
+                        </div>`).join('');
                 }
-                
-                // Update pagination
                 updatePagination(data.pagination);
             }
-        } catch (error) {
-            console.error('Error loading reviews:', error);
+        } catch (e) {
             reviewsList.innerHTML = `
-                <div class="text-center py-8">
-                    <span class="material-symbols-outlined text-red-500 text-6xl">error</span>
-                    <p class="text-gray-400 mt-2">Failed to load reviews</p>
-                </div>
-            `;
+                <div style="text-align:center;padding:3rem 0;">
+                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:3.5rem;color:#DC2626;">error</span>
+                    <p style="color:#555;margin-top:0.75rem;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.1em;">Failed to load reviews</p>
+                </div>`;
         }
     }
-    
+
     function updatePagination(pagination) {
         const container = document.getElementById('reviewsPagination');
-        
-        if (pagination.total_pages <= 1) {
-            container.innerHTML = '';
-            return;
-        }
-        
+        if (pagination.total_pages <= 1) { container.innerHTML = ''; return; }
         let html = '';
-        
-        // Previous button
-        if (pagination.has_previous) {
-            html += `<button onclick="loadReviews(${pagination.current_page - 1})" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">Previous</button>`;
-        }
-        
-        // Page numbers
+        if (pagination.has_previous)
+            html += `<button onclick="loadReviews(${pagination.current_page - 1})">Previous</button>`;
         for (let i = 1; i <= pagination.total_pages; i++) {
-            if (i === pagination.current_page) {
-                html += `<button class="px-4 py-2 bg-primary text-white rounded">${i}</button>`;
-            } else {
-                html += `<button onclick="loadReviews(${i})" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">${i}</button>`;
-            }
+            html += `<button onclick="loadReviews(${i})" ${i === pagination.current_page ? 'class="bg-primary"' : ''}>${i}</button>`;
         }
-        
-        // Next button
-        if (pagination.has_next) {
-            html += `<button onclick="loadReviews(${pagination.current_page + 1})" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">Next</button>`;
-        }
-        
+        if (pagination.has_next)
+            html += `<button onclick="loadReviews(${pagination.current_page + 1})">Next</button>`;
         container.innerHTML = html;
     }
+
+    updateQuantityDisplay();
+    loadReviews(1);
 </script>
 {% endblock %}
+
+

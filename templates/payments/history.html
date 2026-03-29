@@ -4,349 +4,451 @@
 {% block title %}Payment History - EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+<style>
+  /* ── PAGE ── */
+  .ph-header-bar {
+    border-left: 4px solid #DC2626;
+    padding-left: 1rem;
+    margin-bottom: 2rem;
+  }
+  /* ── FILTER CARD ── */
+  .g-card {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.2);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  .g-card:hover { border-color: rgba(220,38,38,0.45); box-shadow: 0 0 20px rgba(220,38,38,0.1); }
+
+  /* ── SELECT / INPUT ── */
+  .g-select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: #0A0A0A;
+    border: 1px solid #374151;
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%239CA3AF'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+  .g-select:focus { outline: none; border-color: #DC2626; box-shadow: 0 0 12px rgba(220,38,38,0.25); }
+  .g-select option { background: #111827; }
+
+  .g-label {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9CA3AF;
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ── CLEAR BUTTON ── */
+  .clear-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(220,38,38,0.3);
+    border-radius: 3px;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .clear-btn:hover { border-color: #DC2626; color: #DC2626; }
+
+  /* ── TABLE ── */
+  .g-table-wrap {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.2);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .g-table { width: 100%; border-collapse: collapse; }
+  .g-table thead { background: #0A0A0A; border-bottom: 1px solid rgba(220,38,38,0.25); }
+  .g-table th {
+    padding: 0.9rem 1.25rem;
+    text-align: left;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    font-size: 0.8rem;
+  }
+  .g-table tbody tr {
+    border-bottom: 1px solid rgba(55,65,81,0.5);
+    transition: background 0.2s ease;
+  }
+  .g-table tbody tr:last-child { border-bottom: none; }
+  .g-table tbody tr:hover { background: rgba(220,38,38,0.05); }
+  .g-table td { padding: 1rem 1.25rem; vertical-align: middle; }
+
+  /* ── STATUS BADGES ── */
+  .s-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    transform: skewX(-6deg);
+  }
+  .s-badge span { display: inline-block; transform: skewX(6deg); }
+  .s-succeeded { background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.35); }
+  .s-pending   { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid rgba(245,158,11,0.35); }
+  .s-processing{ background: rgba(6,182,212,0.15);  color: #06B6D4; border: 1px solid rgba(6,182,212,0.35); }
+  .s-failed    { background: rgba(220,38,38,0.15);  color: #F87171; border: 1px solid rgba(220,38,38,0.35); }
+  .s-refunded  { background: rgba(139,92,246,0.15); color: #A78BFA; border: 1px solid rgba(139,92,246,0.35); }
+  .s-cancelled { background: rgba(107,114,128,0.15);color: #9CA3AF; border: 1px solid rgba(107,114,128,0.35); }
+
+  /* ── VIEW DETAILS LINK ── */
+  .view-link {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.8rem;
+    color: #DC2626;
+    transition: all 0.2s ease;
+  }
+  .view-link:hover { color: #ef4444; text-shadow: 0 0 8px rgba(220,38,38,0.5); }
+
+  /* ── MOBILE CARD ── */
+  .m-card {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.2);
+    border-left: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+  }
+  .m-card:hover { border-color: rgba(220,38,38,0.5); box-shadow: 0 0 18px rgba(220,38,38,0.12); transform: translateY(-2px); }
+
+  .m-card-action {
+    display: block; width: 100%; text-align: center;
+    padding: 0.7rem 1rem;
+    background: linear-gradient(135deg, #DC2626, #991B1B);
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 3px;
+    transform: skewX(-8deg);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(220,38,38,0.3);
+  }
+  .m-card-action span { display: block; transform: skewX(8deg); }
+  .m-card-action:hover { box-shadow: 0 0 25px rgba(220,38,38,0.6); transform: skewX(-8deg) scale(1.02); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.15);
+    border-top: 3px solid #374151;
+    border-radius: 4px;
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  /* ── PAGINATION ── */
+  .pg-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 40px; min-width: 40px;
+    padding: 0.5rem 0.9rem;
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.3);
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    text-decoration: none;
+  }
+  .pg-btn:hover { background: #DC2626; border-color: #DC2626; box-shadow: 0 0 12px rgba(220,38,38,0.5); }
+  .pg-btn.active { background: #DC2626; border-color: #DC2626; box-shadow: 0 0 12px rgba(220,38,38,0.4); }
+  .pg-btn:disabled, .pg-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .pg-ellipsis { color: #6B7280; padding: 0 0.5rem; font-family: 'Inter', sans-serif; }
+
+  /* ── REFUND CHIP ── */
+  .refund-chip {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 2px;
+    color: #A78BFA;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    margin-top: 0.2rem;
+  }
+
+  /* ── RESPONSIVE ── */
+  .desktop-table { display: block; }
+  .mobile-cards  { display: none; }
+  @media (max-width: 767px) {
+    .desktop-table { display: none; }
+    .mobile-cards  { display: block; }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-    <!-- Page Header -->
-    <div class="mb-8 fade-in">
-        <h1 class="text-white text-3xl font-bold mb-2">Payment History</h1>
-        <p class="text-gray-400">View and manage all your payment transactions</p>
+
+  <!-- Page Header -->
+  <div class="ph-header-bar fade-in">
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;font-size:2.25rem;line-height:1;">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2rem;color:#DC2626;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">receipt_long</span>Payment History
+    </h1>
+    <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.9rem;margin-top:0.35rem;">View and manage all your payment transactions</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="g-card mb-6 fade-in">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label for="status-filter" class="g-label">Status</label>
+        <select id="status-filter" aria-label="Filter payments by status" class="g-select">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="succeeded">Succeeded</option>
+          <option value="failed">Failed</option>
+          <option value="refunded">Refunded</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div>
+        <label for="type-filter" class="g-label">Payment Type</label>
+        <select id="type-filter" aria-label="Filter payments by type" class="g-select">
+          <option value="">All Types</option>
+          <option value="tournament_fee">Tournament Fee</option>
+          <option value="coaching_session">Coaching Session</option>
+          <option value="package_purchase">Package Purchase</option>
+          <option value="venue_booking">Venue Booking</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="date-filter" class="g-label">Date Range</label>
+        <select id="date-filter" aria-label="Filter payments by date range" class="g-select">
+          <option value="">All Time</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="365">Last Year</option>
+        </select>
+      </div>
     </div>
+    <div class="mt-4 flex justify-end">
+      <button id="clear-filters" aria-label="Clear all payment filters" class="clear-btn">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;" aria-hidden="true">filter_alt_off</span>
+        Clear Filters
+      </button>
+    </div>
+  </div>
 
-    <!-- Filter Bar -->
-    <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 mb-6 fade-in">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <!-- Status Filter -->
-            <div>
-                <label for="status-filter" class="block text-white font-medium mb-2 text-sm">
-                    Status
-                </label>
-                <select id="status-filter" 
-                        aria-label="Filter payments by status"
-                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
-                    <option value="">All Statuses</option>
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="succeeded">Succeeded</option>
-                    <option value="failed">Failed</option>
-                    <option value="refunded">Refunded</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </div>
+  <!-- Count -->
+  <div class="mb-4 fade-in">
+    <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.85rem;">
+      Showing <span id="payment-count" style="color:#fff;font-weight:600;">{{ payments|length }}</span> payment(s)
+    </p>
+  </div>
 
-            <!-- Type Filter -->
-            <div>
-                <label for="type-filter" class="block text-white font-medium mb-2 text-sm">
-                    Payment Type
-                </label>
-                <select id="type-filter" 
-                        aria-label="Filter payments by type"
-                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
-                    <option value="">All Types</option>
-                    <option value="tournament_fee">Tournament Fee</option>
-                    <option value="coaching_session">Coaching Session</option>
-                    <option value="package_purchase">Package Purchase</option>
-                    <option value="venue_booking">Venue Booking</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
+  <!-- Desktop Table -->
+  <div class="desktop-table g-table-wrap mb-6 fade-in">
+    <div class="overflow-x-auto">
+      <table class="g-table" aria-label="Payment history table">
+        <caption class="sr-only">List of all payment transactions</caption>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Description</th>
+            <th scope="col">Type</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="payments-table-body">
+          {% for payment in payments %}
+          <tr class="payment-row"
+              data-status="{{ payment.status }}"
+              data-type="{{ payment.payment_type }}"
+              data-date="{{ payment.created_at|date:'Y-m-d' }}">
+            <td>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:0.95rem;">{{ payment.created_at|date:"M d, Y" }}</div>
+              <div style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.75rem;">{{ payment.created_at|date:"g:i A" }}</div>
+            </td>
+            <td>
+              <div style="font-family:'Inter',sans-serif;color:#D1D5DB;font-size:0.9rem;max-width:18rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                {{ payment.description|default:"No description" }}
+              </div>
+            </td>
+            <td>
+              <span style="font-family:'Inter',sans-serif;color:#9CA3AF;font-size:0.85rem;">{{ payment.get_payment_type_display }}</span>
+            </td>
+            <td>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:1.05rem;">${{ payment.amount }}</div>
+              {% if payment.refund_amount > 0 %}
+              <div class="refund-chip">-${{ payment.refund_amount }} refunded</div>
+              {% endif %}
+            </td>
+            <td>
+              <span class="s-badge s-{{ payment.status }}" aria-label="Payment status: {{ payment.get_status_display }}">
+                <span>{{ payment.get_status_display }}</span>
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'payments:detail' payment.id %}"
+                 class="view-link"
+                 aria-label="View details for payment of ${{ payment.amount }} on {{ payment.created_at|date:'M d, Y' }}">
+                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:0.95rem;" aria-hidden="true">open_in_new</span>
+                Details
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" style="padding:3rem 1.5rem;text-align:center;" role="status" aria-label="No payments found">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:4rem;color:#374151;margin-bottom:1rem;" aria-hidden="true">receipt_long</span>
+              <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#6B7280;font-size:1.1rem;margin-bottom:0.4rem;">No payments found</p>
+              <p style="font-family:'Inter',sans-serif;color:#4B5563;font-size:0.85rem;">Your payment history will appear here</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-            <!-- Date Range Filter -->
-            <div>
-                <label for="date-filter" class="block text-white font-medium mb-2 text-sm">
-                    Date Range
-                </label>
-                <select id="date-filter" 
-                        aria-label="Filter payments by date range"
-                        class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark focus:border-transparent">
-                    <option value="">All Time</option>
-                    <option value="7">Last 7 Days</option>
-                    <option value="30">Last 30 Days</option>
-                    <option value="90">Last 90 Days</option>
-                    <option value="365">Last Year</option>
-                </select>
-            </div>
+  <!-- Mobile Cards -->
+  <div class="mobile-cards space-y-4 fade-in">
+    {% for payment in payments %}
+    <div class="m-card payment-card"
+         data-status="{{ payment.status }}"
+         data-type="{{ payment.payment_type }}"
+         data-date="{{ payment.created_at|date:'Y-m-d' }}">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:1.5rem;line-height:1;">${{ payment.amount }}</div>
+          <div style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;margin-top:0.2rem;">{{ payment.created_at|date:"M d, Y" }} &middot; {{ payment.created_at|date:"g:i A" }}</div>
         </div>
-
-        <!-- Clear Filters Button -->
-        <div class="mt-4 flex justify-end">
-            <button id="clear-filters" 
-                    aria-label="Clear all payment filters"
-                    class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-medium focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
-                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">filter_alt_off</span>
-                Clear Filters
-            </button>
-        </div>
+        <span class="s-badge s-{{ payment.status }}"><span>{{ payment.get_status_display }}</span></span>
+      </div>
+      <p style="font-family:'Inter',sans-serif;color:#D1D5DB;font-size:0.9rem;margin-bottom:0.75rem;">{{ payment.description|default:"No description" }}</p>
+      <div style="font-family:'Inter',sans-serif;font-size:0.8rem;color:#6B7280;margin-bottom:0.75rem;">
+        <span style="color:#9CA3AF;">Type:</span> {{ payment.get_payment_type_display }}
+      </div>
+      {% if payment.refund_amount > 0 %}
+      <div class="refund-chip" style="display:block;margin-bottom:0.75rem;">Refunded: ${{ payment.refund_amount }}</div>
+      {% endif %}
+      <div style="padding-top:0.75rem;border-top:1px solid rgba(55,65,81,0.5);">
+        <a href="{% url 'payments:detail' payment.id %}" class="m-card-action">
+          <span>View Details</span>
+        </a>
+      </div>
     </div>
-
-    <!-- Payment Count -->
-    <div class="mb-4 fade-in">
-        <p class="text-gray-400 text-sm">
-            Showing <span id="payment-count" class="text-white font-medium">{{ payments|length }}</span> payment(s)
-        </p>
+    {% empty %}
+    <div class="empty-state">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:4rem;color:#374151;margin-bottom:1rem;" aria-hidden="true">receipt_long</span>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#6B7280;font-size:1.1rem;margin-bottom:0.4rem;">No payments found</p>
+      <p style="font-family:'Inter',sans-serif;color:#4B5563;font-size:0.85rem;">Your payment history will appear here</p>
     </div>
+    {% endfor %}
+  </div>
 
-    <!-- Desktop Table View -->
-    <div class="desktop-table bg-card-dark border border-card-border-dark rounded-xl overflow-hidden fade-in">
-        <div class="overflow-x-auto">
-            <table class="w-full" aria-label="Payment history table">
-                <caption class="sr-only">List of all payment transactions</caption>
-                <thead class="bg-background-dark border-b border-card-border-dark">
-                    <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Date
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Description
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Type
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Amount
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Status
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="payments-table-body" class="divide-y divide-card-border-dark">
-                    {% for payment in payments %}
-                    <tr class="payment-row hover:bg-background-dark/50 transition-colors"
-                        data-status="{{ payment.status }}"
-                        data-type="{{ payment.payment_type }}"
-                        data-date="{{ payment.created_at|date:'Y-m-d' }}">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-white text-sm">{{ payment.created_at|date:"M d, Y" }}</div>
-                            <div class="text-gray-400 text-xs">{{ payment.created_at|date:"g:i A" }}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-white text-sm font-medium max-w-xs truncate">
-                                {{ payment.description|default:"No description" }}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-gray-300 text-sm">
-                                {{ payment.get_payment_type_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-white font-semibold text-sm">
-                                ${{ payment.amount }}
-                            </div>
-                            {% if payment.refund_amount > 0 %}
-                            <div class="text-purple-400 text-xs">
-                                -${{ payment.refund_amount }} refunded
-                            </div>
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="status-{{ payment.status }} px-3 py-1 rounded-full text-xs font-medium" aria-label="Payment status: {{ payment.get_status_display }}">
-                                {{ payment.get_status_display }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'payments:detail' payment.id %}" 
-                               aria-label="View details for payment of ${{ payment.amount }} on {{ payment.created_at|date:'M d, Y' }}"
-                               class="text-primary hover:text-primary-dark font-medium text-sm transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
-                                View Details
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center justify-center" role="status" aria-label="No payments found">
-                                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">receipt_long</span>
-                                <p class="text-gray-400 text-lg mb-2">No payments found</p>
-                                <p class="text-gray-500 text-sm">Your payment history will appear here</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  <!-- Empty (filtered) state -->
+  <div id="no-results" class="hidden empty-state fade-in" role="status" aria-live="polite">
+    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:4rem;color:#374151;margin-bottom:1rem;" aria-hidden="true">search_off</span>
+    <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#6B7280;font-size:1.1rem;margin-bottom:0.4rem;">No payments match your filters</p>
+    <p style="font-family:'Inter',sans-serif;color:#4B5563;font-size:0.85rem;margin-bottom:1.25rem;">Try adjusting your filter criteria</p>
+    <button id="clear-filters-empty" aria-label="Clear all filters to show all payments" class="clear-btn" style="margin:0 auto;">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;" aria-hidden="true">filter_alt_off</span>
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- ARIA live region -->
+  <div id="pagination-status" aria-live="polite" aria-atomic="true" class="sr-only">
+    {% if page_obj %}Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} loaded{% endif %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.paginator.count > 25 %}
+  <div id="payment-list-top"></div>
+  <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 fade-in" role="navigation" aria-label="Payment history pagination">
+    <div style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.85rem;" aria-live="polite" aria-atomic="true">
+      Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} payment(s)
     </div>
+    <div class="flex items-center gap-2">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}"
+         class="pg-btn" aria-label="Previous page">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">chevron_left</span>
+        <span class="hidden sm:inline" style="margin-left:0.25rem;">Prev</span>
+      </a>
+      {% else %}
+      <span class="pg-btn disabled" aria-disabled="true">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">chevron_left</span>
+        <span class="hidden sm:inline" style="margin-left:0.25rem;">Prev</span>
+      </span>
+      {% endif %}
 
-    <!-- Mobile Card View -->
-    <div class="mobile-cards space-y-4 fade-in">
-        {% for payment in payments %}
-        <div class="payment-card bg-card-dark border border-card-border-dark rounded-xl p-4"
-             data-status="{{ payment.status }}"
-             data-type="{{ payment.payment_type }}"
-             data-date="{{ payment.created_at|date:'Y-m-d' }}">
-            <!-- Header -->
-            <div class="flex items-start justify-between mb-3">
-                <div class="flex-1">
-                    <div class="text-white font-semibold text-lg mb-1">
-                        ${{ payment.amount }}
-                    </div>
-                    <div class="text-gray-400 text-sm">
-                        {{ payment.created_at|date:"M d, Y" }} at {{ payment.created_at|date:"g:i A" }}
-                    </div>
-                </div>
-                <span class="status-{{ payment.status }} px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap">
-                    {{ payment.get_status_display }}
-                </span>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-3">
-                <p class="text-white text-sm">
-                    {{ payment.description|default:"No description" }}
-                </p>
-            </div>
-
-            <!-- Type -->
-            <div class="mb-3">
-                <span class="text-gray-400 text-xs">Type:</span>
-                <span class="text-gray-300 text-sm ml-1">
-                    {{ payment.get_payment_type_display }}
-                </span>
-            </div>
-
-            <!-- Refund Info -->
-            {% if payment.refund_amount > 0 %}
-            <div class="mb-3 p-2 bg-purple-900/20 border border-purple-800 rounded-lg">
-                <span class="text-purple-400 text-xs">
-                    Refunded: ${{ payment.refund_amount }}
-                </span>
-            </div>
+      <div class="flex gap-1">
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <span class="pg-btn active" aria-current="page" aria-label="Page {{ num }}">{{ num }}</span>
+          {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}"
+             class="pg-btn" aria-label="Page {{ num }}">{{ num }}</a>
+          {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            {% if num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %}
+            <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}"
+               class="pg-btn" aria-label="Page {{ num }}">{{ num }}</a>
+            {% else %}
+            <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}"
+               class="pg-btn hidden md:inline-flex" aria-label="Page {{ num }}">{{ num }}</a>
             {% endif %}
-
-            <!-- Action Button -->
-            <div class="pt-3 border-t border-card-border-dark">
-                <a href="{% url 'payments:detail' payment.id %}" 
-                   class="block w-full text-center py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors text-sm">
-                    View Details
-                </a>
-            </div>
-        </div>
-        {% empty %}
-        <div class="bg-card-dark border border-card-border-dark rounded-xl p-12 text-center">
-            <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">receipt_long</span>
-            <p class="text-gray-400 text-lg mb-2">No payments found</p>
-            <p class="text-gray-500 text-sm">Your payment history will appear here</p>
-        </div>
+          {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+          <span class="pg-ellipsis hidden md:inline" aria-hidden="true">…</span>
+          {% endif %}
         {% endfor %}
-    </div>
+      </div>
 
-    <!-- Empty State (when filtered) -->
-    <div id="no-results" class="hidden bg-card-dark border border-card-border-dark rounded-xl p-12 text-center fade-in" role="status" aria-live="polite">
-        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">search_off</span>
-        <p class="text-gray-400 text-lg mb-2">No payments match your filters</p>
-        <p class="text-gray-500 text-sm mb-4">Try adjusting your filter criteria</p>
-        <button id="clear-filters-empty" 
-                aria-label="Clear all filters to show all payments"
-                class="px-6 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
-            Clear Filters
-        </button>
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}"
+         class="pg-btn" aria-label="Next page">
+        <span class="hidden sm:inline" style="margin-right:0.25rem;">Next</span>
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">chevron_right</span>
+      </a>
+      {% else %}
+      <span class="pg-btn disabled" aria-disabled="true">
+        <span class="hidden sm:inline" style="margin-right:0.25rem;">Next</span>
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">chevron_right</span>
+      </span>
+      {% endif %}
     </div>
+  </div>
+  {% endif %}
 
-    <!-- ARIA Live Region for Page Change Announcements -->
-    <div id="pagination-status" 
-         aria-live="polite" 
-         aria-atomic="true" 
-         class="sr-only">
-        {% if page_obj %}
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} loaded
-        {% endif %}
-    </div>
-
-    <!-- Pagination -->
-    {% if page_obj.paginator.count > 25 %}
-    <div id="payment-list-top"></div>
-    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 fade-in" role="navigation" aria-label="Payment history pagination">
-        <!-- Page Info -->
-        <div class="text-gray-400 text-sm" aria-live="polite" aria-atomic="true">
-            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} payment(s)
-        </div>
-        
-        <!-- Page Numbers -->
-        <div class="flex items-center gap-2">
-            <!-- Previous Button -->
-            {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
-               aria-label="Go to previous page"
-               class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_left</span>
-                <span class="hidden sm:inline ml-1">Previous</span>
-            </a>
-            {% else %}
-            <button disabled 
-                    aria-label="Previous page (disabled)"
-                    aria-disabled="true"
-                    class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-gray-600 rounded-lg cursor-not-allowed opacity-50">
-                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_left</span>
-                <span class="hidden sm:inline ml-1">Previous</span>
-            </button>
-            {% endif %}
-            
-            <!-- Page Numbers -->
-            <div class="flex gap-1">
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                    <span class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-primary text-white rounded-lg font-medium" aria-current="page" aria-label="Current page, page {{ num }}">
-                        {{ num }}
-                    </span>
-                    {% elif num == 1 or num == page_obj.paginator.num_pages %}
-                    {# Always show first and last pages #}
-                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
-                       aria-label="Go to page {{ num }}"
-                       class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                        {{ num }}
-                    </a>
-                    {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                    {# Desktop: Show pages within 2 positions of current page #}
-                    {# Mobile: Show pages within 1 position of current page #}
-                    {% if num >= page_obj.number|add:'-1' and num <= page_obj.number|add:'1' %}
-                    {# Always show for mobile (current ± 1) #}
-                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
-                       aria-label="Go to page {{ num }}"
-                       class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                        {{ num }}
-                    </a>
-                    {% else %}
-                    {# Show only on desktop (current ± 2) #}
-                    <a href="?page={{ num }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
-                       aria-label="Go to page {{ num }}"
-                       class="pagination-btn pagination-page-extended hidden md:inline-flex min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                        {{ num }}
-                    </a>
-                    {% endif %}
-                    {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
-                    {# Show ellipsis for gaps #}
-                    <span class="hidden md:inline px-4 py-2 text-gray-400" aria-hidden="true">...</span>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            
-            <!-- Next Button -->
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if status_filter and status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if type_filter and type_filter != 'all' %}&type={{ type_filter }}{% endif %}" 
-               aria-label="Go to next page"
-               class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-white rounded-lg hover:bg-background-dark transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-                <span class="hidden sm:inline mr-1">Next</span>
-                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_right</span>
-            </a>
-            {% else %}
-            <button disabled 
-                    aria-label="Next page (disabled)"
-                    aria-disabled="true"
-                    class="pagination-btn min-h-[44px] min-w-[44px] px-4 py-2 bg-card-dark border border-card-border-dark text-gray-600 rounded-lg cursor-not-allowed opacity-50">
-                <span class="hidden sm:inline mr-1">Next</span>
-                <span class="material-symbols-outlined align-middle text-sm" aria-hidden="true">chevron_right</span>
-            </button>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
 

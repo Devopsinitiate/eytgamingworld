@@ -4,309 +4,382 @@
 {% block title %}Payment Details - EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/payments.css' %}">
+<style>
+  .g-card {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.2);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  .g-card:hover { border-color: rgba(220,38,38,0.45); box-shadow: 0 0 20px rgba(220,38,38,0.1); }
+
+  .g-heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: -0.01em; color: #fff;
+    font-size: 1.25rem; margin-bottom: 1.25rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(220,38,38,0.2);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(55,65,81,0.5);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { font-family: 'Inter', sans-serif; color: #6B7280; font-size: 0.85rem; flex-shrink: 0; }
+  .detail-value { font-family: 'Inter', sans-serif; color: #D1D5DB; font-size: 0.9rem; text-align: right; margin-left: 1rem; word-break: break-all; }
+  .detail-value.mono { font-family: 'Courier New', monospace; font-size: 0.8rem; color: #9CA3AF; }
+
+  .s-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 2px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; font-size: 0.85rem;
+    transform: skewX(-6deg);
+  }
+  .s-badge span { display: inline-block; transform: skewX(6deg); }
+  .s-succeeded { background: rgba(16,185,129,0.15); color: #10B981; border: 1px solid rgba(16,185,129,0.35); }
+  .s-pending   { background: rgba(245,158,11,0.15); color: #F59E0B; border: 1px solid rgba(245,158,11,0.35); }
+  .s-processing{ background: rgba(6,182,212,0.15);  color: #06B6D4; border: 1px solid rgba(6,182,212,0.35); }
+  .s-failed    { background: rgba(220,38,38,0.15);  color: #F87171; border: 1px solid rgba(220,38,38,0.35); }
+  .s-refunded  { background: rgba(139,92,246,0.15); color: #A78BFA; border: 1px solid rgba(139,92,246,0.35); }
+  .s-cancelled { background: rgba(107,114,128,0.15);color: #9CA3AF; border: 1px solid rgba(107,114,128,0.35); }
+
+  .action-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    border-radius: 3px; border: none; cursor: pointer;
+    transition: all 0.3s ease; font-size: 0.95rem;
+  }
+  .action-btn-primary {
+    background: linear-gradient(135deg, #DC2626, #991B1B);
+    color: #fff; box-shadow: 0 0 15px rgba(220,38,38,0.3);
+  }
+  .action-btn-primary:hover { box-shadow: 0 0 28px rgba(220,38,38,0.6); transform: translateY(-1px); }
+  .action-btn-secondary {
+    background: #1F2937; color: #D1D5DB;
+    border: 1px solid rgba(220,38,38,0.25);
+  }
+  .action-btn-secondary:hover { background: #374151; border-color: rgba(220,38,38,0.5); }
+  .action-btn-disabled {
+    background: rgba(31,41,55,0.5); color: #4B5563;
+    border: 1px solid rgba(55,65,81,0.4); cursor: not-allowed;
+  }
+  .action-btn-refunded {
+    background: rgba(139,92,246,0.12); color: #A78BFA;
+    border: 1px solid rgba(139,92,246,0.35); cursor: default;
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    color: #9CA3AF; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+  .back-link:hover { color: #DC2626; }
+
+  .refund-card {
+    background: rgba(139,92,246,0.07);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-top: 3px solid #7C3AED;
+    border-radius: 4px; padding: 1.5rem;
+  }
+  .refund-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0.65rem 0; border-bottom: 1px solid rgba(139,92,246,0.2);
+  }
+  .refund-row:last-child { border-bottom: none; }
+
+  .security-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.4rem 0;
+    font-family: 'Inter', sans-serif; color: #9CA3AF; font-size: 0.85rem;
+  }
+
+  /* Modal */
+  .modal {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
+    background: #111827;
+    border: 1px solid rgba(220,38,38,0.3);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 2rem; width: 100%; max-width: 32rem;
+    box-shadow: 0 0 40px rgba(220,38,38,0.2);
+  }
+  .modal-input {
+    width: 100%; padding: 0.75rem 1rem;
+    background: #0A0A0A; border: 1px solid #374151;
+    border-radius: 3px; color: #fff;
+    font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    resize: none; transition: all 0.3s ease;
+  }
+  .modal-input:focus { outline: none; border-color: #DC2626; box-shadow: 0 0 12px rgba(220,38,38,0.25); }
+  .modal-input::placeholder { color: #4B5563; }
+  .warning-box {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 3px; padding: 0.9rem 1rem;
+    display: flex; gap: 0.75rem; align-items: flex-start;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-    <!-- Back Button -->
-    <div class="mb-6 fade-in">
-        <a href="{% url 'payments:history' %}" 
-           aria-label="Back to payment history"
-           class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
-            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-            <span>Back to Payment History</span>
-        </a>
+
+  <!-- Back -->
+  <div class="mb-6 fade-in">
+    <a href="{% url 'payments:history' %}" class="back-link" aria-label="Back to payment history">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;" aria-hidden="true">arrow_back</span>
+      Back to Payment History
+    </a>
+  </div>
+
+  <!-- Header -->
+  <div class="mb-8 fade-in">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+      <div style="border-left:4px solid #DC2626;padding-left:1rem;">
+        <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;font-size:2rem;line-height:1;">Payment Details</h1>
+        <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.85rem;margin-top:0.3rem;">Transaction ID: <span style="font-family:'Courier New',monospace;color:#9CA3AF;">{{ payment.id }}</span></p>
+      </div>
+      <span class="s-badge s-{{ payment.status }}" aria-label="Payment status: {{ payment.get_status_display }}">
+        <span>{{ payment.get_status_display }}</span>
+      </span>
     </div>
+  </div>
 
-    <!-- Page Header -->
-    <div class="mb-8 fade-in">
-        <div class="flex items-start justify-between flex-wrap gap-4">
-            <div>
-                <h1 class="text-white text-3xl font-bold mb-2">Payment Details</h1>
-                <p class="text-gray-400">Transaction ID: {{ payment.id }}</p>
-            </div>
-            <span class="status-{{ payment.status }} px-4 py-2 rounded-full text-sm font-medium" aria-label="Payment status: {{ payment.get_status_display }}">
-                {{ payment.get_status_display }}
-            </span>
-        </div>
-    </div>
+  <div class="grid gap-6 lg:grid-cols-3">
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        <!-- Main Payment Information -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Payment Information Card -->
-            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
-                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">receipt</span>
-                    Payment Information
-                </h2>
+    <!-- Main -->
+    <div class="lg:col-span-2 space-y-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Amount -->
-                    <div>
-                        <p class="text-gray-400 text-sm mb-1">Amount</p>
-                        <p class="text-white text-2xl font-bold">${{ payment.amount }}</p>
-                        {% if payment.refund_amount > 0 %}
-                        <p class="text-purple-400 text-sm mt-1">
-                            Refunded: ${{ payment.refund_amount }}
-                        </p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Currency -->
-                    <div>
-                        <p class="text-gray-400 text-sm mb-1">Currency</p>
-                        <p class="text-white font-medium">{{ payment.currency|upper }}</p>
-                    </div>
-
-                    <!-- Date -->
-                    <div>
-                        <p class="text-gray-400 text-sm mb-1">Date & Time</p>
-                        <p class="text-white font-medium">{{ payment.created_at|date:"F d, Y" }}</p>
-                        <p class="text-gray-400 text-sm">{{ payment.created_at|date:"g:i A" }}</p>
-                    </div>
-
-                    <!-- Payment Type -->
-                    <div>
-                        <p class="text-gray-400 text-sm mb-1">Payment Type</p>
-                        <p class="text-white font-medium">{{ payment.get_payment_type_display }}</p>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="md:col-span-2">
-                        <p class="text-gray-400 text-sm mb-1">Description</p>
-                        <p class="text-white font-medium">{{ payment.description|default:"No description provided" }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Transaction Details Card -->
-            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
-                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">info</span>
-                    Transaction Details
-                </h2>
-
-                <div class="space-y-4">
-                    <!-- Payment ID -->
-                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
-                        <span class="text-gray-400 text-sm">Payment ID</span>
-                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.id }}</span>
-                    </div>
-
-                    <!-- Stripe Payment Intent ID -->
-                    {% if payment.stripe_payment_intent_id %}
-                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
-                        <span class="text-gray-400 text-sm">Stripe Payment Intent</span>
-                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.stripe_payment_intent_id }}</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Stripe Charge ID -->
-                    {% if payment.stripe_charge_id %}
-                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
-                        <span class="text-gray-400 text-sm">Stripe Charge ID</span>
-                        <span class="text-white font-mono text-sm break-all ml-4 text-right">{{ payment.stripe_charge_id }}</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Completed At -->
-                    {% if payment.completed_at %}
-                    <div class="flex items-start justify-between py-3 border-b border-card-border-dark">
-                        <span class="text-gray-400 text-sm">Completed At</span>
-                        <span class="text-white text-sm">{{ payment.completed_at|date:"F d, Y g:i A" }}</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Updated At -->
-                    <div class="flex items-start justify-between py-3">
-                        <span class="text-gray-400 text-sm">Last Updated</span>
-                        <span class="text-white text-sm">{{ payment.updated_at|date:"F d, Y g:i A" }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Refund Section (if refunded) -->
-            {% if payment.status == 'refunded' %}
-            <div class="bg-purple-900/20 border border-purple-800 rounded-xl p-6 fade-in">
-                <h2 class="text-white text-xl font-semibold mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">undo</span>
-                    Refund Information
-                </h2>
-
-                <div class="space-y-4">
-                    <!-- Refund Amount -->
-                    <div class="flex items-start justify-between py-3 border-b border-purple-800/50">
-                        <span class="text-purple-200 text-sm">Refund Amount</span>
-                        <span class="text-white font-bold text-lg">${{ payment.refund_amount }}</span>
-                    </div>
-
-                    <!-- Refund Date -->
-                    {% if payment.refunded_at %}
-                    <div class="flex items-start justify-between py-3 border-b border-purple-800/50">
-                        <span class="text-purple-200 text-sm">Refunded At</span>
-                        <span class="text-white text-sm">{{ payment.refunded_at|date:"F d, Y g:i A" }}</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Refund Reason -->
-                    {% if payment.refund_reason %}
-                    <div class="py-3">
-                        <p class="text-purple-200 text-sm mb-2">Reason</p>
-                        <p class="text-white text-sm">{{ payment.refund_reason }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+      <!-- Payment Info -->
+      <div class="g-card fade-in">
+        <h2 class="g-heading">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">receipt</span>
+          Payment Information
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Amount</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:2.5rem;line-height:1;">${{ payment.amount }}</p>
+            {% if payment.refund_amount > 0 %}
+            <p style="font-family:'Inter',sans-serif;color:#A78BFA;font-size:0.8rem;margin-top:0.3rem;">Refunded: ${{ payment.refund_amount }}</p>
             {% endif %}
+          </div>
+          <div>
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Currency</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:1.1rem;">{{ payment.currency|upper }}</p>
+          </div>
+          <div>
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Date &amp; Time</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:1rem;">{{ payment.created_at|date:"F d, Y" }}</p>
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;">{{ payment.created_at|date:"g:i A" }}</p>
+          </div>
+          <div>
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Payment Type</p>
+            <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;font-size:1rem;">{{ payment.get_payment_type_display }}</p>
+          </div>
+          <div class="md:col-span-2">
+            <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.3rem;">Description</p>
+            <p style="font-family:'Inter',sans-serif;color:#D1D5DB;font-size:0.9rem;">{{ payment.description|default:"No description provided" }}</p>
+          </div>
         </div>
+      </div>
 
-        <!-- Sidebar -->
-        <div class="lg:col-span-1 space-y-6">
-            <!-- Actions Card -->
-            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in sticky top-6">
-                <h2 class="text-white text-lg font-semibold mb-4">Actions</h2>
-
-                <div class="space-y-3">
-                    <!-- Request Refund Button -->
-                    {% if payment.is_refundable %}
-                    <button id="request-refund-btn"
-                            data-payment-id="{{ payment.id }}"
-                            aria-label="Request refund for this payment"
-                            class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
-                        <span class="material-symbols-outlined" aria-hidden="true">undo</span>
-                        <span>Request Refund</span>
-                    </button>
-                    {% elif payment.status == 'refunded' %}
-                    <div class="w-full flex items-center justify-center gap-2 bg-purple-900/20 border border-purple-800 text-purple-200 font-semibold py-3 px-4 rounded-lg">
-                        <span class="material-symbols-outlined">check_circle</span>
-                        <span>Refunded</span>
-                    </div>
-                    {% else %}
-                    <div class="w-full flex items-center justify-center gap-2 bg-gray-700/50 text-gray-400 font-semibold py-3 px-4 rounded-lg cursor-not-allowed">
-                        <span class="material-symbols-outlined">block</span>
-                        <span>Not Refundable</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- View History Button -->
-                    <a href="{% url 'payments:history' %}"
-                       class="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                        <span class="material-symbols-outlined">history</span>
-                        <span>View All Payments</span>
-                    </a>
-                </div>
-
-                <!-- Related Object Link -->
-                {% if payment.related_model and payment.related_object_id %}
-                <div class="mt-6 pt-6 border-t border-card-border-dark">
-                    <p class="text-gray-400 text-sm mb-2">Related To</p>
-                    <a href="#" class="text-primary hover:text-primary-dark font-medium text-sm transition-colors flex items-center gap-1">
-                        <span>{{ payment.related_model }}</span>
-                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Security Info Card -->
-            <div class="bg-card-dark border border-card-border-dark rounded-xl p-6 fade-in">
-                <h2 class="text-white text-lg font-semibold mb-4">Security</h2>
-
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2 text-gray-400 text-sm">
-                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">verified_user</span>
-                        <span>PCI DSS Compliant</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-gray-400 text-sm">
-                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">https</span>
-                        <span>256-bit SSL Encryption</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-gray-400 text-sm">
-                        <span class="material-symbols-outlined text-green-500" style="font-size: 18px;">lock</span>
-                        <span>Secure Payment Processing</span>
-                    </div>
-                </div>
-            </div>
+      <!-- Transaction Details -->
+      <div class="g-card fade-in">
+        <h2 class="g-heading">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">info</span>
+          Transaction Details
+        </h2>
+        <div>
+          <div class="detail-row">
+            <span class="detail-label">Payment ID</span>
+            <span class="detail-value mono">{{ payment.id }}</span>
+          </div>
+          {% if payment.stripe_payment_intent_id %}
+          <div class="detail-row">
+            <span class="detail-label">Stripe Payment Intent</span>
+            <span class="detail-value mono">{{ payment.stripe_payment_intent_id }}</span>
+          </div>
+          {% endif %}
+          {% if payment.stripe_charge_id %}
+          <div class="detail-row">
+            <span class="detail-label">Stripe Charge ID</span>
+            <span class="detail-value mono">{{ payment.stripe_charge_id }}</span>
+          </div>
+          {% endif %}
+          {% if payment.completed_at %}
+          <div class="detail-row">
+            <span class="detail-label">Completed At</span>
+            <span class="detail-value">{{ payment.completed_at|date:"F d, Y g:i A" }}</span>
+          </div>
+          {% endif %}
+          <div class="detail-row">
+            <span class="detail-label">Last Updated</span>
+            <span class="detail-value">{{ payment.updated_at|date:"F d, Y g:i A" }}</span>
+          </div>
         </div>
+      </div>
+
+      <!-- Refund Info -->
+      {% if payment.status == 'refunded' %}
+      <div class="refund-card fade-in">
+        <h2 class="g-heading" style="border-bottom-color:rgba(139,92,246,0.25);">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#A78BFA;" aria-hidden="true">undo</span>
+          Refund Information
+        </h2>
+        <div class="refund-row">
+          <span style="font-family:'Inter',sans-serif;color:#C4B5FD;font-size:0.85rem;">Refund Amount</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:1.4rem;">${{ payment.refund_amount }}</span>
+        </div>
+        {% if payment.refunded_at %}
+        <div class="refund-row">
+          <span style="font-family:'Inter',sans-serif;color:#C4B5FD;font-size:0.85rem;">Refunded At</span>
+          <span style="font-family:'Inter',sans-serif;color:#D1D5DB;font-size:0.85rem;">{{ payment.refunded_at|date:"F d, Y g:i A" }}</span>
+        </div>
+        {% endif %}
+        {% if payment.refund_reason %}
+        <div style="padding-top:0.65rem;">
+          <p style="font-family:'Inter',sans-serif;color:#C4B5FD;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.4rem;">Reason</p>
+          <p style="font-family:'Inter',sans-serif;color:#D1D5DB;font-size:0.9rem;">{{ payment.refund_reason }}</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+
+      <!-- Actions -->
+      <div class="g-card fade-in" style="position:sticky;top:1.5rem;">
+        <h2 class="g-heading">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">bolt</span>
+          Actions
+        </h2>
+        <div class="space-y-3">
+          {% if payment.is_refundable %}
+          <button id="request-refund-btn" data-payment-id="{{ payment.id }}"
+                  class="action-btn action-btn-primary" aria-label="Request refund for this payment">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">undo</span>
+            Request Refund
+          </button>
+          {% elif payment.status == 'refunded' %}
+          <div class="action-btn action-btn-refunded">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">check_circle</span>
+            Refunded
+          </div>
+          {% else %}
+          <div class="action-btn action-btn-disabled" aria-disabled="true">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">block</span>
+            Not Refundable
+          </div>
+          {% endif %}
+          <a href="{% url 'payments:history' %}" class="action-btn action-btn-secondary" style="text-decoration:none;">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;" aria-hidden="true">history</span>
+            View All Payments
+          </a>
+        </div>
+        {% if payment.related_model and payment.related_object_id %}
+        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid rgba(55,65,81,0.5);">
+          <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.8rem;margin-bottom:0.4rem;">Related To</p>
+          <a href="#" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#DC2626;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.3rem;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#DC2626'">
+            {{ payment.related_model }}
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:0.9rem;" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Security -->
+      <div class="g-card fade-in">
+        <h2 class="g-heading">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">shield</span>
+          Security
+        </h2>
+        <div class="space-y-1">
+          <div class="security-item">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#10B981;" aria-hidden="true">verified_user</span>
+            PCI DSS Compliant
+          </div>
+          <div class="security-item">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#10B981;" aria-hidden="true">https</span>
+            256-bit SSL Encryption
+          </div>
+          <div class="security-item">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#10B981;" aria-hidden="true">lock</span>
+            Secure Payment Processing
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Refund Modal -->
 <div id="refund-modal" class="modal" role="dialog" aria-labelledby="refund-modal-title" aria-describedby="refund-modal-description" aria-modal="true">
-    <div class="modal-content">
-        <div class="flex items-start justify-between mb-6">
-            <div>
-                <h3 id="refund-modal-title" class="text-white text-xl font-bold mb-1">Request Refund</h3>
-                <p id="refund-modal-description" class="text-gray-400 text-sm">Please provide a reason for the refund request</p>
-            </div>
-            <button id="close-modal" aria-label="Close refund dialog" class="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-3 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card-dark">
-                <span class="material-symbols-outlined" aria-hidden="true">close</span>
-            </button>
-        </div>
-
-        <form id="refund-form" method="POST" action="{% url 'payments:request_refund' payment.id %}">
-            {% csrf_token %}
-            
-            <!-- Refund Amount Display -->
-            <div class="mb-6 p-4 bg-background-dark rounded-lg">
-                <p class="text-gray-400 text-sm mb-1">Refund Amount</p>
-                <p class="text-white text-2xl font-bold">${{ payment.amount }}</p>
-            </div>
-
-            <!-- Reason Input -->
-            <div class="mb-6">
-                <label for="refund-reason" class="block text-white font-medium mb-2">
-                    Reason for Refund <span class="text-red-400">*</span>
-                </label>
-                <textarea 
-                    id="refund-reason" 
-                    name="reason"
-                    rows="4"
-                    required
-                    placeholder="Please explain why you're requesting a refund..."
-                    class="w-full bg-input-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"></textarea>
-                <p class="text-gray-400 text-xs mt-2">Minimum 10 characters required</p>
-            </div>
-
-            <!-- Warning Message -->
-            <div class="mb-6 p-4 bg-yellow-900/20 border border-yellow-800 rounded-lg">
-                <div class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-yellow-500 flex-shrink-0">warning</span>
-                    <div>
-                        <p class="text-yellow-200 text-sm font-medium mb-1">Important</p>
-                        <p class="text-yellow-200/80 text-xs">
-                            Refunds typically take 5-10 business days to appear in your account. 
-                            This action cannot be undone.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-3">
-                <button 
-                    type="submit" 
-                    id="confirm-refund-btn"
-                    class="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    <!-- Loading Spinner -->
-                    <svg id="refund-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span id="refund-btn-text">Confirm Refund</span>
-                </button>
-                
-                <button 
-                    type="button" 
-                    id="cancel-refund-btn"
-                    class="flex-1 sm:flex-none bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                    Cancel
-                </button>
-            </div>
-        </form>
+  <div class="modal-content">
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <h3 id="refund-modal-title" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;color:#fff;font-size:1.5rem;line-height:1;">Request Refund</h3>
+        <p id="refund-modal-description" style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.85rem;margin-top:0.3rem;">Please provide a reason for the refund request</p>
+      </div>
+      <button id="close-modal" aria-label="Close refund dialog"
+              style="background:none;border:none;cursor:pointer;color:#6B7280;transition:color 0.2s;"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#6B7280'">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.5rem;" aria-hidden="true">close</span>
+      </button>
     </div>
+
+    <form id="refund-form" method="POST" action="{% url 'payments:request_refund' payment.id %}">
+      {% csrf_token %}
+      <div style="background:#0A0A0A;border:1px solid rgba(220,38,38,0.2);border-radius:3px;padding:1rem;margin-bottom:1.25rem;">
+        <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.25rem;">Refund Amount</p>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:2rem;line-height:1;">${{ payment.amount }}</p>
+      </div>
+      <div style="margin-bottom:1.25rem;">
+        <label for="refund-reason" style="display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#D1D5DB;font-size:0.85rem;margin-bottom:0.4rem;">
+          Reason for Refund <span style="color:#DC2626;">*</span>
+        </label>
+        <textarea id="refund-reason" name="reason" rows="4" required
+                  class="modal-input"
+                  placeholder="Please explain why you're requesting a refund..."></textarea>
+        <p style="font-family:'Inter',sans-serif;color:#4B5563;font-size:0.75rem;margin-top:0.3rem;">Minimum 10 characters required</p>
+      </div>
+      <div class="warning-box" style="margin-bottom:1.25rem;">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.3rem;color:#F59E0B;flex-shrink:0;" aria-hidden="true">warning</span>
+        <div>
+          <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#FCD34D;font-size:0.85rem;margin-bottom:0.2rem;">Important</p>
+          <p style="font-family:'Inter',sans-serif;color:#D97706;font-size:0.8rem;">Refunds typically take 5–10 business days to appear in your account. This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="submit" id="confirm-refund-btn" class="action-btn action-btn-primary" style="flex:1;">
+          <svg id="refund-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span id="refund-btn-text">Confirm Refund</span>
+        </button>
+        <button type="button" id="cancel-refund-btn" class="action-btn action-btn-secondary" style="flex:1 0 auto;">Cancel</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 

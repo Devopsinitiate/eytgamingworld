@@ -1,0 +1,134 @@
+{% load account %}
+{% load i18n %}
+{% user_display user as user_display %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to EYTGaming</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Arial', 'Helvetica', sans-serif; background-color: #0A0A0A; color: #ffffff;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #0A0A0A;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #1F1F1F; border: 2px solid #DC2626; border-radius: 12px; overflow: hidden;">
+                    
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #DC2626 0%, #991b1b 100%); padding: 30px 40px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold; letter-spacing: 1px;">
+                                🎮 EYTGaming
+                            </h1>
+                            <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 14px; opacity: 0.9;">
+                                Elevate Your Tournament Experience
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="margin: 0 0 20px 0; color: #DC2626; font-size: 24px; font-weight: bold;">
+                                Welcome, {{ user_display }}!
+                            </h2>
+                            
+                            <p style="margin: 0 0 20px 0; color: #E5E7EB; font-size: 16px; line-height: 1.6;">
+                                Thank you for joining the ultimate esports tournament platform. We're excited to have you as part of our gaming community!
+                            </p>
+                            
+                            <p style="margin: 0 0 30px 0; color: #E5E7EB; font-size: 16px; line-height: 1.6;">
+                                To get started and unlock all features, please confirm your email address by clicking the button below:
+                            </p>
+                            
+                            <!-- CTA Button -->
+                            <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td align="center" style="padding: 0 0 30px 0;">
+                                        <a href="{{ activate_url }}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #DC2626 0%, #991b1b 100%); color: #ffffff; text-decoration: none; font-size: 18px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);">
+                                            Confirm Email Address
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Features List -->
+                            <div style="background-color: #0A0A0A; border: 1px solid #374151; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
+                                <p style="margin: 0 0 15px 0; color: #06B6D4; font-size: 16px; font-weight: bold;">
+                                    Once confirmed, you'll be able to:
+                                </p>
+                                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Join and create tournaments
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Form and manage teams
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Book gaming venues
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Connect with coaches
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Shop for gaming gear
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; color: #E5E7EB; font-size: 15px;">
+                                            ✓ Track your competitive stats
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- Alternative Link -->
+                            <p style="margin: 0 0 10px 0; color: #9CA3AF; font-size: 14px; line-height: 1.6;">
+                                If the button doesn't work, copy and paste this link into your browser:
+                            </p>
+                            <p style="margin: 0 0 30px 0; word-break: break-all;">
+                                <a href="{{ activate_url }}" style="color: #06B6D4; text-decoration: underline; font-size: 13px;">{{ activate_url }}</a>
+                            </p>
+                            
+                            <!-- Security Notice -->
+                            <div style="border-top: 1px solid #374151; padding-top: 20px;">
+                                <p style="margin: 0 0 15px 0; color: #9CA3AF; font-size: 14px; line-height: 1.6;">
+                                    If you didn't create an account on EYTGaming, please ignore this email.
+                                </p>
+                                <p style="margin: 0; color: #9CA3AF; font-size: 14px; line-height: 1.6;">
+                                    Need help? Contact us at <a href="mailto:support@eytgaming.com" style="color: #DC2626; text-decoration: none;">support@eytgaming.com</a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #0A0A0A; padding: 30px 40px; text-align: center; border-top: 2px solid #374151;">
+                            <p style="margin: 0 0 10px 0; color: #DC2626; font-size: 16px; font-weight: bold;">
+                                Where Champions Are Made
+                            </p>
+                            <p style="margin: 0 0 15px 0; color: #9CA3AF; font-size: 14px;">
+                                The EYTGaming Team
+                            </p>
+                            <p style="margin: 0; color: #6B7280; font-size: 12px;">
+                                {{ current_site.domain }}
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

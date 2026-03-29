@@ -142,7 +142,7 @@ class Tournament(models.Model):
         now = timezone.now()
         return (self.status == 'registration' and 
                 self.registration_start <= now <= self.registration_end and
-                self.total_registered < self.max_participants)
+                not self.is_full)
     
     @property
     def is_full(self):
@@ -154,12 +154,16 @@ class Tournament(models.Model):
             # For team tournaments, count unique teams
             team_count = self.participants.filter(
                 team__isnull=False,
-                status__in=['confirmed', 'pending_payment']
+                status__in=['confirmed', 'pending_payment', 'pending']
             ).count()
             return team_count >= self.max_participants
         else:
-            # For individual tournaments, count users
-            return self.total_registered >= self.max_participants
+            # For individual tournaments, count users with active registrations
+            user_count = self.participants.filter(
+                user__isnull=False,
+                status__in=['confirmed', 'pending_payment', 'pending']
+            ).count()
+            return user_count >= self.max_participants
     
     @property
     def is_check_in_open(self):
@@ -176,12 +180,16 @@ class Tournament(models.Model):
             # For team tournaments, count unique teams
             team_count = self.participants.filter(
                 team__isnull=False,
-                status__in=['confirmed', 'pending_payment']
+                status__in=['confirmed', 'pending_payment', 'pending']
             ).count()
             return max(0, self.max_participants - team_count)
         else:
-            # For individual tournaments
-            return max(0, self.max_participants - self.total_registered)
+            # For individual tournaments, count users with active registrations
+            user_count = self.participants.filter(
+                user__isnull=False,
+                status__in=['confirmed', 'pending_payment', 'pending']
+            ).count()
+            return max(0, self.max_participants - user_count)
     
     @property
     def registration_progress(self):
@@ -193,12 +201,16 @@ class Tournament(models.Model):
             # For team tournaments, count unique teams
             team_count = self.participants.filter(
                 team__isnull=False,
-                status__in=['confirmed', 'pending_payment']
+                status__in=['confirmed', 'pending_payment', 'pending']
             ).count()
             return min(100, (team_count / self.max_participants) * 100)
         else:
-            # For individual tournaments
-            return min(100, (self.total_registered / self.max_participants) * 100)
+            # For individual tournaments, count users with active registrations
+            user_count = self.participants.filter(
+                user__isnull=False,
+                status__in=['confirmed', 'pending_payment', 'pending']
+            ).count()
+            return min(100, (user_count / self.max_participants) * 100)
     
     def get_current_registrations(self):
         """Get actual registration count based on tournament type"""
@@ -206,11 +218,14 @@ class Tournament(models.Model):
             # For team tournaments, count teams
             return self.participants.filter(
                 team__isnull=False,
-                status__in=['confirmed', 'pending_payment']
+                status__in=['confirmed', 'pending_payment', 'pending']
             ).count()
         else:
-            # For individual tournaments, use total_registered
-            return self.total_registered
+            # For individual tournaments, count users with active registrations
+            return self.participants.filter(
+                user__isnull=False,
+                status__in=['confirmed', 'pending_payment', 'pending']
+            ).count()
     
     def can_user_register(self, user):
         """Check if user can register for tournament with detailed error messages"""

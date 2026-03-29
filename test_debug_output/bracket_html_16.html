@@ -1,0 +1,2750 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bracket Bug Test Tournament 41pjso - Interactive Bracket</title>
+
+    
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+    <link rel="icon" type="image/jpeg" href="/static/images/EYTLOGO.jpg" sizes="any">
+    <link rel="apple-touch-icon" href="/static/images/EYTLOGO.jpg">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- TailwindCSS with Brand Color Configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': {
+                            DEFAULT: '#b91c1c', // Official EYT Red from logo
+                            'dark': '#991b1b',
+                            'light': '#dc2626',
+                            'accent': '#dc2626',
+                        },
+                        'background': {
+                            'dark': '#0a0a0a',
+                            'light': '#f6f6f8',
+                        },
+                        'surface': {
+                            'dark': '#1f1f1f',
+                        },
+                        'card-dark': '#1f1f1f',
+                        // Landing Page Brand Colors
+                        'electric-red': '#DC2626',
+                        'deep-black': '#0A0A0A',
+                        'gunmetal-gray': '#1F2937',
+                        'neon-cyan': '#06B6D4',
+                    },
+                    fontFamily: {
+                        'barlow': ['Barlow Condensed', 'sans-serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                        'spline': ['Spline Sans', 'sans-serif'],
+                        'grotesk': ['Space Grotesk', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow-red': '0 0 20px rgba(185, 28, 28, 0.5), 0 0 40px rgba(185, 28, 28, 0.3)',
+                        'glow-red-lg': '0 0 30px rgba(185, 28, 28, 0.6), 0 0 60px rgba(185, 28, 28, 0.4)',
+                        'neon-red': '0 0 10px rgba(220, 38, 38, 0.5), inset 0 0 10px rgba(220, 38, 38, 0.2)',
+                        'neon-cyan': '0 0 10px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(6, 182, 212, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Brand Colors CSS -->
+    <link rel="stylesheet" href="/static/css/brand-colors.css">
+
+    <!-- Brand Consistency Fix - Ensures all pages use correct EYT colors -->
+    <link rel="stylesheet" href="/static/css/brand-consistency-fix.css">
+
+    <!-- Breadcrumb Mobile Fix - Ensures breadcrumbs and navigation are clickable on mobile -->
+    <link rel="stylesheet" href="/static/css/breadcrumb-mobile-fix.css">
+
+    <!-- Dashboard Gaming CSS - For mobile navigation on base.html pages -->
+    <link rel="stylesheet" href="/static/css/dashboard-gaming.css">
+    <link rel="stylesheet" href="/static/css/dashboard-mobile.css">
+
+    <!-- Landing Page Custom Animations and Effects -->
+    <link rel="stylesheet" href="/static/css/landing-page.css">
+
+    <!-- Basic CSS -->
+    <style>
+        body {
+            font-family: 'Spline Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            background-color: #0a0a0a;
+            /* Pure dark background from brand */
+        }
+
+        /* Add glow effect to primary buttons like in the design */
+        .bg-primary,
+        [class*="bg-primary"] {
+            box-shadow: 0 0 20px rgba(185, 28, 28, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .bg-primary:hover,
+        [class*="bg-primary"]:hover {
+            box-shadow: 0 0 30px rgba(185, 28, 28, 0.6), 0 0 50px rgba(185, 28, 28, 0.3);
+            transform: translateY(-1px);
+        }
+    </style>
+
+    
+<link rel="stylesheet" href="/static/css/brand-consistency-fix.css">
+<link rel="stylesheet" href="/static/css/mobile-responsive.css">
+<!-- Dashboard Gaming CSS for consistent styling -->
+<link rel="stylesheet" href="/static/css/dashboard-gaming.css">
+<link rel="stylesheet" href="/static/css/dashboard-mobile.css">
+
+<!-- Gaming Styling for Bracket -->
+<style>
+    /* ==========================================
+   BRACKET GAMING CONTAINER
+   ========================================== */
+    .bracket-container {
+        background: linear-gradient(135deg, #0A0A0A 0%, #1F1F1F 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bracket-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, transparent 50%, rgba(6, 182, 212, 0.05) 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* ==========================================
+   GAMING MATCH CARDS
+   ========================================== */
+    .match-card {
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(220, 38, 38, 0.4);
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .match-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.15), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .match-card:hover::before {
+        left: 100%;
+    }
+
+    .match-card:hover {
+        border-color: rgba(220, 38, 38, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    /* ==========================================
+   PARTICIPANT SLOTS
+   ========================================== */
+    .participant-slot {
+        transition: all 0.3s ease;
+        position: relative;
+        background: rgba(31, 31, 31, 0.6);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        font-weight: 600;
+    }
+
+    .participant-slot.winner {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.15) 100%);
+        border-left: 3px solid #10B981;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        font-weight: 700;
+    }
+
+    .participant-slot.loser {
+        background: rgba(55, 65, 81, 0.4);
+        opacity: 0.7;
+    }
+
+    /* ==========================================
+   GAMING ROUND HEADERS
+   ========================================== */
+    .round-header {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(10, 10, 10, 0.95) 100%);
+        border: 2px solid rgba(220, 38, 38, 0.4);
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 12px rgba(220, 38, 38, 0.2);
+    }
+
+    .round-header h3 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #DC2626;
+        text-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        font-size: 1.125rem;
+    }
+
+    /* ==========================================
+   BRACKET NAVIGATION
+   ========================================== */
+    .bracket-navigation {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(20px);
+        border-bottom: 2px solid rgba(220, 38, 38, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .bracket-navigation h1 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        color: #FFFFFF;
+    }
+
+    /* ==========================================
+   GAMING ZOOM CONTROLS
+   ========================================== */
+    .zoom-controls {
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(220, 38, 38, 0.3);
+        border-radius: 0.5rem;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.2);
+    }
+
+    .zoom-controls button {
+        transition: all 0.3s ease;
+    }
+
+    .zoom-controls button:hover {
+        color: #DC2626;
+        background: rgba(220, 38, 38, 0.1);
+    }
+
+    /* ==========================================
+   GAMING STATUS BADGES
+   ========================================== */
+    .match-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid;
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%);
+        color: #10B981;
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    .status-live {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(185, 28, 28, 0.1) 100%);
+        color: #DC2626;
+        border-color: rgba(220, 38, 38, 0.5);
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .status-ready {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(14, 116, 144, 0.1) 100%);
+        color: #06B6D4;
+        border-color: rgba(6, 182, 212, 0.4);
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(75, 85, 99, 0.1) 100%);
+        color: #9CA3AF;
+        border-color: rgba(107, 114, 128, 0.4);
+    }
+
+    .status-disputed {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.1) 100%);
+        color: #F59E0B;
+        border-color: rgba(245, 158, 11, 0.4);
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        }
+
+        50% {
+            box-shadow: 0 0 25px rgba(220, 38, 38, 0.6);
+        }
+    }
+
+    /* ==========================================
+   GAMING PARTICIPANT DISPLAY
+   ========================================== */
+    .participant-avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 0.75rem;
+        box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+        border: 2px solid rgba(220, 38, 38, 0.3);
+    }
+
+    .participant-slot .font-semibold,
+    .participant-slot .font-bold {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    /* ==========================================
+   SCORE DISPLAY
+   ========================================== */
+    .score-display {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 800;
+        min-width: 2rem;
+        text-align: center;
+        text-shadow: 0 0 10px currentColor;
+        letter-spacing: -0.02em;
+    }
+
+    /* ==========================================
+   LIVE INDICATOR
+   ========================================== */
+    .live-indicator {
+        animation: pulse-indicator 2s infinite;
+    }
+
+    @keyframes pulse-indicator {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .live-indicator .w-2 {
+        box-shadow: 0 0 10px #10B981;
+    }
+
+    /* ==========================================
+   GAMING BUTTONS
+   ========================================== */
+    .bracket-navigation a,
+    .match-card a {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.3s ease;
+    }
+
+    .bracket-navigation a:hover {
+        color: #DC2626;
+        text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+
+    /* Report Score Button */
+    .match-card a[href*="match_report"] {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .match-card a[href*="match_report"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .match-card a[href*="match_report"]:hover::before {
+        left: 100%;
+    }
+
+    .match-card a[href*="match_report"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+    }
+
+    /* ==========================================
+   MATCH TIME DISPLAY
+   ========================================== */
+    .match-time {
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9CA3AF;
+    }
+
+    /* ==========================================
+   NO BRACKET STATE
+   ========================================== */
+    .bg-gray-800\/50 {
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+        border: 2px solid rgba(220, 38, 38, 0.2);
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.1);
+    }
+
+    /* Generate Bracket Button */
+    a[href*="generate_bracket"] {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 20px rgba(220, 38, 38, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    a[href*="generate_bracket"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    a[href*="generate_bracket"]:hover::before {
+        left: 100%;
+    }
+
+    a[href*="generate_bracket"]:hover {
+        box-shadow: 0 8px 30px rgba(220, 38, 38, 0.6);
+        transform: translateY(-2px);
+    }
+
+    /* ==========================================
+   BRACKET STATS
+   ========================================== */
+    .bracket-navigation .text-lg {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        color: #DC2626;
+        text-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+    }
+
+    /* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+    @media (max-width: 768px) {
+        .match-card {
+            padding: 1rem;
+        }
+
+        .participant-avatar {
+            width: 2rem;
+            height: 2rem;
+            font-size: 0.75rem;
+        }
+
+        .score-display {
+            font-size: 1.25rem;
+        }
+
+        .round-header h3 {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+</head>
+
+<body class="bg-background-dark text-gray-100">
+    
+    <!-- Navigation -->
+    <nav class="bg-surface-dark shadow-sm border-b border-white/10 relative z-[100]" style="pointer-events: auto;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img src="/static/images/EYTLOGO.jpg" alt="EYTGaming" class="h-8 w-8 rounded">
+                        <span class="ml-2 text-xl font-bold text-white">EYTGaming</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/tournaments/"
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Tournaments
+                    </a>
+                    <a href="/store/"
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Store
+                    </a>
+
+                    
+                    <a href="/dashboard/"
+                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                    </a>
+                    <a href="/accounts/logout/"
+                        class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                        Logout
+                    </a>
+                    
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white hover:text-red-600 transition-colors p-2 relative z-[10000]"
+                    id="mobile-menu-button" aria-label="Toggle mobile menu" aria-expanded="false"
+                    style="pointer-events: auto; cursor: pointer; touch-action: manipulation;"
+                    onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined text-3xl pointer-events-none">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Inline dropdown for base pages without mobile_bottom_nav) -->
+        <div class="hidden md:hidden bg-surface-dark border-t border-white/10" id="mobile-menu-inline">
+            <div class="px-4 py-4 space-y-2">
+                <!-- Primary Navigation -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Main</h3>
+                    <a href="/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">home</span>
+                        Home
+                    </a>
+                    
+                    <a href="/dashboard/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">dashboard</span>
+                        Dashboard
+                    </a>
+                    
+                </div>
+
+                <!-- Competition -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Competition</h3>
+                    <a href="/tournaments/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">emoji_events</span>
+                        Tournaments
+                    </a>
+                    <a href="/teams/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">groups</span>
+                        Teams
+                    </a>
+                </div>
+
+                <!-- Training -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Training</h3>
+                    <a href="/coaching/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">sports_esports</span>
+                        Coaching
+                    </a>
+                </div>
+
+                <!-- Marketplace -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Marketplace</h3>
+                    <a href="/store/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">shopping_bag</span>
+                        Store
+                    </a>
+                    <a href="/venues/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">location_on</span>
+                        Venues
+                    </a>
+                </div>
+
+                <!-- Personal & System -->
+                
+                <div class="mb-4 pt-4 border-t border-gray-700">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Personal</h3>
+                    <a href="/dashboard/profile/org_bracket_41pjso/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">person</span>
+                        Profile
+                    </a>
+                    <a href="/payments/methods/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">payment</span>
+                        Payments
+                    </a>
+                    <a href="/notifications/preferences/"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">settings</span>
+                        Settings
+                    </a>
+                </div>
+                <a href="/accounts/logout/"
+                    class="block bg-red-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-red-700 text-center mt-4">
+                    <span class="material-symbols-outlined text-sm inline-block mr-2">logout</span>
+                    Logout
+                </a>
+                
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Global mobile menu toggle function
+        // Handles both the slide-out panel (from mobile_bottom_nav.html) and the inline dropdown
+        function toggleMobileMenu() {
+            // Prefer the slide-out panel menu (from mobile_bottom_nav.html)
+            const slideOutMenu = document.getElementById('mobile-menu');
+            // Fallback to the inline dropdown menu
+            const inlineMenu = document.getElementById('mobile-menu-inline');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const bottomNavMenuButton = document.querySelector('.mobile-bottom-nav button[aria-controls="mobile-menu"]');
+
+            // Use the slide-out menu if it exists, otherwise fall back to inline
+            const targetMenu = slideOutMenu || inlineMenu;
+
+            if (targetMenu) {
+                const isHidden = targetMenu.classList.contains('hidden');
+                targetMenu.classList.toggle('hidden');
+
+                // Prevent body scroll when menu is open
+                if (isHidden) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Update aria-expanded for all menu buttons
+            const allMenuButtons = [mobileMenuButton, bottomNavMenuButton].filter(Boolean);
+            allMenuButtons.forEach(button => {
+                if (button) {
+                    const isExpanded = button.getAttribute('aria-expanded') === 'true';
+                    button.setAttribute('aria-expanded', !isExpanded);
+                }
+            });
+        }
+
+        // Mobile menu toggle for base.html
+        document.addEventListener('DOMContentLoaded', function () {
+            // NOTE: Click handlers for toggleMobileMenu() are already attached inline
+            // via onclick="toggleMobileMenu()" on the buttons. Do NOT add duplicate
+            // addEventListener('click') handlers here — that causes double-toggle
+            // (menu opens then immediately closes, appearing non-responsive).
+
+            // Close menu when clicking on a link inside any mobile menu
+            const allMenus = document.querySelectorAll('#mobile-menu, #mobile-menu-inline');
+            allMenus.forEach(menu => {
+                if (menu) {
+                    const menuLinks = menu.querySelectorAll('a');
+                    menuLinks.forEach(link => {
+                        link.addEventListener('click', function () {
+                            toggleMobileMenu();
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+    
+
+    <!-- Main Content -->
+    <main>
+        
+<div class="bracket-container">
+    <!-- Navigation Header -->
+    <div class="bracket-navigation py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Top Row: Back Button and Quick Nav -->
+            <div class="flex items-center justify-between mb-4">
+                <a href="/tournaments/bracket-bug-test-41pjso/"
+                    class="inline-flex items-center text-primary hover:text-primary/80 transition-colors">
+                    <span class="material-symbols-outlined mr-2">arrow_back</span>
+                    Back to Tournament
+                </a>
+                
+                <!-- Quick Navigation Icons (hidden on mobile) -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/dashboard/" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Dashboard">
+                        <span class="material-symbols-outlined">dashboard</span>
+                    </a>
+                    <a href="/tournaments/" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Tournaments">
+                        <span class="material-symbols-outlined">emoji_events</span>
+                    </a>
+                    <a href="/teams/" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Teams">
+                        <span class="material-symbols-outlined">groups</span>
+                    </a>
+                    <a href="/store/" 
+                       class="p-2 text-gray-400 hover:text-white transition-colors" 
+                       title="Store">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bottom Row: Title and Controls -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-white">Bracket Bug Test Tournament 41pjso</h1>
+                    <p class="text-sm text-gray-400">Interactive Tournament Bracket</p>
+                </div>
+
+                <!-- Zoom Controls -->
+                <div class="zoom-controls flex items-center space-x-2 px-4 py-2 rounded-lg">
+                    <a href="/tournaments/bracket-bug-test-41pjso/bracket/partial/" 
+                       class="px-4 py-2 bg-primary/20 text-primary border border-primary/50 rounded-lg hover:bg-primary/30 transition-all font-medium text-sm flex items-center"
+                       title="Full Screen Bracket View"
+                       target="_blank">
+                        <span class="material-symbols-outlined text-sm mr-2">open_in_full</span>
+                        <span class="hidden md:inline">Full Screen View</span>
+                    </a>
+                    <div class="h-6 w-px bg-gray-600 mx-2"></div>
+                    <button id="zoom-out" class="p-2 text-gray-400 hover:text-white transition-colors" title="Zoom Out (-)">
+                        <span class="material-symbols-outlined">zoom_out</span>
+                    </button>
+                    <span id="zoom-level" class="text-sm text-gray-300 font-medium min-w-[3rem] text-center">100%</span>
+                    <button id="zoom-in" class="p-2 text-gray-400 hover:text-white transition-colors" title="Zoom In (+)">
+                        <span class="material-symbols-outlined">zoom_in</span>
+                    </button>
+                    <div class="h-6 w-px bg-gray-600 mx-2"></div>
+                    <button id="reset-zoom" class="px-3 py-1 text-sm text-gray-300 hover:text-white transition-colors" title="Reset Zoom (0)">
+                        Reset
+                    </button>
+                    <button id="fullscreen" class="p-2 text-gray-400 hover:text-white transition-colors" title="Fullscreen (F)">
+                        <span class="material-symbols-outlined">fullscreen</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Match Filter Section -->
+        <div class="mb-6 flex flex-wrap items-center gap-3">
+            <button class="filter-btn active px-4 py-2 rounded-lg bg-primary/20 text-primary border border-primary/50 font-medium text-sm transition-all hover:bg-primary/30" data-filter="all">
+                All Matches
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="live">
+                <span class="material-symbols-outlined text-xs mr-1">radio_button_checked</span>
+                Live
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="completed">
+                <span class="material-symbols-outlined text-xs mr-1">check_circle</span>
+                Completed
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-400 border border-gray-700 font-medium text-sm transition-all hover:bg-gray-800 hover:text-white" data-filter="pending">
+                <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                Pending
+            </button>
+        </div>
+        
+        <!-- Interactive Bracket Display -->
+        
+        <div class="mb-12">
+            <!-- Bracket Header -->
+            <div class="round-header rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <span class="material-symbols-outlined text-primary mr-3">emoji_events</span>
+                            Main Bracket
+                        </h2>
+                        <p class="text-gray-300 mt-1">4 rounds •  participants</p>
+                    </div>
+
+                    <!-- Live Updates Indicator -->
+                    <div class="flex items-center space-x-4">
+                        <div class="live-indicator flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span class="text-sm text-green-400 font-medium">Live Updates</span>
+                        </div>
+
+                        <!-- Bracket Stats -->
+                        <div class="text-right">
+                            <div class="text-sm text-gray-400">Matches Completed</div>
+                            <div class="text-lg font-bold text-white">
+                                0/15
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bracket Container with Horizontal Scroll -->
+            <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <div id="bracket-container" class="p-6 min-w-max" style="transform-origin: top left;">
+                        <div class="flex space-x-8 relative">
+                            
+                            <!-- Round Column -->
+                            <div class="flex flex-col space-y-4 min-w-[260px] relative">
+                                <!-- Round Header -->
+                                <div class="text-center mb-4">
+                                    <div class="round-header rounded-lg p-2 mx-2">
+                                        <h3 class="text-base font-black text-white">
+                                            
+                                            Round 1
+                                            
+                                        </h3>
+                                        <p class="text-xs text-gray-300 mt-1 font-semibold">8 matches</p>
+                                    </div>
+                                </div>
+
+                                <!-- Matches in Round -->
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="a4182124-b342-409b-8559-09e1462331ec">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 1</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_0
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_1
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/a4182124-b342-409b-8559-09e1462331ec/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="477312ab-addd-423f-bf6d-583c9e45c5b0">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 2</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_2
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_3
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/477312ab-addd-423f-bf6d-583c9e45c5b0/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="d3dabdea-ef29-4871-bebd-cee27a3e0762">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 3</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_4
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_5
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/d3dabdea-ef29-4871-bebd-cee27a3e0762/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="00987e34-c285-42f7-9921-09373b32881b">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 4</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_6
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_7
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/00987e34-c285-42f7-9921-09373b32881b/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="59dc8921-8654-4b5c-92f9-a05cc75725fd">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 5</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_8
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_9
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/59dc8921-8654-4b5c-92f9-a05cc75725fd/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="3831f18d-0860-435a-9c5a-d6bc14ad7f86">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 6</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_10
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_11
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/3831f18d-0860-435a-9c5a-d6bc14ad7f86/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="a9becb32-3ff1-4d8e-ae67-025d7a68b5c4">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 7</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_12
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_13
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/a9becb32-3ff1-4d8e-ae67-025d7a68b5c4/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="5ee1492b-6c6f-4669-99e7-3ae8588e05ba">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 8</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-ready
+                                            ">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">play_circle</span>
+                                            Ready
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-bold text-white truncate text-sm">
+                                                        player_41pjso_14
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar">
+                                                    P
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-white truncate">
+                                                        player_41pjso_15
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                        
+                                        <div class="pt-4 border-t border-gray-700">
+                                            <a href="/tournaments/match/5ee1492b-6c6f-4669-99e7-3ae8588e05ba/report/"
+                                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm">
+                                                <span class="material-symbols-outlined text-sm mr-2">edit_note</span>
+                                                Report Score
+                                            </a>
+                                        </div>
+                                        
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Round Column -->
+                            <div class="flex flex-col space-y-4 min-w-[260px] relative">
+                                <!-- Round Header -->
+                                <div class="text-center mb-4">
+                                    <div class="round-header rounded-lg p-2 mx-2">
+                                        <h3 class="text-base font-black text-white">
+                                            
+                                            🥉 Quarter-Finals
+                                            
+                                        </h3>
+                                        <p class="text-xs text-gray-300 mt-1 font-semibold">4 matches</p>
+                                    </div>
+                                </div>
+
+                                <!-- Matches in Round -->
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="3caf1bed-5adc-4e58-ae06-8b6c6e717918">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 1</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="d4b302ac-5e2e-4ae4-8f89-5e93e0b81a39">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 2</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="666c2eb8-2bf1-4e32-ac56-84250cd7c579">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 3</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="f0593720-4981-4897-bc7f-0be393313ee8">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 4</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Round Column -->
+                            <div class="flex flex-col space-y-4 min-w-[260px] relative">
+                                <!-- Round Header -->
+                                <div class="text-center mb-4">
+                                    <div class="round-header rounded-lg p-2 mx-2">
+                                        <h3 class="text-base font-black text-white">
+                                            
+                                            🥈 Semi-Finals
+                                            
+                                        </h3>
+                                        <p class="text-xs text-gray-300 mt-1 font-semibold">2 matches</p>
+                                    </div>
+                                </div>
+
+                                <!-- Matches in Round -->
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="5d408650-3e9e-4935-8eab-559d7d28df63">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 1</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="c7f2a8a3-0dba-45f7-8bb8-743ca787f350">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 2</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                            <!-- Round Column -->
+                            <div class="flex flex-col space-y-4 min-w-[260px] relative">
+                                <!-- Round Header -->
+                                <div class="text-center mb-4">
+                                    <div class="round-header rounded-lg p-2 mx-2">
+                                        <h3 class="text-base font-black text-white">
+                                            
+                                            🏆 Grand Finals
+                                            
+                                        </h3>
+                                        <p class="text-xs text-gray-300 mt-1 font-semibold">1 match</p>
+                                    </div>
+                                </div>
+
+                                <!-- Matches in Round -->
+                                
+                                <div class="match-card rounded-lg p-4 relative" data-match-id="113fcb72-21cf-4ae1-bd97-3c4b740da2c6">
+                                    <!-- Match Header -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs font-bold text-gray-400">Match 1</span>
+                                            
+                                        </div>
+
+                                        <!-- Match Status Badge -->
+                                        <div class="match-status-badge 
+                                            status-pending">
+                                            
+                                            <span class="material-symbols-outlined text-xs mr-1">schedule</span>
+                                            Pending
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 1 -->
+                                    <div class="participant-slot rounded-md p-3 mb-2 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1 text-sm">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="text-center py-1">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-black text-gray-400">
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                            <span>VS</span>
+                                            <div class="w-6 h-px bg-gray-600"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Participant 2 -->
+                                    <div class="participant-slot rounded-md p-3 mb-3 
+                                        winner
+                                        ">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                
+                                                <div class="participant-avatar bg-gray-600">
+                                                    <span class="material-symbols-outlined text-xs">person</span>
+                                                </div>
+                                                <span class="text-gray-400 italic flex-1">To Be Determined</span>
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    <!-- Match Actions -->
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('bracket-container');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const resetZoomBtn = document.getElementById('reset-zoom');
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+
+        if (!container) return;
+
+        let currentZoom = 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.3;
+        const maxZoom = 3.0;
+
+        function updateZoom() {
+            container.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+
+            // Update button states
+            zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+        }
+
+        // Zoom controls
+        zoomInBtn.addEventListener('click', function () {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                updateZoom();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', function () {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                updateZoom();
+            }
+        });
+
+        resetZoomBtn.addEventListener('click', function () {
+            currentZoom = 1.0;
+            updateZoom();
+        });
+
+        // Fullscreen toggle
+        fullscreenBtn.addEventListener('click', function () {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Mouse wheel zoom
+        container.addEventListener('wheel', function (e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+                const newZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
+                if (newZoom !== currentZoom) {
+                    currentZoom = newZoom;
+                    updateZoom();
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.target.tagName.toLowerCase() === 'input') return;
+
+            switch (e.key) {
+                case '+':
+                case '=':
+                    if (currentZoom < maxZoom) {
+                        currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                        updateZoom();
+                    }
+                    break;
+                case '-':
+                    if (currentZoom > minZoom) {
+                        currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                        updateZoom();
+                    }
+                    break;
+                case '0':
+                    currentZoom = 1.0;
+                    updateZoom();
+                    break;
+                case 'f':
+                case 'F11':
+                    e.preventDefault();
+                    fullscreenBtn.click();
+                    break;
+            }
+        });
+
+        // Match card interactions
+        document.querySelectorAll('.match-card').forEach(card => {
+            card.addEventListener('click', function (e) {
+                // Don't trigger if clicking on a link
+                if (e.target.tagName === 'A' || e.target.closest('a')) return;
+                
+                const matchId = this.dataset.matchId;
+                // Add click animation
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+
+                console.log('Match clicked:', matchId);
+            });
+        });
+
+        // Match Filter Functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const matchCards = document.querySelectorAll('.match-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const filter = this.dataset.filter;
+
+                // Update active button
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                    b.classList.add('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+                });
+                this.classList.add('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                this.classList.remove('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+
+                // Filter matches
+                matchCards.forEach(card => {
+                    const statusBadge = card.querySelector('.match-status-badge');
+                    if (!statusBadge) return;
+
+                    let shouldShow = false;
+                    if (filter === 'all') {
+                        shouldShow = true;
+                    } else if (filter === 'live' && statusBadge.classList.contains('status-live')) {
+                        shouldShow = true;
+                    } else if (filter === 'completed' && statusBadge.classList.contains('status-completed')) {
+                        shouldShow = true;
+                    } else if (filter === 'pending' && (statusBadge.classList.contains('status-pending') || statusBadge.classList.contains('status-ready'))) {
+                        shouldShow = true;
+                    }
+
+                    if (shouldShow) {
+                        card.style.display = '';
+                        card.style.opacity = '1';
+                    } else {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            if (card.style.opacity === '0') {
+                                card.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Real-time updates simulation (replace with actual WebSocket connection)
+        function simulateRealTimeUpdates() {
+            const liveMatches = document.querySelectorAll('.status-live');
+            liveMatches.forEach(badge => {
+                // Add pulsing animation to live matches
+                setInterval(() => {
+                    badge.style.opacity = badge.style.opacity === '0.5' ? '1' : '0.5';
+                }, 1000);
+            });
+        }
+
+        // Initialize
+        updateZoom();
+        simulateRealTimeUpdates();
+
+        // Auto-scroll to current round (if any live matches)
+        const liveMatch = document.querySelector('.status-live');
+        if (liveMatch) {
+            setTimeout(() => {
+                liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+        }
+
+        // Touch gestures for mobile
+        let touchStartDistance = 0;
+        let touchStartZoom = 1;
+
+        container.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 2) {
+                touchStartDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                touchStartZoom = currentZoom;
+            }
+        });
+
+        container.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const touchDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                const scale = touchDistance / touchStartDistance;
+                const newZoom = Math.max(minZoom, Math.min(maxZoom, touchStartZoom * scale));
+                if (newZoom !== currentZoom) {
+                    currentZoom = newZoom;
+                    updateZoom();
+                }
+            }
+        });
+
+        // Show keyboard shortcuts hint
+        console.log('Keyboard shortcuts: +/- to zoom, 0 to reset, F for fullscreen, Ctrl+Scroll to zoom');
+    });
+
+    // Fullscreen change handler
+    document.addEventListener('fullscreenchange', function () {
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const icon = fullscreenBtn.querySelector('.material-symbols-outlined');
+        if (document.fullscreenElement) {
+            icon.textContent = 'fullscreen_exit';
+        } else {
+            icon.textContent = 'fullscreen';
+        }
+    });
+</script>
+
+
+    </main>
+
+    <!-- Footer -->
+    
+    <footer class="bg-surface-dark text-white mt-16 border-t border-white/10 hidden md:block">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p>&copy; 2026 EYTGaming. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+
+    <!-- Mobile Bottom Navigation - Only for pages extending base.html -->
+    
+    
+
+<!-- Mobile Bottom Navigation - For pages extending base.html -->
+<nav class="mobile-bottom-nav md:hidden" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-nav-grid">
+        <a href="/dashboard/"
+            class="mobile-nav-item "
+            aria-label="Dashboard" >
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">dashboard</span>
+            <span>Home</span>
+        </a>
+
+        <a href="/tournaments/"
+            class="mobile-nav-item active"
+            aria-label="Tournaments, current page" aria-current="page">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">emoji_events</span>
+            <span>Tournaments</span>
+        </a>
+
+        <a href="/teams/" class="mobile-nav-item "
+            aria-label="Teams" >
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">groups</span>
+            <span>Teams</span>
+        </a>
+
+        <a href="/notifications/"
+            class="mobile-nav-item "
+            aria-label="Notifications" >
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">notifications</span>
+            <span>Alerts</span>
+        </a>
+
+        <button onclick="toggleMobileMenu()" class="mobile-nav-item" aria-label="Open menu" aria-expanded="false"
+            aria-controls="mobile-menu">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">menu</span>
+            <span>Menu</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Slide-out Menu -->
+<div id="mobile-menu" class="fixed inset-0 z-[10001] hidden" role="dialog" aria-modal="true"
+    aria-label="Navigation menu">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
+
+    <!-- Menu Panel -->
+    <div class="absolute right-0 top-0 w-80 max-w-[85vw] bg-[#0A0A0A] border-l-2 border-[#DC2626]/30 shadow-2xl transform transition-transform duration-300 translate-x-0 flex flex-col"
+        style="height: 100vh; height: 100dvh; max-height: 100vh; max-height: 100dvh;">
+        <!-- Menu Header -->
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <img src="/static/images/EYTLOGO.jpg" alt="EYTGaming" class="h-10 w-auto rounded neon-red-glow">
+                <span class="gaming-header text-lg text-white">MENU</span>
+            </div>
+            <button onclick="toggleMobileMenu()"
+                class="w-10 h-10 rounded-lg bg-[#1F1F1F] text-white flex items-center justify-center hover:bg-[#DC2626] transition-colors"
+                aria-label="Close menu">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Menu Content - Scrollable Area -->
+        <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-8"
+            style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; max-height: calc(100vh - 74px); max-height: calc(100dvh - 74px);">
+            <!-- Primary Navigation -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">PRIMARY</h3>
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="/dashboard/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">dashboard</span>
+                        </span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Competition -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">COMPETITION</h3>
+                <div class="nav-group" role="group" aria-label="Competition navigation">
+                    <a href="/tournaments/"
+                        class="nav-item-gaming active">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">emoji_events</span>
+                        </span>
+                        <span class="nav-label">Tournaments</span>
+                    </a>
+                    <a href="/teams/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">groups</span>
+                        </span>
+                        <span class="nav-label">Teams</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Training -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">TRAINING</h3>
+                <div class="nav-group" role="group" aria-label="Training navigation">
+                    <a href="/coaching/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">sports_esports</span>
+                        </span>
+                        <span class="nav-label">Coaching</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Marketplace -->
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">MARKETPLACE</h3>
+                <div class="nav-group" role="group" aria-label="Marketplace navigation">
+                    <a href="/store/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">shopping_bag</span>
+                        </span>
+                        <span class="nav-label">Store</span>
+                    </a>
+                    <a href="/venues/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">location_on</span>
+                        </span>
+                        <span class="nav-label">Venues</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Personal -->
+            
+            <div class="nav-section mb-6">
+                <h3 class="nav-section-title">PERSONAL</h3>
+                <div class="nav-group" role="group" aria-label="Personal navigation">
+                    <a href="/dashboard/profile/org_bracket_41pjso/"
+                        class="nav-item-gaming ">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">person</span>
+                        </span>
+                        <span class="nav-label">Profile</span>
+                    </a>
+                </div>
+            </div>
+            
+
+            <!-- System -->
+            <div class="nav-section mb-8">
+                <h3 class="nav-section-title">SYSTEM</h3>
+                <div class="nav-group" role="group" aria-label="System navigation">
+                    
+                    <a href="/payments/methods/" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">payment</span>
+                        </span>
+                        <span class="nav-label">Payments</span>
+                    </a>
+                    <a href="/notifications/preferences/" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">settings</span>
+                        </span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                    <a href="/accounts/logout/" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper">
+                            <span class="material-symbols-outlined nav-icon">logout</span>
+                        </span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spacer for fixed bottom nav -->
+<div class="h-16 md:hidden"></div>
+    
+
+    <!-- Landing Page JavaScript -->
+    <script src="/static/js/landing-animations.js"></script>
+    <script src="/static/js/video-player.js"></script>
+
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('bracket-container');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const resetZoomBtn = document.getElementById('reset-zoom');
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+
+        if (!container) return;
+
+        let currentZoom = 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.3;
+        const maxZoom = 3.0;
+
+        function updateZoom() {
+            container.style.transform = `scale(${currentZoom})`;
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+
+            // Update button states
+            zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+        }
+
+        // Zoom controls
+        zoomInBtn.addEventListener('click', function () {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                updateZoom();
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', function () {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                updateZoom();
+            }
+        });
+
+        resetZoomBtn.addEventListener('click', function () {
+            currentZoom = 1.0;
+            updateZoom();
+        });
+
+        // Fullscreen toggle
+        fullscreenBtn.addEventListener('click', function () {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Mouse wheel zoom
+        container.addEventListener('wheel', function (e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+                const newZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
+                if (newZoom !== currentZoom) {
+                    currentZoom = newZoom;
+                    updateZoom();
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.target.tagName.toLowerCase() === 'input') return;
+
+            switch (e.key) {
+                case '+':
+                case '=':
+                    if (currentZoom < maxZoom) {
+                        currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                        updateZoom();
+                    }
+                    break;
+                case '-':
+                    if (currentZoom > minZoom) {
+                        currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                        updateZoom();
+                    }
+                    break;
+                case '0':
+                    currentZoom = 1.0;
+                    updateZoom();
+                    break;
+                case 'f':
+                case 'F11':
+                    e.preventDefault();
+                    fullscreenBtn.click();
+                    break;
+            }
+        });
+
+        // Match card interactions
+        document.querySelectorAll('.match-card').forEach(card => {
+            card.addEventListener('click', function (e) {
+                // Don't trigger if clicking on a link
+                if (e.target.tagName === 'A' || e.target.closest('a')) return;
+                
+                const matchId = this.dataset.matchId;
+                // Add click animation
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+
+                console.log('Match clicked:', matchId);
+            });
+        });
+
+        // Match Filter Functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const matchCards = document.querySelectorAll('.match-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const filter = this.dataset.filter;
+
+                // Update active button
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                    b.classList.add('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+                });
+                this.classList.add('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                this.classList.remove('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+
+                // Filter matches
+                matchCards.forEach(card => {
+                    const statusBadge = card.querySelector('.match-status-badge');
+                    if (!statusBadge) return;
+
+                    let shouldShow = false;
+                    if (filter === 'all') {
+                        shouldShow = true;
+                    } else if (filter === 'live' && statusBadge.classList.contains('status-live')) {
+                        shouldShow = true;
+                    } else if (filter === 'completed' && statusBadge.classList.contains('status-completed')) {
+                        shouldShow = true;
+                    } else if (filter === 'pending' && (statusBadge.classList.contains('status-pending') || statusBadge.classList.contains('status-ready'))) {
+                        shouldShow = true;
+                    }
+
+                    if (shouldShow) {
+                        card.style.display = '';
+                        card.style.opacity = '1';
+                    } else {
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            if (card.style.opacity === '0') {
+                                card.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                });
+            });
+        });
+
+        // Real-time updates simulation (replace with actual WebSocket connection)
+        function simulateRealTimeUpdates() {
+            const liveMatches = document.querySelectorAll('.status-live');
+            liveMatches.forEach(badge => {
+                // Add pulsing animation to live matches
+                setInterval(() => {
+                    badge.style.opacity = badge.style.opacity === '0.5' ? '1' : '0.5';
+                }, 1000);
+            });
+        }
+
+        // Initialize
+        updateZoom();
+        simulateRealTimeUpdates();
+
+        // Auto-scroll to current round (if any live matches)
+        const liveMatch = document.querySelector('.status-live');
+        if (liveMatch) {
+            setTimeout(() => {
+                liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+        }
+
+        // Touch gestures for mobile
+        let touchStartDistance = 0;
+        let touchStartZoom = 1;
+
+        container.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 2) {
+                touchStartDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                touchStartZoom = currentZoom;
+            }
+        });
+
+        container.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const touchDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                const scale = touchDistance / touchStartDistance;
+                const newZoom = Math.max(minZoom, Math.min(maxZoom, touchStartZoom * scale));
+                if (newZoom !== currentZoom) {
+                    currentZoom = newZoom;
+                    updateZoom();
+                }
+            }
+        });
+
+        // Show keyboard shortcuts hint
+        console.log('Keyboard shortcuts: +/- to zoom, 0 to reset, F for fullscreen, Ctrl+Scroll to zoom');
+    });
+
+    // Fullscreen change handler
+    document.addEventListener('fullscreenchange', function () {
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const icon = fullscreenBtn.querySelector('.material-symbols-outlined');
+        if (document.fullscreenElement) {
+            icon.textContent = 'fullscreen_exit';
+        } else {
+            icon.textContent = 'fullscreen';
+        }
+    });
+</script>
+
+</body>
+
+</html>

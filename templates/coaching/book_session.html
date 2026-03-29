@@ -1,234 +1,275 @@
 {% extends "layouts/dashboard_base.html" %}
 {% load static %}
 
-{% block title %}Book Session with {{ coach.user.get_display_name }}{% endblock %}
+{% block title %}Book Session — {{ coach.user.get_display_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 1px;
-        background: #374151;
-        border-radius: 0.5rem;
-        overflow: hidden;
-    }
-    
-    .calendar-day {
-        background: #1f2937;
-        padding: 0.75rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        min-height: 3rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .calendar-day:hover {
-        background: #374151;
-    }
-    
-    .calendar-day.available {
-        background: #065f46;
-        color: #10b981;
-    }
-    
-    .calendar-day.available:hover {
-        background: #047857;
-    }
-    
-    .calendar-day.selected {
-        background: #b91c1c;
-        color: white;
-    }
-    
-    .calendar-day.disabled {
-        background: #111827;
-        color: #6b7280;
-        cursor: not-allowed;
-    }
-    
-    .time-slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 0.5rem;
-    }
-    
-    .time-slot {
-        padding: 0.75rem;
-        background: #1f2937;
-        border: 1px solid #374151;
-        border-radius: 0.5rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        color: #d1d5db;
-    }
-    
-    .time-slot:hover {
-        background: #374151;
-        border-color: #b91c1c;
-    }
-    
-    .time-slot.selected {
-        background: #b91c1c;
-        border-color: #b91c1c;
-        color: white;
-    }
-    
-    .time-slot.disabled {
-        background: #111827;
-        color: #6b7280;
-        cursor: not-allowed;
-        border-color: #374151;
-    }
-    
-    .step-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 2rem;
-    }
-    
-    .step {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .step-number {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 0.875rem;
-    }
-    
-    .step.active .step-number {
-        background: #b91c1c;
-        color: white;
-    }
-    
-    .step.completed .step-number {
-        background: #10b981;
-        color: white;
-    }
-    
-    .step.inactive .step-number {
-        background: #374151;
-        color: #9ca3af;
-    }
-    
-    .step-connector {
-        width: 3rem;
-        height: 2px;
-        background: #374151;
-        margin: 0 1rem;
-    }
-    
-    .step.completed + .step-connector {
-        background: #10b981;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+
+/* ── Base ── */
+.bk-page { background: #0A0A0A; min-height: 100vh; font-family: 'Barlow', sans-serif; color: #e5e5e5; }
+
+/* ── Card ── */
+.bk-card {
+    background: #111;
+    border: 1px solid rgba(220,38,38,0.15);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Section title ── */
+.bk-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Step indicator ── */
+.bk-steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 2rem; flex-wrap: wrap; gap: 0.5rem; }
+.bk-step { display: flex; align-items: center; gap: 8px; }
+.bk-step-num {
+    width: 2rem; height: 2rem; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 0.9rem;
+    border: 2px solid #333; color: #555; background: #111;
+    transition: all 0.3s;
+}
+.bk-step.active .bk-step-num { background: #DC2626; border-color: #DC2626; color: #fff; box-shadow: 0 0 12px rgba(220,38,38,0.4); }
+.bk-step.done .bk-step-num { background: #16a34a; border-color: #16a34a; color: #fff; }
+.bk-step-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+.bk-step.active .bk-step-label { color: #fff; }
+.bk-step.done .bk-step-label { color: #22c55e; }
+.bk-connector { width: 2.5rem; height: 2px; background: #222; margin: 0 0.25rem; }
+.bk-connector.done { background: #16a34a; }
+
+/* ── Calendar ── */
+.bk-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+.bk-cal-day {
+    background: #1a1a1a;
+    border: 1px solid #222;
+    border-radius: 3px;
+    padding: 0.6rem 0.25rem;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.2s;
+    min-height: 2.5rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.bk-cal-day.header { cursor: default; color: #DC2626; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; background: #0d0d0d; border-color: transparent; }
+.bk-cal-day.available { background: #111; border-color: #1f1f1f; color: #ccc; cursor: pointer; }
+.bk-cal-day.available:hover { border-color: #DC2626; color: #fff; background: rgba(220,38,38,0.08); }
+.bk-cal-day.selected { background: rgba(220,38,38,0.15); border-color: #DC2626; color: #fff; box-shadow: 0 0 8px rgba(220,38,38,0.25); }
+.bk-cal-day.disabled { background: #0d0d0d; color: #2a2a2a; cursor: not-allowed; border-color: transparent; }
+
+/* ── Time slots ── */
+.bk-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.bk-slot {
+    padding: 0.65rem 0.5rem;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #aaa;
+    transition: all 0.2s;
+}
+.bk-slot:hover { border-color: #DC2626; color: #fff; background: rgba(220,38,38,0.08); }
+.bk-slot.selected { background: rgba(220,38,38,0.15); border-color: #DC2626; color: #fff; box-shadow: 0 0 8px rgba(220,38,38,0.2); }
+.bk-slot.disabled { background: #0d0d0d; color: #2a2a2a; cursor: not-allowed; border-color: transparent; }
+
+/* ── Form fields ── */
+.bk-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: #aaa; display: block; margin-bottom: 0.5rem;
+}
+.bk-select, .bk-textarea {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    color: #e5e5e5;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9375rem;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+    -webkit-text-fill-color: #e5e5e5;
+    caret-color: #e5e5e5;
+}
+.bk-select:focus, .bk-textarea:focus { border-color: #DC2626; outline: none; box-shadow: 0 0 0 2px rgba(220,38,38,0.15); }
+.bk-select option { background: #1a1a1a; color: #e5e5e5; }
+.bk-textarea { resize: vertical; line-height: 1.6; }
+.bk-textarea::placeholder { color: #444; opacity: 1; }
+.bk-hint { font-size: 0.8rem; color: #555; margin-top: 0.35rem; }
+
+/* ── Buttons ── */
+.bk-btn-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 3px;
+    color: #888; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    text-decoration: none; transition: all 0.2s;
+}
+.bk-btn-back:hover { border-color: #DC2626; color: #fff; }
+
+.bk-btn-submit {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #DC2626, #b91c1c);
+    border: none; border-radius: 3px; color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    box-shadow: 0 4px 16px rgba(220,38,38,0.3);
+    transition: all 0.25s;
+    margin-top: 1.25rem;
+}
+.bk-btn-submit:hover { background: linear-gradient(135deg, #ef4444, #DC2626); box-shadow: 0 6px 24px rgba(220,38,38,0.5); transform: translateY(-1px); }
+
+/* ── Cal nav ── */
+.bk-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.bk-cal-nav-btn {
+    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 3px;
+    color: #888; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+}
+.bk-cal-nav-btn:hover { border-color: #DC2626; color: #fff; }
+.bk-cal-month { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; }
+
+/* ── Summary rows ── */
+.bk-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #1a1a1a; }
+.bk-row:last-child { border-bottom: none; }
+.bk-row-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+.bk-row-val { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 700; color: #fff; }
+.bk-total-val { font-size: 1.4rem; color: #DC2626; text-shadow: 0 0 12px rgba(220,38,38,0.3); }
+
+/* ── Policy items ── */
+.bk-policy { display: flex; align-items: flex-start; gap: 10px; padding: 0.5rem 0; color: #666; font-size: 0.875rem; line-height: 1.5; }
+
+/* ── Avatar ── */
+.bk-avatar { width: 3rem; height: 3rem; border-radius: 50%; overflow: hidden; background: rgba(220,38,38,0.15); border: 2px solid rgba(220,38,38,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.25rem; color: #DC2626; flex-shrink: 0; }
+
+/* ── Star rating ── */
+.bk-stars { display: flex; gap: 2px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="bk-page">
+<div class="max-w-5xl mx-auto px-4 py-8">
+
     <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-4 mb-4">
-            <a href="{% url 'coaching:coach_detail' pk=coach.pk %}" 
-               class="p-2 bg-card-dark border border-card-border-dark rounded-lg hover:border-primary transition-colors">
-                <span class="material-symbols-outlined text-gray-400">arrow_back</span>
-            </a>
-            <div>
-                <h1 class="text-white text-2xl font-bold">Book Session</h1>
-                <p class="text-gray-400">with {{ coach.user.get_display_name }}</p>
-            </div>
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;">
+        <a href="{% url 'coaching:coach_detail' pk=coach.pk %}" class="bk-btn-back">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">arrow_back</span>
+            Back
+        </a>
+        <div>
+            <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:1.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#fff;line-height:1;">Book Session</h1>
+            <p style="color:#666;font-size:0.875rem;margin-top:2px;">with {{ coach.user.get_display_name }}</p>
         </div>
-        
-        <!-- Step Indicator -->
-        <div class="step-indicator">
-            <div class="step active">
-                <div class="step-number">1</div>
-                <span class="text-white text-sm">Select Date & Time</span>
-            </div>
-            <div class="step-connector"></div>
-            <div class="step inactive">
-                <div class="step-number">2</div>
-                <span class="text-gray-400 text-sm">Session Details</span>
-            </div>
-            <div class="step-connector"></div>
-            <div class="step inactive">
-                <div class="step-number">3</div>
-                <span class="text-gray-400 text-sm">Payment</span>
-            </div>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="bk-steps">
+        <div class="bk-step active" id="step-1">
+            <div class="bk-step-num">1</div>
+            <span class="bk-step-label">Date &amp; Time</span>
+        </div>
+        <div class="bk-connector" id="conn-1"></div>
+        <div class="bk-step" id="step-2">
+            <div class="bk-step-num">2</div>
+            <span class="bk-step-label">Details</span>
+        </div>
+        <div class="bk-connector" id="conn-2"></div>
+        <div class="bk-step" id="step-3">
+            <div class="bk-step-num">3</div>
+            <span class="bk-step-label">Payment</span>
         </div>
     </div>
 
     <form method="post" id="booking-form">
         {% csrf_token %}
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Booking Form -->
-            <div class="lg:col-span-2 space-y-6">
+        <div style="display:grid;grid-template-columns:1fr;gap:1.5rem;">
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;" class="bk-main-grid">
+
+            <!-- LEFT COLUMN -->
+            <div>
                 <!-- Date Selection -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                    <h2 class="text-white text-lg font-semibold mb-4">Select Date</h2>
-                    
-                    <!-- Calendar Navigation -->
-                    <div class="flex items-center justify-between mb-4">
-                        <button type="button" id="prev-month" class="p-2 bg-background-dark border border-card-border-dark rounded-lg hover:border-primary transition-colors">
-                            <span class="material-symbols-outlined text-gray-400">chevron_left</span>
+                <div class="bk-card">
+                    <div class="bk-title">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;">calendar_month</span>
+                        Select Date
+                    </div>
+                    <div class="bk-cal-nav">
+                        <button type="button" id="prev-month" class="bk-cal-nav-btn">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">chevron_left</span>
                         </button>
-                        <h3 class="text-white font-semibold" id="current-month"></h3>
-                        <button type="button" id="next-month" class="p-2 bg-background-dark border border-card-border-dark rounded-lg hover:border-primary transition-colors">
-                            <span class="material-symbols-outlined text-gray-400">chevron_right</span>
+                        <span class="bk-cal-month" id="current-month"></span>
+                        <button type="button" id="next-month" class="bk-cal-nav-btn">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">chevron_right</span>
                         </button>
                     </div>
-                    
-                    <!-- Calendar -->
-                    <div class="calendar-grid" id="calendar">
-                        <!-- Calendar days will be populated by JavaScript -->
-                    </div>
-                    
+                    <div class="bk-cal-grid" id="calendar"></div>
                     <input type="hidden" name="date" id="selected-date">
                 </div>
 
                 <!-- Time Selection -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6" id="time-selection" style="display: none;">
-                    <h2 class="text-white text-lg font-semibold mb-4">Available Times</h2>
-                    <div class="time-slots" id="time-slots">
-                        <!-- Time slots will be populated by JavaScript -->
+                <div class="bk-card" id="time-selection" style="display:none;">
+                    <div class="bk-title">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;">schedule</span>
+                        Available Times
                     </div>
+                    <div class="bk-slots" id="time-slots"></div>
                     <input type="hidden" name="time" id="selected-time">
                 </div>
 
                 <!-- Session Details -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6" id="session-details" style="display: none;">
-                    <h2 class="text-white text-lg font-semibold mb-4">Session Details</h2>
-                    
-                    <div class="space-y-4">
-                        <!-- Game Selection -->
+                <div class="bk-card" id="session-details" style="display:none;">
+                    <div class="bk-title">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;">tune</span>
+                        Session Details
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
                         <div>
-                            <label class="block text-white font-medium mb-2">Game</label>
-                            <select name="game" id="id_game" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                            <label class="bk-label">Game</label>
+                            <select name="game" id="id_game" required class="bk-select">
                                 <option value="">Select a game</option>
                                 {% for game in form.game.field.queryset %}
                                 <option value="{{ game.id }}">{{ game.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        
-                        <!-- Duration -->
+
                         <div>
-                            <label class="block text-white font-medium mb-2">Duration</label>
-                            <select name="duration_minutes" id="id_duration_minutes" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                            <label class="bk-label">Duration</label>
+                            <select name="duration_minutes" id="id_duration_minutes" required class="bk-select">
                                 <option value="">Select duration</option>
                                 <option value="60">1 hour</option>
                                 <option value="90">1.5 hours</option>
@@ -236,356 +277,286 @@
                                 <option value="180">3 hours</option>
                             </select>
                         </div>
-                        
-                        <!-- Session Type -->
+
                         <div>
-                            <label class="block text-white font-medium mb-2">Session Type</label>
-                            <select name="session_type" id="id_session_type" required class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                            <label class="bk-label">Session Type</label>
+                            <select name="session_type" id="id_session_type" required class="bk-select">
                                 <option value="individual">Individual (1-on-1)</option>
                                 {% if coach.offers_group %}
                                 <option value="group">Group Session</option>
                                 {% endif %}
                             </select>
                         </div>
-                        
-                        <!-- Goals/Topics -->
+
                         <div>
-                            <label class="block text-white font-medium mb-2">What would you like to work on?</label>
-                            <textarea name="student_notes" id="id_student_notes" rows="4" required placeholder="Describe your goals for this session..." class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors resize-none"></textarea>
+                            <label class="bk-label">What would you like to work on? *</label>
+                            <textarea name="student_notes" id="id_student_notes" rows="4" required placeholder="Describe your goals for this session..." class="bk-textarea"></textarea>
                         </div>
-                        
-                        <!-- Special Requests -->
+
                         <div>
-                            <label class="block text-white font-medium mb-2">Special Requests (Optional)</label>
-                            <textarea name="topics" id="id_topics" rows="3" placeholder='e.g., ["Positioning", "Combos", "Match-ups"]' class="w-full px-4 py-3 bg-background-dark border border-card-border-dark rounded-lg text-white placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors resize-none"></textarea>
-                            <p class="text-gray-400 text-sm mt-1">Optional: Specific topics or areas you want to focus on</p>
+                            <label class="bk-label">Specific Topics (Optional)</label>
+                            <textarea name="topics" id="id_topics" rows="2" placeholder='e.g. Positioning, Combos, Match-ups' class="bk-textarea"></textarea>
+                            <p class="bk-hint">Specific areas you want to focus on</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
+            <!-- RIGHT COLUMN (Sidebar) -->
+            <div>
                 <!-- Coach Summary -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 rounded-full overflow-hidden bg-primary/20">
+                <div class="bk-card">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
+                        <div class="bk-avatar">
                             {% if coach.user.avatar %}
-                            <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" class="w-full h-full object-cover">
+                            <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}" style="width:100%;height:100%;object-fit:cover;">
                             {% else %}
-                            <div class="w-full h-full bg-primary flex items-center justify-center text-white font-bold">
-                                {{ coach.user.get_display_name|first|upper }}
-                            </div>
+                            {{ coach.user.get_display_name|first|upper }}
                             {% endif %}
                         </div>
                         <div>
-                            <h3 class="text-white font-semibold">{{ coach.user.get_display_name }}</h3>
-                            <div class="flex items-center gap-1">
-                                <div class="flex items-center text-yellow-400">
-                                    {% for i in "12345" %}
-                                        {% if forloop.counter <= coach.average_rating %}
-                                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                                        {% else %}
-                                        <span class="material-symbols-outlined text-sm">star</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                                <span class="text-gray-400 text-sm">{{ coach.average_rating|floatformat:1 }}</span>
+                            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:0.05em;color:#fff;">{{ coach.user.get_display_name }}</div>
+                            <div class="bk-stars">
+                                {% for i in "12345" %}
+                                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' {% if coach.average_rating >= forloop.counter %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:0.9rem;color:{% if coach.average_rating >= forloop.counter %}#fbbf24{% else %}#333{% endif %};">star</span>
+                                {% endfor %}
+                                <span style="font-size:0.75rem;color:#666;margin-left:4px;">{{ coach.average_rating|floatformat:1 }}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="space-y-2 text-sm">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Hourly Rate</span>
-                            <span class="text-white font-semibold">${{ coach.hourly_rate }}</span>
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        <div class="bk-row">
+                            <span class="bk-row-label">Hourly Rate</span>
+                            <span class="bk-row-val" style="color:#DC2626;">${{ coach.hourly_rate }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Experience</span>
-                            <span class="text-white">{{ coach.get_experience_level_display }}</span>
+                        <div class="bk-row">
+                            <span class="bk-row-label">Experience</span>
+                            <span class="bk-row-val">{{ coach.get_experience_level_display }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Response Time</span>
-                            <span class="text-white">{{ coach.response_time_hours }}h avg</span>
+                        <div class="bk-row">
+                            <span class="bk-row-label">Platform</span>
+                            <span class="bk-row-val">{{ coach.preferred_platform }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Booking Summary -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6" id="booking-summary" style="display: none;">
-                    <h3 class="text-white font-semibold mb-4">Booking Summary</h3>
-                    
-                    <div class="space-y-3 text-sm">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Date</span>
-                            <span class="text-white" id="summary-date">-</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Time</span>
-                            <span class="text-white" id="summary-time">-</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Duration</span>
-                            <span class="text-white" id="summary-duration">-</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Game</span>
-                            <span class="text-white" id="summary-game">-</span>
-                        </div>
-                        
-                        <hr class="border-card-border-dark">
-                        
-                        <div class="flex items-center justify-between font-semibold">
-                            <span class="text-white">Total</span>
-                            <span class="text-primary text-lg" id="summary-total">$0</span>
+                <div class="bk-card" id="booking-summary" style="display:none;">
+                    <div class="bk-title">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;">receipt</span>
+                        Summary
+                    </div>
+                    <div style="display:flex;flex-direction:column;">
+                        <div class="bk-row"><span class="bk-row-label">Date</span><span class="bk-row-val" id="summary-date">—</span></div>
+                        <div class="bk-row"><span class="bk-row-label">Time</span><span class="bk-row-val" id="summary-time">—</span></div>
+                        <div class="bk-row"><span class="bk-row-label">Duration</span><span class="bk-row-val" id="summary-duration">—</span></div>
+                        <div class="bk-row"><span class="bk-row-label">Game</span><span class="bk-row-val" id="summary-game">—</span></div>
+                        <div class="bk-row" style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px solid rgba(220,38,38,0.2);">
+                            <span class="bk-row-label" style="color:#fff;font-size:0.9rem;">Total</span>
+                            <span class="bk-row-val bk-total-val" id="summary-total">$0</span>
                         </div>
                     </div>
-                    
-                    <button type="submit" class="w-full mt-6 px-4 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
+                    <button type="submit" class="bk-btn-submit">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;">payment</span>
                         Proceed to Payment
                     </button>
                 </div>
 
-                <!-- Coach Policies -->
-                <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                    <h3 class="text-white font-semibold mb-4">Policies</h3>
-                    <div class="space-y-3 text-sm text-gray-400">
-                        <div class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-xs mt-0.5">schedule</span>
-                            <span>Cancellations must be made 24 hours in advance for a full refund</span>
+                <!-- Policies -->
+                <div class="bk-card">
+                    <div class="bk-title">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;">policy</span>
+                        Policies
+                    </div>
+                    <div>
+                        <div class="bk-policy">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#DC2626;flex-shrink:0;margin-top:2px;">schedule</span>
+                            Cancellations must be made 24 hours in advance for a full refund
                         </div>
-                        <div class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-xs mt-0.5">videocam</span>
-                            <span>Sessions conducted via {{ coach.get_platform_display }}</span>
+                        <div class="bk-policy">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#DC2626;flex-shrink:0;margin-top:2px;">videocam</span>
+                            Sessions conducted via {{ coach.preferred_platform }}
                         </div>
-                        <div class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-xs mt-0.5">replay</span>
-                            <span>Session recordings available upon request</span>
+                        <div class="bk-policy">
+                            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#DC2626;flex-shrink:0;margin-top:2px;">replay</span>
+                            Session recordings available upon request
                         </div>
                     </div>
                 </div>
             </div>
+
+        </div><!-- end bk-main-grid -->
         </div>
     </form>
+
 </div>
+</div>
+
+<style>
+@media (max-width: 900px) {
+    .bk-main-grid { grid-template-columns: 1fr !important; }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const calendar = document.getElementById('calendar');
-    const timeSelection = document.getElementById('time-selection');
-    const sessionDetails = document.getElementById('session-details');
-    const bookingSummary = document.getElementById('booking-summary');
-    const currentMonthEl = document.getElementById('current-month');
-    const prevMonthBtn = document.getElementById('prev-month');
-    const nextMonthBtn = document.getElementById('next-month');
-    
-    let currentDate = new Date();
-    let selectedDate = null;
-    let selectedTime = null;
-    
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
+document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl    = document.getElementById('calendar');
+    const timeSection   = document.getElementById('time-selection');
+    const detailSection = document.getElementById('session-details');
+    const summaryCard   = document.getElementById('booking-summary');
+    const monthLabel    = document.getElementById('current-month');
+
+    let currentDate   = new Date();
+    let selectedDate  = null;
+    let selectedTime  = null;
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
     function renderCalendar() {
-        const year = currentDate.getFullYear();
+        const year  = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        
-        currentMonthEl.textContent = `${months[month]} ${year}`;
-        
-        // Clear calendar
-        calendar.innerHTML = '';
-        
-        // Add day headers
-        daysOfWeek.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'calendar-day disabled';
-            dayHeader.textContent = day;
-            dayHeader.style.fontWeight = 'bold';
-            dayHeader.style.cursor = 'default';
-            calendar.appendChild(dayHeader);
+        monthLabel.textContent = MONTHS[month] + ' ' + year;
+        calendarEl.innerHTML = '';
+
+        // Day headers
+        DAYS.forEach(d => {
+            const h = document.createElement('div');
+            h.className = 'bk-cal-day header';
+            h.textContent = d;
+            calendarEl.appendChild(h);
         });
-        
-        // Get first day of month and number of days
-        const firstDay = new Date(year, month, 1).getDay();
+
+        const firstDay    = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
-        
-        // Add empty cells for days before month starts
+        const today       = new Date(); today.setHours(0,0,0,0);
+
         for (let i = 0; i < firstDay; i++) {
-            const emptyDay = document.createElement('div');
-            emptyDay.className = 'calendar-day disabled';
-            calendar.appendChild(emptyDay);
+            const e = document.createElement('div');
+            e.className = 'bk-cal-day disabled';
+            calendarEl.appendChild(e);
         }
-        
-        // Add days of month
+
         for (let day = 1; day <= daysInMonth; day++) {
-            const dayEl = document.createElement('div');
-            const dayDate = new Date(year, month, day);
-            
-            dayEl.className = 'calendar-day';
-            dayEl.textContent = day;
-            
-            // Disable past dates
-            if (dayDate < today.setHours(0, 0, 0, 0)) {
-                dayEl.classList.add('disabled');
+            const d   = document.createElement('div');
+            const dt  = new Date(year, month, day);
+            d.textContent = day;
+
+            if (dt < today) {
+                d.className = 'bk-cal-day disabled';
             } else {
-                dayEl.classList.add('available');
-                dayEl.addEventListener('click', () => selectDate(dayDate));
+                d.className = 'bk-cal-day available';
+                d.addEventListener('click', function () { selectDate(dt, this); });
             }
-            
-            calendar.appendChild(dayEl);
+            calendarEl.appendChild(d);
         }
     }
-    
-    function selectDate(date) {
-        // Remove previous selection
-        document.querySelectorAll('.calendar-day.selected').forEach(el => {
-            el.classList.remove('selected');
-            el.classList.add('available');
+
+    function selectDate(date, el) {
+        document.querySelectorAll('.bk-cal-day.selected').forEach(e => {
+            e.classList.remove('selected');
+            e.classList.add('available');
         });
-        
-        // Select new date
-        event.target.classList.remove('available');
-        event.target.classList.add('selected');
-        
+        el.classList.remove('available');
+        el.classList.add('selected');
+
         selectedDate = date;
         document.getElementById('selected-date').value = date.toISOString().split('T')[0];
-        
-        // Update summary
-        document.getElementById('summary-date').textContent = date.toLocaleDateString();
-        
-        // Load available times
-        loadAvailableTimes(date);
-        
-        // Show time selection
-        timeSelection.style.display = 'block';
-        timeSelection.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('summary-date').textContent = date.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+
+        loadSlots(date);
+        timeSection.style.display = 'block';
+        timeSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-    
-    function loadAvailableTimes(date) {
-        const timeSlotsContainer = document.getElementById('time-slots');
-        timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">Loading available times...</div>';
-        
-        // Fetch available times from server (fixed URL)
+
+    function loadSlots(date) {
+        const container = document.getElementById('time-slots');
+        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#555;font-family:\'Barlow Condensed\',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;padding:1rem;">Loading slots...</div>';
+
         fetch(`/coaching/api/coach/{{ coach.pk }}/slots/?date=${date.toISOString().split('T')[0]}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(data => {
-                timeSlotsContainer.innerHTML = '';
-                
+                container.innerHTML = '';
                 if (data.error) {
-                    timeSlotsContainer.innerHTML = `<div class="col-span-full text-center text-red-400">${data.error}</div>`;
+                    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#ef4444;font-size:0.85rem;padding:1rem;">${data.error}</div>`;
                 } else if (data.slots && data.slots.length > 0) {
                     data.slots.forEach(slot => {
-                        const timeSlot = document.createElement('div');
-                        timeSlot.className = 'time-slot';
-                        timeSlot.textContent = slot.time;
-                        timeSlot.dataset.datetime = slot.datetime;
-                        timeSlot.addEventListener('click', () => selectTime(slot));
-                        timeSlotsContainer.appendChild(timeSlot);
+                        const el = document.createElement('div');
+                        el.className = 'bk-slot';
+                        el.textContent = slot.time;
+                        el.dataset.datetime = slot.datetime;
+                        el.addEventListener('click', function () { selectSlot(slot, this); });
+                        container.appendChild(el);
                     });
                 } else {
-                    timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-gray-400">No available times for this date. Coach may not have availability set for this day.</div>';
+                    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#555;font-family:\'Barlow Condensed\',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;padding:1rem;">No available times for this date</div>';
                 }
             })
-            .catch(error => {
-                console.error('Error loading times:', error);
-                timeSlotsContainer.innerHTML = '<div class="col-span-full text-center text-red-400">Error loading available times. Please try again or contact support.</div>';
+            .catch(() => {
+                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef4444;font-size:0.85rem;padding:1rem;">Error loading times. Please try again.</div>';
             });
     }
-    
-    function selectTime(slot) {
-        // Remove previous selection
-        document.querySelectorAll('.time-slot.selected').forEach(el => {
-            el.classList.remove('selected');
-        });
-        
-        // Select new time
-        event.target.classList.add('selected');
-        
+
+    function selectSlot(slot, el) {
+        document.querySelectorAll('.bk-slot.selected').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+
         selectedTime = slot;
         document.getElementById('selected-time').value = slot.datetime;
-        
-        // Update summary
         document.getElementById('summary-time').textContent = slot.time;
-        
-        // Show session details
-        sessionDetails.style.display = 'block';
-        sessionDetails.scrollIntoView({ behavior: 'smooth' });
-        
-        // Update step indicator
-        updateStepIndicator(2);
+
+        detailSection.style.display = 'block';
+        detailSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setStep(2);
     }
-    
-    function updateStepIndicator(activeStep) {
-        const steps = document.querySelectorAll('.step');
-        steps.forEach((step, index) => {
-            const stepNumber = index + 1;
-            step.classList.remove('active', 'completed', 'inactive');
-            
-            if (stepNumber < activeStep) {
-                step.classList.add('completed');
-            } else if (stepNumber === activeStep) {
-                step.classList.add('active');
-            } else {
-                step.classList.add('inactive');
-            }
-        });
-    }
-    
-    function updateBookingSummary() {
-        if (selectedDate && selectedTime) {
-            const durationSelect = document.querySelector('select[name="duration_minutes"]');
-            const gameSelect = document.querySelector('select[name="game"]');
-            
-            if (durationSelect.value) {
-                const duration = parseInt(durationSelect.value);
-                const hours = duration / 60;
-                const total = {{ coach.hourly_rate }} * hours;
-                
-                document.getElementById('summary-duration').textContent = `${duration} minutes`;
-                document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
-                
-                bookingSummary.style.display = 'block';
-                updateStepIndicator(3);
-            }
-            
-            if (gameSelect.value) {
-                const selectedOption = gameSelect.options[gameSelect.selectedIndex];
-                document.getElementById('summary-game').textContent = selectedOption.text;
-            }
+
+    function updateSummary() {
+        if (!selectedDate || !selectedTime) return;
+        const durSel  = document.getElementById('id_duration_minutes');
+        const gameSel = document.getElementById('id_game');
+
+        if (durSel.value) {
+            const mins  = parseInt(durSel.value);
+            const hours = mins / 60;
+            const total = {{ coach.hourly_rate }} * hours;
+            document.getElementById('summary-duration').textContent = mins + ' min';
+            document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
+            summaryCard.style.display = 'block';
+            setStep(3);
+        }
+        if (gameSel.value) {
+            document.getElementById('summary-game').textContent = gameSel.options[gameSel.selectedIndex].text;
         }
     }
-    
-    // Event listeners
-    prevMonthBtn.addEventListener('click', () => {
+
+    function setStep(n) {
+        for (let i = 1; i <= 3; i++) {
+            const s = document.getElementById('step-' + i);
+            s.classList.remove('active', 'done');
+            if (i < n)       s.classList.add('done');
+            else if (i === n) s.classList.add('active');
+        }
+        for (let i = 1; i <= 2; i++) {
+            const c = document.getElementById('conn-' + i);
+            c.classList.toggle('done', i < n);
+        }
+    }
+
+    document.getElementById('prev-month').addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
     });
-    
-    nextMonthBtn.addEventListener('click', () => {
+    document.getElementById('next-month').addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
     });
-    
-    // Listen for form changes
-    document.addEventListener('change', function(e) {
-        if (e.target.name === 'duration_minutes' || e.target.name === 'game') {
-            updateBookingSummary();
-        }
+
+    document.addEventListener('change', e => {
+        if (e.target.name === 'duration_minutes' || e.target.name === 'game') updateSummary();
     });
-    
-    // Initialize calendar
+
     renderCalendar();
 });
 </script>

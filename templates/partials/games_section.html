@@ -1,70 +1,99 @@
 {% load static %}
 
 {# Games Section - Showcase Supported Games and Divisions #}
-<section id="games" class="games-section py-20 bg-black relative overflow-hidden">
-  {# Animated Grid Background #}
+<section id="games" class="games-section py-10 bg-black relative overflow-hidden">
   <div class="grid-pattern-animated absolute inset-0 opacity-20" aria-hidden="true"></div>
-  
+
   <div class="container mx-auto px-4 relative z-10">
-    {# Section Title #}
-    <h2 class="section-title text-center text-5xl md:text-6xl font-bold uppercase tracking-tight mb-4 gradient-text-red">
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
       BATTLEGROUNDS
     </h2>
-    <p class="text-center text-gray-400 text-lg mb-12 uppercase tracking-wide">
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
       Our Competitive Divisions
     </p>
-    
-    {# Games Grid - Responsive: 1 col mobile, 2 col tablet, 4 col desktop #}
+
     <div class="games-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {% for game in games %}
-      <div class="game-card group">
-        {# Game Icon/Art Wrapper #}
-        <div class="game-icon-wrapper mb-4 relative overflow-hidden rounded-lg">
+      {# Each card is a full anchor — clicking anywhere navigates to tournaments filtered by this game #}
+      <a href="{% url 'tournaments:list' %}?game={{ game.slug }}"
+         style="display:block;text-decoration:none;position:relative;"
+         class="game-card group">
+
+        {# Game Art #}
+        <div class="game-icon-wrapper mb-3 relative overflow-hidden rounded-lg">
           {% if game.key_art %}
-          <img 
-            src="{{ game.key_art.url }}" 
-            alt="{{ game.name }} - {{ game.category }}" 
-            class="game-icon w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+          <img
+            src="{{ game.key_art.url }}"
+            alt="{{ game.name }} - {{ game.category }}"
+            class="game-icon w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
             loading="lazy"
           >
           {% else %}
-          <div class="w-full h-48 bg-gray-800 flex items-center justify-center">
-            <span class="material-symbols-outlined text-gray-600 text-6xl">sports_esports</span>
+          <div class="w-full h-32 bg-gray-800 flex items-center justify-center">
+            <span style="font-family:'Material Symbols Outlined';font-size:48px;color:#374151;
+                         background:none;-webkit-background-clip:unset;background-clip:unset;
+                         -webkit-text-fill-color:#374151;">sports_esports</span>
           </div>
           {% endif %}
-          {# Dark overlay that fades on hover #}
-          <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300"></div>
+          {# Hover overlay #}
+          <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300 rounded-lg"></div>
+
+          {# "View Tournaments" pill — appears on hover #}
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <span style="background:#DC2626;color:#fff;font-size:.7rem;font-weight:700;
+                         text-transform:uppercase;letter-spacing:.06em;padding:5px 14px;
+                         border-radius:4px;">View Tournaments</span>
+          </div>
         </div>
-        
+
         {# Game Info #}
-        <h3 class="game-title text-2xl font-bold uppercase tracking-tight text-white mb-2">
+        <h3 class="game-title text-xl font-bold uppercase tracking-tight text-white mb-1 group-hover:text-red-500 transition-colors">
           {{ game.name }}
         </h3>
-        <p class="game-category text-sm text-red-500 uppercase tracking-wide font-bold mb-3">
-          {{ game.category }}
+        <p class="game-category text-xs text-red-500 uppercase tracking-wide font-bold mb-2">
+          {{ game.category|default:game.get_genre_display }}
         </p>
-        
-        {# Hover Description - Fades in from bottom #}
+
+        {# Description — fades in on hover #}
         <div class="game-description opacity-0 group-hover:opacity-100 transition-opacity duration-300 max-h-0 group-hover:max-h-40 overflow-hidden">
-          <p class="text-gray-400 text-sm leading-relaxed">
-            {{ game.description|truncatewords:20 }}
+          <p class="text-gray-400 text-xs leading-relaxed">
+            {{ game.description|truncatewords:18 }}
           </p>
         </div>
-        
-        {# Animated Border Effect #}
+
+        {# Stats row — active tournaments count #}
+        <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+          <span style="font-family:'Material Symbols Outlined';font-size:13px;color:#6b7280;
+                       background:none;-webkit-background-clip:unset;background-clip:unset;
+                       -webkit-text-fill-color:#6b7280;">emoji_events</span>
+          <span style="font-size:.72rem;color:#6b7280;">
+          {{ game.tournament_count }} tournament{{ game.tournament_count|pluralize }}
+          </span>
+          {% if game.supports_teams %}
+          <span style="margin-left:auto;font-size:.65rem;font-weight:700;text-transform:uppercase;
+                       letter-spacing:.05em;background:#1f2937;color:#9ca3af;
+                       padding:2px 7px;border-radius:3px;">Teams</span>
+          {% endif %}
+        </div>
+
         <div class="animated-border"></div>
-      </div>
+      </a>
       {% empty %}
-      {# Empty State - No Games #}
       <div class="col-span-full text-center py-12">
-        <span class="material-symbols-outlined text-gray-600 text-6xl mb-4" aria-hidden="true">
-          sports_esports
-        </span>
-        <p class="text-gray-500 text-xl">
-          No games available yet. Check back soon!
-        </p>
+        <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;
+                     margin-bottom:16px;background:none;-webkit-background-clip:unset;
+                     background-clip:unset;-webkit-text-fill-color:#374151;" aria-hidden="true">sports_esports</span>
+        <p class="text-gray-500 text-xl">No games available yet. Check back soon!</p>
       </div>
       {% endfor %}
     </div>
+
+    {% if games %}
+    <div class="text-center mt-8">
+      <a href="{% url 'tournaments:list' %}" class="cta-secondary inline-block rounded-md">
+        Browse All Tournaments
+      </a>
+    </div>
+    {% endif %}
   </div>
 </section>

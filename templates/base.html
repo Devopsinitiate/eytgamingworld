@@ -7,6 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}EYTGaming - Elevate Your Tournament Experience{% endblock %}</title>
 
+    <!-- SEO: canonical + meta description (override per page via block) -->
+    <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta name="description" content="{% block meta_description %}EYTGaming — Nigeria's premier esports platform for tournaments, coaching, teams, and gaming venues. Compete, improve, and dominate.{% endblock %}">
+    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="EYTGaming">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}EYTGaming - Elevate Your Tournament Experience{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}EYTGaming — Nigeria's premier esports platform for tournaments, coaching, teams, and gaming venues.{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/EYTLOGO.jpg' %}{% endblock %}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}EYTGaming - Elevate Your Tournament Experience{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}EYTGaming — Nigeria's premier esports platform for tournaments, coaching, teams, and gaming venues.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/EYTLOGO.jpg' %}{% endblock %}">
+
     {% block extra_meta %}{% endblock %}
 
     <!-- Favicon -->
@@ -22,7 +41,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
         rel="stylesheet" />
 
     <!-- TailwindCSS with Brand Color Configuration -->
@@ -113,43 +132,63 @@
 <body class="bg-background-dark text-gray-100">
     {% block navigation %}
     <!-- Navigation -->
-    <nav class="bg-surface-dark shadow-sm border-b border-white/10 relative z-[100]" style="pointer-events: auto;">
+    <nav class="bg-[#0a0a0a] shadow-sm border-b border-[#dc2626]/30 relative z-[100]" style="pointer-events: auto;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="{% url 'home' %}" class="flex items-center">
-                        <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-8 w-8 rounded">
-                        <span class="ml-2 text-xl font-bold text-white">EYTGaming</span>
+                    <a href="{% url 'home' %}" class="flex items-center gap-2">
+                        <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-8 w-8 rounded" style="border:1px solid rgba(220,38,38,.4);box-shadow:0 0 8px rgba(220,38,38,.3);">
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;text-shadow:0 0 12px rgba(220,38,38,.4);">EYTGaming</span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="{% url 'tournaments:list' %}"
-                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'tournaments:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">emoji_events</span>
                         Tournaments
                     </a>
-                    <a href="{% url 'store:product_list' %}"
-                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="{% url 'teams:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">groups</span>
+                        Teams
+                    </a>
+                    <a href="{% url 'coaching:coach_list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">sports_esports</span>
+                        Coaching
+                    </a>
+                    <a href="{% url 'store:product_list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">shopping_bag</span>
                         Store
+                    </a>
+                    <a href="{% url 'venues:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">location_on</span>
+                        Venues
+                    </a>
+                    <a href="{% url 'core:leaderboard' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">leaderboard</span>
+                        Leaderboard
+                    </a>
+                    <a href="{% url 'about' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">info</span>
+                        About
                     </a>
 
                     {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard:home' %}"
-                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="{% url 'dashboard:home' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">dashboard</span>
                         Dashboard
                     </a>
-                    <a href="{% url 'account_logout' %}"
-                        class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                    <a href="{% url 'account_logout' %}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);transition:all .2s;">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;">logout</span>
                         Logout
                     </a>
                     {% else %}
-                    <a href="{% url 'account_login' %}"
-                        class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="{% url 'account_login' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">login</span>
                         Login
                     </a>
-                    <a href="{% url 'account_signup' %}"
-                        class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90">
+                    <a href="{% url 'account_signup' %}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);transition:all .2s;">
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;">person_add</span>
                         Sign Up
                     </a>
                     {% endif %}
@@ -160,7 +199,7 @@
                     id="mobile-menu-button" aria-label="Toggle mobile menu" aria-expanded="false"
                     style="pointer-events: auto; cursor: pointer; touch-action: manipulation;"
                     onclick="toggleMobileMenu()">
-                    <span class="material-symbols-outlined text-3xl pointer-events-none">menu</span>
+                    <span class="material-symbols-outlined text-3xl pointer-events-none" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:28px;text-transform:none;letter-spacing:0;">menu</span>
                 </button>
             </div>
         </div>
@@ -222,6 +261,16 @@
                         class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
                         <span class="material-symbols-outlined text-sm inline-block mr-2">location_on</span>
                         Venues
+                    </a>
+                    <a href="{% url 'core:leaderboard' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">leaderboard</span>
+                        Leaderboard
+                    </a>
+                    <a href="{% url 'about' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">info</span>
+                        About
                     </a>
                 </div>
 
@@ -334,12 +383,19 @@
 
     <!-- Footer -->
     {% block footer %}
-    <footer class="bg-surface-dark text-white mt-16 border-t border-white/10 hidden md:block">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center">
-                <p>&copy; 2026 EYTGaming. All rights reserved.</p>
-            </div>
+    <footer style="background:#0A0A0A;border-top:1px solid #1f1f1f;position:relative;overflow:hidden;" class="hidden md:block">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#DC2626,transparent);"></div>
+      <div style="max-width:1200px;margin:0 auto;padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#DC2626;">EYTGAMING</span>
+          <span style="color:#374151;font-size:.75rem;">&copy; 2026 All rights reserved.</span>
         </div>
+        <div style="display:flex;gap:16px;">
+          <a href="{% url 'privacy' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Privacy</a>
+          <a href="{% url 'terms' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Terms</a>
+          <a href="{% url 'about' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">About</a>
+        </div>
+      </div>
     </footer>
     {% endblock footer %}
 

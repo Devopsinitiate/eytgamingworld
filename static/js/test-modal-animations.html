@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Modal Animation Test</title>
+    <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0A0A0A;
+            color: white;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            color: #DC2626;
+            margin-top: 0;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status.success {
+            border-left: 4px solid #10B981;
+        }
+        .status.info {
+            border-left: 4px solid #06B6D4;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #DC2626; text-transform: uppercase;">
+            Gaming Modal Animation Test
+        </h1>
+
+        <div class="test-section">
+            <h2>Test 1: Modal Open/Close with Animations</h2>
+            <p>Click the button to open the modal. Test the following:</p>
+            <ul>
+                <li>Modal should fade in with slide animation</li>
+                <li>Backdrop should blur the background</li>
+                <li>Close button should trigger fade-out animation</li>
+            </ul>
+            <div class="test-buttons">
+                <button class="gaming-btn-primary" onclick="openTestModal()">
+                    Open Test Modal
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Keyboard Handler (Escape Key)</h2>
+            <p>Open the modal and press the <strong>Escape</strong> key:</p>
+            <ul>
+                <li>Modal should close with fade-out animation</li>
+                <li>Animation should complete before modal is hidden</li>
+            </ul>
+            <div class="status info">
+                Status: Open modal and press Escape to test
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Background Click Handler</h2>
+            <p>Open the modal and click on the dark background (not the modal content):</p>
+            <ul>
+                <li>Modal should close with fade-out animation</li>
+                <li>Clicking inside the modal should NOT close it</li>
+            </ul>
+            <div class="status info">
+                Status: Open modal and click background to test
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: Gaming Button Styles</h2>
+            <p>Verify modal buttons have gaming styles:</p>
+            <ul>
+                <li>Submit button should have skewed transform and red glow</li>
+                <li>Cancel button should have ghost style</li>
+                <li>Hover effects should work correctly</li>
+            </ul>
+            <div class="status info">
+                Status: Open modal and inspect button styles
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 5: Ripple Effect on Buttons</h2>
+            <p>Click any button to verify ripple effect:</p>
+            <div class="test-buttons">
+                <button class="gaming-btn-primary">Primary Button</button>
+                <button class="gaming-btn-ghost">Ghost Button</button>
+                <button class="gaming-btn-action">Action Button</button>
+            </div>
+            <div class="status success" style="margin-top: 16px;">
+                ✓ Ripple effect should appear at click position
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Modal -->
+    <div id="test-modal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="gaming-modal">
+            <div class="gaming-modal-header">
+                <h3 class="gaming-modal-title">Test Modal</h3>
+                <button class="gaming-modal-close" onclick="closeTestModal()">×</button>
+            </div>
+            <div class="gaming-modal-body">
+                <p style="color: #9da6b9; margin-bottom: 20px;">
+                    This is a test modal to verify gaming-style animations and interactions.
+                </p>
+                <div class="gaming-label">Test Input Field</div>
+                <input type="text" class="gaming-input" placeholder="Enter test value..." />
+            </div>
+            <div class="gaming-modal-footer">
+                <button type="button" class="gaming-btn-ghost" onclick="closeTestModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="gaming-btn-primary" onclick="closeTestModal()">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="gaming-ripple-effect.js"></script>
+    <script src="gaming-modal-handler.js"></script>
+    <script>
+        function openTestModal() {
+            const modal = document.getElementById('test-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeTestModal() {
+            const modal = document.getElementById('test-modal');
+            modal.classList.add('closing');
+            
+            const modalContent = modal.querySelector('.gaming-modal');
+            if (modalContent) {
+                modalContent.classList.add('closing');
+            }
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('closing');
+                if (modalContent) {
+                    modalContent.classList.remove('closing');
+                }
+            }, 300);
+        }
+
+        // Test keyboard handler
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('test-modal');
+                if (!modal.classList.contains('hidden')) {
+                    closeTestModal();
+                }
+            }
+        });
+
+        // Test background click handler
+        document.getElementById('test-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTestModal();
+            }
+        });
+    </script>
+</body>
+</html>

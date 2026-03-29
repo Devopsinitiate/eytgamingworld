@@ -1,0 +1,117 @@
+{% load static %}
+
+<section id="coaches" class="py-10 bg-black relative overflow-hidden">
+  <div class="container mx-auto px-4">
+
+    <h2 class="section-title text-center text-3xl md:text-4xl font-bold uppercase tracking-tight mb-3 gradient-text-red">
+      ELITE COACHES
+    </h2>
+    <p class="text-center text-gray-400 text-sm mb-6 uppercase tracking-wide">
+      Level Up With The Best
+    </p>
+
+    {% if home_coaches %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for coach in home_coaches %}
+      <a href="{% url 'coaching:coach_detail' coach.pk %}"
+         style="display:flex;flex-direction:column;background:#111;border:1px solid #1f2937;
+                border-radius:10px;overflow:hidden;text-decoration:none;
+                transition:border-color .25s,transform .25s;"
+         onmouseover="this.style.borderColor='#DC2626';this.style.transform='translateY(-4px)'"
+         onmouseout="this.style.borderColor='#1f2937';this.style.transform='translateY(0)'">
+
+        <div style="padding:20px;display:flex;align-items:center;gap:14px;">
+          <!-- Avatar -->
+          <div style="flex-shrink:0;width:56px;height:56px;border-radius:50%;overflow:hidden;
+                      border:2px solid #DC2626;background:#1f2937;">
+            {% if coach.user.avatar %}
+            <img src="{{ coach.user.avatar.url }}" alt="{{ coach.user.get_display_name }}"
+                 style="width:100%;height:100%;object-fit:cover;">
+            {% else %}
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+              <span style="font-family:'Material Symbols Outlined';font-size:28px;color:#6b7280;
+                           background:none;-webkit-background-clip:unset;background-clip:unset;
+                           -webkit-text-fill-color:#6b7280;">person</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Name + rating -->
+          <div style="flex:1;min-width:0;">
+            <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;
+                       text-transform:uppercase;color:#fff;margin:0 0 2px 0;
+                       background:none;-webkit-background-clip:unset;background-clip:unset;
+                       -webkit-text-fill-color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {{ coach.user.get_display_name }}
+            </h3>
+            <!-- Stars -->
+            <div style="display:flex;align-items:center;gap:3px;">
+              {% with rating=coach.average_rating|floatformat:0 %}
+              {% for i in "12345" %}
+              <span style="font-family:'Material Symbols Outlined';font-size:13px;
+                           background:none;-webkit-background-clip:unset;background-clip:unset;
+                           -webkit-text-fill-color:{% if forloop.counter <= rating|add:'0' %}#fbbf24{% else %}#374151{% endif %};">
+                star
+              </span>
+              {% endfor %}
+              {% endwith %}
+              <span style="font-size:.7rem;color:#9ca3af;margin-left:4px;">
+                {{ coach.average_rating }} ({{ coach.total_reviews }})
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div style="padding:0 20px 16px;flex:1;">
+          <p style="font-size:.8rem;color:#9ca3af;margin:0 0 10px 0;line-height:1.5;
+                    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+            {{ coach.bio|truncatewords:18 }}
+          </p>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+            <span style="font-size:.75rem;color:#6b7280;">
+              {{ coach.get_experience_level_display }}
+            </span>
+            <span style="font-size:.85rem;font-weight:700;color:#DC2626;">
+              ₦{{ coach.hourly_rate|floatformat:0 }}/hr
+            </span>
+          </div>
+        </div>
+
+        <!-- CTA strip -->
+        <div style="padding:10px 20px;background:#1a1a1a;border-top:1px solid #1f2937;
+                    display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
+            {{ coach.total_sessions }} sessions
+          </span>
+          <span style="font-size:.75rem;font-weight:700;color:#DC2626;text-transform:uppercase;
+                       letter-spacing:.05em;">
+            Book Now →
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="{% url 'coaching:coach_list' %}"
+         class="cta-secondary inline-block rounded-md">
+        Find Your Coach
+      </a>
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:48px 0;">
+      <span style="font-family:'Material Symbols Outlined';font-size:64px;color:#374151;display:block;
+                   margin-bottom:16px;background:none;-webkit-background-clip:unset;
+                   background-clip:unset;-webkit-text-fill-color:#374151;">school</span>
+      <p style="color:#6b7280;font-size:1.1rem;">No coaches available right now.</p>
+      <a href="{% url 'coaching:coach_list' %}" style="display:inline-block;margin-top:16px;
+         color:#DC2626;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;">
+        Browse Coaches →
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

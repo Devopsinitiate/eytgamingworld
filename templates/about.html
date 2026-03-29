@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}About - EYTGaming{% endblock %}
+{% block meta_description %}Learn about EYTGaming — Nigeria's premier esports platform built for competitive gamers, coaches, teams, and venue owners.{% endblock %}
+{% block og_title %}About EYTGaming{% endblock %}
+{% block og_description %}Learn about EYTGaming — Nigeria's premier esports platform built for competitive gamers, coaches, teams, and venue owners.{% endblock %}
+{% block twitter_title %}About EYTGaming{% endblock %}
+{% block twitter_description %}Learn about EYTGaming — Nigeria's premier esports platform built for competitive gamers, coaches, teams, and venue owners.{% endblock %}
+{% block extra_css %}
+<style>
+/* ── Base ── */
+.ab-page{background:#080808;min-height:100vh;color:#e5e7eb}
+
+/* ── Hero ── */
+.ab-hero{position:relative;padding:7rem 0 6rem;text-align:center;overflow:hidden}
+.ab-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% -10%,rgba(185,28,28,.22) 0%,transparent 65%);pointer-events:none}
+.ab-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(185,28,28,.4),transparent)}
+.ab-tag{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 1rem;border-radius:9999px;background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.35);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#f87171;margin-bottom:1.75rem}
+.ab-hero-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(3.5rem,9vw,7rem);line-height:.9;color:#fff;letter-spacing:.02em;margin-bottom:1.5rem}
+.ab-hero-title span{color:#dc2626;text-shadow:0 0 40px rgba(220,38,38,.4)}
+.ab-hero-sub{max-width:44rem;margin:0 auto;color:#9ca3af;font-size:1.0625rem;line-height:1.75}
+.ab-hero-actions{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:2.5rem}
+
+/* ── Divider ── */
+.ab-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(185,28,28,.25),transparent);margin:0}
+
+/* ── Stats Bar ── */
+.ab-stats{background:#0a0a0a;border-top:1px solid #111827;border-bottom:1px solid #111827;padding:3rem 0}
+.ab-stat-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:3.25rem;color:#fff;line-height:1}
+.ab-stat-num em{color:#dc2626;font-style:normal}
+.ab-stat-label{font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-top:.375rem}
+
+/* ── Section ── */
+.ab-section{padding:6rem 0}
+.ab-eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.7rem;color:#dc2626;margin-bottom:.875rem}
+.ab-eyebrow::before{content:'';width:1.75rem;height:2px;background:#dc2626;border-radius:2px;box-shadow:0 0 6px rgba(220,38,38,.5)}
+.ab-h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(2.25rem,4vw,3.5rem);color:#fff;line-height:.95;letter-spacing:.02em}
+.ab-h2 em{color:#dc2626;font-style:normal}
+.ab-body{color:#9ca3af;line-height:1.8;font-size:.9375rem}
+
+/* ── Feature Cards ── */
+.ab-card{background:#0d1117;border:1px solid #1a2030;border-radius:1rem;padding:1.75rem;position:relative;overflow:hidden;transition:border-color .25s,transform .25s,box-shadow .25s}
+.ab-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,.15) 70%,transparent 100%)}
+.ab-card:hover{border-color:rgba(185,28,28,.4);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(185,28,28,.1)}
+.ab-card-icon{width:3rem;height:3rem;border-radius:.75rem;background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.25);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;flex-shrink:0}
+.ab-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:1.0625rem;color:#fff;margin-bottom:.5rem}
+
+/* ── Value Cards ── */
+.ab-value{background:linear-gradient(135deg,#0d1117 0%,#0a0f1a 100%);border:1px solid #1a2030;border-radius:1rem;padding:2.25rem 2rem;text-align:center;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.ab-value::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#b91c1c,transparent)}
+.ab-value:hover{border-color:rgba(185,28,28,.4);transform:translateY(-3px)}
+.ab-value-icon{width:4rem;height:4rem;border-radius:1rem;background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;box-shadow:0 0 20px rgba(185,28,28,.1)}
+.ab-value-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:1.25rem;color:#fff;margin-bottom:.625rem}
+
+/* ── Team Cards ── */
+.ab-team{background:#0d1117;border:1px solid #1a2030;border-radius:1rem;padding:2rem 1.5rem;text-align:center;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.ab-team::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#b91c1c,transparent)}
+.ab-team:hover{border-color:rgba(185,28,28,.4);transform:translateY(-3px)}
+.ab-avatar{width:5rem;height:5rem;border-radius:50%;background:linear-gradient(135deg,#b91c1c,#7f1d1d);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;border:2px solid rgba(185,28,28,.5);box-shadow:0 0 20px rgba(185,28,28,.3)}
+.ab-member-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:1.0625rem;color:#fff}
+.ab-member-role{font-size:.8125rem;color:#6b7280;margin-top:.3rem}
+
+/* ── CTA ── */
+.ab-cta-wrap{background:linear-gradient(135deg,rgba(185,28,28,.12) 0%,rgba(127,29,29,.06) 100%);border:1px solid rgba(185,28,28,.2);border-radius:1.5rem;padding:5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.ab-cta-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#dc2626 40%,#dc2626 60%,transparent)}
+.ab-cta-wrap::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(185,28,28,.08) 0%,transparent 70%);pointer-events:none}
+
+/* ── Buttons ── */
+.ab-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8125rem 2rem;border-radius:.5rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.07em;font-size:.9375rem;text-decoration:none;transition:all .2s;cursor:pointer;border:none}
+.ab-btn-primary{background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;box-shadow:0 0 24px rgba(185,28,28,.4)}
+.ab-btn-primary:hover{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 36px rgba(185,28,28,.6);transform:translateY(-2px);color:#fff}
+.ab-btn-ghost{background:transparent;color:#9ca3af;border:1px solid #1f2937}
+.ab-btn-ghost:hover{border-color:rgba(185,28,28,.5);color:#fff;background:rgba(185,28,28,.08)}
+
+/* ── Timeline / Mission strip ── */
+.ab-strip{background:#0a0a0a;border:1px solid #111827;border-radius:1rem;padding:2rem;display:flex;align-items:flex-start;gap:1.25rem}
+.ab-strip-dot{width:2.5rem;height:2.5rem;border-radius:50%;background:rgba(185,28,28,.15);border:2px solid rgba(185,28,28,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.125rem}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="ab-page">
+
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<section class="ab-hero px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="ab-tag">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:.875rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">bolt</span>
+      Our Story
+    </div>
+    <h1 class="ab-hero-title">
+      West Africa's<br>
+      <span>Esports</span><br>
+      Ecosystem
+    </h1>
+    <p class="ab-hero-sub">EYT Gaming is a community-built organisation dedicated to developing African fighting game talent and connecting the continent to the global esports industry — based in Lagos, Nigeria.</p>
+    <div class="ab-hero-actions">
+      {% if user.is_authenticated %}
+      <a href="{% url 'tournaments:list' %}" class="ab-btn ab-btn-primary">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">emoji_events</span>
+        Browse Tournaments
+      </a>
+      <a href="{% url 'dashboard:home' %}" class="ab-btn ab-btn-ghost">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">dashboard</span>
+        Dashboard
+      </a>
+      {% else %}
+      <a href="{% url 'account_signup' %}" class="ab-btn ab-btn-primary">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">person_add</span>
+        Create Free Account
+      </a>
+      <a href="{% url 'tournaments:list' %}" class="ab-btn ab-btn-ghost">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">emoji_events</span>
+        Browse Tournaments
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ STATS -->
+<div class="ab-stats px-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="text-center">
+        <div class="ab-stat-num">4<em>+</em></div>
+        <div class="ab-stat-label">Org Pillars</div>
+      </div>
+      <div class="text-center">
+        <div class="ab-stat-num">119<em>+</em></div>
+        <div class="ab-stat-label">Dojo Address</div>
+      </div>
+      <div class="text-center">
+        <div class="ab-stat-num">1<em>st</em></div>
+        <div class="ab-stat-label">Solar Esports Facility</div>
+      </div>
+      <div class="text-center">
+        <div class="ab-stat-num">W.<em>AFR</em></div>
+        <div class="ab-stat-label">Regional Reach</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MISSION -->
+<section class="ab-section px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="ab-eyebrow">Who We Are</p>
+        <h2 class="ab-h2">Built by <em>Community</em>,<br>For Africa</h2>
+        <p class="ab-body mt-5">EYT Gaming is a multi-pillar esports ecosystem based in Lagos, Nigeria. What began as a small group of passionate competitors has grown into one of West Africa's most complete esports infrastructures — operating as a competitive team, tournament organiser, training institution, broadcast hub, and grassroots community platform, all under one unified mission.</p>
+        <p class="ab-body mt-4">At the centre of our organisation is the <strong style="color:#fff;">EYT Dojo</strong> — a solar-powered esports training facility at 119 Erelu Ayisat Oniru Road, Maroko, Lagos. Players who travel from far distances are provided accommodation and meals, creating a stable learning environment free from economic pressure.</p>
+        <div class="flex flex-col gap-3 mt-8">
+          <div class="ab-strip">
+            <div class="ab-strip-dot">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">solar_power</span>
+            </div>
+            <div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.9375rem;color:#fff;margin-bottom:.25rem;">The EYT Dojo</div>
+              <p class="ab-body text-sm">A solar-powered facility where players train, analyse gameplay, record content, scrim across countries, and prepare for tournaments — stable power in a place of instability.</p>
+            </div>
+          </div>
+          <div class="ab-strip">
+            <div class="ab-strip-dot">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">route</span>
+            </div>
+            <div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.9375rem;color:#fff;margin-bottom:.25rem;">The Development Pipeline</div>
+              <p class="ab-body text-sm">Beginner → Dojo Trainee → Tournament Competitor → National Contender → Continental Representative → International Athlete.</p>
+            </div>
+          </div>
+          <div class="ab-strip">
+            <div class="ab-strip-dot">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">public</span>
+            </div>
+            <div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.9375rem;color:#fff;margin-bottom:.25rem;">EWCF Partnership</div>
+              <p class="ab-body text-sm">Expanding this model across West Africa — transforming grassroots talent into a confident, competitive generation of esports professionals.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="ab-card">
+          <div class="ab-card-icon">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">emoji_events</span>
+          </div>
+          <div class="ab-card-title">The Team</div>
+          <p class="ab-body text-sm">Elite competitors including CHUX, Ryu Apprentice, and K.I.D. representing Nigeria and West Africa in global tournaments and continental events.</p>
+        </div>
+        <div class="ab-card">
+          <div class="ab-card-icon">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">calendar_month</span>
+          </div>
+          <div class="ab-card-title">Tournament Organiser</div>
+          <p class="ab-body text-sm">Producers of Airtime Brawl, Wakanga League, EYT League, Fight Friday, and cross-regional showdowns involving players from across Africa and beyond.</p>
+        </div>
+        <div class="ab-card">
+          <div class="ab-card-icon">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">school</span>
+          </div>
+          <div class="ab-card-title">Training &amp; Knowledge Hub</div>
+          <p class="ab-body text-sm">Through coaching, VOD reviews, content creation, and guidebooks from educators like Ryu Apprentice, EYT is raising the skill ceiling of the entire West African FGC.</p>
+        </div>
+        <div class="ab-card">
+          <div class="ab-card-icon">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">diversity_3</span>
+          </div>
+          <div class="ab-card-title">Community Ecosystem</div>
+          <p class="ab-body text-sm">A home for players, casters, analysts, fans, and newcomers — providing hospitality, mentorship, learning opportunities, and the cultural backbone of the Nigerian FGC.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ab-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════ VALUES -->
+<section class="ab-section px-4" style="background:linear-gradient(180deg,#080808 0%,#0a0a0a 100%);">
+  <div class="max-w-5xl mx-auto text-center">
+    <p class="ab-eyebrow" style="justify-content:center;">What Drives Us</p>
+    <h2 class="ab-h2">What <em>EYT</em> Stands For</h2>
+    <p class="ab-body mt-4" style="max-width:36rem;margin-left:auto;margin-right:auto;">EYT is not a brand built on corporate funding or external sponsorship. It is a community-built infrastructure created through consistency, passion, and an unwavering belief that African players deserve global opportunity.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <div class="ab-value">
+        <div class="ab-value-icon">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">lightbulb</span>
+        </div>
+        <div class="ab-value-title">Opportunity</div>
+        <p class="ab-body text-sm">Creating opportunity where there was none — giving players in overlooked regions a real pathway from passion to professionalism.</p>
+      </div>
+      <div class="ab-value">
+        <div class="ab-value-icon">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">handshake</span>
+        </div>
+        <div class="ab-value-title">Community</div>
+        <p class="ab-body text-sm">A home where players train together, compete together, and grow together — forming bonds that strengthen both performance and culture.</p>
+      </div>
+      <div class="ab-value">
+        <div class="ab-value-icon">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">trending_up</span>
+        </div>
+        <div class="ab-value-title">Development</div>
+        <p class="ab-body text-sm">A complete developmental pipeline that is rare anywhere in Africa — scalable, sustainable, and strategically aligned with the global esports industry.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ab-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════ TEAM -->
+<section class="ab-section px-4">
+  <div class="max-w-5xl mx-auto text-center">
+    <p class="ab-eyebrow" style="justify-content:center;">The Roster</p>
+    <h2 class="ab-h2">Meet the <em>Competitors</em></h2>
+    <p class="ab-body mt-4" style="max-width:32rem;margin-left:auto;margin-right:auto;">Elite players representing Nigeria and West Africa in global tournaments, qualifiers, and continental events.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mt-12">
+      <div class="ab-team">
+        <div class="ab-avatar">CHX</div>
+        <div class="ab-member-name">CHUX</div>
+        <div class="ab-member-role">Competitor</div>
+      </div>
+      <div class="ab-team">
+        <div class="ab-avatar">RYU</div>
+        <div class="ab-member-name">Ryu Apprentice</div>
+        <div class="ab-member-role">Competitor &amp; Educator</div>
+      </div>
+      <div class="ab-team">
+        <div class="ab-avatar">KID</div>
+        <div class="ab-member-name">K.I.D.</div>
+        <div class="ab-member-role">Competitor</div>
+      </div>
+      <div class="ab-team">
+        <div class="ab-avatar">EYT</div>
+        <div class="ab-member-name">EYT Gaming</div>
+        <div class="ab-member-role">Lagos, Nigeria</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ab-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════ CTA -->
+<section class="ab-section px-4">
+  <div class="max-w-3xl mx-auto">
+    <div class="ab-cta-wrap">
+      <p class="ab-eyebrow" style="justify-content:center;position:relative;z-index:1;">Join the Movement</p>
+      <h2 class="ab-h2" style="margin-bottom:1.25rem;position:relative;z-index:1;">Ready to <em>Compete</em>?</h2>
+      <p class="ab-body" style="max-width:34rem;margin:0 auto 2.5rem;position:relative;z-index:1;">African players deserve global opportunity. Join the EYT Gaming community and be part of the ecosystem that is building the next generation of West African esports professionals.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;position:relative;z-index:1;">
+        {% if user.is_authenticated %}
+        <a href="{% url 'tournaments:list' %}" class="ab-btn ab-btn-primary">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">emoji_events</span>
+          Browse Tournaments
+        </a>
+        <a href="{% url 'dashboard:home' %}" class="ab-btn ab-btn-ghost">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">dashboard</span>
+          Go to Dashboard
+        </a>
+        {% else %}
+        <a href="{% url 'account_signup' %}" class="ab-btn ab-btn-primary">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">person_add</span>
+          Create Free Account
+        </a>
+        <a href="{% url 'account_login' %}" class="ab-btn ab-btn-ghost">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;line-height:1;display:inline-block;">login</span>
+          Sign In
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+{% endblock %}

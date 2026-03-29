@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Responsive Test - Gaming Participant Management</title>
+    <link rel="stylesheet" href="../css/manage-participant-gaming.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0A0A0A;
+        }
+        .test-section {
+            margin-bottom: 40px;
+        }
+        .test-title {
+            color: #DC2626;
+            font-family: 'Barlow Condensed', sans-serif;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .viewport-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="viewport-indicator" id="viewport-indicator">
+        Viewport: <span id="viewport-width"></span>px
+    </div>
+
+    <div class="gaming-page-container" style="padding: 20px;">
+        <h1 class="gaming-heading gaming-heading-primary">Mobile Responsive Test</h1>
+        <p style="color: #9da6b9; margin-bottom: 30px;">
+            Resize your browser window to test responsive behavior at &lt;768px viewport width.
+        </p>
+
+        <!-- Test Section 1: Stat Cards Stacking -->
+        <div class="test-section">
+            <h2 class="test-title">Test 1: Stat Cards (Should Stack Vertically on Mobile)</h2>
+            <div class="gaming-stats-container">
+                <div class="gaming-stat-card">
+                    <div class="gaming-stat-value">24</div>
+                    <div class="gaming-stat-label">Total Registered</div>
+                </div>
+                <div class="gaming-stat-card">
+                    <div class="gaming-stat-value">18</div>
+                    <div class="gaming-stat-label">Checked In</div>
+                </div>
+                <div class="gaming-stat-card">
+                    <div class="gaming-stat-value">6</div>
+                    <div class="gaming-stat-label">Pending Check-in</div>
+                </div>
+                <div class="gaming-stat-card">
+                    <div class="gaming-stat-value">8</div>
+                    <div class="gaming-stat-label">Spots Remaining</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Section 2: Table Horizontal Scrolling -->
+        <div class="test-section">
+            <h2 class="test-title">Test 2: Participant Table (Should Scroll Horizontally on Mobile)</h2>
+            <div class="gaming-table-container">
+                <table class="gaming-table">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Team</th>
+                            <th>Status</th>
+                            <th>Seed</th>
+                            <th>Record</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Player One</td>
+                            <td>Team Alpha</td>
+                            <td>
+                                <div class="gaming-status-indicator">
+                                    <span class="gaming-status-dot checked-in"></span>
+                                    <span>Checked In</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="gaming-seed-badge">1</span>
+                            </td>
+                            <td>5W - 2L</td>
+                            <td>
+                                <button class="gaming-btn-action">Seed</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Player Two</td>
+                            <td>Team Beta</td>
+                            <td>
+                                <div class="gaming-status-indicator">
+                                    <span class="gaming-status-dot pending"></span>
+                                    <span>Pending</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="gaming-seed-badge">2</span>
+                            </td>
+                            <td>3W - 1L</td>
+                            <td>
+                                <button class="gaming-btn-action">Seed</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Player Three</td>
+                            <td>Team Gamma</td>
+                            <td>
+                                <div class="gaming-status-indicator">
+                                    <span class="gaming-status-dot confirmed"></span>
+                                    <span>Confirmed</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="gaming-seed-badge">3</span>
+                            </td>
+                            <td>4W - 3L</td>
+                            <td>
+                                <button class="gaming-btn-action">Seed</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Test Section 3: Search Bar Full Width -->
+        <div class="test-section">
+            <h2 class="test-title">Test 3: Search Bar (Should Be Full Width on Mobile)</h2>
+            <div class="gaming-search-container" style="max-width: 600px;">
+                <input type="text" class="gaming-search-bar" placeholder="Search by name, ID, or team...">
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="test-section">
+            <h2 class="test-title">Expected Behavior</h2>
+            <div style="color: #9da6b9; line-height: 1.8;">
+                <p><strong style="color: #DC2626;">Desktop (≥768px):</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Stat cards display in a horizontal row with flex-wrap</li>
+                    <li>Table displays normally without scrolling</li>
+                    <li>Search bar respects max-width</li>
+                </ul>
+                <p style="margin-top: 20px;"><strong style="color: #DC2626;">Mobile (&lt;768px):</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Stat cards stack vertically (flex-direction: column)</li>
+                    <li>Table enables horizontal scrolling (overflow-x: auto)</li>
+                    <li>Search bar expands to full width (width: 100%)</li>
+                    <li>Stat cards lose skew transform (skewY: 0deg)</li>
+                    <li>Primary buttons lose skew transform (skewX: 0deg)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update viewport width indicator
+        function updateViewportIndicator() {
+            const width = window.innerWidth;
+            document.getElementById('viewport-width').textContent = width;
+            
+            // Change color based on breakpoint
+            const indicator = document.getElementById('viewport-indicator');
+            if (width < 768) {
+                indicator.style.background = 'rgba(16, 185, 129, 0.9)'; // Green for mobile
+            } else if (width < 1024) {
+                indicator.style.background = 'rgba(245, 158, 11, 0.9)'; // Yellow for tablet
+            } else {
+                indicator.style.background = 'rgba(220, 38, 38, 0.9)'; // Red for desktop
+            }
+        }
+
+        updateViewportIndicator();
+        window.addEventListener('resize', updateViewportIndicator);
+    </script>
+</body>
+</html>

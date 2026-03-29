@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Become an Organizer — EYTGaming{% endblock %}
+{% block meta_description %}Apply to become a tournament organizer or venue host on EYTGaming. Run your own esports events and reach thousands of players.{% endblock %}
+
+{% block extra_css %}
+<style>
+.bo-page { background:#0A0A0A; min-height:100vh; }
+.bo-hero {
+  position:relative; overflow:hidden;
+  background:linear-gradient(135deg,#1a0000 0%,#0d0d0d 60%,#1a0000 100%);
+  border-bottom:1px solid rgba(220,38,38,.2);
+  padding:5rem 0 4rem;
+  text-align:center;
+}
+.bo-hero::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(220,38,38,.12) 0%,transparent 70%);
+}
+.bo-hero-title {
+  font-family:'Barlow Condensed',sans-serif;font-size:3.5rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1;
+  position:relative;z-index:1;
+}
+.bo-hero-title span { color:#DC2626; }
+.bo-hero-sub { color:#9ca3af;font-size:1.1rem;margin-top:.75rem;position:relative;z-index:1; }
+.bo-card {
+  background:#111;border:1px solid #1f1f1f;border-radius:12px;
+  padding:2rem;position:relative;overflow:hidden;
+}
+.bo-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#DC2626,#ef4444,#DC2626);
+}
+.bo-perk {
+  display:flex;align-items:flex-start;gap:1rem;
+  padding:1.25rem;background:#0d0d0d;border:1px solid #1f1f1f;
+  border-radius:8px;
+}
+.bo-perk-icon {
+  width:44px;height:44px;border-radius:8px;flex-shrink:0;
+  background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);
+  display:flex;align-items:center;justify-content:center;
+}
+.bo-step {
+  display:flex;align-items:flex-start;gap:1rem;
+  padding:1rem 0;border-bottom:1px solid #1a1a1a;
+}
+.bo-step:last-child { border-bottom:none; }
+.bo-step-num {
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#DC2626,#b91c1c);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;color:#fff;
+}
+.bo-btn {
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 32px;border-radius:8px;
+  background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  border:1px solid rgba(220,38,38,.4);box-shadow:0 0 20px rgba(220,38,38,.3);
+  cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.bo-btn:hover { box-shadow:0 0 32px rgba(220,38,38,.55);transform:translateY(-2px);color:#fff; }
+.bo-btn-ghost {
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 32px;border-radius:8px;
+  background:transparent;color:#9ca3af;
+  font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  border:1px solid #2a2a2a;cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.bo-btn-ghost:hover { border-color:#555;color:#fff; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="bo-page">
+
+  {# Hero #}
+  <div class="bo-hero">
+    <div class="container mx-auto px-4">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;
+                  text-transform:uppercase;letter-spacing:.2em;color:#DC2626;margin-bottom:.75rem;
+                  position:relative;z-index:1;">
+        EYTGaming Organizer Program
+      </div>
+      <h1 class="bo-hero-title">Become an <span>Organizer</span></h1>
+      <p class="bo-hero-sub">Run tournaments. List venues. Build your esports brand.</p>
+      <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:2rem;flex-wrap:wrap;position:relative;z-index:1;">
+        <div style="display:flex;align-items:center;gap:.5rem;color:#9ca3af;font-size:.85rem;">
+          <span style="font-family:'Material Symbols Outlined';font-size:16px;color:#22c55e;
+                       font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">check_circle</span>
+          Free to apply
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;color:#9ca3af;font-size:.85rem;">
+          <span style="font-family:'Material Symbols Outlined';font-size:16px;color:#22c55e;
+                       font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">check_circle</span>
+          Instant access
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;color:#9ca3af;font-size:.85rem;">
+          <span style="font-family:'Material Symbols Outlined';font-size:16px;color:#22c55e;
+                       font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">check_circle</span>
+          Full dashboard tools
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-12" style="max-width:1000px;">
+
+    {% if messages %}
+    <div style="margin-bottom:1.5rem;">
+      {% for message in messages %}
+      <div style="display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border-radius:8px;
+                  font-size:.875rem;margin-bottom:.5rem;
+                  {% if message.tags == 'success' %}background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;
+                  {% elif message.tags == 'error' %}background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#fca5a5;
+                  {% else %}background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#93c5fd;{% endif %}">
+        <span style="font-family:'Material Symbols Outlined';font-size:1rem;font-feature-settings:'liga' 1;
+                     text-transform:none;letter-spacing:0;line-height:1;flex-shrink:0;">
+          {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% else %}info{% endif %}
+        </span>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start;">
+
+      {# Left — perks + steps #}
+      <div>
+        <div class="bo-card" style="margin-bottom:1.5rem;">
+          <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;
+                     text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:1.25rem;">
+            What you get as an Organizer
+          </h2>
+          <div style="display:flex;flex-direction:column;gap:.75rem;">
+
+            <div class="bo-perk">
+              <div class="bo-perk-icon">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;color:#DC2626;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">emoji_events</span>
+              </div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Create & Manage Tournaments</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Build brackets, set prize pools, manage registrations, and run live events.</p>
+              </div>
+            </div>
+
+            <div class="bo-perk">
+              <div class="bo-perk-icon">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;color:#DC2626;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">location_on</span>
+              </div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">List Gaming Venues</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Add your esports arena or gaming lounge and accept bookings from players.</p>
+              </div>
+            </div>
+
+            <div class="bo-perk">
+              <div class="bo-perk-icon">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;color:#DC2626;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">payments</span>
+              </div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Collect Entry Fees & Prize Pools</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Integrated Paystack payments — collect entry fees and distribute prizes seamlessly.</p>
+              </div>
+            </div>
+
+            <div class="bo-perk">
+              <div class="bo-perk-icon">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;color:#DC2626;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">analytics</span>
+              </div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Organizer Analytics Dashboard</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Track registrations, revenue, player stats, and event performance in real time.</p>
+              </div>
+            </div>
+
+            <div class="bo-perk">
+              <div class="bo-perk-icon">
+                <span style="font-family:'Material Symbols Outlined';font-size:22px;color:#DC2626;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">verified</span>
+              </div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Verified Organizer Badge</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Stand out with a verified badge on your profile and all your events.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bo-card">
+          <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;
+                     text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:1.25rem;">
+            How it works
+          </h2>
+          <div>
+            <div class="bo-step">
+              <div class="bo-step-num">1</div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Click "Activate Organizer Access"</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Your account is instantly upgraded — no waiting, no approval queue.</p>
+              </div>
+            </div>
+            <div class="bo-step">
+              <div class="bo-step-num">2</div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Create your first tournament or venue</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Use the full organizer dashboard to set up your event in minutes.</p>
+              </div>
+            </div>
+            <div class="bo-step">
+              <div class="bo-step-num">3</div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Publish and promote</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Your event goes live on EYTGaming and is visible to thousands of players.</p>
+              </div>
+            </div>
+            <div class="bo-step">
+              <div class="bo-step-num">4</div>
+              <div>
+                <p style="font-weight:600;color:#fff;font-size:.9rem;margin:0 0 3px;">Run the event & pay out prizes</p>
+                <p style="color:#6b7280;font-size:.8rem;margin:0;">Manage brackets, resolve disputes, and distribute winnings — all in one place.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Right — CTA card #}
+      <div style="position:sticky;top:1.5rem;">
+        <div class="bo-card" style="text-align:center;">
+          <div style="width:64px;height:64px;border-radius:50%;margin:0 auto 1rem;
+                      background:linear-gradient(135deg,#DC2626,#7f1d1d);
+                      display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Material Symbols Outlined';font-size:32px;color:#fff;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+              emoji_events
+            </span>
+          </div>
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;
+                     text-transform:uppercase;color:#fff;margin:0 0 .5rem;">
+            Ready to lead?
+          </h3>
+          <p style="color:#6b7280;font-size:.85rem;margin:0 0 1.5rem;line-height:1.6;">
+            Join the growing community of EYTGaming organizers running Nigeria's top esports events.
+          </p>
+
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'accounts:become_organizer' %}">
+              {% csrf_token %}
+              <button type="submit" class="bo-btn" style="width:100%;justify-content:center;">
+                <span style="font-family:'Material Symbols Outlined';font-size:18px;
+                             font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+                  bolt
+                </span>
+                Activate Organizer Access
+              </button>
+            </form>
+            <p style="color:#555;font-size:.75rem;margin-top:.75rem;">
+              Instant — no approval required
+            </p>
+          {% else %}
+            <a href="{% url 'account_signup' %}?next={% url 'accounts:become_organizer' %}" class="bo-btn" style="width:100%;justify-content:center;box-sizing:border-box;">
+              <span style="font-family:'Material Symbols Outlined';font-size:18px;
+                           font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+                person_add
+              </span>
+              Sign Up to Apply
+            </a>
+            <p style="color:#555;font-size:.75rem;margin-top:.75rem;">
+              Already have an account?
+              <a href="{% url 'account_login' %}?next={% url 'accounts:become_organizer' %}" style="color:#DC2626;text-decoration:none;">Sign in</a>
+            </p>
+          {% endif %}
+
+          <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #1a1a1a;">
+            <p style="color:#555;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;">
+              Already an organizer?
+            </p>
+            <a href="{% url 'tournaments:create' %}" class="bo-btn-ghost" style="width:100%;justify-content:center;box-sizing:border-box;">
+              Create a Tournament
+            </a>
+          </div>
+        </div>
+
+        {# Stats strip #}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;">
+          <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:1rem;text-align:center;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#DC2626;">Free</div>
+            <div style="font-size:.72rem;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">To Join</div>
+          </div>
+          <div style="background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:1rem;text-align:center;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;color:#DC2626;">24/7</div>
+            <div style="font-size:.72rem;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;">Support</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

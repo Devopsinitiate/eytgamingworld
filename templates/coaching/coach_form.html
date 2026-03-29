@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Coach Profile{% else %}Become a Coach{% endif %} - EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: #0A0A0A; }
+.cf-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+.cf-header { border-left: 4px solid #DC2626; padding-left: 1rem; margin-bottom: 2.5rem; }
+.g-card {
+  background: #111827;
+  border: 1px solid rgba(220,38,38,0.2);
+  border-top: 3px solid #DC2626;
+  border-radius: 4px;
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+  transition: all 0.3s ease;
+}
+.g-card:hover { border-color: rgba(220,38,38,0.4); box-shadow: 0 0 20px rgba(220,38,38,0.08); }
+.g-section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #fff; font-size: 1.15rem; margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem; border-bottom: 1px solid rgba(220,38,38,0.2);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.g-label {
+  display: block;
+  font-family: 'Inter', sans-serif; font-size: 0.82rem;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #9CA3AF; margin-bottom: 0.4rem;
+}
+.g-input, .g-select, .g-textarea {
+  width: 100%; padding: 0.75rem 1rem;
+  background: #0A0A0A; border: 1px solid #374151;
+  border-radius: 3px; color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+.g-input:focus, .g-select:focus, .g-textarea:focus {
+  outline: none; border-color: #DC2626;
+  box-shadow: 0 0 12px rgba(220,38,38,0.25);
+}
+.g-input::placeholder, .g-textarea::placeholder { color: #4B5563; }
+.g-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%239CA3AF'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.75rem center;
+}
+.g-select option { background: #111827; }
+.g-textarea { resize: vertical; min-height: 100px; }
+.g-checkbox-row { display: flex; align-items: center; gap: 0.6rem; }
+.g-checkbox-row input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: #DC2626; cursor: pointer; }
+.g-checkbox-row label { font-family: 'Inter', sans-serif; color: #D1D5DB; font-size: 0.9rem; cursor: pointer; }
+.field-error { color: #F87171; font-family: 'Inter', sans-serif; font-size: 0.78rem; margin-top: 0.3rem; }
+.g-help { color: #6B7280; font-family: 'Inter', sans-serif; font-size: 0.78rem; margin-top: 0.3rem; }
+.submit-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.9rem 2.5rem;
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  color: #fff; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 1.05rem; border: none; border-radius: 3px;
+  transform: skewX(-8deg); cursor: pointer;
+  transition: all 0.3s ease; box-shadow: 0 0 20px rgba(220,38,38,0.35);
+}
+.submit-btn span { display: inline-block; transform: skewX(8deg); }
+.submit-btn:hover { box-shadow: 0 0 35px rgba(220,38,38,0.65); transform: skewX(-8deg) scale(1.03); }
+.back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: #9CA3AF; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: color 0.2s; }
+.back-link:hover { color: #DC2626; }
+.avail-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end; margin-bottom: 0.75rem; }
+.avail-delete-btn { padding: 0.75rem; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); border-radius: 3px; color: #F87171; cursor: pointer; transition: all 0.2s; }
+.avail-delete-btn:hover { background: rgba(220,38,38,0.25); }
+@media (max-width: 640px) {
+  .avail-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="min-h-screen" style="background:#0A0A0A;">
+  <div class="cf-wrap">
+
+    <!-- Back -->
+    <div class="mb-6">
+      <a href="{% url 'coaching:coach_list' %}" class="back-link">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;" aria-hidden="true">arrow_back</span>
+        Back to Coaches
+      </a>
+    </div>
+
+    <!-- Header -->
+    <div class="cf-header">
+      <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:#fff;font-size:2.5rem;line-height:1;">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2.2rem;color:#DC2626;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">school</span>{% if object %}Edit Coach Profile{% else %}Become a Coach{% endif %}
+      </h1>
+      <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:0.9rem;margin-top:0.4rem;">{% if object %}Update your coaching profile and availability{% else %}Set up your coaching profile and start earning{% endif %}</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+      <div style="background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.4);border-radius:3px;padding:1rem;margin-bottom:1.5rem;" role="alert">
+        {% for error in form.non_field_errors %}
+        <p style="font-family:'Inter',sans-serif;color:#F87171;font-size:0.9rem;">{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- About You -->
+      <div class="g-card">
+        <h2 class="g-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">person</span>
+          About You
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label for="{{ form.bio.id_for_label }}" class="g-label">Bio *</label>
+            <textarea name="{{ form.bio.html_name }}" id="{{ form.bio.id_for_label }}" rows="5" class="g-textarea" placeholder="Tell students about your gaming background and coaching style...">{{ form.bio.value|default:'' }}</textarea>
+            {% if form.bio.errors %}<p class="field-error" role="alert">{{ form.bio.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.specializations.id_for_label }}" class="g-label">Specializations</label>
+            <textarea name="{{ form.specializations.html_name }}" id="{{ form.specializations.id_for_label }}" rows="3" class="g-textarea" placeholder='["Strategy", "Mechanics", "Game Sense"]'>{{ form.specializations.value|default:'' }}</textarea>
+            <p class="g-help">Enter as JSON array, e.g. ["Strategy", "Aim Training"]</p>
+            {% if form.specializations.errors %}<p class="field-error" role="alert">{{ form.specializations.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="{{ form.experience_level.id_for_label }}" class="g-label">Experience Level *</label>
+              <select name="{{ form.experience_level.html_name }}" id="{{ form.experience_level.id_for_label }}" class="g-select">
+                {% for val, label in form.experience_level.field.choices %}
+                <option value="{{ val }}" {% if form.experience_level.value == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              {% if form.experience_level.errors %}<p class="field-error" role="alert">{{ form.experience_level.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+              <label for="{{ form.years_experience.id_for_label }}" class="g-label">Years of Experience *</label>
+              <input type="number" name="{{ form.years_experience.html_name }}" id="{{ form.years_experience.id_for_label }}" class="g-input" value="{{ form.years_experience.value|default:'' }}" min="0" max="50">
+              {% if form.years_experience.errors %}<p class="field-error" role="alert">{{ form.years_experience.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+          <div>
+            <label for="{{ form.achievements.id_for_label }}" class="g-label">Achievements</label>
+            <textarea name="{{ form.achievements.html_name }}" id="{{ form.achievements.id_for_label }}" rows="4" class="g-textarea" placeholder="List your notable gaming achievements, tournament wins, ranks...">{{ form.achievements.value|default:'' }}</textarea>
+            {% if form.achievements.errors %}<p class="field-error" role="alert">{{ form.achievements.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Availability -->
+      <div class="g-card">
+        <h2 class="g-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">payments</span>
+          Pricing &amp; Availability
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label for="{{ form.hourly_rate.id_for_label }}" class="g-label">Hourly Rate ($) *</label>
+            <input type="number" name="{{ form.hourly_rate.html_name }}" id="{{ form.hourly_rate.id_for_label }}" class="g-input" value="{{ form.hourly_rate.value|default:'' }}" min="0" step="0.01" placeholder="25.00">
+            {% if form.hourly_rate.errors %}<p class="field-error" role="alert">{{ form.hourly_rate.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.status.id_for_label }}" class="g-label">Status</label>
+            <select name="{{ form.status.html_name }}" id="{{ form.status.id_for_label }}" class="g-select">
+              {% for val, label in form.status.field.choices %}
+              <option value="{{ val }}" {% if form.status.value == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if form.status.errors %}<p class="field-error" role="alert">{{ form.status.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.max_students_per_week.id_for_label }}" class="g-label">Max Students / Week</label>
+            <input type="number" name="{{ form.max_students_per_week.html_name }}" id="{{ form.max_students_per_week.id_for_label }}" class="g-input" value="{{ form.max_students_per_week.value|default:'' }}" min="1">
+            {% if form.max_students_per_week.errors %}<p class="field-error" role="alert">{{ form.max_students_per_week.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="g-checkbox-row">
+          <input type="checkbox" name="{{ form.accepting_students.html_name }}" id="{{ form.accepting_students.id_for_label }}" {% if form.accepting_students.value %}checked{% endif %}>
+          <label for="{{ form.accepting_students.id_for_label }}">Currently accepting new students</label>
+        </div>
+        {% if form.accepting_students.errors %}<p class="field-error" role="alert">{{ form.accepting_students.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- Session Settings -->
+      <div class="g-card">
+        <h2 class="g-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">schedule</span>
+          Session Settings
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label for="{{ form.min_session_duration.id_for_label }}" class="g-label">Min Duration (min)</label>
+            <input type="number" name="{{ form.min_session_duration.html_name }}" id="{{ form.min_session_duration.id_for_label }}" class="g-input" value="{{ form.min_session_duration.value|default:'' }}" min="15" step="15" placeholder="30">
+            {% if form.min_session_duration.errors %}<p class="field-error" role="alert">{{ form.min_session_duration.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.max_session_duration.id_for_label }}" class="g-label">Max Duration (min)</label>
+            <input type="number" name="{{ form.max_session_duration.html_name }}" id="{{ form.max_session_duration.id_for_label }}" class="g-input" value="{{ form.max_session_duration.value|default:'' }}" min="15" step="15" placeholder="120">
+            {% if form.max_session_duration.errors %}<p class="field-error" role="alert">{{ form.max_session_duration.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.session_increment.id_for_label }}" class="g-label">Increment (min)</label>
+            <input type="number" name="{{ form.session_increment.html_name }}" id="{{ form.session_increment.id_for_label }}" class="g-input" value="{{ form.session_increment.value|default:'' }}" min="15" step="15" placeholder="30">
+            {% if form.session_increment.errors %}<p class="field-error" role="alert">{{ form.session_increment.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="g-checkbox-row">
+            <input type="checkbox" name="{{ form.offers_individual.html_name }}" id="{{ form.offers_individual.id_for_label }}" {% if form.offers_individual.value %}checked{% endif %}>
+            <label for="{{ form.offers_individual.id_for_label }}">Offers individual sessions</label>
+          </div>
+          <div class="g-checkbox-row">
+            <input type="checkbox" name="{{ form.offers_group.html_name }}" id="{{ form.offers_group.id_for_label }}" {% if form.offers_group.value %}checked{% endif %}>
+            <label for="{{ form.offers_group.id_for_label }}">Offers group sessions</label>
+          </div>
+          <div>
+            <label for="{{ form.max_group_size.id_for_label }}" class="g-label">Max Group Size</label>
+            <input type="number" name="{{ form.max_group_size.html_name }}" id="{{ form.max_group_size.id_for_label }}" class="g-input" value="{{ form.max_group_size.value|default:'' }}" min="2" placeholder="5">
+            {% if form.max_group_size.errors %}<p class="field-error" role="alert">{{ form.max_group_size.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Platform -->
+      <div class="g-card">
+        <h2 class="g-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">videocam</span>
+          Video Platform
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="{{ form.preferred_platform.id_for_label }}" class="g-label">Preferred Platform</label>
+            <input type="text" name="{{ form.preferred_platform.html_name }}" id="{{ form.preferred_platform.id_for_label }}" class="g-input" value="{{ form.preferred_platform.value|default:'' }}" placeholder="Discord, Zoom, Google Meet...">
+            <p class="g-help">e.g. Discord, Zoom, Google Meet</p>
+            {% if form.preferred_platform.errors %}<p class="field-error" role="alert">{{ form.preferred_platform.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ form.platform_username.id_for_label }}" class="g-label">Platform Username</label>
+            <input type="text" name="{{ form.platform_username.html_name }}" id="{{ form.platform_username.id_for_label }}" class="g-input" value="{{ form.platform_username.value|default:'' }}" placeholder="Your username on the platform">
+            {% if form.platform_username.errors %}<p class="field-error" role="alert">{{ form.platform_username.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+        <div>
+          <label for="{{ form.profile_video.id_for_label }}" class="g-label">Profile Video URL</label>
+          <input type="url" name="{{ form.profile_video.html_name }}" id="{{ form.profile_video.id_for_label }}" class="g-input" value="{{ form.profile_video.value|default:'' }}" placeholder="https://youtube.com/...">
+          <p class="g-help">Link to a YouTube/Twitch clip showcasing your skills (optional)</p>
+          {% if form.profile_video.errors %}<p class="field-error" role="alert">{{ form.profile_video.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <!-- Availability (edit only) -->
+      {% if availability_formset %}
+      <div class="g-card">
+        <h2 class="g-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.2rem;color:#DC2626;" aria-hidden="true">calendar_month</span>
+          Weekly Availability
+        </h2>
+        {{ availability_formset.management_form }}
+        {% for avail_form in availability_formset %}
+        {{ avail_form.id }}
+        <div class="avail-row" style="padding:1rem;background:rgba(10,10,10,0.4);border-radius:3px;border-left:2px solid rgba(220,38,38,0.3);margin-bottom:0.75rem;">
+          <div>
+            <label for="{{ avail_form.weekday.id_for_label }}" class="g-label">Day</label>
+            <select name="{{ avail_form.weekday.html_name }}" id="{{ avail_form.weekday.id_for_label }}" class="g-select">
+              {% for val, label in avail_form.weekday.field.choices %}
+              <option value="{{ val }}" {% if avail_form.weekday.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if avail_form.weekday.errors %}<p class="field-error">{{ avail_form.weekday.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ avail_form.start_time.id_for_label }}" class="g-label">Start Time</label>
+            <input type="time" name="{{ avail_form.start_time.html_name }}" id="{{ avail_form.start_time.id_for_label }}" class="g-input" value="{{ avail_form.start_time.value|default:'' }}">
+            {% if avail_form.start_time.errors %}<p class="field-error">{{ avail_form.start_time.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="{{ avail_form.end_time.id_for_label }}" class="g-label">End Time</label>
+            <input type="time" name="{{ avail_form.end_time.html_name }}" id="{{ avail_form.end_time.id_for_label }}" class="g-input" value="{{ avail_form.end_time.value|default:'' }}">
+            {% if avail_form.end_time.errors %}<p class="field-error">{{ avail_form.end_time.errors.0 }}</p>{% endif %}
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:0.75rem;padding-bottom:0.25rem;">
+            <div class="g-checkbox-row">
+              <input type="checkbox" name="{{ avail_form.is_active.html_name }}" id="{{ avail_form.is_active.id_for_label }}" {% if avail_form.is_active.value %}checked{% endif %} style="width:1.1rem;height:1.1rem;accent-color:#DC2626;">
+              <label for="{{ avail_form.is_active.id_for_label }}" style="font-size:0.8rem;color:#9CA3AF;">Active</label>
+            </div>
+            {% if avail_form.instance.pk %}
+            <div class="g-checkbox-row">
+              <input type="checkbox" name="{{ avail_form.DELETE.html_name }}" id="{{ avail_form.DELETE.id_for_label }}" style="width:1.1rem;height:1.1rem;accent-color:#DC2626;">
+              <label for="{{ avail_form.DELETE.id_for_label }}" style="font-family:'Inter',sans-serif;font-size:0.78rem;color:#F87171;cursor:pointer;">Delete</label>
+            </div>
+            {% endif %}
+          </div>
+          {% if avail_form.non_field_errors %}
+          <div style="grid-column:1/-1;">
+            {% for error in avail_form.non_field_errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Submit -->
+      <div class="flex items-center gap-4 flex-wrap">
+        <button type="submit" class="submit-btn">
+          <span>
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">save</span>{% if object %}Save Changes{% else %}Create Profile{% endif %}
+          </span>
+        </button>
+        {% if object %}
+        <a href="{% url 'coaching:coach_detail' object.pk %}" class="back-link">Cancel</a>
+        {% else %}
+        <a href="{% url 'coaching:coach_list' %}" class="back-link">Cancel</a>
+        {% endif %}
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

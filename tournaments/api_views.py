@@ -480,3 +480,374 @@ def tournament_bracket_api(request, slug):
     except Exception as e:
         logger.error(f"Error fetching bracket data for {slug}: {e}")
         return JsonResponse({'error': 'Failed to fetch bracket data'}, status=500)
+
+
+@require_http_methods(["GET"])
+@cache_page(30)  # Cache for 30 seconds
+def tournament_unified_updates_api(request, slug):
+    """
+    Unified API endpoint that consolidates all tournament update data.
+    Reduces multiple API calls to a single batched request.
+    
+    Returns:
+        - statistics: participant counts, engagement metrics, match counts
+        - registration: current registration status and capacity
+        - timeline: current phase and progress
+        - participants: summary of recent registrations
+        - matches: recent and live match data
+    """
+    tournament = get_object_or_404(Tournament, slug=slug)
+    
+    try:
+        # Get statistics (try cache first)
+        cached_stats = TournamentCache.get_tournament_stats(tournament.id)
+        
+        if not cached_stats:
+            # Generate fresh statistics
+            cached_stats = {
+                'participants': {
+                    'registered': tournament.total_registered,
+                    'checked_in': tournament.total_checked_in,
+                    'capacity': tournament.max_participants,
+                    'percentage_full': (tournament.total_registered / tournament.max_participants) * 100 if tournament.max_participants > 0 else 0,
+                    'spots_remaining': tournament.max_participants - tournament.total_registered if tournament.max_participants > tournament.total_registered else 0,
+                    'is_full': tournament.is_full
+                },
+                'engagement': {
+                    'views': tournament.view_count,
+                    'shares': getattr(tournament, 'share_count', 0),
+                    'registrations_today': tournament.get_registrations_today()
+                },
+                'matches': {
+                    'total': tournament.matches.count(),
+                    'completed': tournament.matches.filter(status='completed').count(),
+                    'in_progress': tournament.matches.filter(status='in_progress').count(),
+                    'pending': tournament.matches.filter(status__in=['pending', 'ready']).count()
+                }
+            }
+            # Cache the statistics
+            TournamentCache.set_tournament_stats(tournament.id, cached_stats)
+        
+        # Registration status
+        registration_data = {
+            'is_open': tournament.is_registration_open,
+            'is_full': tournament.is_full,
+            'spots_remaining': tournament.max_participants - tournament.total_registered if tournament.max_participants > tournament.total_registered else 0,
+            'capacity': tournament.max_participants,
+            'registered': tournament.total_registered,
+            'checked_in': tournament.total_checked_in,
+            'percentage_full': (tournament.total_registered / tournament.max_participants) * 100 if tournament.max_participants > 0 else 0
+        }
+        
+        # Timeline progress
+        timeline_data = {
+            'current_phase': tournament.status,
+            'progress_percentage': {
+                'draft': 0,
+                'registration': 25,
+                'check_in': 50,
+                'in_progress': 75,
+                'completed': 100,
+                'cancelled': 0
+            }.get(tournament.status, 0),
+            'registration_start': tournament.registration_start.isoformat() if tournament.registration_start else None,
+            'registration_end': tournament.registration_end.isoformat() if tournament.registration_end else None,
+            'start_date': tournament.start_date.isoformat() if tournament.start_date else None,
+            'end_date': tournament.end_date.isoformat() if tournament.end_date else None
+        }
+        
+        # Recent participants (last 5 registrations)
+        recent_participants = tournament.participants.select_related(
+            'user', 'team'
+        ).order_by('-registered_at')[:5]
+        
+        participants_data = {
+            'total': tournament.participants.count(),
+            'checked_in_count': tournament.participants.filter(checked_in=True).count(),
+            'recent': [{
+                'id': str(p.id),
+                'display_name': p.display_name,
+                'registered_at': p.registered_at.isoformat(),
+                'checked_in': p.checked_in,
+                'seed': p.seed
+            } for p in recent_participants]
+        }
+        
+        # Recent matches (last 5 completed)
+        recent_matches = tournament.matches.filter(
+            status='completed'
+        ).select_related(
+            'participant1', 'participant2', 'winner'
+        ).order_by('-completed_at')[:5]
+        
+        # Live matches (currently in progress)
+        live_matches = tournament.matches.filter(
+            status='in_progress'
+        ).select_related(
+            'participant1', 'participant2'
+        ).order_by('round_number', 'match_number')[:10]
+        
+        matches_data = {
+            'recent': [{
+                'id': str(m.id),
+                'participant1': m.participant1.display_name if m.participant1 else 'TBD',
+                'participant2': m.participant2.display_name if m.participant2 else 'TBD',
+                'score': f"{m.score_p1} - {m.score_p2}" if m.score_p1 is not None and m.score_p2 is not None else 'vs',
+                'winner': m.winner.display_name if m.winner else None,
+                'completed_at': m.completed_at.isoformat() if m.completed_at else None,
+                'round_number': m.round_number
+            } for m in recent_matches],
+            'live': [{
+                'id': str(m.id),
+                'participant1': m.participant1.display_name if m.participant1 else 'TBD',
+                'participant2': m.participant2.display_name if m.participant2 else 'TBD',
+                'score': f"{m.score_p1 or 0} - {m.score_p2 or 0}",
+                'round_number': m.round_number,
+                'match_number': m.match_number,
+                'started_at': m.started_at.isoformat() if m.started_at else None
+            } for m in live_matches]
+        }
+        
+        # Construct unified response
+        response_data = {
+            'statistics': cached_stats,
+            'registration': registration_data,
+            'timeline': timeline_data,
+            'participants': participants_data,
+            'matches': matches_data,
+            'status': tournament.status,
+            'timestamp': timezone.now().isoformat()
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error fetching unified updates for {slug}: {e}")
+        return JsonResponse({
+            'error': 'Failed to fetch unified updates',
+            'timestamp': timezone.now().isoformat()
+        }, status=500)
+
+
+@require_http_methods(["POST"])
+def seed_participants_api(request, slug):
+    """
+    API endpoint for manual seed assignment.
+    
+    Allows tournament organizers to assign seed values to participants.
+    Validates authorization, tournament status, seeding method, and seed values.
+    Updates are performed in an atomic transaction with audit logging.
+    """
+    from django.contrib.auth.decorators import login_required
+    from django.db import transaction
+    from django.contrib.admin.models import LogEntry, CHANGE
+    from django.contrib.contenttypes.models import ContentType
+    import json
+    
+    # Check authentication
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required'}, status=401)
+    
+    tournament = get_object_or_404(Tournament, slug=slug)
+    
+    # Authorization check - must be organizer or superuser
+    if request.user != tournament.organizer and not request.user.is_superuser:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Permission denied. Only tournament organizers can modify seeds.'
+        }, status=403)
+    
+    # Status check - tournament must not have started
+    if tournament.status in ['in_progress', 'completed']:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Tournament has already started. Seeding is locked.'
+        }, status=409)
+    
+    # Seeding method check - must be manual
+    if tournament.seeding_method != 'manual':
+        return JsonResponse({
+            'success': False, 
+            'error': 'Manual seeding is not enabled for this tournament.'
+        }, status=400)
+    
+    # Parse request body
+    try:
+        data = json.loads(request.body)
+        seeds = data.get('seeds', [])
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Invalid JSON in request body'
+        }, status=400)
+    
+    if not isinstance(seeds, list):
+        return JsonResponse({
+            'success': False, 
+            'error': 'Seeds must be an array'
+        }, status=400)
+    
+    # Validate and update in atomic transaction
+    try:
+        with transaction.atomic():
+            for seed_data in seeds:
+                participant_id = seed_data.get('participant_id')
+                seed_value = seed_data.get('seed')
+                
+                # Validate participant_id is provided
+                if not participant_id:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Missing participant_id in seed data'
+                    }, status=400)
+                
+                # Validate seed value - must be positive integer or null
+                if seed_value is not None:
+                    if not isinstance(seed_value, int) or seed_value <= 0:
+                        return JsonResponse({
+                            'success': False,
+                            'error': 'Invalid seed value',
+                            'details': {'invalid_seeds': [seed_value]}
+                        }, status=400)
+                
+                # Get participant - must exist, belong to tournament, and be confirmed
+                try:
+                    participant = tournament.participants.get(
+                        id=participant_id, 
+                        status='confirmed'
+                    )
+                except Participant.DoesNotExist:
+                    return JsonResponse({
+                        'success': False, 
+                        'error': 'Participant not found or not confirmed'
+                    }, status=400)
+                
+                # Store old seed for audit log
+                old_seed = participant.seed
+                
+                # Update seed
+                participant.seed = seed_value
+                participant.save()
+                
+                # Create audit log entry with tournament and participant names
+                LogEntry.objects.create(
+                    user_id=request.user.id,
+                    content_type_id=ContentType.objects.get_for_model(Participant).pk,
+                    object_id=participant.id,
+                    object_repr=str(participant),
+                    action_flag=CHANGE,
+                    change_message=f"Tournament: {tournament.name} | Participant: {participant.display_name} | Seed changed from {old_seed} to {seed_value}"
+                )
+        
+        # Return updated participants
+        participants = tournament.participants.filter(
+            status='confirmed'
+        ).select_related('user', 'team').order_by('seed', 'registered_at')
+        
+        participant_data = [{
+            'id': str(p.id),
+            'display_name': p.display_name,
+            'seed': p.seed,
+            'status': p.status,
+            'registered_at': p.registered_at.isoformat()
+        } for p in participants]
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Seeds updated successfully',
+            'participants': participant_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating seeds for tournament {slug}: {e}")
+        return JsonResponse({
+            'success': False, 
+            'error': 'An error occurred while updating seeds'
+        }, status=500)
+
+
+@require_http_methods(["POST"])
+def auto_seed_api(request, slug):
+    """
+    API endpoint for automatic seed assignment by registration order.
+    
+    Assigns seeds sequentially (1, 2, 3...) based on participant registration timestamp.
+    Earliest registered participant gets seed 1, second earliest gets seed 2, etc.
+    """
+    from django.contrib.auth.decorators import login_required
+    from django.db import transaction
+    from django.contrib.admin.models import LogEntry, CHANGE
+    from django.contrib.contenttypes.models import ContentType
+    import json
+    
+    # Check authentication
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required'}, status=401)
+    
+    tournament = get_object_or_404(Tournament, slug=slug)
+    
+    # Authorization check - must be organizer or superuser
+    if request.user != tournament.organizer and not request.user.is_superuser:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Permission denied. Only tournament organizers can modify seeds.'
+        }, status=403)
+    
+    # Status check - tournament must not have started
+    if tournament.status in ['in_progress', 'completed']:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Tournament has already started. Seeding is locked.'
+        }, status=409)
+    
+    # Seeding method check - must be manual
+    if tournament.seeding_method != 'manual':
+        return JsonResponse({
+            'success': False, 
+            'error': 'Manual seeding is not enabled for this tournament.'
+        }, status=400)
+    
+    # Get confirmed participants ordered by registration time
+    participants = tournament.participants.filter(
+        status='confirmed'
+    ).select_related('user', 'team').order_by('registered_at')
+    
+    # Auto-assign seeds in atomic transaction
+    try:
+        with transaction.atomic():
+            for index, participant in enumerate(participants, start=1):
+                old_seed = participant.seed
+                participant.seed = index
+                participant.save()
+                
+                # Create audit log entry with tournament and participant names
+                LogEntry.objects.create(
+                    user_id=request.user.id,
+                    content_type_id=ContentType.objects.get_for_model(Participant).pk,
+                    object_id=participant.id,
+                    object_repr=str(participant),
+                    action_flag=CHANGE,
+                    change_message=f"Tournament: {tournament.name} | Participant: {participant.display_name} | Auto-seeded from {old_seed} to {index}"
+                )
+        
+        # Prepare response data
+        participant_data = [{
+            'id': str(p.id),
+            'display_name': p.display_name,
+            'seed': p.seed,
+            'status': p.status,
+            'registered_at': p.registered_at.isoformat()
+        } for p in participants]
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Auto-seeding completed. {participants.count()} participants seeded.',
+            'participants': participant_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error auto-seeding tournament {slug}: {e}")
+        return JsonResponse({
+            'success': False, 
+            'error': 'An error occurred during auto-seeding'
+        }, status=500)

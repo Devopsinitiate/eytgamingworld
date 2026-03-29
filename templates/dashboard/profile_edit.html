@@ -5,558 +5,668 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    
-    /* Upload area styling */
-    .upload-area {
-        border: 2px dashed #374151;
-        transition: all 0.3s ease;
-    }
-    
-    .upload-area:hover {
-        border-color: #b91c1c;
-        background-color: rgba(185, 28, 28, 0.05);
-    }
-    
-    .upload-area.dragover {
-        border-color: #b91c1c;
-        background-color: rgba(185, 28, 28, 0.1);
-    }
-    
-    /* Form styling improvements */
-    .form-input {
-        width: 100%;
-        border-radius: 0.5rem;
-        border: 1px solid #4b5563;
-        background-color: #1f2937;
-        color: #ffffff !important;
-        padding: 0.75rem;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-input::placeholder {
-        color: #9ca3af;
-    }
-    
-    .form-input:focus {
-        outline: none;
-        border-color: #b91c1c;
-        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.5);
-    }
-    
-    .form-input:hover {
-        border-color: #6b7280;
-    }
-    
-    /* Ensure all form inputs have visible text */
-    input[type="text"], 
-    input[type="email"], 
-    input[type="tel"], 
-    input[type="date"], 
-    textarea, 
-    select {
-        color: #ffffff !important;
-        background-color: #1f2937 !important;
-    }
-    
-    /* Fix for Django form widgets */
-    .form-input input,
-    .form-input textarea,
-    .form-input select {
-        color: #ffffff !important;
-        background-color: #1f2937 !important;
-    }
-    
-    .form-label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #d1d5db;
+    /* ── Gaming Page Base ── */
+    .pe-page { background: #080808; min-height: 100vh; }
+
+    /* ── Page Header ── */
+    .pe-header {
+        position: relative;
+        padding: 2rem 0 1.5rem;
         margin-bottom: 0.5rem;
     }
-    
-    /* Character counter */
-    .char-counter {
-        @apply text-xs text-gray-400 mt-1;
+    .pe-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0;
+        width: 3rem; height: 3px;
+        background: linear-gradient(90deg, #b91c1c, transparent);
+        border-radius: 2px;
     }
-    
-    .char-counter.over-limit {
-        @apply text-red-400;
+    .pe-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-style: italic;
+        text-transform: uppercase;
+        font-size: 2.25rem;
+        letter-spacing: 0.05em;
+        color: #fff;
+        line-height: 1;
     }
-    
-    /* Progress bar animation */
-    .progress-bar {
-        transition: width 0.5s ease-in-out;
+    .pe-subtitle { color: #6b7280; font-size: 0.875rem; margin-top: 0.375rem; }
+
+    /* ── Cards ── */
+    .pe-card {
+        background: #0d1117;
+        border: 1px solid #1f2937;
+        border-radius: 0.875rem;
+        padding: 1.75rem;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s;
     }
-    
-    /* Force dark theme overrides for profile edit page */
-    .bg-white,
-    .bg-gray-50 {
-        background-color: #111318 !important;
-        color: #ffffff !important;
+    .pe-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #b91c1c 0%, rgba(185,28,28,0.3) 60%, transparent 100%);
     }
-    
-    .text-gray-900 {
-        color: #ffffff !important;
+    .pe-card:hover { border-color: rgba(185,28,28,0.3); }
+
+    /* ── Section Title ── */
+    .pe-section-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.9375rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
     }
-    
-    .text-gray-600 {
-        color: #9ca3af !important;
+    .pe-section-title::before {
+        content: '';
+        width: 3px; height: 1rem;
+        background: #b91c1c;
+        border-radius: 2px;
+        box-shadow: 0 0 6px rgba(185,28,28,0.6);
+        flex-shrink: 0;
     }
-    
-    .border-gray-200 {
-        border-color: #374151 !important;
+    /* Prevent text-transform/letter-spacing from breaking icon ligatures */
+    .pe-section-title .material-symbols-outlined,
+    .pe-upload-btn .material-symbols-outlined,
+    .pe-btn .material-symbols-outlined,
+    .pe-label .material-symbols-outlined {
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        font-family: 'Material Symbols Outlined' !important;
+        font-feature-settings: 'liga' 1 !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+        display: inline-block !important;
     }
-    
-    /* Profile completeness widget styling */
-    .profile-completeness {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+
+    /* ── Upload Areas ── */
+    .pe-upload-area {
+        border: 2px dashed #1f2937;
+        border-radius: 0.75rem;
+        padding: 2.5rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        transition: border-color 0.2s, background 0.2s;
+        cursor: pointer;
+        background: rgba(255,255,255,0.01);
     }
-    
-    /* Quick links styling */
-    .quick-links {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .pe-upload-area:hover,
+    .pe-upload-area.dragover {
+        border-color: rgba(185,28,28,0.5);
+        background: rgba(185,28,28,0.04);
     }
-    
-    .quick-links a {
-        color: #e5e7eb !important;
-        transition: color 0.2s ease;
+    .pe-upload-icon {
+        width: 3rem; height: 3rem;
+        border-radius: 0.75rem;
+        background: rgba(185,28,28,0.1);
+        border: 1px solid rgba(185,28,28,0.25);
+        display: flex; align-items: center; justify-content: center;
     }
-    
-    .quick-links a:hover {
-        color: var(--eyt-primary) !important;
+
+    /* ── Form Inputs ── */
+    .pe-input {
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #1f2937;
+        background: #080808;
+        color: #e5e7eb;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: 'Inter', sans-serif;
     }
-    
-    /* Profile tips styling */
-    .profile-tips {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    .pe-input::placeholder { color: #374151; }
+    .pe-input:hover  { border-color: #374151; }
+    .pe-input:focus  {
+        outline: none;
+        border-color: #b91c1c;
+        box-shadow: 0 0 0 2px rgba(185,28,28,0.2);
+        background: #0d1117;
     }
-    
-    /* Account stats styling */
-    .account-stats {
-        background-color: #111318 !important;
-        border-color: #374151 !important;
+    select.pe-input option { background: #0d1117; }
+
+    /* ── Label ── */
+    .pe-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        margin-bottom: 0.375rem;
+    }
+
+    /* ── Buttons ── */
+    .pe-btn {
+        display: inline-flex; align-items: center; gap: 0.375rem;
+        padding: 0.5625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .pe-btn-primary {
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        color: #fff;
+        box-shadow: 0 0 16px rgba(185,28,28,0.3);
+    }
+    .pe-btn-primary:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        box-shadow: 0 0 24px rgba(185,28,28,0.5);
+        transform: translateY(-1px);
+    }
+    .pe-btn-ghost {
+        background: transparent;
+        color: #9ca3af;
+        border: 1px solid #1f2937;
+    }
+    .pe-btn-ghost:hover { border-color: #374151; color: #e5e7eb; background: rgba(255,255,255,0.03); }
+
+    .pe-upload-btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.5rem 1.125rem;
+        border-radius: 0.5rem;
+        background: rgba(185,28,28,0.1);
+        border: 1px solid rgba(185,28,28,0.25);
+        color: #f87171;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .pe-upload-btn:hover {
+        background: rgba(185,28,28,0.2);
+        border-color: rgba(185,28,28,0.5);
+        box-shadow: 0 0 12px rgba(185,28,28,0.2);
+    }
+
+    /* ── Progress Bar ── */
+    .pe-progress-track {
+        width: 100%; height: 5px;
+        border-radius: 9999px;
+        background: #1f2937;
+        overflow: hidden;
+    }
+    .pe-progress-fill {
+        height: 100%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #b91c1c, #ef4444);
+        box-shadow: 0 0 8px rgba(185,28,28,0.5);
+        transition: width 0.5s ease;
+    }
+
+    /* ── Quick Links ── */
+    .pe-quick-link {
+        display: flex; align-items: center; gap: 0.625rem;
+        padding: 0.5rem 0.625rem;
+        border-radius: 0.5rem;
+        color: #9ca3af;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: all 0.15s;
+        border-left: 2px solid transparent;
+        text-decoration: none;
+    }
+    .pe-quick-link:hover {
+        color: #f87171;
+        background: rgba(185,28,28,0.08);
+        border-left-color: #b91c1c;
+        padding-left: 0.875rem;
+    }
+    .pe-quick-link .material-symbols-outlined { font-size: 1rem; color: #4b5563; transition: color 0.15s; }
+    .pe-quick-link:hover .material-symbols-outlined { color: #ef4444; }
+
+    /* ── Stat Row ── */
+    .pe-stat-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.625rem 0;
+        border-bottom: 1px solid #111827;
+        font-size: 0.8125rem;
+    }
+    .pe-stat-row:last-child { border-bottom: none; }
+
+    /* ── Gaming Account Row ── */
+    .pe-account-row {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid #111827;
+        margin-bottom: 0.5rem;
+        transition: border-color 0.15s;
+    }
+    .pe-account-row:focus-within { border-color: rgba(185,28,28,0.4); }
+    .pe-account-icon {
+        width: 2rem; height: 2rem; border-radius: 0.375rem;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+
+    /* ── Alert ── */
+    .pe-alert {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        border-radius: 0.625rem;
+        border: 1px solid;
+        font-size: 0.875rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 p-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 flex flex-col gap-8">
-            <!-- Page Header -->
-            <div>
-                <h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Edit Profile</h1>
-            </div>
+<div class="pe-page px-4 md:px-8 pb-12">
+    <div class="max-w-6xl mx-auto">
 
-            <!-- Messages -->
-            {% if messages %}
-                <div class="space-y-3">
-                    {% for message in messages %}
-                        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-green-900/20 border-green-500/30 text-green-300{% elif message.tags == 'error' %}bg-red-900/20 border-red-500/30 text-red-300{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500/30 text-yellow-300{% else %}bg-blue-900/20 border-blue-500/30 text-blue-300{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined">
-                                    {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
-                                </span>
-                                <p>{{ message }}</p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <!-- Profile Completeness Widget -->
-            {% if completeness %}
-                <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                    <div class="flex flex-col gap-3">
-                        <div class="flex gap-6 justify-between items-center">
-                            <p class="text-gray-900 dark:text-white text-base font-medium leading-normal">Profile Completeness</p>
-                            <p class="text-primary text-sm font-bold leading-normal">{{ completeness.percentage }}%</p>
-                        </div>
-                        <div class="w-full rounded-full bg-gray-200 dark:bg-[#3b4354]">
-                            <div class="h-2 rounded-full bg-primary progress-bar" style="width: {{ completeness.percentage }}%;"></div>
-                        </div>
-                        {% if completeness.percentage < 100 %}
-                            <p class="text-gray-500 dark:text-[#9da6b9] text-sm font-normal leading-normal">Add your gaming accounts to complete your profile!</p>
-                        {% else %}
-                            <p class="text-green-500 dark:text-green-400 text-sm font-normal leading-normal">Your profile is 100% complete! Great job!</p>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Profile Images Section -->
-            <div class="flex flex-col gap-y-6">
-                <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Profile Images</h2>
-                <div class="flex flex-col gap-4">
-                    <!-- Banner Upload -->
-                    <div class="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-[#3b4354] px-6 py-14 upload-area" id="banner-upload-area">
-                        {% if user.banner %}
-                            <div class="w-full max-w-md h-32 rounded-lg overflow-hidden">
-                                {% responsive_banner user.banner "Current Banner" "w-full h-full object-cover" "banner-preview" %}
-                            </div>
-                        {% endif %}
-                        <div class="flex max-w-[480px] flex-col items-center gap-2 text-center">
-                            <p class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Profile Banner</p>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">1920x400px, Max 5MB</p>
-                        </div>
-                        <form method="post" enctype="multipart/form-data" id="banner-form">
-                            {% csrf_token %}
-                            <input type="file" name="banner" id="banner-input" accept="image/*" class="hidden" onchange="previewBanner(event)" aria-label="Upload banner image">
-                            <button type="button" onclick="document.getElementById('banner-input').click()" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-[#282e39] text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em]">
-                                <span>Upload Banner</span>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- Avatar Upload -->
-                    <div class="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-[#3b4354] px-6 py-14 upload-area" id="avatar-upload-area">
-                        {% if user.avatar %}
-                            <div class="w-24 h-24 rounded-full overflow-hidden">
-                                {% responsive_avatar user.avatar "Current Avatar" "w-full h-full object-cover" True "avatar-preview" %}
-                            </div>
-                        {% else %}
-                            <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center">
-                                <span class="text-white text-2xl font-bold">{{ user.get_display_name|first|upper }}</span>
-                            </div>
-                        {% endif %}
-                        <div class="flex max-w-[480px] flex-col items-center gap-2 text-center">
-                            <p class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Profile Avatar</p>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">400x400px, Max 2MB</p>
-                        </div>
-                        <form method="post" enctype="multipart/form-data" id="avatar-form">
-                            {% csrf_token %}
-                            <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden" onchange="previewAvatar(event)" aria-label="Upload avatar image">
-                            <button type="button" onclick="document.getElementById('avatar-input').click()" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-[#282e39] text-gray-900 dark:text-white text-sm font-bold leading-normal tracking-[0.015em]">
-                                <span>Upload Avatar</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Basic Information Section -->
-            <div class="flex flex-col gap-y-6">
-                <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Basic Information</h2>
-                <form method="post" id="profile-form">
-                    {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
-                        <!-- Display Name -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_display_name">Display Name</label>
-                            {{ profile_form.display_name }}
-                            {% if profile_form.display_name.errors %}
-                                <p class="text-sm text-red-400">{{ profile_form.display_name.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- First Name -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_first_name">First Name</label>
-                            {{ profile_form.first_name }}
-                        </div>
-                        
-                        <!-- Last Name -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_last_name">Last Name</label>
-                            {{ profile_form.last_name }}
-                        </div>
-                        
-                        <!-- Date of Birth -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_date_of_birth">Date of Birth</label>
-                            {{ profile_form.date_of_birth }}
-                        </div>
-                        
-                        <!-- Country -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_country">Country</label>
-                            {{ profile_form.country }}
-                        </div>
-                        
-                        <!-- City -->
-                        <div class="flex flex-col gap-y-2">
-                            <label class="form-label" for="id_city">City</label>
-                            {{ profile_form.city }}
-                        </div>
-                        
-                        <!-- Phone Number -->
-                        <div class="flex flex-col gap-y-2 md:col-span-2">
-                            <label class="form-label" for="id_phone_number">Phone Number</label>
-                            {{ profile_form.phone_number }}
-                        </div>
-                        
-                        <!-- Bio -->
-                        <div class="flex flex-col gap-y-2 md:col-span-2">
-                            <div class="flex justify-between">
-                                <label class="form-label" for="id_bio">Bio</label>
-                                <span class="text-xs text-gray-500 dark:text-gray-400" id="bio-counter">0 / 500</span>
-                            </div>
-                            {{ profile_form.bio }}
-                            {% if profile_form.bio.errors %}
-                                <p class="text-sm text-red-400">{{ profile_form.bio.errors.0 }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Form Actions -->
-                    <div class="flex justify-end gap-4 mt-6">
-                        <a href="{% url 'dashboard:profile_view' user.username %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-[#282e39] text-gray-800 dark:text-white text-sm font-bold leading-normal tracking-[0.015em]" aria-label="Cancel profile editing and return to profile">Cancel</a>
-                        <button type="submit" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Gaming Accounts Section -->
-            <div class="flex flex-col gap-y-6">
-                <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Gaming Accounts</h2>
-                <form method="post" id="gaming-accounts-form">
-                    {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Discord -->
-                        <div>
-                            <label class="form-label" for="id_discord_username">Discord Username</label>
-                            {{ profile_form.discord_username }}
-                        </div>
-                        
-                        <!-- Steam -->
-                        <div>
-                            <label class="form-label" for="id_steam_id">Steam ID</label>
-                            {{ profile_form.steam_id }}
-                        </div>
-                        
-                        <!-- Twitch -->
-                        <div class="md:col-span-2">
-                            <label class="form-label" for="id_twitch_username">Twitch Username</label>
-                            {{ profile_form.twitch_username }}
-                        </div>
-                    </div>
-                    
-                    <!-- Form Actions -->
-                    <div class="flex justify-end gap-4 mt-6">
-                        <button type="button" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em]" aria-label="Cancel gaming account changes">Cancel</button>
-                        <button type="submit" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">Save Changes</button>
-                    </div>
-                </form>
-            </div>
+        <!-- Page Header -->
+        <div class="pe-header">
+            <h1 class="pe-title">Edit Profile</h1>
+            <p class="pe-subtitle">Keep your profile up to date to get the best experience</p>
         </div>
 
-        <!-- Sidebar -->
-        <aside class="hidden lg:block space-y-8">
-            <!-- Quick Links -->
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Links</h3>
-                <ul class="space-y-3">
-                    <li><a class="flex items-center gap-2 text-primary hover:underline" href="{% url 'dashboard:profile_view' user.username %}"><span class="material-symbols-outlined text-base">visibility</span>View Profile</a></li>
-                    <li><a class="flex items-center gap-2 text-primary hover:underline" href="{% url 'dashboard:settings_privacy' %}"><span class="material-symbols-outlined text-base">privacy_tip</span>Privacy Settings</a></li>
-                    <li><a class="flex items-center gap-2 text-primary hover:underline" href="{% url 'dashboard:settings_security' %}"><span class="material-symbols-outlined text-base">security</span>Security Settings</a></li>
-                    <li><a class="flex items-center gap-2 text-primary hover:underline" href="{% url 'dashboard:game_profile_list' %}"><span class="material-symbols-outlined text-base">sports_esports</span>Manage Game Profiles</a></li>
-                </ul>
+        <!-- Messages -->
+        {% if messages %}
+        <div class="space-y-2 mb-6">
+            {% for message in messages %}
+            <div class="pe-alert
+                {% if message.tags == 'success' %}bg-green-950/40 border-green-700/40 text-green-300
+                {% elif message.tags == 'error' %}bg-red-950/40 border-red-700/40 text-red-300
+                {% elif message.tags == 'warning' %}bg-yellow-950/40 border-yellow-700/40 text-yellow-300
+                {% else %}bg-blue-950/40 border-blue-700/40 text-blue-300{% endif %}">
+                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1.1rem;text-transform:none;letter-spacing:0;flex-shrink:0;">{% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}</span>
+                <p>{{ message }}</p>
             </div>
-            
-            <!-- Profile Tips -->
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Profile Tips</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">A complete profile with a banner and avatar is more likely to receive team invites and followers.</p>
-            </div>
-            
-            <!-- Account Stats -->
-            <div class="bg-white dark:bg-[#111318] p-6 rounded-xl border border-gray-200 dark:border-gray-800">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Account Stats</h3>
-                <ul class="space-y-3 text-sm">
-                    <li class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Member Since:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ user.date_joined|date:"M Y" }}</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Profile Views:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">-</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Last Updated:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ user.updated_at|date:"M d, Y"|default:"Today" }}</span>
-                    </li>
-                </ul>
-            </div>
-        </aside>
-    </div>
-</main>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- ── Main Column ── -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+
+                <!-- Profile Completeness -->
+                {% if completeness %}
+                <div class="pe-card">
+                    <div class="flex justify-between items-center mb-2">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">bar_chart</span>
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Profile Completeness</span>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#f87171;text-transform:none;letter-spacing:0;"{% if completeness.percentage == 100 %}#22c55e{% elif completeness.percentage >= 60 %}#f59e0b{% else %}#ef4444{% endif %};">{{ completeness.percentage }}%</span>
+                    </div>
+                    <div class="pe-progress-track mt-3">
+                        <div class="pe-progress-fill" style="width:{{ completeness.percentage }}%;"></div>
+                    </div>
+                    <p class="text-xs mt-2 {% if completeness.percentage < 100 %}text-gray-600{% else %}text-green-500{% endif %}">
+                        {% if completeness.percentage < 100 %}Add your gaming accounts to complete your profile{% else %}Your profile is 100% complete{% endif %}
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Profile Images -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">image</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Profile Images</span>
+                    </div>
+                    <div class="flex flex-col gap-4">
+
+                        <!-- Banner -->
+                        <div>
+                            <p class="pe-label">Banner Image</p>
+                            <div class="pe-upload-area" id="banner-upload-area">
+                                {% if user.banner %}
+                                <div class="w-full h-28 rounded-lg overflow-hidden">
+                                    {% responsive_banner user.banner "Current Banner" "w-full h-full object-cover" "banner-preview" %}
+                                </div>
+                                {% else %}
+                                <div class="pe-upload-icon">
+                                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#f87171;text-transform:none;letter-spacing:0;">panorama</span>
+                                </div>
+                                {% endif %}
+                                <div class="text-center">
+                                    <p class="text-white text-sm font-semibold">Profile Banner</p>
+                                    <p class="text-gray-600 text-xs mt-0.5">1920×400px · Max 5MB</p>
+                                </div>
+                                <form method="post" enctype="multipart/form-data" id="banner-form">
+                                    {% csrf_token %}
+                                    <input type="file" name="banner" id="banner-input" accept="image/*" class="hidden" onchange="previewBanner(event)" aria-label="Upload banner image">
+                                    <button type="button" onclick="document.getElementById('banner-input').click()" class="pe-upload-btn">
+                                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#f87171;text-transform:none;letter-spacing:0;">upload</span>
+                                        Upload Banner
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Avatar -->
+                        <div>
+                            <p class="pe-label">Avatar</p>
+                            <div class="pe-upload-area" id="avatar-upload-area">
+                                {% if user.avatar %}
+                                <div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-red-900/40">
+                                    {% responsive_avatar user.avatar "Current Avatar" "w-full h-full object-cover" True "avatar-preview" %}
+                                </div>
+                                {% else %}
+                                <div class="w-20 h-20 rounded-full bg-red-900/30 border border-red-800/40 flex items-center justify-center ring-2 ring-red-900/20">
+                                    <span class="text-white text-2xl font-bold" style="font-family:'Barlow Condensed',sans-serif;">{{ user.get_display_name|first|upper }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="text-center">
+                                    <p class="text-white text-sm font-semibold">Profile Avatar</p>
+                                    <p class="text-gray-600 text-xs mt-0.5">400×400px · Max 2MB</p>
+                                </div>
+                                <form method="post" enctype="multipart/form-data" id="avatar-form">
+                                    {% csrf_token %}
+                                    <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden" onchange="previewAvatar(event)" aria-label="Upload avatar image">
+                                    <button type="button" onclick="document.getElementById('avatar-input').click()" class="pe-upload-btn">
+                                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#f87171;text-transform:none;letter-spacing:0;">upload</span>
+                                        Upload Avatar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">person</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Basic Information</span>
+                    </div>
+                    <form method="post" id="profile-form">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_display_name">Display Name</label>
+                                {{ profile_form.display_name }}
+                                {% if profile_form.display_name.errors %}<p class="text-xs text-red-400 mt-1">{{ profile_form.display_name.errors.0 }}</p>{% endif %}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_first_name">First Name</label>
+                                {{ profile_form.first_name }}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_last_name">Last Name</label>
+                                {{ profile_form.last_name }}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_date_of_birth">Date of Birth</label>
+                                {{ profile_form.date_of_birth }}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_country">Country</label>
+                                {{ profile_form.country }}
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="pe-label" for="id_city">City</label>
+                                {{ profile_form.city }}
+                            </div>
+                            <div class="flex flex-col gap-1 md:col-span-2">
+                                <label class="pe-label" for="id_phone_number">Phone Number</label>
+                                {{ profile_form.phone_number }}
+                            </div>
+                            <div class="flex flex-col gap-1 md:col-span-2">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="pe-label" style="margin-bottom:0;" for="id_bio">Bio</label>
+                                    <span class="text-xs text-gray-600" id="bio-counter">0 / 500</span>
+                                </div>
+                                {{ profile_form.bio }}
+                                {% if profile_form.bio.errors %}<p class="text-xs text-red-400 mt-1">{{ profile_form.bio.errors.0 }}</p>{% endif %}
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-900">
+                            <a href="{% url 'dashboard:profile_view' user.username %}" class="pe-btn pe-btn-ghost">Cancel</a>
+                            <button type="submit" class="pe-btn pe-btn-primary">
+                                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">save</span>
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Gaming Accounts -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">sports_esports</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Gaming Accounts</span>
+                    </div>
+                    <form method="post" id="gaming-accounts-form">
+                        {% csrf_token %}
+                        <div class="flex flex-col gap-3">
+
+                            <!-- Discord -->
+                            <div class="pe-account-row">
+                                <div class="pe-account-icon" style="background:rgba(88,101,242,0.15); border:1px solid rgba(88,101,242,0.3);">
+                                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;color:#818cf8;text-transform:none;letter-spacing:0;">chat</span>
+                                </div>
+                                <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                                    <label class="pe-label" style="margin-bottom:0;" for="id_discord_username">Discord</label>
+                                    {{ profile_form.discord_username }}
+                                </div>
+                            </div>
+
+                            <!-- Steam -->
+                            <div class="pe-account-row">
+                                <div class="pe-account-icon" style="background:rgba(23,107,135,0.15); border:1px solid rgba(23,107,135,0.3);">
+                                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;color:#38bdf8;text-transform:none;letter-spacing:0;">sports_esports</span>
+                                </div>
+                                <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                                    <label class="pe-label" style="margin-bottom:0;" for="id_steam_id">Steam ID</label>
+                                    {{ profile_form.steam_id }}
+                                </div>
+                            </div>
+
+                            <!-- Twitch -->
+                            <div class="pe-account-row">
+                                <div class="pe-account-icon" style="background:rgba(145,70,255,0.15); border:1px solid rgba(145,70,255,0.3);">
+                                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;color:#c084fc;text-transform:none;letter-spacing:0;">live_tv</span>
+                                </div>
+                                <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                                    <label class="pe-label" style="margin-bottom:0;" for="id_twitch_username">Twitch</label>
+                                    {{ profile_form.twitch_username }}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-900">
+                            <button type="button" class="pe-btn pe-btn-ghost">Cancel</button>
+                            <button type="submit" class="pe-btn pe-btn-primary">
+                                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">save</span>
+                                Save Accounts
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- end main col -->
+
+            <!-- ── Sidebar ── -->
+            <aside class="hidden lg:flex flex-col gap-5">
+
+                <!-- Quick Links -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">link</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Quick Links</span>
+                    </div>
+                    <nav class="flex flex-col gap-0.5">
+                        <a class="pe-quick-link" href="{% url 'dashboard:profile_view' user.username %}">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;">visibility</span>View Profile
+                        </a>
+                        <a class="pe-quick-link" href="{% url 'dashboard:settings_privacy' %}">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;">privacy_tip</span>Privacy Settings
+                        </a>
+                        <a class="pe-quick-link" href="{% url 'dashboard:settings_security' %}">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;">security</span>Security Settings
+                        </a>
+                        <a class="pe-quick-link" href="{% url 'dashboard:game_profile_list' %}">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:1rem;text-transform:none;letter-spacing:0;">sports_esports</span>Game Profiles
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Profile Tips -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">tips_and_updates</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Tips</span>
+                    </div>
+                    <ul class="flex flex-col gap-2.5">
+                        <li class="flex items-start gap-2 text-xs text-gray-500">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.875rem;color:#b91c1c;text-transform:none;letter-spacing:0;flex-shrink:0;margin-top:0.05rem;">bolt</span>
+                            Add a banner and avatar to stand out in tournaments
+                        </li>
+                        <li class="flex items-start gap-2 text-xs text-gray-500">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.875rem;color:#b91c1c;text-transform:none;letter-spacing:0;flex-shrink:0;margin-top:0.05rem;">bolt</span>
+                            Link your Discord to receive team invites faster
+                        </li>
+                        <li class="flex items-start gap-2 text-xs text-gray-500">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.875rem;color:#b91c1c;text-transform:none;letter-spacing:0;flex-shrink:0;margin-top:0.05rem;">bolt</span>
+                            A complete profile gets more coaching requests
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Account Stats -->
+                <div class="pe-card">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+                        <span style="width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0;display:inline-block;"></span>
+                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:0.9rem;color:#fff;text-transform:none;letter-spacing:0;">analytics</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;">Account Stats</span>
+                    </div>
+                    <div>
+                        <div class="pe-stat-row">
+                            <span class="text-gray-500 text-xs uppercase tracking-wide">Member Since</span>
+                            <span class="text-white text-sm font-semibold">{{ user.date_joined|date:"M Y" }}</span>
+                        </div>
+                        <div class="pe-stat-row">
+                            <span class="text-gray-500 text-xs uppercase tracking-wide">Profile Views</span>
+                            <span class="text-white text-sm font-semibold">—</span>
+                        </div>
+                        <div class="pe-stat-row">
+                            <span class="text-gray-500 text-xs uppercase tracking-wide">Last Updated</span>
+                            <span class="text-white text-sm font-semibold">{{ user.updated_at|date:"M d, Y"|default:"Today" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </div><!-- end grid -->
+    </div><!-- end max-w -->
+</div><!-- end pe-page -->
 
 <script>
-    // Banner preview function
-    function previewBanner(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let preview = document.getElementById('banner-preview');
-                if (preview) {
-                    preview.src = e.target.result;
-                } else {
-                    // Create new preview image
-                    const uploadArea = document.getElementById('banner-upload-area');
-                    const imageContainer = document.createElement('div');
-                    imageContainer.className = 'w-full max-w-md h-32 rounded-lg overflow-hidden';
-                    imageContainer.innerHTML = `<img src="${e.target.result}" alt="Banner Preview" id="banner-preview" class="w-full h-full object-cover">`;
-                    uploadArea.insertBefore(imageContainer, uploadArea.children[0]);
-                }
-            };
-            reader.readAsDataURL(file);
-            
-            // Auto-submit form after preview
-            setTimeout(() => {
-                document.getElementById('banner-form').submit();
-            }, 500);
+function previewBanner(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        let preview = document.getElementById('banner-preview');
+        if (preview) {
+            preview.src = e.target.result;
+        } else {
+            const area = document.getElementById('banner-upload-area');
+            const wrap = document.createElement('div');
+            wrap.className = 'w-full h-28 rounded-lg overflow-hidden';
+            wrap.innerHTML = `<img src="${e.target.result}" id="banner-preview" class="w-full h-full object-cover" alt="Banner Preview">`;
+            area.insertBefore(wrap, area.firstChild);
         }
-    }
+    };
+    reader.readAsDataURL(file);
+    setTimeout(() => document.getElementById('banner-form').submit(), 500);
+}
 
-    // Avatar preview function
-    function previewAvatar(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let preview = document.getElementById('avatar-preview');
-                if (preview) {
-                    preview.src = e.target.result;
-                } else {
-                    // Create new preview image
-                    const uploadArea = document.getElementById('avatar-upload-area');
-                    const imageContainer = document.createElement('div');
-                    imageContainer.className = 'w-24 h-24 rounded-full overflow-hidden';
-                    imageContainer.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview" id="avatar-preview" class="w-full h-full object-cover">`;
-                    uploadArea.insertBefore(imageContainer, uploadArea.children[0]);
-                }
-            };
-            reader.readAsDataURL(file);
-            
-            // Auto-submit form after preview
-            setTimeout(() => {
-                document.getElementById('avatar-form').submit();
-            }, 500);
+function previewAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        let preview = document.getElementById('avatar-preview');
+        if (preview) {
+            preview.src = e.target.result;
+        } else {
+            const area = document.getElementById('avatar-upload-area');
+            const wrap = document.createElement('div');
+            wrap.className = 'w-20 h-20 rounded-full overflow-hidden ring-2 ring-red-900/40';
+            wrap.innerHTML = `<img src="${e.target.result}" id="avatar-preview" class="w-full h-full object-cover" alt="Avatar Preview">`;
+            area.insertBefore(wrap, area.firstChild);
         }
-    }
+    };
+    reader.readAsDataURL(file);
+    setTimeout(() => document.getElementById('avatar-form').submit(), 500);
+}
 
-    // Drag and drop functionality
-    function setupDragAndDrop() {
-        const uploadAreas = document.querySelectorAll('.upload-area');
-        
-        uploadAreas.forEach(area => {
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                area.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            ['dragenter', 'dragover'].forEach(eventName => {
-                area.addEventListener(eventName, () => area.classList.add('dragover'), false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                area.addEventListener(eventName, () => area.classList.remove('dragover'), false);
-            });
-            
-            area.addEventListener('drop', handleDrop, false);
-        });
-        
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            
-            if (files.length > 0) {
-                const file = files[0];
-                const area = e.currentTarget;
-                
-                if (area.id === 'banner-upload-area') {
-                    document.getElementById('banner-input').files = files;
-                    previewBanner({ target: { files: [file] } });
-                } else if (area.id === 'avatar-upload-area') {
-                    document.getElementById('avatar-input').files = files;
-                    previewAvatar({ target: { files: [file] } });
-                }
-            }
-        }
-    }
-
-    // Character counter for bio
-    function setupBioCounter() {
-        const bioField = document.querySelector('textarea[name="bio"]');
-        const counter = document.getElementById('bio-counter');
-        
-        if (bioField && counter) {
-            const maxLength = 500;
-            
-            function updateCounter() {
-                const currentLength = bioField.value.length;
-                counter.textContent = `${currentLength} / ${maxLength}`;
-                
-                if (currentLength > maxLength) {
-                    counter.classList.add('over-limit');
-                } else {
-                    counter.classList.remove('over-limit');
-                }
-            }
-            
-            // Initial count
-            updateCounter();
-            
-            // Update on input
-            bioField.addEventListener('input', updateCounter);
-        }
-    }
-
-    // Style form fields
-    function styleFormFields() {
-        // Style all text inputs
-        const textInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"]');
-        textInputs.forEach(input => {
-            input.className = 'form-input';
-            // Ensure text is visible
-            input.style.color = '#ffffff';
-            input.style.backgroundColor = '#1f2937';
-            input.style.border = '1px solid #4b5563';
-        });
-
-        // Style textareas
-        const textareas = document.querySelectorAll('textarea');
-        textareas.forEach(textarea => {
-            textarea.className = 'form-input';
-            textarea.rows = 4;
-            textarea.placeholder = textarea.placeholder || 'Tell us about yourself...';
-            // Ensure text is visible
-            textarea.style.color = '#ffffff';
-            textarea.style.backgroundColor = '#1f2937';
-            textarea.style.border = '1px solid #4b5563';
-        });
-
-        // Style selects
-        const selects = document.querySelectorAll('select');
-        selects.forEach(select => {
-            select.className = 'form-input';
-            // Ensure text is visible
-            select.style.color = '#ffffff';
-            select.style.backgroundColor = '#1f2937';
-            select.style.border = '1px solid #4b5563';
-        });
-    }
-
-    // Initialize everything when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        styleFormFields();
-        setupBioCounter();
-        setupDragAndDrop();
+document.addEventListener('DOMContentLoaded', function () {
+    // Apply pe-input class to all form fields
+    document.querySelectorAll(
+        'input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="url"], input[type="number"]'
+    ).forEach(el => el.classList.add('pe-input'));
+    document.querySelectorAll('textarea').forEach(el => {
+        el.classList.add('pe-input');
+        el.rows = el.rows || 4;
     });
+    document.querySelectorAll('select').forEach(el => el.classList.add('pe-input'));
+
+    // Bio counter
+    const bio = document.querySelector('textarea[name="bio"]');
+    const counter = document.getElementById('bio-counter');
+    if (bio && counter) {
+        const update = () => {
+            const len = bio.value.length;
+            counter.textContent = `${len} / 500`;
+            counter.style.color = len > 500 ? '#f87171' : '#4b5563';
+        };
+        update();
+        bio.addEventListener('input', update);
+    }
+
+    // Drag and drop
+    document.querySelectorAll('.pe-upload-area').forEach(area => {
+        ['dragenter','dragover','dragleave','drop'].forEach(ev =>
+            area.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); })
+        );
+        ['dragenter','dragover'].forEach(ev => area.addEventListener(ev, () => area.classList.add('dragover')));
+        ['dragleave','drop'].forEach(ev => area.addEventListener(ev, () => area.classList.remove('dragover')));
+        area.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (!files.length) return;
+            if (area.id === 'banner-upload-area') {
+                document.getElementById('banner-input').files = files;
+                previewBanner({ target: { files } });
+            } else {
+                document.getElementById('avatar-input').files = files;
+                previewAvatar({ target: { files } });
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
