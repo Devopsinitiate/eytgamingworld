@@ -33,89 +33,99 @@ class BracketGenerator:
             participant.save()
     
     def next_power_of_two(self, n: int) -> int:
-        """Get next power of 2 for bracket size"""
+        """Get next power of 2 for bracket size (safe against n <= 1)."""
+        if n <= 1:
+            return 2
         return 2 ** math.ceil(math.log2(n))
-    
+
+    def build_seeded_slot_order(self, bracket_size: int) -> list:
+        """Standard FGC/start.gg seeded slot order. See bracket_generator.py for details."""
+        slots = [1, 2]
+        size = 2
+        while size < bracket_size:
+            size *= 2
+            new_slots = []
+            for s in slots:
+                new_slots.append(s)
+                new_slots.append(size + 1 - s)
+            slots = new_slots
+        return slots
+
     def generate_single_elimination(self):
-        """Generate single elimination bracket"""
+        """Generate single elimination bracket with correct FGC seeding."""
+        if self.participant_count < 1:
+            raise ValueError("Cannot generate bracket with no participants")
+
         self.seed_participants()
-        
-        bracket_size = self.next_power_of_two(self.participant_count)
+
+        bracket_size = self.next_power_of_two(max(2, self.participant_count))
         total_rounds = int(math.log2(bracket_size))
-        
-        # Create main bracket
+
         bracket = Bracket.objects.create(
             tournament=self.tournament,
             bracket_type='main',
             name='Main Bracket',
-            total_rounds=total_rounds
+            total_rounds=total_rounds,
         )
-        
-        # Calculate byes
-        byes = bracket_size - self.participant_count
-        
-        # Create all matches for all rounds
-        matches_by_round = {}
-        
-        # Round 1 - initial matches
-        round_1_matches = bracket_size // 2
-        matches_by_round[1] = []
-        
-        participant_idx = 0
-        for match_num in range(round_1_matches):
+
+        slot_order = self.build_seeded_slot_order(bracket_size)
+        seed_to_participant = {p.seed: p for p in self.participants}
+
+        matches_by_round = {1: []}
+        for match_num in range(bracket_size // 2):
+            p1 = seed_to_participant.get(slot_order[match_num * 2])
+            p2 = seed_to_participant.get(slot_order[match_num * 2 + 1])
+
             match = Match.objects.create(
                 tournament=self.tournament,
                 bracket=bracket,
                 round_number=1,
-                match_number=match_num + 1
+                match_number=match_num + 1,
+                participant1=p1,
+                participant2=p2,
             )
-            
-            # Assign participants with bye logic
-            if participant_idx < self.participant_count:
-                match.participant1 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            if participant_idx < self.participant_count:
-                match.participant2 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            # Handle byes
-            if match.is_bye:
+
+            if (p1 is None) != (p2 is None):
                 match.status = 'completed'
-                match.winner = match.participant1 or match.participant2
-                match.score_p1 = 1 if match.participant1 else 0
-                match.score_p2 = 1 if match.participant2 else 0
-            elif match.is_ready:
+                match.winner = p1 or p2
+                match.score_p1 = 1 if p1 else 0
+                match.score_p2 = 1 if p2 else 0
+            elif p1 and p2:
                 match.status = 'ready'
-            
+
             match.save()
             matches_by_round[1].append(match)
-        
-        # Create subsequent rounds
+
         for round_num in range(2, total_rounds + 1):
             matches_in_round = bracket_size // (2 ** round_num)
             matches_by_round[round_num] = []
-            
             for match_num in range(matches_in_round):
                 match = Match.objects.create(
                     tournament=self.tournament,
                     bracket=bracket,
                     round_number=round_num,
                     match_number=match_num + 1,
-                    is_grand_finals=(round_num == total_rounds)
+                    is_grand_finals=(round_num == total_rounds),
                 )
                 matches_by_round[round_num].append(match)
-        
-        # Link matches together
+
         for round_num in range(1, total_rounds):
-            current_round = matches_by_round[round_num]
-            next_round = matches_by_round[round_num + 1]
-            
-            for idx, match in enumerate(current_round):
-                next_match_idx = idx // 2
-                match.next_match_winner = next_round[next_match_idx]
+            for idx, match in enumerate(matches_by_round[round_num]):
+                match.next_match_winner = matches_by_round[round_num + 1][idx // 2]
                 match.save()
-        
+
+        # Auto-advance bye winners
+        for match in matches_by_round[1]:
+            if match.status == 'completed' and match.winner and match.next_match_winner:
+                next_m = match.next_match_winner
+                if next_m.participant1 is None:
+                    next_m.participant1 = match.winner
+                elif next_m.participant2 is None:
+                    next_m.participant2 = match.winner
+                if next_m.participant1 and next_m.participant2:
+                    next_m.status = 'ready'
+                next_m.save()
+
         return bracket
     
     def generate_double_elimination(self):

@@ -1747,17 +1747,35 @@ def tournament_register(request, slug):
         
         # Get user's teams if tournament is team-based
         user_teams = []
+        context_extra = {}
         if tournament.is_team_based:
             from teams.models import Team, TeamMember
-            # Get teams where user is captain or co-captain (only they can register teams)
+            # Get teams where user is captain or co-captain.
+            # First try matching the tournament's game; if none found, show all
+            # captain/co-captain teams so the user sees a meaningful message.
             user_teams = Team.objects.filter(
                 members__user=request.user,
                 members__status='active',
                 members__role__in=['captain', 'co_captain'],
                 status='active',
-                game=tournament.game  # Only teams for the same game
+                game=tournament.game
             ).distinct()
-            
+
+            if not user_teams.exists():
+                # Broaden: show all active captain teams regardless of game
+                # so the template can display a helpful "wrong game" message
+                user_teams = Team.objects.filter(
+                    members__user=request.user,
+                    members__status='active',
+                    members__role__in=['captain', 'co_captain'],
+                    status='active',
+                ).distinct()
+                # Mark them so the template knows they don't match the game
+                # We pass a separate flag instead of filtering them out
+                context_extra = {'teams_wrong_game': True}
+            else:
+                context_extra = {'teams_wrong_game': False}
+
             logger.info(f"Found {user_teams.count()} eligible teams for user {request.user.username}")
         
         # Create a temporary mixin instance to get enhanced context
@@ -1772,6 +1790,8 @@ def tournament_register(request, slug):
             'tournament': tournament,
             'user_teams': user_teams,
         }
+        if tournament.is_team_based:
+            context.update(context_extra)
         context.update(enhanced_context)
         
         return render(request, 'tournaments/tournament_register.html', context)

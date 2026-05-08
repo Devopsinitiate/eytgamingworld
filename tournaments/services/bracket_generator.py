@@ -34,99 +34,143 @@ class BracketGenerator:
     
     def next_power_of_two(self, n: int) -> int:
         """Get next power of 2 for bracket size"""
-        if n <= 0:
-            return 2  # Minimum bracket size
-        if n == 1:
-            return 2  # Single participant needs at least 2 slots
-        # Ensure n is at least 2 to avoid math domain error
-        n = max(2, n)
+        if n <= 1:
+            return 2  # Minimum bracket size is 2 slots
         return 2 ** math.ceil(math.log2(n))
+
+    def build_seeded_slot_order(self, bracket_size: int) -> list:
+        """
+        Build the standard FGC/start.gg seeded slot order for a bracket.
+
+        For an 8-slot bracket the slot order is [1, 8, 5, 4, 3, 6, 7, 2],
+        ensuring seed 1 and seed 2 can only meet in the Grand Final, and
+        top seeds receive byes when the field is not a perfect power of 2.
+
+        The algorithm works recursively:
+          - Start with [1, 2]
+          - Each expansion doubles the list by interleaving the complement:
+            [1, 2] → [1, 4, 3, 2] → [1, 8, 5, 4, 3, 6, 7, 2]
+        """
+        slots = [1, 2]
+        size = 2
+        while size < bracket_size:
+            size *= 2
+            new_slots = []
+            for s in slots:
+                new_slots.append(s)
+                new_slots.append(size + 1 - s)
+            slots = new_slots
+        return slots
     
     def generate_single_elimination(self):
-        """Generate single elimination bracket"""
-        # Validate minimum participants
+        """
+        Generate a single-elimination bracket using standard FGC/start.gg seeding.
+
+        Fixes applied vs the old implementation:
+          1. Standard seeded slot placement (seed 1 vs seed N, not seed 1 vs seed 2).
+          2. Byes are awarded to the TOP seeds (lowest seed numbers), matching
+             Capcom Cup / start.gg behaviour.
+          3. Bye winners are automatically advanced into Round 2 immediately after
+             generation so the bracket is playable without manual intervention.
+          4. A next-round match whose both participants are now known is automatically
+             set to 'ready' so players and organisers see the correct status.
+        """
         if self.participant_count < 1:
             raise ValueError("Cannot generate bracket with no participants")
-        
+
         self.seed_participants()
-        
-        # Ensure we have at least 2 participants for bracket calculation
+
         bracket_size = self.next_power_of_two(max(2, self.participant_count))
         total_rounds = int(math.log2(bracket_size))
-        
-        # Create main bracket
+
         bracket = Bracket.objects.create(
             tournament=self.tournament,
             bracket_type='main',
             name='Main Bracket',
-            total_rounds=total_rounds
+            total_rounds=total_rounds,
         )
-        
-        # Calculate byes
-        byes = bracket_size - self.participant_count
-        
-        # Create all matches for all rounds
-        matches_by_round = {}
-        
-        # Round 1 - initial matches
-        round_1_matches = bracket_size // 2
-        matches_by_round[1] = []
-        
-        participant_idx = 0
-        for match_num in range(round_1_matches):
+
+        # ── Standard seeded slot order (FGC / start.gg) ──────────────────────
+        # slot_order[i] is the seed number that belongs in bracket slot i+1.
+        # For 8 slots: [1, 8, 5, 4, 3, 6, 7, 2]
+        # Byes fill the LAST slots in this order, so top seeds (1, 2, …) get byes.
+        slot_order = self.build_seeded_slot_order(bracket_size)
+
+        # Build a seed→participant lookup (seed is 1-based after seed_participants)
+        seed_to_participant = {p.seed: p for p in self.participants}
+
+        # ── Round 1 matches ───────────────────────────────────────────────────
+        matches_by_round = {1: []}
+        round_1_match_count = bracket_size // 2
+
+        for match_num in range(round_1_match_count):
+            slot_a = slot_order[match_num * 2]       # e.g. slot 1 → seed 1
+            slot_b = slot_order[match_num * 2 + 1]   # e.g. slot 2 → seed 8
+
+            p1 = seed_to_participant.get(slot_a)  # None if this is a bye slot
+            p2 = seed_to_participant.get(slot_b)  # None if this is a bye slot
+
             match = Match.objects.create(
                 tournament=self.tournament,
                 bracket=bracket,
                 round_number=1,
-                match_number=match_num + 1
+                match_number=match_num + 1,
+                participant1=p1,
+                participant2=p2,
             )
-            
-            # Assign participants with bye logic
-            if participant_idx < self.participant_count:
-                match.participant1 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            if participant_idx < self.participant_count:
-                match.participant2 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            # Handle byes
-            if match.is_bye:
+
+            # Auto-complete byes immediately
+            if p1 is None and p2 is None:
+                # Both slots empty — shouldn't happen, but guard anyway
+                pass
+            elif p1 is None or p2 is None:
+                # One participant → bye
                 match.status = 'completed'
-                match.winner = match.participant1 or match.participant2
-                match.score_p1 = 1 if match.participant1 else 0
-                match.score_p2 = 1 if match.participant2 else 0
-            elif match.is_ready:
+                match.winner = p1 or p2
+                match.score_p1 = 1 if p1 else 0
+                match.score_p2 = 1 if p2 else 0
+            else:
                 match.status = 'ready'
-            
+
             match.save()
             matches_by_round[1].append(match)
-        
-        # Create subsequent rounds
+
+        # ── Subsequent round shells ───────────────────────────────────────────
         for round_num in range(2, total_rounds + 1):
             matches_in_round = bracket_size // (2 ** round_num)
             matches_by_round[round_num] = []
-            
             for match_num in range(matches_in_round):
                 match = Match.objects.create(
                     tournament=self.tournament,
                     bracket=bracket,
                     round_number=round_num,
                     match_number=match_num + 1,
-                    is_grand_finals=(round_num == total_rounds)
+                    is_grand_finals=(round_num == total_rounds),
                 )
                 matches_by_round[round_num].append(match)
-        
-        # Link matches together
+
+        # ── Link matches (winner path) ────────────────────────────────────────
         for round_num in range(1, total_rounds):
-            current_round = matches_by_round[round_num]
-            next_round = matches_by_round[round_num + 1]
-            
-            for idx, match in enumerate(current_round):
-                next_match_idx = idx // 2
-                match.next_match_winner = next_round[next_match_idx]
+            for idx, match in enumerate(matches_by_round[round_num]):
+                next_match = matches_by_round[round_num + 1][idx // 2]
+                match.next_match_winner = next_match
                 match.save()
-        
+
+        # ── Auto-advance bye winners into Round 2 ────────────────────────────
+        # Fix #3: bye matches are already completed but their winner was never
+        # placed into the next-round match.  Do it now so Round 2 is populated.
+        for match in matches_by_round[1]:
+            if match.status == 'completed' and match.winner and match.next_match_winner:
+                next_m = match.next_match_winner
+                if next_m.participant1 is None:
+                    next_m.participant1 = match.winner
+                elif next_m.participant2 is None:
+                    next_m.participant2 = match.winner
+                # Fix #4: mark next match ready if both slots are now filled
+                if next_m.participant1 and next_m.participant2:
+                    next_m.status = 'ready'
+                next_m.save()
+
         return bracket
     
     def generate_double_elimination(self):
@@ -190,60 +234,73 @@ class BracketGenerator:
         return winners_bracket, losers_bracket
     
     def _generate_bracket_rounds(self, bracket, bracket_size, total_rounds):
-        """Helper to generate bracket rounds"""
-        matches_by_round = {}
-        
-        # Round 1
-        round_1_matches = bracket_size // 2
-        matches_by_round[1] = []
-        
-        participant_idx = 0
-        for match_num in range(round_1_matches):
+        """
+        Helper to generate bracket rounds for double-elimination winners bracket.
+        Uses the same standard seeded slot order as generate_single_elimination.
+        """
+        matches_by_round = {1: []}
+
+        slot_order = self.build_seeded_slot_order(bracket_size)
+        seed_to_participant = {p.seed: p for p in self.participants}
+
+        round_1_match_count = bracket_size // 2
+        for match_num in range(round_1_match_count):
+            slot_a = slot_order[match_num * 2]
+            slot_b = slot_order[match_num * 2 + 1]
+            p1 = seed_to_participant.get(slot_a)
+            p2 = seed_to_participant.get(slot_b)
+
             match = Match.objects.create(
                 tournament=self.tournament,
                 bracket=bracket,
                 round_number=1,
-                match_number=match_num + 1
+                match_number=match_num + 1,
+                participant1=p1,
+                participant2=p2,
             )
-            
-            if participant_idx < self.participant_count:
-                match.participant1 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            if participant_idx < self.participant_count:
-                match.participant2 = self.participants[participant_idx]
-                participant_idx += 1
-            
-            if match.is_bye:
+
+            if (p1 is None) != (p2 is None):  # exactly one is None → bye
                 match.status = 'completed'
-                match.winner = match.participant1 or match.participant2
-            elif match.is_ready:
+                match.winner = p1 or p2
+                match.score_p1 = 1 if p1 else 0
+                match.score_p2 = 1 if p2 else 0
+            elif p1 and p2:
                 match.status = 'ready'
-            
+
             match.save()
             matches_by_round[1].append(match)
-        
+
         # Subsequent rounds
         for round_num in range(2, total_rounds + 1):
             matches_in_round = bracket_size // (2 ** round_num)
             matches_by_round[round_num] = []
-            
             for match_num in range(matches_in_round):
                 match = Match.objects.create(
                     tournament=self.tournament,
                     bracket=bracket,
                     round_number=round_num,
-                    match_number=match_num + 1
+                    match_number=match_num + 1,
                 )
                 matches_by_round[round_num].append(match)
-        
+
         # Link matches
         for round_num in range(1, total_rounds):
             for idx, match in enumerate(matches_by_round[round_num]):
-                next_match_idx = idx // 2
-                match.next_match_winner = matches_by_round[round_num + 1][next_match_idx]
+                match.next_match_winner = matches_by_round[round_num + 1][idx // 2]
                 match.save()
-        
+
+        # Auto-advance bye winners into Round 2
+        for match in matches_by_round[1]:
+            if match.status == 'completed' and match.winner and match.next_match_winner:
+                next_m = match.next_match_winner
+                if next_m.participant1 is None:
+                    next_m.participant1 = match.winner
+                elif next_m.participant2 is None:
+                    next_m.participant2 = match.winner
+                if next_m.participant1 and next_m.participant2:
+                    next_m.status = 'ready'
+                next_m.save()
+
         return matches_by_round
     
     def _generate_losers_bracket(self, bracket, bracket_size, total_rounds):

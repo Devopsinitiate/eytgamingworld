@@ -247,9 +247,9 @@ class Tournament(models.Model):
                 if Participant.objects.filter(tournament=self, team__in=user_teams).exists():
                     return False, "Your team is already registered for this tournament"
                 
-                # Check if user has eligible teams to register
-                if not user_teams.exists():
-                    return False, "You must be a captain or co-captain of an active team for this game to register"
+                # NOTE: Do NOT block here if user has no eligible teams.
+                # Let them reach the registration form so they see the
+                # "no eligible teams" message and a link to create/join a team.
                     
             except ImportError:
                 return False, "Team system not available"
@@ -776,22 +776,28 @@ class Match(CacheInvalidationMixin, models.Model):
         )
     
     def progress_bracket(self):
-        """Move winner/loser to next matches"""
+        """Move winner/loser to next matches and update match status."""
         if self.next_match_winner and self.winner:
-            # Assign winner to next match
-            if not self.next_match_winner.participant1:
-                self.next_match_winner.participant1 = self.winner
-            elif not self.next_match_winner.participant2:
-                self.next_match_winner.participant2 = self.winner
-            self.next_match_winner.save()
-        
+            next_w = self.next_match_winner
+            if not next_w.participant1:
+                next_w.participant1 = self.winner
+            elif not next_w.participant2:
+                next_w.participant2 = self.winner
+            # Fix #4: auto-set ready when both participants are now assigned
+            if next_w.participant1 and next_w.participant2 and next_w.status == 'pending':
+                next_w.status = 'ready'
+            next_w.save()
+
         if self.next_match_loser and self.loser:
-            # Assign loser to losers bracket
-            if not self.next_match_loser.participant1:
-                self.next_match_loser.participant1 = self.loser
-            elif not self.next_match_loser.participant2:
-                self.next_match_loser.participant2 = self.loser
-            self.next_match_loser.save()
+            next_l = self.next_match_loser
+            if not next_l.participant1:
+                next_l.participant1 = self.loser
+            elif not next_l.participant2:
+                next_l.participant2 = self.loser
+            # Auto-set ready for losers bracket match too
+            if next_l.participant1 and next_l.participant2 and next_l.status == 'pending':
+                next_l.status = 'ready'
+            next_l.save()
 
 
 class MatchDispute(models.Model):

@@ -1,260 +1,323 @@
 {% extends "layouts/dashboard_base.html" %}
+{% load static %}
 
-{% block title %}{{ team.name }} - Announcements - EYTGaming{% endblock %}
+{% block title %}{{ team.name }} — Announcements — EYTGaming{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+.ta-page { background:#080808; min-height:100vh; }
+.ta-card {
+  background:#0d1117; border:1px solid #1f2937; border-radius:12px;
+  padding:1.5rem; position:relative; overflow:hidden; margin-bottom:1.25rem;
+}
+.ta-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,.3) 60%,transparent 100%);
+}
+.ta-section-title {
+  font-family:'Barlow Condensed',sans-serif; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; font-size:.95rem;
+  color:#fff; display:flex; align-items:center; gap:.5rem;
+  margin-bottom:1.1rem; padding-bottom:.65rem; border-bottom:1px solid #111827;
+}
+.ta-section-title::before {
+  content:''; width:3px; height:1rem; background:#b91c1c; border-radius:2px;
+  box-shadow:0 0 6px rgba(185,28,28,.6); flex-shrink:0;
+}
+.ta-label {
+  display:block; font-size:.72rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:.06em; color:#6b7280; margin-bottom:.375rem;
+}
+.ta-input {
+  width:100%; background:#080808; border:1px solid #1f2937; border-radius:.5rem;
+  color:#e5e7eb; padding:.625rem .875rem; font-size:.875rem; outline:none;
+  transition:border-color .2s; font-family:'Inter',sans-serif; box-sizing:border-box;
+}
+.ta-input:focus { border-color:#b91c1c; box-shadow:0 0 0 2px rgba(185,28,28,.2); }
+.ta-input::placeholder { color:#374151; }
+select.ta-input option { background:#0d1117; }
+textarea.ta-input { resize:vertical; min-height:5rem; }
+.ta-btn-primary {
+  display:inline-flex; align-items:center; gap:6px; padding:.65rem 1.25rem;
+  background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; border:none;
+  border-radius:.5rem; font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+  box-shadow:0 0 12px rgba(185,28,28,.25); transition:all .15s; text-decoration:none;
+  white-space:nowrap;
+}
+.ta-btn-primary:hover { box-shadow:0 0 20px rgba(185,28,28,.45); color:#fff; }
+.ta-btn-ghost {
+  display:inline-flex; align-items:center; gap:6px; padding:.65rem 1.25rem;
+  background:transparent; color:#9ca3af; border:1px solid #1f2937;
+  border-radius:.5rem; font-family:'Barlow Condensed',sans-serif; font-size:.9rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+  transition:all .15s; text-decoration:none; white-space:nowrap;
+}
+.ta-btn-ghost:hover { border-color:#374151; color:#fff; }
+
+/* Announcement item */
+.ta-item {
+  padding:1.1rem 1.1rem 1.1rem 1.25rem;
+  background:rgba(255,255,255,.02); border:1px solid #111827;
+  border-radius:.625rem; border-left:4px solid #b91c1c;
+  transition:border-color .15s; margin-bottom:.75rem;
+}
+.ta-item.urgent { border-left-color:#ef4444; }
+.ta-item.important { border-left-color:#f59e0b; }
+.ta-item.normal { border-left-color:#b91c1c; }
+.ta-item:hover { border-color:rgba(185,28,28,.25); }
+
+.ta-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  padding:2px 8px; border-radius:4px; font-size:.65rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+}
+.ta-badge-pin { background:rgba(185,28,28,.15); color:#f87171; border:1px solid rgba(185,28,28,.3); }
+.ta-badge-urgent { background:rgba(239,68,68,.15); color:#fca5a5; border:1px solid rgba(239,68,68,.3); }
+.ta-badge-important { background:rgba(245,158,11,.15); color:#fcd34d; border:1px solid rgba(245,158,11,.3); }
+
+/* Activity item */
+.ta-activity {
+  display:flex; align-items:flex-start; gap:.75rem;
+  padding:.65rem; background:rgba(255,255,255,.02);
+  border:1px solid #111827; border-radius:.5rem; margin-bottom:.5rem;
+}
+.ta-activity-icon {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:rgba(185,28,28,.1); border:1px solid rgba(185,28,28,.2);
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* Quick link */
+.ta-link {
+  display:flex; align-items:center; gap:.5rem;
+  padding:.55rem .875rem; background:rgba(255,255,255,.02);
+  border:1px solid #111827; border-radius:.5rem; color:#9ca3af;
+  text-decoration:none; font-size:.82rem; transition:all .15s;
+  margin-bottom:.4rem;
+}
+.ta-link:hover { border-color:rgba(185,28,28,.25); color:#fff; background:rgba(185,28,28,.05); }
+
+/* Override dashboard_base global input rules */
+.ta-page input[type="text"], .ta-page textarea, .ta-page select {
+  background-color:#080808 !important; color:#e5e7eb !important;
+  border-color:#1f2937 !important; border-radius:.5rem !important;
+  padding:.625rem .875rem !important; font-size:.875rem !important;
+}
+.ta-page input:focus, .ta-page textarea:focus, .ta-page select:focus {
+  border-color:#b91c1c !important; box-shadow:0 0 0 2px rgba(185,28,28,.2) !important; outline:none !important;
+}
+.ta-page button[type="submit"] {
+  background:linear-gradient(135deg,#b91c1c,#991b1b) !important;
+  color:#fff !important; border:none !important;
+  box-shadow:0 0 12px rgba(185,28,28,.25) !important;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl">
-    <!-- Page Header -->
-    <div class="mb-6 md:mb-8">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+<div class="ta-page px-4 md:px-8 pb-16">
+<div style="max-width:1100px;margin:0 auto;">
+
+  {# Header #}
+  <div style="padding:2rem 0 1.5rem;position:relative;">
+    <div style="position:absolute;bottom:0;left:0;width:3rem;height:3px;
+                background:linear-gradient(90deg,#b91c1c,transparent);border-radius:2px;"></div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
+      <a href="{% url 'teams:detail' slug=team.slug %}" class="ta-btn-ghost" style="padding:4px 10px;font-size:.75rem;">
+        <span style="font-family:'Material Symbols Outlined';font-size:14px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">arrow_back</span>
+        {{ team.name }}
+      </a>
+    </div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:2.25rem;font-weight:900;
+               text-transform:uppercase;letter-spacing:.04em;color:#fff;line-height:1;margin:0;">
+      <span style="color:#dc2626;">Team</span> Announcements
+    </h1>
+    <p style="color:#6b7280;font-size:.85rem;margin-top:.35rem;">Stay updated with team news and events</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 280px;gap:1.5rem;align-items:start;">
+
+    {# ── Left column ── #}
+    <div>
+
+      {# Post form — captains/co-captains only #}
+      {% if user_membership and user_membership.role in 'captain,co_captain' %}
+      <div class="ta-card">
+        <div class="ta-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">add_circle</span>
+          Post Announcement
+        </div>
+        <form method="post" action="{% url 'teams:announcement_post' slug=team.slug %}">
+          {% csrf_token %}
+          <div style="margin-bottom:.875rem;">
+            <label class="ta-label" for="title">Title</label>
+            <input type="text" id="title" name="title" required maxlength="200"
+                   class="ta-input" placeholder="Enter announcement title">
+          </div>
+          <div style="margin-bottom:.875rem;">
+            <label class="ta-label" for="content">Content</label>
+            <textarea id="content" name="content" required rows="4"
+                      class="ta-input" placeholder="Write your announcement..."></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
             <div>
-                <h1 class="text-white text-2xl md:text-3xl font-bold mb-2">Team Announcements</h1>
-                <p class="text-gray-400 text-sm md:text-base">
-                    <a href="{% url 'teams:detail' slug=team.slug %}" class="hover:text-primary transition-colors">{{ team.name }}</a>
-                    <span class="mx-2 hidden sm:inline">•</span>
-                    <span class="block sm:inline">Stay updated with team news and events</span>
-                </p>
+              <label class="ta-label" for="priority">Priority</label>
+              <select id="priority" name="priority" class="ta-input">
+                <option value="normal">Normal</option>
+                <option value="important">Important</option>
+                <option value="urgent">Urgent</option>
+              </select>
             </div>
-            
-            <!-- Back Button -->
-            <a href="{% url 'teams:detail' slug=team.slug %}" class="w-full sm:w-auto px-4 py-3 min-h-[48px] bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-sm">arrow_back</span>
-                Back to Team
-            </a>
+            <div style="display:flex;align-items:flex-end;padding-bottom:.1rem;">
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;color:#9ca3af;font-size:.85rem;">
+                <input type="checkbox" id="is_pinned" name="is_pinned"
+                       style="width:16px;height:16px;accent-color:#dc2626;cursor:pointer;">
+                <span>Pin to top</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="ta-btn-primary" style="width:100%;justify-content:center;">
+            <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">send</span>
+            Post Announcement
+          </button>
+        </form>
+      </div>
+      {% endif %}
+
+      {# Announcements feed #}
+      <div class="ta-card">
+        <div class="ta-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">campaign</span>
+          Announcements
         </div>
-    </div>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-        <!-- Main Content (Left Column - 2/3) -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Post Announcement Form (Captain/Co-Captain Only) -->
-            {% if user_membership and user_membership.role in 'captain,co_captain' %}
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined">add_circle</span>
-                    Post Announcement
-                </h2>
-                
-                <form method="post" action="{% url 'teams:announcement_post' slug=team.slug %}" class="space-y-4">
-                    {% csrf_token %}
-                    
-                    <!-- Title -->
-                    <div>
-                        <label for="title" class="block text-gray-300 font-medium mb-2">Title</label>
-                        <input 
-                            type="text" 
-                            id="title" 
-                            name="title" 
-                            required
-                            maxlength="200"
-                            class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            placeholder="Enter announcement title"
-                        >
-                    </div>
-                    
-                    <!-- Content -->
-                    <div>
-                        <label for="content" class="block text-gray-300 font-medium mb-2">Content</label>
-                        <textarea 
-                            id="content" 
-                            name="content" 
-                            required
-                            rows="4"
-                            class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            placeholder="Write your announcement..."
-                        ></textarea>
-                    </div>
-                    
-                    <!-- Priority and Pin Options -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Priority -->
-                        <div>
-                            <label for="priority" class="block text-gray-300 font-medium mb-2">Priority</label>
-                            <select 
-                                id="priority" 
-                                name="priority"
-                                class="w-full min-h-[48px] bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            >
-                                <option value="normal">Normal</option>
-                                <option value="important">Important</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Pin to Top -->
-                        <div class="flex items-end">
-                            <label class="flex items-center gap-2 cursor-pointer min-h-[48px]">
-                                <input 
-                                    type="checkbox" 
-                                    id="is_pinned" 
-                                    name="is_pinned"
-                                    class="w-5 h-5 text-primary bg-background-dark border-card-border-dark rounded focus:ring-primary focus:ring-2"
-                                >
-                                <span class="text-gray-300">Pin to top</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <button 
-                        type="submit"
-                        class="w-full px-6 py-3 min-h-[48px] bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
-                    >
-                        <span class="material-symbols-outlined">send</span>
-                        Post Announcement
-                    </button>
-                </form>
-            </div>
+
+        {% if announcements %}
+        {% for announcement in announcements %}
+        <div class="ta-item {% if announcement.priority == 'urgent' %}urgent{% elif announcement.priority == 'important' %}important{% else %}normal{% endif %}">
+          {# Badges #}
+          <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;flex-wrap:wrap;">
+            {% if announcement.is_pinned %}
+            <span class="ta-badge ta-badge-pin">
+              <span style="font-family:'Material Symbols Outlined';font-size:11px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">push_pin</span>
+              Pinned
+            </span>
             {% endif %}
-            
-            <!-- Announcements Feed (Pinned First, Then by Date) -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined">campaign</span>
-                    Team Announcements
-                </h2>
-                
-                {% if announcements %}
-                <div class="space-y-4">
-                    {% for announcement in announcements %}
-                    <div class="bg-background-dark rounded-lg p-5 border-l-4 
-                        {% if announcement.priority == 'urgent' %}border-red-500
-                        {% elif announcement.priority == 'important' %}border-yellow-500
-                        {% else %}border-primary{% endif %}">
-                        
-                        <!-- Announcement Header -->
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1">
-                                <!-- Badges -->
-                                <div class="flex items-center gap-2 mb-2">
-                                    {% if announcement.is_pinned %}
-                                    <span class="px-2 py-1 bg-primary/20 text-primary text-xs rounded-full font-medium flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs">push_pin</span>
-                                        Pinned
-                                    </span>
-                                    {% endif %}
-                                    
-                                    {% if announcement.priority == 'urgent' %}
-                                    <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full font-medium flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs">priority_high</span>
-                                        Urgent
-                                    </span>
-                                    {% elif announcement.priority == 'important' %}
-                                    <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full font-medium flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs">info</span>
-                                        Important
-                                    </span>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Title -->
-                                <h3 class="text-white text-lg font-bold mb-1">{{ announcement.title }}</h3>
-                                
-                                <!-- Meta Info -->
-                                <div class="flex items-center gap-2 text-gray-400 text-sm">
-                                    <span class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs">person</span>
-                                        {{ announcement.posted_by.get_display_name }}
-                                    </span>
-                                    <span>•</span>
-                                    <span class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-xs">schedule</span>
-                                        {{ announcement.created_at|timesince }} ago
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Content -->
-                        <div class="text-gray-300 whitespace-pre-line">{{ announcement.content }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-12">
-                    <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">campaign</span>
-                    <p class="text-gray-400 text-lg mb-2">No announcements yet</p>
-                    <p class="text-gray-500 text-sm">
-                        {% if user_membership and user_membership.role in 'captain,co_captain' %}
-                        Post the first announcement to keep your team informed!
-                        {% else %}
-                        Check back later for team updates
-                        {% endif %}
-                    </p>
-                </div>
-                {% endif %}
-            </div>
+            {% if announcement.priority == 'urgent' %}
+            <span class="ta-badge ta-badge-urgent">
+              <span style="font-family:'Material Symbols Outlined';font-size:11px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">priority_high</span>
+              Urgent
+            </span>
+            {% elif announcement.priority == 'important' %}
+            <span class="ta-badge ta-badge-important">
+              <span style="font-family:'Material Symbols Outlined';font-size:11px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">info</span>
+              Important
+            </span>
+            {% endif %}
+          </div>
+
+          {# Title #}
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;
+                     text-transform:uppercase;letter-spacing:.04em;color:#fff;margin:0 0 .35rem;">
+            {{ announcement.title }}
+          </h3>
+
+          {# Meta #}
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.65rem;">
+            <span style="display:flex;align-items:center;gap:3px;font-size:.75rem;color:#6b7280;">
+              <span style="font-family:'Material Symbols Outlined';font-size:13px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">person</span>
+              {{ announcement.posted_by.get_display_name }}
+            </span>
+            <span style="color:#374151;font-size:.75rem;">•</span>
+            <span style="display:flex;align-items:center;gap:3px;font-size:.75rem;color:#6b7280;">
+              <span style="font-family:'Material Symbols Outlined';font-size:13px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">schedule</span>
+              {{ announcement.created_at|timesince }} ago
+            </span>
+          </div>
+
+          {# Content #}
+          <p style="color:#d1d5db;font-size:.875rem;line-height:1.6;white-space:pre-line;margin:0;">{{ announcement.content }}</p>
         </div>
-        
-        <!-- Sidebar (Right Column - 1/3) -->
-        <div class="space-y-6">
-            <!-- Team Activity Feed -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined">history</span>
-                    Recent Activity
-                </h2>
-                
-                {% if activity_feed %}
-                <div class="space-y-3">
-                    {% for activity in activity_feed %}
-                    <div class="bg-background-dark rounded-lg p-3">
-                        <div class="flex items-start gap-3">
-                            <!-- Icon -->
-                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-primary text-sm">{{ activity.icon }}</span>
-                            </div>
-                            
-                            <!-- Activity Info -->
-                            <div class="flex-1 min-w-0">
-                                <p class="text-gray-300 text-sm mb-1">{{ activity.description }}</p>
-                                <p class="text-gray-500 text-xs">{{ activity.timestamp|timesince }} ago</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-gray-400 text-center py-8 text-sm">No recent activity</p>
-                {% endif %}
-            </div>
-            
-            <!-- Quick Links -->
-            <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-                <h2 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined">link</span>
-                    Quick Links
-                </h2>
-                
-                <div class="space-y-2">
-                    <a href="{% url 'teams:detail' slug=team.slug %}" class="block px-4 py-2 bg-background-dark hover:bg-background-dark/70 text-gray-300 hover:text-white rounded-lg transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">home</span>
-                        Team Profile
-                    </a>
-                    
-                    {% if user_membership and user_membership.role in 'captain,co_captain' %}
-                    <a href="{% url 'teams:roster' slug=team.slug %}" class="block px-4 py-2 bg-background-dark hover:bg-background-dark/70 text-gray-300 hover:text-white rounded-lg transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">groups</span>
-                        Manage Roster
-                    </a>
-                    {% endif %}
-                    
-                    {% if user_membership and user_membership.role == 'captain' %}
-                    <a href="{% url 'teams:settings' slug=team.slug %}" class="block px-4 py-2 bg-background-dark hover:bg-background-dark/70 text-gray-300 hover:text-white rounded-lg transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">settings</span>
-                        Team Settings
-                    </a>
-                    {% endif %}
-                    
-                    {% if team.discord_server %}
-                    <a href="{{ team.discord_server }}" target="_blank" class="block px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-lg transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm">forum</span>
-                        Join Discord
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
+        {% endfor %}
+
+        {% else %}
+        <div style="text-align:center;padding:3.5rem 1rem;">
+          <span style="font-family:'Material Symbols Outlined';font-size:56px;color:#374151;display:block;margin-bottom:1rem;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">campaign</span>
+          <p style="color:#9ca3af;font-size:.95rem;font-weight:600;margin:0 0 .35rem;">No announcements yet</p>
+          <p style="color:#555;font-size:.82rem;margin:0;">
+            {% if user_membership and user_membership.role in 'captain,co_captain' %}
+            Post the first announcement to keep your team informed.
+            {% else %}
+            Check back later for team updates.
+            {% endif %}
+          </p>
         </div>
-    </div>
+        {% endif %}
+      </div>
+
+    </div>{# end left column #}
+
+    {# ── Right sidebar ── #}
+    <div style="position:sticky;top:1.5rem;">
+
+      {# Recent Activity #}
+      <div class="ta-card">
+        <div class="ta-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">history</span>
+          Recent Activity
+        </div>
+        {% if activity_feed %}
+        {% for activity in activity_feed %}
+        <div class="ta-activity">
+          <div class="ta-activity-icon">
+            <span style="font-family:'Material Symbols Outlined';font-size:15px;color:#dc2626;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">{{ activity.icon }}</span>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p style="color:#d1d5db;font-size:.8rem;margin:0 0 2px;line-height:1.4;">{{ activity.description }}</p>
+            <p style="color:#4b5563;font-size:.72rem;margin:0;">{{ activity.timestamp|timesince }} ago</p>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:#555;font-size:.82rem;text-align:center;padding:1.5rem 0;">No recent activity</p>
+        {% endif %}
+      </div>
+
+      {# Quick Links #}
+      <div class="ta-card">
+        <div class="ta-section-title">
+          <span style="font-family:'Material Symbols Outlined';font-size:1rem;color:#b91c1c;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">link</span>
+          Quick Links
+        </div>
+        <a href="{% url 'teams:detail' slug=team.slug %}" class="ta-link">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">home</span>
+          Team Profile
+        </a>
+        {% if user_membership and user_membership.role in 'captain,co_captain' %}
+        <a href="{% url 'teams:roster' slug=team.slug %}" class="ta-link">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">groups</span>
+          Manage Roster
+        </a>
+        {% endif %}
+        {% if user_membership and user_membership.role == 'captain' %}
+        <a href="{% url 'teams:settings' slug=team.slug %}" class="ta-link">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">settings</span>
+          Team Settings
+        </a>
+        {% endif %}
+        {% if team.discord_server %}
+        <a href="{{ team.discord_server }}" target="_blank" rel="noopener noreferrer"
+           class="ta-link" style="color:#818cf8;border-color:rgba(99,102,241,.2);">
+          <span style="font-family:'Material Symbols Outlined';font-size:15px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">forum</span>
+          Join Discord
+        </a>
+        {% endif %}
+      </div>
+
+    </div>{# end sidebar #}
+  </div>
+
+</div>
 </div>
 {% endblock %}

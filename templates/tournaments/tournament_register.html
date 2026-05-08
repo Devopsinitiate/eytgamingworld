@@ -225,11 +225,10 @@
                 </div>
             </div>
 
-            <!-- Team Selection (if team-based tournament) -->
             {% if tournament.is_team_based %}
             <div class="form-group">
                 <label class="text-lg font-semibold text-white mb-3 block">Select Your Team</label>
-                {% if user_teams %}
+                {% if user_teams and not teams_wrong_game %}
                 <div class="grid grid-cols-1 gap-3" id="team-selection-container">
                     {% for team in user_teams %}
                     <div class="team-option-card group" data-team-id="{{ team.id }}" role="button" tabindex="0" aria-label="Select {{ team.name }}">
@@ -245,7 +244,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-white group-hover:text-primary transition-colors">{{ team.name }}</h4>
-                                    <p class="text-xs text-gray-500">{{ team.members.count }} Members</p>
+                                    <p class="text-xs text-gray-500">{{ team.members.count }} Members &bull; {{ team.game.name }}</p>
                                 </div>
                             </div>
                             <div class="radio-indicator w-6 h-6 border-2 border-gray-600 rounded-full flex items-center justify-center transition-all">
@@ -255,18 +254,46 @@
                     </div>
                     {% endfor %}
                 </div>
-                <p class="mt-2 text-sm text-gray-500">Must meet size requirement: {{ tournament.team_size }} players</p>
+                <p class="mt-2 text-sm text-gray-500">Team must have at least {{ tournament.team_size }} active member{{ tournament.team_size|pluralize }}</p>
+                {% elif teams_wrong_game and user_teams %}
+                <div class="p-4 rounded-lg bg-yellow-900/20 border border-yellow-700 text-yellow-200">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="material-symbols-outlined">warning</span>
+                        <span class="font-bold">Wrong Game</span>
+                    </div>
+                    <p class="text-sm mb-2">
+                        You are a captain of the following team{{ user_teams.count|pluralize }}, but
+                        {% if user_teams.count == 1 %}it is{% else %}they are{% endif %}
+                        not registered for <strong>{{ tournament.game.name }}</strong>:
+                    </p>
+                    <ul class="text-sm list-disc list-inside mb-4 text-yellow-300">
+                        {% for team in user_teams %}
+                        <li>{{ team.name }} ({{ team.game.name }})</li>
+                        {% endfor %}
+                    </ul>
+                    <p class="text-sm">To register, create or join a team that plays <strong>{{ tournament.game.name }}</strong>.</p>
+                    <a href="{% url 'teams:create' %}" class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-yellow-700 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Create a {{ tournament.game.name }} Team
+                    </a>
+                </div>
                 {% else %}
                 <div class="p-4 rounded-lg bg-red-900/20 border border-red-800 text-red-200">
                     <div class="flex items-center gap-3 mb-2">
                         <span class="material-symbols-outlined">warning</span>
                         <span class="font-bold">Team Required</span>
                     </div>
-                    <p class="text-sm mb-4">You need a team to register for this tournament.</p>
-                    <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
-                        <span class="material-symbols-outlined text-sm">add</span>
-                        Create or Join a Team
-                    </a>
+                    <p class="text-sm mb-2">You need to be a captain or co-captain of an active <strong>{{ tournament.game.name }}</strong> team to register.</p>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <a href="{% url 'teams:create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
+                            <span class="material-symbols-outlined text-sm">add</span>
+                            Create a Team
+                        </a>
+                        <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">
+                            <span class="material-symbols-outlined text-sm">groups</span>
+                            Browse Teams
+                        </a>
+                    </div>
                 </div>
                 {% endif %}
             </div>
@@ -300,6 +327,11 @@
                 </a>
                 
                 {% if tournament.is_team_based and not user_teams %}
+                <button type="button" disabled 
+                        class="w-full sm:w-auto px-10 py-3 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed font-bold">
+                    Register Now
+                </button>
+                {% elif tournament.is_team_based and teams_wrong_game %}
                 <button type="button" disabled 
                         class="w-full sm:w-auto px-10 py-3 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed font-bold">
                     Register Now

@@ -6,59 +6,94 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/settings-gaming.css' %}">
 <style>
-  /* Self-contained toggle — beats every global rule */
-  .prv-toggle-wrap {
+/* ── Inline toggle — completely self-contained, no external CSS dependency ── */
+.prv-switch {
     position: relative;
     display: inline-block;
-    width: 48px;
-    height: 26px;
+    width: 44px;
+    height: 24px;
     flex-shrink: 0;
-    cursor: pointer;
-  }
-  .prv-toggle-wrap input[type="checkbox"] {
+}
+.prv-switch input {
+    /* Hide the raw checkbox — inline style wins over everything */
     position: absolute !important;
     opacity: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+    width: 0 !important;
+    height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    top: 0 !important; left: 0 !important;
-    cursor: pointer !important;
-    z-index: 2 !important;
-    background: none !important;
     border: none !important;
+    background: none !important;
     box-shadow: none !important;
-    appearance: none !important;
+    outline: none !important;
+    pointer-events: none !important;
     -webkit-appearance: none !important;
-  }
-  .prv-track {
+    appearance: none !important;
+}
+.prv-track {
     position: absolute;
     inset: 0;
-    border-radius: 9999px;
     background: #1f2937;
     border: 1px solid #374151;
-    transition: background .2s, border-color .2s;
-    pointer-events: none;
-  }
-  .prv-thumb {
-    position: absolute;
-    top: 4px; left: 4px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #6b7280;
-    transition: transform .2s, background .2s, box-shadow .2s;
-    pointer-events: none;
-  }
-  /* ON state — driven by JS class */
-  .prv-toggle-wrap.is-on .prv-track {
-    background: rgba(185,28,28,.35);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.prv-switch input:checked ~ .prv-track {
+    background: rgba(185,28,28,0.3);
     border-color: #b91c1c;
-  }
-  .prv-toggle-wrap.is-on .prv-thumb {
-    transform: translateX(22px);
+}
+.prv-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #6b7280;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    pointer-events: none;
+}
+.prv-switch input:checked ~ .prv-track .prv-thumb {
+    transform: translateX(20px);
     background: #ef4444;
-    box-shadow: 0 0 6px rgba(239,68,68,.5);
-  }
+    box-shadow: 0 0 6px rgba(239,68,68,0.5);
+}
+/* Row layout */
+.prv-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-radius: 0.625rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #111827;
+    transition: border-color 0.15s;
+}
+.prv-row:hover { border-color: rgba(185,28,28,0.2); }
+.prv-row-red {
+    background: rgba(220,38,38,0.05);
+    border: 1px solid rgba(220,38,38,0.15);
+    border-radius: 8px;
+    padding: 1rem;
+}
+.prv-icon {
+    width: 2rem; height: 2rem; border-radius: 0.5rem;
+    background: rgba(185,28,28,0.1); border: 1px solid rgba(185,28,28,0.2);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+/* Save button */
+.st-page button[type="submit"].st-btn-primary {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 0 16px rgba(185,28,28,0.3) !important;
+}
+.st-page button[type="submit"].st-btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 24px rgba(185,28,28,0.5) !important;
+    transform: translateY(-1px) !important;
+}
 </style>
 {% endblock %}
 
@@ -66,269 +101,249 @@
 <div class="st-page px-4 md:px-8 pb-12">
 <div class="max-w-6xl mx-auto">
 
-  <div class="st-header">
-    <h1 class="st-title">Privacy Settings</h1>
-    <p class="st-subtitle">Control what information is visible to other users on your profile</p>
-  </div>
-
-  {% if messages %}
-  <div class="space-y-2 mb-5">
-  {% for message in messages %}
-  <div class="st-alert {% if message.tags == 'success' %}st-alert-success{% elif message.tags == 'error' %}st-alert-error{% elif message.tags == 'warning' %}st-alert-warning{% else %}st-alert-info{% endif %}">
-    <span class="material-symbols-outlined" style="font-size:1.1rem;flex-shrink:0;">{% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}</span>
-    <p>{{ message }}</p>
-  </div>
-  {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-    <aside class="lg:col-span-1">
-      <div class="st-sidebar">
-        <p class="st-sidebar-title">Account Settings</p>
-        <nav>
-          <a href="{% url 'dashboard:settings_profile' %}" class="st-nav-link"><span class="material-symbols-outlined">person</span>Profile</a>
-          <a href="{% url 'dashboard:settings_privacy' %}" class="st-nav-link active" aria-current="page"><span class="material-symbols-outlined">privacy_tip</span>Privacy</a>
-          <a href="{% url 'dashboard:settings_security' %}" class="st-nav-link"><span class="material-symbols-outlined">security</span>Security</a>
-          <a href="{% url 'dashboard:settings_notifications' %}" class="st-nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a>
-          <a href="{% url 'dashboard:settings_accounts' %}" class="st-nav-link"><span class="material-symbols-outlined">link</span>Connected Accounts</a>
-          <a href="{% url 'dashboard:account_delete' %}" class="st-nav-link danger"><span class="material-symbols-outlined">delete_forever</span>Delete Account</a>
-        </nav>
-      </div>
-    </aside>
-
-    <div class="lg:col-span-3 flex flex-col gap-5">
-
-      <!-- Live summary banner -->
-      <div class="st-info-banner" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
-        <div style="display:flex;align-items:center;gap:.5rem;">
-          <span class="material-symbols-outlined" style="font-size:1rem;color:#60a5fa;flex-shrink:0;">info</span>
-          <p style="font-size:.85rem;color:#d1d5db;font-weight:600;">Your current profile visibility</p>
-        </div>
-        <div id="summary-items" style="display:flex;flex-wrap:wrap;gap:.5rem;padding-left:1.5rem;">
-          <span id="sum-private" style="display:none;"></span>
-          <span id="sum-online"></span>
-          <span id="sum-activity"></span>
-          <span id="sum-stats"></span>
-        </div>
-      </div>
-
-      <form id="privacy-form" method="post" class="flex flex-col gap-5">
-        {% csrf_token %}
-
-        <!-- Profile Access -->
-        <div class="st-card">
-          <h2 class="st-section-title">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">lock</span>
-            Profile Access
-          </h2>
-          <div class="st-toggle-row" style="background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);border-radius:8px;padding:1rem;">
-            <div class="flex items-center gap-3">
-              <div class="st-toggle-icon">
-                <span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">lock_person</span>
-              </div>
-              <div>
-                <p class="st-toggle-label">Private Profile</p>
-                <p class="st-toggle-desc">Only you can see your full profile. Other users will see a locked profile page.</p>
-                <p id="private-warning" class="st-toggle-desc" style="color:#f87171;margin-top:4px;display:none;">When enabled, the visibility settings below only apply to you.</p>
-              </div>
-            </div>
-            <!-- Custom toggle: overlay checkbox on top of visual track+thumb -->
-            <div class="prv-toggle-wrap{% if form.private_profile.value %} is-on{% endif %}" data-field="private_profile">
-              <input type="checkbox" name="private_profile" id="id_private_profile"{% if form.private_profile.value %} checked{% endif %}>
-              <div class="prv-track"></div>
-              <div class="prv-thumb"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Profile Visibility -->
-        <div class="st-card" id="card-visibility">
-          <h2 class="st-section-title">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">privacy_tip</span>
-            Profile Visibility
-          </h2>
-          <p class="text-sm text-gray-500 mb-4">These settings control what visitors can see on your public profile.</p>
-          <div class="flex flex-col gap-3">
-
-            <div class="st-toggle-row">
-              <div class="flex items-center gap-3">
-                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">circle</span></div>
-                <div>
-                  <p class="st-toggle-label">Show Online Status</p>
-                  <p class="st-toggle-desc">Display a green dot when you are active. Others can see when you were last online.</p>
-                </div>
-              </div>
-              <div class="prv-toggle-wrap{% if form.online_status_visible.value %} is-on{% endif %}" data-field="online_status_visible">
-                <input type="checkbox" name="online_status_visible" id="id_online_status_visible"{% if form.online_status_visible.value %} checked{% endif %}>
-                <div class="prv-track"></div>
-                <div class="prv-thumb"></div>
-              </div>
-            </div>
-
-            <div class="st-toggle-row">
-              <div class="flex items-center gap-3">
-                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">timeline</span></div>
-                <div>
-                  <p class="st-toggle-label">Show Activity Feed</p>
-                  <p class="st-toggle-desc">Show your recent tournaments joined, teams created, and achievements earned.</p>
-                </div>
-              </div>
-              <div class="prv-toggle-wrap{% if form.activity_visible.value %} is-on{% endif %}" data-field="activity_visible">
-                <input type="checkbox" name="activity_visible" id="id_activity_visible"{% if form.activity_visible.value %} checked{% endif %}>
-                <div class="prv-track"></div>
-                <div class="prv-thumb"></div>
-              </div>
-            </div>
-
-            <div class="st-toggle-row">
-              <div class="flex items-center gap-3">
-                <div class="st-toggle-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">analytics</span></div>
-                <div>
-                  <p class="st-toggle-label">Show Statistics</p>
-                  <p class="st-toggle-desc">Show your win rate, match history, tournament placements, and prize winnings.</p>
-                </div>
-              </div>
-              <div class="prv-toggle-wrap{% if form.statistics_visible.value %} is-on{% endif %}" data-field="statistics_visible">
-                <input type="checkbox" name="statistics_visible" id="id_statistics_visible"{% if form.statistics_visible.value %} checked{% endif %}>
-                <div class="prv-track"></div>
-                <div class="prv-thumb"></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Privacy Reference -->
-        <div class="st-card">
-          <h2 class="st-section-title">
-            <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">info</span>
-            Privacy Reference
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">visibility</span>Always Visible</p>
-              <ul class="st-check-list">
-                <li>Your username and display name</li>
-                <li>Your avatar and banner images</li>
-                <li>Your bio and basic profile info</li>
-                <li>Your game profiles</li>
-                <li>Your public achievements</li>
-              </ul>
-            </div>
-            <div>
-              <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">tune</span>Controlled by You</p>
-              <ul class="st-check-list">
-                <li>Whether your profile is private</li>
-                <li>Online / last-seen status</li>
-                <li>Recent activity feed</li>
-                <li>Tournament statistics and win rate</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between pt-1">
-          <a href="{% url 'dashboard:home' %}" class="st-btn st-btn-ghost">Cancel</a>
-          <button type="submit" class="st-btn st-btn-primary">
-            <span class="material-symbols-outlined" style="font-size:0.9rem;">save</span>
-            Save Privacy Settings
-          </button>
-        </div>
-
-      </form>
+    <div class="st-header">
+        <h1 class="st-title">Privacy Settings</h1>
+        <p class="st-subtitle">Control what information is visible to other users on your profile</p>
     </div>
-  </div>
+
+    {% if messages %}
+    <div class="space-y-2 mb-5">
+    {% for message in messages %}
+    <div class="st-alert {% if message.tags == 'success' %}st-alert-success{% elif message.tags == 'error' %}st-alert-error{% elif message.tags == 'warning' %}st-alert-warning{% else %}st-alert-info{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:1.1rem;flex-shrink:0;">
+            {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+        </span>
+        <p>{{ message }}</p>
+    </div>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <aside class="lg:col-span-1">
+            <div class="st-sidebar">
+                <p class="st-sidebar-title">Account Settings</p>
+                <nav>
+                    <a href="{% url 'dashboard:settings_profile' %}" class="st-nav-link"><span class="material-symbols-outlined">person</span>Profile</a>
+                    <a href="{% url 'dashboard:settings_privacy' %}" class="st-nav-link active" aria-current="page"><span class="material-symbols-outlined">privacy_tip</span>Privacy</a>
+                    <a href="{% url 'dashboard:settings_security' %}" class="st-nav-link"><span class="material-symbols-outlined">security</span>Security</a>
+                    <a href="{% url 'dashboard:settings_notifications' %}" class="st-nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a>
+                    <a href="{% url 'dashboard:settings_accounts' %}" class="st-nav-link"><span class="material-symbols-outlined">link</span>Connected Accounts</a>
+                    <a href="{% url 'dashboard:account_delete' %}" class="st-nav-link danger"><span class="material-symbols-outlined">delete_forever</span>Delete Account</a>
+                </nav>
+            </div>
+        </aside>
+
+        <div class="lg:col-span-3 flex flex-col gap-5">
+
+            <div id="privacy-summary" class="st-info-banner" style="flex-direction:column;align-items:flex-start;gap:.5rem;">
+                <div style="display:flex;align-items:center;gap:.5rem;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;color:#60a5fa;flex-shrink:0;">info</span>
+                    <p class="text-sm text-gray-300 font-semibold">Your current profile visibility</p>
+                </div>
+                <div id="summary-items" style="display:flex;flex-wrap:wrap;gap:.5rem;padding-left:1.5rem;">
+                    <span id="sum-private" style="display:none;"></span>
+                    <span id="sum-online"></span>
+                    <span id="sum-activity"></span>
+                    <span id="sum-stats"></span>
+                </div>
+            </div>
+
+            <form id="privacy-form" method="post" class="flex flex-col gap-5">
+                {% csrf_token %}
+
+                <!-- Profile Access -->
+                <div class="st-card">
+                    <h2 class="st-section-title">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">lock</span>
+                        Profile Access
+                    </h2>
+                    <div class="prv-row-red">
+                        <div style="display:flex;align-items:center;gap:.75rem;">
+                            <div class="prv-icon">
+                                <span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">lock_person</span>
+                            </div>
+                            <div>
+                                <p class="st-toggle-label">Private Profile</p>
+                                <p class="st-toggle-desc">Only you can see your full profile. Other users will see a locked profile page.</p>
+                                <p id="private-warning" class="st-toggle-desc" style="color:#f87171;margin-top:4px;display:none;">
+                                    When enabled, the visibility settings below only apply to you.
+                                </p>
+                            </div>
+                        </div>
+                        <label class="prv-switch" for="id_private_profile">
+                            <input type="checkbox" id="id_private_profile" name="private_profile" {% if form.private_profile.value %}checked{% endif %}>
+                            <span class="prv-track"><span class="prv-thumb"></span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Profile Visibility -->
+                <div class="st-card" id="card-visibility">
+                    <h2 class="st-section-title">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">privacy_tip</span>
+                        Profile Visibility
+                    </h2>
+                    <p class="text-sm text-gray-500 mb-4">These settings control what visitors can see on your public profile.</p>
+                    <div class="flex flex-col gap-3">
+
+                        <div class="prv-row">
+                            <div style="display:flex;align-items:center;gap:.75rem;">
+                                <div class="prv-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">circle</span></div>
+                                <div>
+                                    <p class="st-toggle-label">Show Online Status</p>
+                                    <p class="st-toggle-desc">Display a green dot when you are active. Others can see when you were last online.</p>
+                                </div>
+                            </div>
+                            <label class="prv-switch" for="id_online_status_visible">
+                                <input type="checkbox" id="id_online_status_visible" name="online_status_visible" {% if form.online_status_visible.value %}checked{% endif %}>
+                                <span class="prv-track"><span class="prv-thumb"></span></span>
+                            </label>
+                        </div>
+
+                        <div class="prv-row">
+                            <div style="display:flex;align-items:center;gap:.75rem;">
+                                <div class="prv-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">timeline</span></div>
+                                <div>
+                                    <p class="st-toggle-label">Show Activity Feed</p>
+                                    <p class="st-toggle-desc">Show your recent tournaments joined, teams created, and achievements earned.</p>
+                                </div>
+                            </div>
+                            <label class="prv-switch" for="id_activity_visible">
+                                <input type="checkbox" id="id_activity_visible" name="activity_visible" {% if form.activity_visible.value %}checked{% endif %}>
+                                <span class="prv-track"><span class="prv-thumb"></span></span>
+                            </label>
+                        </div>
+
+                        <div class="prv-row">
+                            <div style="display:flex;align-items:center;gap:.75rem;">
+                                <div class="prv-icon"><span class="material-symbols-outlined" style="font-size:1rem;color:#ef4444;">analytics</span></div>
+                                <div>
+                                    <p class="st-toggle-label">Show Statistics</p>
+                                    <p class="st-toggle-desc">Show your win rate, match history, tournament placements, and prize winnings.</p>
+                                </div>
+                            </div>
+                            <label class="prv-switch" for="id_statistics_visible">
+                                <input type="checkbox" id="id_statistics_visible" name="statistics_visible" {% if form.statistics_visible.value %}checked{% endif %}>
+                                <span class="prv-track"><span class="prv-thumb"></span></span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Privacy Reference -->
+                <div class="st-card">
+                    <h2 class="st-section-title">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;color:#b91c1c;">info</span>
+                        Privacy Reference
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">visibility</span>Always Visible</p>
+                            <ul class="st-check-list">
+                                <li>Your username and display name</li>
+                                <li>Your avatar and banner images</li>
+                                <li>Your bio and basic profile info</li>
+                                <li>Your game profiles</li>
+                                <li>Your public achievements</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="st-subsection-title"><span class="material-symbols-outlined" style="font-size:0.875rem;">tune</span>Controlled by You</p>
+                            <ul class="st-check-list">
+                                <li>Whether your profile is private</li>
+                                <li>Online / last-seen status</li>
+                                <li>Recent activity feed</li>
+                                <li>Tournament statistics and win rate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <a href="{% url 'dashboard:home' %}" class="st-btn st-btn-ghost">Cancel</a>
+                    <button type="submit" class="st-btn st-btn-primary">
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">save</span>
+                        Save Privacy Settings
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
 </div>
 </div>
 
 <script>
 (function () {
-  /* Wire up every .prv-toggle-wrap */
-  document.querySelectorAll('.prv-toggle-wrap').forEach(function (wrap) {
-    var cb = wrap.querySelector('input[type="checkbox"]');
-    if (!cb) return;
+    var fPrivate  = document.getElementById('id_private_profile');
+    var fOnline   = document.getElementById('id_online_status_visible');
+    var fActivity = document.getElementById('id_activity_visible');
+    var fStats    = document.getElementById('id_statistics_visible');
+    var sumPrivate  = document.getElementById('sum-private');
+    var sumOnline   = document.getElementById('sum-online');
+    var sumActivity = document.getElementById('sum-activity');
+    var sumStats    = document.getElementById('sum-stats');
+    var warning     = document.getElementById('private-warning');
+    var cardVis     = document.getElementById('card-visibility');
 
-    /* Sync visual state from checkbox state */
-    function sync() {
-      if (cb.checked) {
-        wrap.classList.add('is-on');
-      } else {
-        wrap.classList.remove('is-on');
-      }
-      updateSummary();
+    function badge(el, on, onLabel, offLabel) {
+        if (!el) return;
+        el.textContent = on ? onLabel : offLabel;
+        el.style.background    = on ? 'rgba(34,197,94,.15)' : 'rgba(107,114,128,.15)';
+        el.style.color         = on ? '#22c55e' : '#9ca3af';
+        el.style.border        = on ? '1px solid rgba(34,197,94,.3)' : '1px solid rgba(107,114,128,.3)';
+        el.style.padding       = '3px 10px';
+        el.style.borderRadius  = '4px';
+        el.style.fontSize      = '.72rem';
+        el.style.fontWeight    = '700';
+        el.style.textTransform = 'uppercase';
+        el.style.letterSpacing = '.05em';
+        el.style.display       = 'inline-block';
     }
 
-    /* Clicking anywhere on the wrap toggles the checkbox */
-    wrap.addEventListener('click', function (e) {
-      /* The checkbox itself also fires a change, so only toggle manually
-         when the click did NOT land on the checkbox input */
-      if (e.target !== cb) {
-        cb.checked = !cb.checked;
-      }
-      sync();
-    });
+    function update() {
+        var isPrivate  = fPrivate  && fPrivate.checked;
+        var isOnline   = fOnline   && fOnline.checked;
+        var isActivity = fActivity && fActivity.checked;
+        var isStats    = fStats    && fStats.checked;
 
-    cb.addEventListener('change', sync);
-  });
+        if (sumPrivate) {
+            if (isPrivate) {
+                sumPrivate.textContent        = 'Profile is Private';
+                sumPrivate.style.display      = 'inline-block';
+                sumPrivate.style.background   = 'rgba(220,38,38,.15)';
+                sumPrivate.style.color        = '#f87171';
+                sumPrivate.style.border       = '1px solid rgba(220,38,38,.3)';
+                sumPrivate.style.padding      = '3px 10px';
+                sumPrivate.style.borderRadius = '4px';
+                sumPrivate.style.fontSize     = '.72rem';
+                sumPrivate.style.fontWeight   = '700';
+                sumPrivate.style.textTransform= 'uppercase';
+                sumPrivate.style.letterSpacing= '.05em';
+            } else {
+                sumPrivate.style.display = 'none';
+            }
+        }
 
-  /* ── Summary badges ── */
-  var sumPrivate  = document.getElementById('sum-private');
-  var sumOnline   = document.getElementById('sum-online');
-  var sumActivity = document.getElementById('sum-activity');
-  var sumStats    = document.getElementById('sum-stats');
-  var warning     = document.getElementById('private-warning');
-  var cardVis     = document.getElementById('card-visibility');
+        badge(sumOnline,   isOnline,   'Online Status: Visible',  'Online Status: Hidden');
+        badge(sumActivity, isActivity, 'Activity: Visible',       'Activity: Hidden');
+        badge(sumStats,    isStats,    'Statistics: Visible',     'Statistics: Hidden');
 
-  function badge(el, on, onLabel, offLabel) {
-    if (!el) return;
-    el.textContent = on ? onLabel : offLabel;
-    el.style.cssText = [
-      'display:inline-block',
-      'padding:3px 10px',
-      'border-radius:4px',
-      'font-size:.72rem',
-      'font-weight:700',
-      'text-transform:uppercase',
-      'letter-spacing:.05em',
-      on ? 'background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)'
-         : 'background:rgba(107,114,128,.15);color:#9ca3af;border:1px solid rgba(107,114,128,.3)'
-    ].join(';');
-  }
-
-  function updateSummary() {
-    var cbPrivate  = document.getElementById('id_private_profile');
-    var cbOnline   = document.getElementById('id_online_status_visible');
-    var cbActivity = document.getElementById('id_activity_visible');
-    var cbStats    = document.getElementById('id_statistics_visible');
-
-    var isPrivate  = cbPrivate  && cbPrivate.checked;
-    var isOnline   = cbOnline   && cbOnline.checked;
-    var isActivity = cbActivity && cbActivity.checked;
-    var isStats    = cbStats    && cbStats.checked;
-
-    if (sumPrivate) {
-      if (isPrivate) {
-        sumPrivate.textContent = 'Profile is Private';
-        sumPrivate.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(220,38,38,.3)';
-      } else {
-        sumPrivate.style.display = 'none';
-      }
+        if (cardVis) {
+            cardVis.style.opacity       = isPrivate ? '0.45' : '1';
+            cardVis.style.pointerEvents = isPrivate ? 'none' : '';
+        }
+        if (warning) warning.style.display = isPrivate ? 'block' : 'none';
     }
 
-    badge(sumOnline,   isOnline,   'Online Status: Visible',  'Online Status: Hidden');
-    badge(sumActivity, isActivity, 'Activity: Visible',       'Activity: Hidden');
-    badge(sumStats,    isStats,    'Statistics: Visible',     'Statistics: Hidden');
-
-    if (cardVis) {
-      cardVis.style.opacity       = isPrivate ? '0.45' : '1';
-      cardVis.style.pointerEvents = isPrivate ? 'none' : '';
-    }
-    if (warning) warning.style.display = isPrivate ? 'block' : 'none';
-  }
-
-  updateSummary();
+    if (fPrivate)  fPrivate.addEventListener('change', update);
+    if (fOnline)   fOnline.addEventListener('change', update);
+    if (fActivity) fActivity.addEventListener('change', update);
+    if (fStats)    fStats.addEventListener('change', update);
+    update();
 }());
 </script>
 {% endblock %}
