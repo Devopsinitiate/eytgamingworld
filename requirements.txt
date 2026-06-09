@@ -48,7 +48,7 @@ gunicorn==23.0.0
 hypothesis==6.148.2
 idna==3.11
 iniconfig==2.3.0
-ipython==9.7.0
+ipython==9.14.1
 ipython_pygments_lexers==1.1.1
 jedi==0.19.2
 jmespath==1.0.1
