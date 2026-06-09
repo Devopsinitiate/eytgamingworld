@@ -1,0 +1,56 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Complete Session — {{ session.game.name }} — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#0A0A0A;}
+.cs-card{background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:28px;max-width:560px;margin:3rem auto;border-top:3px solid #22c55e;}
+.cs-icon{width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:#22c55e;}
+.cs-title{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;text-align:center;margin-bottom:.5rem;}
+.cs-sub{text-align:center;color:#9ca3af;font-size:.9rem;margin-bottom:1.5rem;}
+.cs-detail{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid #1a1a1a;font-size:.875rem;}
+.cs-detail .lbl{color:#6b7280;}
+.cs-detail .val{color:#fff;font-weight:500;}
+.cs-form-group{margin-bottom:1.25rem;}
+.cs-form-group label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#dc2626;margin-bottom:.5rem;}
+.cs-form-group textarea{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:12px;color:#fff;font-size:.875rem;resize:vertical;min-height:100px;}
+.cs-form-group textarea:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.2);}
+.cs-btns{display:flex;gap:12px;margin-top:1.5rem;}
+.cs-btns form{flex:1;}
+.cs-btn{width:100%;padding:10px 18px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.cs-btn-primary{background:#22c55e;color:#fff;}
+.cs-btn-primary:hover{background:#16a34a;box-shadow:0 0 16px rgba(34,197,94,.4);}
+.cs-btn-cancel{background:transparent;color:#6b7280;border:1px solid #2a2a2a;text-decoration:none;}
+.cs-btn-cancel:hover{border-color:#dc2626;color:#fff;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cs-card">
+  <div class="cs-icon"><span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;">check_circle</span></div>
+  <h1 class="cs-title">Complete Session</h1>
+  <p class="cs-sub">Mark this session as completed and leave notes for the student.</p>
+
+  <div class="cs-detail"><span class="lbl">Game</span><span class="val">{{ session.game.name }}</span></div>
+  <div class="cs-detail"><span class="lbl">Student</span><span class="val">{{ session.student.get_display_name }}</span></div>
+  <div class="cs-detail"><span class="lbl">Date & Time</span><span class="val">{{ session.start_time|date:"M j, Y g:i A" }}</span></div>
+  <div class="cs-detail"><span class="lbl">Duration</span><span class="val">{{ session.duration_minutes }} min</span></div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="cs-form-group">
+      <label for="coach_notes">Coach Notes</label>
+      <textarea name="coach_notes" id="coach_notes" placeholder="Summarize what was covered, areas for improvement, and next steps...">{{ session.coach_notes|default:'' }}</textarea>
+    </div>
+    <div class="cs-btns">
+      <button type="submit" class="cs-btn cs-btn-primary">
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;">done</span>
+        Complete Session
+      </button>
+      <a href="{% url 'coaching:session_detail' pk=session.pk %}" class="cs-btn cs-btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Standings - {{ tournament.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .standings-container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  .standings-header { margin-bottom: 32px; }
+  .standings-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem; font-weight: 800; text-transform: uppercase;
+    color: #DC2626; text-shadow: 0 0 20px rgba(220,38,38,0.3);
+    margin-bottom: 8px;
+  }
+  .pool-card {
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+    border: 1px solid rgba(220,38,38,0.2);
+    border-radius: 12px; padding: 24px; margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .pool-card h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: #DC2626; margin-bottom: 16px;
+    border-bottom: 1px solid rgba(220,38,38,0.15);
+    padding-bottom: 10px;
+  }
+  .pool-card h2 .pool-status {
+    font-size: 0.75rem; font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400; margin-left: 12px;
+    padding: 2px 10px; border-radius: 999px;
+  }
+  .pool-card h2 .pool-status.complete { background: rgba(34,197,94,0.15); color: #22C55E; }
+  .pool-card h2 .pool-status.in-progress { background: rgba(59,130,246,0.15); color: #60A5FA; }
+  .pool-card h2 .pool-status.pending { background: rgba(107,114,128,0.15); color: #9CA3AF; }
+  .standings-table { width: 100%; border-collapse: collapse; }
+  .standings-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 10px 12px; text-align: left;
+    border-bottom: 1px solid rgba(220,38,38,0.1);
+  }
+  .standings-table td {
+    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #E5E7EB; font-size: 0.9rem;
+  }
+  .standings-table tr.advancing td { background: rgba(34,197,94,0.06); }
+  .standings-table tr.advancing .seed-badge {
+    display: inline-block; width: 24px; height: 24px;
+    line-height: 24px; text-align: center; border-radius: 50%;
+    background: #22C55E; color: #000; font-weight: 700; font-size: 0.75rem;
+  }
+  .standings-table tr.eliminated td { opacity: 0.6; }
+  .standings-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .seed-col { width: 40px; }
+  .player-col { }
+  .stat-col { width: 70px; text-align: center; }
+  .stat-col .stat-value { font-weight: 600; color: #fff; }
+  .stat-col .stat-label { font-size: 0.65rem; color: #6B7280; display: block; text-transform: uppercase; }
+  .win { color: #22C55E; }
+  .loss { color: #EF4444; }
+  .diff { color: #60A5FA; }
+  .advance-banner {
+    background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.03));
+    border: 1px solid rgba(34,197,94,0.3); border-radius: 8px;
+    padding: 16px 20px; margin-top: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .advance-banner .material-symbols-outlined { color: #22C55E; font-size: 28px; }
+  .advance-banner p { color: #D1FAE5; font-size: 0.9rem; margin: 0; flex: 1; }
+  .advance-btn {
+    background: linear-gradient(135deg, #DC2626, #B91C1C);
+    color: #fff; border: none; padding: 10px 24px; border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 0 15px rgba(220,38,38,0.3);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .advance-btn:hover { transform: translateY(-1px); box-shadow: 0 0 25px rgba(220,38,38,0.5); }
+  .advance-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .advance-btn.success { background: linear-gradient(135deg, #22C55E, #16A34A); box-shadow: 0 0 15px rgba(34,197,94,0.3); }
+  .no-standings { text-align: center; padding: 60px 20px; color: #6B7280; }
+  .no-standings .material-symbols-outlined { font-size: 48px; margin-bottom: 12px; }
+  .no-standings h3 { font-family: 'Barlow Condensed', sans-serif; color: #9CA3AF; margin-bottom: 8px; }
+  .standings-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="standings-container">
+  <nav style="margin-bottom: 20px; font-size: 0.85rem;">
+    <a href="{% url 'tournaments:detail' tournament.slug %}" style="color: #DC2626; text-decoration: none;">&larr; Back to Tournament</a>
+  </nav>
+
+  <div class="standings-header">
+    <h1><span class="material-symbols-outlined" style="vertical-align: middle; font-size: 32px;">leaderboard</span> {{ tournament.name }} Standings</h1>
+    <p style="color: #9CA3AF;">
+      {% if is_swiss_rr_mode %}
+        {{ tournament.get_format_display }} standings — top {{ advance_count }} advance to finals
+      {% elif pool_brackets %}
+        Pool stage standings — top {{ advance_count }} from each pool advance
+      {% else %}
+        No phase data available
+      {% endif %}
+    </p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="gaming-alert gaming-alert-{{ message.tags }}" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 8px; background: {% if message.tags == 'success' %}rgba(34,197,94,0.1){% else %}rgba(239,68,68,0.1){% endif %}; border: 1px solid {% if message.tags == 'success' %}rgba(34,197,94,0.3){% else %}rgba(239,68,68,0.3){% endif %}; color: {% if message.tags == 'success' %}#22C55E{% else %}#EF4444{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% for pool in pool_standings %}
+    <div class="pool-card">
+      <h2>
+        {{ pool.name }}
+        <span class="pool-status {{ pool.status_class }}">{{ pool.status_label }}</span>
+      </h2>
+
+      {% if pool.standings %}
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th class="seed-col">#</th>
+            <th class="player-col">Player</th>
+            <th class="stat-col"><span class="stat-label">W</span></th>
+            <th class="stat-col"><span class="stat-label">L</span></th>
+            <th class="stat-col"><span class="stat-label">GW</span></th>
+            <th class="stat-col"><span class="stat-label">GL</span></th>
+            <th class="stat-col"><span class="stat-label">GD</span></th>
+            <th class="stat-col"><span class="stat-label">Win%</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in pool.standings %}
+          <tr class="{% if forloop.counter <= advance_count %}advancing{% else %}eliminated{% endif %}">
+            <td class="seed-col">
+              {% if forloop.counter <= advance_count %}
+                <span class="seed-badge">{{ forloop.counter }}</span>
+              {% else %}
+                <span style="color: #6B7280;">{{ forloop.counter }}</span>
+              {% endif %}
+            </td>
+            <td class="player-col">
+              {{ entry.display_name }}
+              {% if forloop.counter <= advance_count %}
+                <span style="color: #22C55E; font-size: 0.7rem; margin-left: 6px;">ADV</span>
+              {% endif %}
+            </td>
+            <td class="stat-col"><span class="stat-value win">{{ entry.matches_won }}</span></td>
+            <td class="stat-col"><span class="stat-value loss">{{ entry.matches_lost }}</span></td>
+            <td class="stat-col"><span class="stat-value win">{{ entry.games_won }}</span></td>
+            <td class="stat-col"><span class="stat-value loss">{{ entry.games_lost }}</span></td>
+            <td class="stat-col"><span class="stat-value diff">+{{ entry.game_diff }}</span></td>
+            <td class="stat-col"><span class="stat-value">{{ entry.win_pct }}%</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="no-standings">
+        <span class="material-symbols-outlined">sports_esports</span>
+        <h3>No matches completed yet</h3>
+        <p>Standings will appear once pool matches start being reported.</p>
+      </div>
+      {% endif %}
+
+      {% if pool.standings and pool.all_complete and can_advance and forloop.last %}
+      <div class="advance-banner">
+        <span class="material-symbols-outlined">celebration</span>
+        <p>
+          {% if is_swiss_rr_mode %}
+            All {{ tournament.get_format_display }} rounds are complete! Advance the top {{ advance_count }} players to the single-elimination finals.
+          {% else %}
+            All pool matches are complete! Advance the top {{ advance_count }} players from each pool to the playoffs bracket.
+          {% endif %}
+        </p>
+        <form method="post" action="{% url 'tournaments:standings' tournament.slug %}" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="advance">
+          <button type="submit" class="advance-btn">
+            <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
+            {% if is_swiss_rr_mode %}Generate Finals Bracket{% else %}Advance to Playoffs{% endif %}
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <div class="no-standings">
+      <span class="material-symbols-outlined">leaderboard</span>
+      <h3>No Pool Brackets</h3>
+      <p>This tournament does not have a group/pool stage. Standings are not available.</p>
+      <div class="standings-actions">
+        <a href="{% url 'tournaments:bracket' tournament.slug %}" class="advance-btn">
+          <span class="material-symbols-outlined" style="font-size: 18px;">account_tree</span>
+          View Bracket
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+
+  {% if playoffs_bracket %}
+  <div class="pool-card" style="border-color: rgba(255,215,0,0.3);">
+    <h2 style="color: #FFD700;">
+      <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 24px;">emoji_events</span>
+      Playoffs Bracket
+    </h2>
+    <p style="color: #9CA3AF; margin-bottom: 16px;">
+      The playoffs bracket has been generated. {% if playoffs_bracket.current_round <= playoffs_bracket.total_rounds %}Currently in Round {{ playoffs_bracket.current_round }} of {{ playoffs_bracket.total_rounds }}.{% endif %}
+    </p>
+    <a href="{% url 'tournaments:bracket' tournament.slug %}" class="advance-btn">
+      <span class="material-symbols-outlined" style="font-size: 18px;">account_tree</span>
+      View Playoffs Bracket
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

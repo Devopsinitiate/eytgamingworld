@@ -176,6 +176,10 @@ def book_session(request, coach_pk):
     """Book a coaching session"""
     coach = get_object_or_404(CoachProfile, pk=coach_pk)
     
+    if request.user == coach.user:
+        messages.error(request, 'You cannot book a session with yourself.')
+        return redirect('coaching:coach_detail', pk=coach_pk)
+    
     if not coach.is_available:
         messages.error(request, 'This coach is not currently accepting bookings.')
         return redirect('coaching:coach_detail', pk=coach_pk)
@@ -389,9 +393,12 @@ def cancel_session(request, pk):
             else:
                 messages.success(request, 'Session cancelled successfully.')
             
-            # Send cancellation notification
-            from .tasks import send_cancellation_notification
-            send_cancellation_notification.delay(session.id)
+            # Send cancellation notification (fail gracefully if broker is down)
+            try:
+                from .tasks import send_cancellation_notification
+                send_cancellation_notification.delay(session.id)
+            except Exception:
+                pass
             
         else:
             messages.error(request, 'Cannot cancel session (must be 24h before start).')

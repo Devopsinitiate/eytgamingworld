@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix RelatedObjectLookups.js crash when window.opener is null.
+    // The original handler on a[data-popup-opener] calls opener.dismissRelatedLookupPopup
+    // which throws "Cannot read properties of null" on pages navigated to directly.
+    // We replace the handler with a safe version that checks opener exists.
+    if (typeof django !== 'undefined' && django.jQuery) {
+        django.jQuery(function($) {
+            $("a[data-popup-opener]").off('click').on('click', function(e) {
+                e.preventDefault();
+                if (window.opener && typeof window.opener.dismissRelatedLookupPopup === 'function') {
+                    window.opener.dismissRelatedLookupPopup(window, $(this).data("popup-opener"));
+                }
+                // If opener is null (page navigated to directly, not as a popup),
+                // silently do nothing. The original code would throw a TypeError.
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

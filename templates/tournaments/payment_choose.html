@@ -4,129 +4,186 @@
 {% block title %}Choose Payment Method - {{ tournament.name }}{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <style>
-  input[type="radio"] {
+  .pm-radio {
     -webkit-appearance: none;
     appearance: none;
-    background-color: transparent;
+    background: transparent;
     margin: 0;
-    font: inherit;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.1rem;
+    height: 1.1rem;
     border-radius: 9999px;
-    transform: translateY(-0.075em);
+    border: 2px solid #6B7280;
     display: grid;
     place-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s;
   }
-
-  input[type="radio"]::before {
+  .pm-radio::before {
     content: "";
-    width: 0.65rem;
-    height: 0.65rem;
+    width: 0.55rem;
+    height: 0.55rem;
     border-radius: 9999px;
     transform: scale(0);
     transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em #b91c1c;
+    box-shadow: inset 1em 1em #DC2626;
   }
+  .pm-radio:checked { border-color: #DC2626; }
+  .pm-radio:checked::before { transform: scale(1); }
 
-  input[type="radio"]:checked::before {
-    transform: scale(1);
+  .pm-card {
+    border-radius: 8px;
+    border: 1px solid rgba(220, 38, 38, .12);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all .2s;
+    background: #0d1117;
+    position: relative;
+  }
+  .pm-card:hover {
+    border-color: rgba(220, 38, 38, .35);
+    background: #111;
+    box-shadow: 0 2px 12px rgba(220, 38, 38, .08);
+  }
+  .pm-card:has(:checked) {
+    border-color: #DC2626;
+    background: rgba(220, 38, 38, .06);
+    box-shadow: 0 0 16px rgba(220, 38, 38, .1);
+  }
+  .pm-card:has(:checked) .pm-check {
+    opacity: 1;
+  }
+  .pm-check {
+    opacity: 0;
+    transition: opacity .2s;
   }
 </style>
 {% endblock %}
 
 {% block body %}
-<main class="flex flex-1 justify-center py-10 sm:py-20 px-4 sm:px-6 lg:px-8 min-h-screen bg-gray-900">
-  <div class="flex flex-col w-full max-w-2xl">
-    <!-- Header Section -->
-    <div class="flex flex-wrap justify-between gap-4 items-center mb-8">
-      <div class="flex min-w-72 flex-col gap-2">
-        <h1 class="text-white text-4xl sm:text-5xl font-black leading-tight tracking-[-0.033em]">Choose Your Payment Method</h1>
-        <p class="text-white/60 text-base font-normal leading-normal">
-          Tournament: <span class="text-white font-medium">{{ tournament.name }}</span>
-        </p>
-        <p class="text-white/60 text-base font-normal leading-normal">
-          Total Amount Due: <span class="text-white font-bold">${{ tournament.registration_fee }} USD</span>
-        </p>
-      </div>
+<main class="min-h-screen bg-background-dark py-8 px-4">
+  <div class="max-w-lg mx-auto content-loaded">
+
+    {% comment %}<!-- Breadcrumbs -->{% endcomment %}
+    <nav class="flex items-center gap-2 text-xs text-gray-500 mb-6 font-barlow uppercase tracking-wider">
+      <a href="{% url 'home' %}" class="hover:text-electric-red transition-colors">Home</a>
+      <span class="text-gray-700">/</span>
+      <a href="{% url 'tournaments:list' %}" class="hover:text-electric-red transition-colors">Tournaments</a>
+      <span class="text-gray-700">/</span>
+      <a href="{% url 'tournaments:detail' tournament.slug %}" class="hover:text-electric-red transition-colors truncate max-w-[160px]">{{ tournament.name }}</a>
+      <span class="text-gray-700">/</span>
+      <span class="text-electric-red font-semibold">Payment</span>
+    </nav>
+
+    {% comment %}<!-- Header -->{% endcomment %}
+    <div class="mb-6">
+      <h1 class="gaming-header text-2xl text-electric-red mb-1">Choose Your Payment Method</h1>
+      <p class="gaming-body text-gray-400 text-sm">
+        Tournament: <span class="text-white font-medium">{{ tournament.name }}</span>
+      </p>
+      <p class="gaming-body text-gray-400 text-sm mt-0.5">
+        Total Due: <span class="text-electric-red font-bold">${{ tournament.registration_fee }} USD</span>
+      </p>
     </div>
 
-    <!-- Django Messages -->
+    {% comment %}<!-- Messages -->{% endcomment %}
     {% if messages %}
-    <div class="mb-6">
+    <div class="mb-6 space-y-2">
       {% for message in messages %}
-      <div class="rounded-lg p-4 mb-3 {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% elif message.tags == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %}">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-xl">
-            {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
-          </span>
-          <p class="text-sm font-medium">{{ message }}</p>
-        </div>
+      <div class="flex items-center gap-2.5 p-3 rounded-lg text-xs font-medium
+                  {% if message.tags == 'error' %}bg-red-900/20 border border-red-800/30 text-red-300{% elif message.tags == 'success' %}bg-green-900/20 border border-green-800/30 text-green-300{% else %}bg-blue-900/20 border border-blue-800/30 text-blue-300{% endif %}">
+        <span class="material-symbols-outlined text-sm">
+          {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
+        </span>
+        {{ message }}
       </div>
       {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Payment Method Form -->
-    <form method="post" class="flex flex-col gap-4 mb-8">
+    {% comment %}<!-- Payment Form -->{% endcomment %}
+    <form method="post">
       {% csrf_token %}
-      
-      <!-- Stripe Payment Option -->
-      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
-        <div class="flex items-center gap-4 grow">
-          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white/80">credit_card</span>
-          </div>
-          <div class="flex grow flex-col">
-            <p class="text-white text-base font-medium leading-normal">Stripe</p>
-            <p class="text-white/60 text-sm font-normal leading-normal">Credit or Debit Card (Visa, Mastercard, Amex)</p>
-          </div>
-        </div>
-        <input class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="stripe"/>
-      </label>
 
-      <!-- Paystack Payment Option -->
-      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
-        <div class="flex items-center gap-4 grow">
-          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white/80">payment</span>
-          </div>
-          <div class="flex grow flex-col">
-            <p class="text-white text-base font-medium leading-normal">Paystack</p>
-            <p class="text-white/60 text-sm font-normal leading-normal">Secure payment via Paystack</p>
-          </div>
-        </div>
-        <input class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="paystack"/>
-      </label>
+      <div class="g-card p-4 mb-6" style="border-top:2px solid #DC2626;">
+        <h2 class="gaming-subheader text-electric-red text-sm mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">credit_card</span>
+          Select Payment Provider
+        </h2>
 
-      <!-- Local Payment Option (Development) -->
-      <label class="flex items-center gap-4 rounded-xl border border-solid border-white/10 p-4 cursor-pointer hover:border-red-600/80 transition-colors has-[:checked]:border-red-600 has-[:checked]:bg-red-600/10">
-        <div class="flex items-center gap-4 grow">
-          <div class="w-12 h-8 rounded-md bg-white/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white/80">account_balance_wallet</span>
-          </div>
-          <div class="flex grow flex-col">
-            <p class="text-white text-base font-medium leading-normal">Pay Locally</p>
-            <p class="text-white/60 text-sm font-normal leading-normal">Development mode - Instant confirmation</p>
-          </div>
-        </div>
-        <input checked class="border-2 border-white/20 bg-transparent text-red-600 focus:outline-none focus:ring-0 focus:ring-offset-0" name="provider" type="radio" value="local"/>
-      </label>
+        <div class="space-y-2.5">
 
-      <!-- Action Buttons -->
-      <div class="flex flex-col gap-2 mt-4">
-        <button type="submit" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 flex-1 bg-red-600 hover:bg-red-700 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors shadow-lg shadow-red-600/30">
-          <span class="truncate">Proceed to Payment</span>
-        </button>
-        <a href="{% url 'tournaments:detail' slug=tournament.slug %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 flex-1 bg-transparent hover:bg-white/5 text-white/60 hover:text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
-          <span class="truncate">Back to Tournament</span>
+          {% comment %}<!-- Stripe -->{% endcomment %}
+          <label class="pm-card flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-7 rounded bg-[#0a0a0a] flex items-center justify-center border border-white/5">
+                <span class="material-symbols-outlined text-sm text-white/70">credit_card</span>
+              </div>
+              <div>
+                <p class="text-white text-sm font-barlow uppercase tracking-wider font-semibold">Stripe</p>
+                <p class="text-gray-500 text-xs">Credit / Debit Card (Visa, Mastercard, Amex)</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined pm-check text-electric-red text-sm">check_circle</span>
+              <input class="pm-radio" name="provider" type="radio" value="stripe">
+            </div>
+          </label>
+
+          {% comment %}<!-- Paystack -->{% endcomment %}
+          <label class="pm-card flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-7 rounded bg-[#0a0a0a] flex items-center justify-center border border-white/5">
+                <span class="material-symbols-outlined text-sm text-white/70">payment</span>
+              </div>
+              <div>
+                <p class="text-white text-sm font-barlow uppercase tracking-wider font-semibold">Paystack</p>
+                <p class="text-gray-500 text-xs">Secure payment via Paystack</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined pm-check text-electric-red text-sm">check_circle</span>
+              <input class="pm-radio" name="provider" type="radio" value="paystack">
+            </div>
+          </label>
+
+          {% comment %}<!-- Local (Dev) -->{% endcomment %}
+          <label class="pm-card flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-7 rounded bg-[#0a0a0a] flex items-center justify-center border border-white/5">
+                <span class="material-symbols-outlined text-sm text-white/70">account_balance_wallet</span>
+              </div>
+              <div>
+                <p class="text-white text-sm font-barlow uppercase tracking-wider font-semibold">Pay Locally</p>
+                <p class="text-gray-500 text-xs">Development mode — instant confirmation</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined pm-check text-electric-red text-sm">check_circle</span>
+              <input class="pm-radio" name="provider" type="radio" value="local" checked>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      {% comment %}<!-- Actions -->{% endcomment %}
+      <div class="flex flex-col sm:flex-row gap-3 items-center justify-between pt-4" style="border-top:1px solid rgba(255,255,255,.06);">
+        <a href="{% url 'tournaments:detail' slug=tournament.slug %}"
+           class="text-xs text-gray-500 hover:text-white transition-colors font-barlow uppercase tracking-wider">
+          &larr; Back to Tournament
         </a>
+        <button type="submit" class="btn-gaming-primary text-xs py-2 px-6">
+          <span class="material-symbols-outlined text-sm mr-1">lock</span>
+          Proceed to Payment
+        </button>
       </div>
     </form>
 
-    <!-- Security Notice -->
-    <div class="flex items-center justify-center gap-2 mt-8 text-sm text-white/40">
-      <span class="material-symbols-outlined text-base">lock</span>
+    {% comment %}<!-- Security notice -->{% endcomment %}
+    <div class="flex items-center justify-center gap-1.5 mt-8 text-xs text-gray-600">
+      <span class="material-symbols-outlined text-sm">lock</span>
       <p>All transactions are secure and encrypted.</p>
     </div>
   </div>

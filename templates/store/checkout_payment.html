@@ -22,22 +22,28 @@
     .pay-method { background:#0d1117; border:2px solid #1f2937; border-radius:0.75rem; padding:1.25rem; cursor:pointer; transition:all 0.15s; }
     .pay-method:hover { border-color:rgba(185,28,28,0.4); }
     .pay-method.selected { border-color:#b91c1c; background:rgba(185,28,28,0.05); box-shadow:0 0 20px rgba(185,28,28,0.15); }
-    .pay-method input[type="radio"] { display:none; }
+    .hidden-radio { position:absolute; opacity:0; width:0; height:0; pointer-events:none; }
+    .pay-method { cursor:pointer; }
     .pay-icon { width:3rem; height:3rem; border-radius:0.5rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .order-item { background:#080808; border:1px solid #111827; border-radius:0.5rem; padding:0.75rem; }
     .btn-primary { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.875rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; }
     .btn-primary:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 20px rgba(185,28,28,0.4); }
     .btn-ghost { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.875rem 1.25rem; background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:0.5rem; font-size:0.875rem; text-decoration:none; transition:all 0.15s; }
     .btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
-    .loading-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; }
-    .loading-overlay.active { display:flex; }
-    .spinner { width:3rem; height:3rem; border-radius:50%; border:3px solid rgba(185,28,28,0.2); border-top-color:#b91c1c; animation:spin 0.8s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
+.loading-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; }
+.loading-overlay.active { display:flex; }
+.spinner { width:3rem; height:3rem; border-radius:50%; border:3px solid rgba(185,28,28,0.2); border-top-color:#b91c1c; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.pay-selected-badge{display:none;width:1.25rem;height:1.25rem;border-radius:50%;background:#4ade80;align-items:center;justify-content:center;flex-shrink:0}
+.pay-method.selected .pay-selected-badge{display:flex}
+.pd-toast{position:fixed;bottom:2rem;right:2rem;z-index:99999;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:0.85rem 1.25rem;display:flex;align-items:center;gap:10px;font-size:0.9rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.3s ease;pointer-events:none}
+.pd-toast.show{transform:translateY(0);opacity:1}
+.pd-toast.error{border-color:#DC2626}
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8 max-w-6xl">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
     <div class="mb-6">
         <h1 class="page-title">Payment <span>Method</span></h1>
         <p class="text-gray-500 text-sm mt-1">Choose how you'd like to pay</p>
@@ -78,34 +84,36 @@
             <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:1rem;color:#9ca3af;margin-bottom:1rem;">Select Payment Method</h2>
             <form method="post" action="{% url 'store:checkout_payment' %}" id="payment-form">
                 {% csrf_token %}
-                <div class="space-y-4 mb-6">
-                    <div class="pay-method" id="stripe-method" onclick="selectMethod(this,'stripe')">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="stripe">
-                            <div class="flex items-center gap-4">
-                                <div class="pay-icon" style="background:#1d4ed8;">
-                                    <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">credit_card</span>
-                                </div>
-                                <div>
-                                    <p class="text-white font-semibold">Credit / Debit Card</p>
-                                    <p class="text-gray-500 text-sm">Pay securely with Stripe</p>
-                                </div>
+                <div class="space-y-4 mb-6" id="payment-methods">
+                    <div class="pay-method" data-method="stripe" onclick="selectMethod(this,'stripe')">
+                        <input type="radio" name="payment_method" value="stripe" id="radio-stripe" class="hidden-radio">
+                        <div class="flex items-center gap-4">
+                            <div class="pay-icon" style="background:#1d4ed8;">
+                                <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">credit_card</span>
                             </div>
-                        </label>
+                            <div class="flex-1">
+                                <p class="text-white font-semibold">Credit / Debit Card</p>
+                                <p class="text-gray-500 text-sm">Pay securely with Stripe</p>
+                            </div>
+                            <div class="pay-selected-badge">
+                                <span class="material-symbols-outlined" style="font-size:0.75rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">check</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pay-method" id="paystack-method" onclick="selectMethod(this,'paystack')">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="payment_method" value="paystack">
-                            <div class="flex items-center gap-4">
-                                <div class="pay-icon" style="background:#059669;">
-                                    <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">account_balance</span>
-                                </div>
-                                <div>
-                                    <p class="text-white font-semibold">Paystack</p>
-                                    <p class="text-gray-500 text-sm">Card, bank transfer, or mobile money</p>
-                                </div>
+                    <div class="pay-method" data-method="paystack" onclick="selectMethod(this,'paystack')">
+                        <input type="radio" name="payment_method" value="paystack" id="radio-paystack" class="hidden-radio">
+                        <div class="flex items-center gap-4">
+                            <div class="pay-icon" style="background:#059669;">
+                                <span class="material-symbols-outlined" style="font-size:1.5rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">account_balance</span>
                             </div>
-                        </label>
+                            <div class="flex-1">
+                                <p class="text-white font-semibold">Paystack</p>
+                                <p class="text-gray-500 text-sm">Card, bank transfer, or mobile money</p>
+                            </div>
+                            <div class="pay-selected-badge">
+                                <span class="material-symbols-outlined" style="font-size:0.75rem;color:#fff;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">check</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -165,9 +173,18 @@
     </div>
 </div>
 
+<div class="pd-toast" id="paymentToast"></div>
+
 <script src="https://js.stripe.com/v3/"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
+    function showToast(msg) {
+        const t = document.getElementById('paymentToast');
+        t.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:18px;font-style:normal;font-weight:normal;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;line-height:1;color:#DC2626;">error</span> ' + msg;
+        t.className = 'pd-toast error show';
+        setTimeout(() => { t.className = 'pd-toast'; }, 4000);
+    }
+
     function selectMethod(el, method) {
         document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
         el.classList.add('selected');
@@ -183,21 +200,26 @@
         const selected = document.querySelector('input[name="payment_method"]:checked');
         if (!selected) {
             document.querySelectorAll('.pay-method').forEach(m => m.style.borderColor = '#ef4444');
-            alert('Please select a payment method to continue.');
+            showToast('Please select a payment method to continue.');
             return;
         }
         document.querySelectorAll('.pay-method').forEach(m => m.style.borderColor = '');
         loadingIndicator.classList.add('active');
         submitButton.disabled = true;
-        if (selected.value === 'stripe') { await handleStripePayment(); }
-        else if (selected.value === 'paystack') { await handlePaystackPayment(); }
+        try {
+            if (selected.value === 'stripe') { await handleStripePayment(); }
+            else if (selected.value === 'paystack') { await handlePaystackPayment(); }
+        } catch(err) {
+            loadingIndicator.classList.remove('active');
+            submitButton.disabled = false;
+        }
     });
 
     async function handleStripePayment() {
         try {
             const r = await fetch('{% url "store:stripe_create_intent" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'} });
             const d = await r.json();
-            if (!d.success) throw new Error(d.error || 'Failed to create payment intent');
+            if (!d.success) { showToast(d.error || 'Failed to create payment intent'); throw new Error(d.error); }
             const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
             const result = await stripe.confirmCardPayment(d.client_secret);
             if (result.error) throw new Error(result.error.message);
@@ -205,7 +227,7 @@
             const cd = await cr.json();
             if (!cd.success) throw new Error(cd.error || 'Payment confirmation failed');
             window.location.href = cd.redirect_url;
-        } catch(err) { alert('Payment failed: ' + err.message); loadingIndicator.classList.remove('active'); submitButton.disabled = false; }
+        } catch(err) { showToast(err.message || 'Payment failed'); loadingIndicator.classList.remove('active'); submitButton.disabled = false; }
     }
 
     let paystackInitializing = false;
@@ -225,6 +247,13 @@
                 ref: d.reference,
                 callback: function(response) {
                     // Must be a plain (non-async) function — Paystack rejects async callbacks
+                    if (!response || !response.reference) {
+                        showToast('Payment cancelled or failed.');
+                        loadingIndicator.classList.remove('active');
+                        submitButton.disabled = false;
+                        paystackInitializing = false;
+                        return;
+                    }
                     loadingIndicator.classList.add('active');
                     submitButton.disabled = true;
                     fetch('{% url "store:paystack_verify" %}', {
@@ -237,14 +266,13 @@
                         if (vd.success) {
                             window.location.href = vd.redirect_url;
                         } else {
-                            alert('Payment verification failed: ' + (vd.error || 'Unknown error'));
-                            loadingIndicator.classList.remove('active');
-                            submitButton.disabled = false;
-                            paystackInitializing = false;
+                            showToast(vd.error || 'Payment verification failed');
                         }
                     })
                     .catch(function(err) {
-                        alert('Verification error: ' + err.message);
+                        showToast(err.message || 'Verification error');
+                    })
+                    .finally(function() {
                         loadingIndicator.classList.remove('active');
                         submitButton.disabled = false;
                         paystackInitializing = false;
@@ -253,12 +281,18 @@
                 onClose: function() {
                     loadingIndicator.classList.remove('active');
                     submitButton.disabled = false;
-                    paystackInitializing = false;  // allow retry after closing
+                    paystackInitializing = false;
+                },
+                onError: function(err) {
+                    loadingIndicator.classList.remove('active');
+                    submitButton.disabled = false;
+                    paystackInitializing = false;
+                    showToast((err && err.message) || 'Payment error');
                 }
             });
             handler.openIframe();
         } catch(err) {
-            alert('Payment failed: ' + err.message);
+            showToast(err.message || 'Payment failed');
             loadingIndicator.classList.remove('active');
             submitButton.disabled = false;
             paystackInitializing = false;

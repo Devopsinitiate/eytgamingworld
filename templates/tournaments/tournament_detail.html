@@ -6,7 +6,7 @@
 {% block title %}{{ tournament_display.name|safe_default:"Tournament" }} - EYTGaming{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+
 <link rel="stylesheet" href="{% static 'css/tournament-detail.css' %}">
 <link rel="stylesheet" href="{% static 'css/mobile-responsive.css' %}">
 <link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
@@ -196,6 +196,22 @@ nav[aria-label="Breadcrumb"] a {
 @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.2); }
     50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.5); }
+}
+
+/* Gaming Imported Badge */
+.gaming-imported-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%);
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    border-radius: 0.5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    color: #DC2626;
 }
 
 /* Gaming Featured Badge */
@@ -846,6 +862,92 @@ nav[aria-label="Breadcrumb"] a {
     color: rgba(255, 255, 255, 0.7);
     font-weight: 500;
 }
+
+/* ── Compact / zoom-out for tournament detail ── */
+.tournament-detail-wrap { max-width: 1200px; margin: 0 auto; }
+.tournament-detail-wrap h1 { font-size: 1.6rem !important; }
+.tournament-detail-wrap h2 { font-size: 1.15rem !important; }
+.tournament-detail-wrap h3 { font-size: 1rem !important; }
+.tournament-detail-wrap p, .tournament-detail-wrap li, .tournament-detail-wrap .text-sm { font-size: 0.85rem !important; }
+.tournament-detail-wrap .text-xs { font-size: 0.7rem !important; }
+.tournament-detail-wrap .text-lg { font-size: 0.95rem !important; }
+.tournament-detail-wrap .text-xl { font-size: 1.05rem !important; }
+.tournament-detail-wrap .text-2xl { font-size: 1.15rem !important; }
+.tournament-detail-wrap .text-3xl { font-size: 1.4rem !important; }
+.tournament-detail-wrap .text-4xl { font-size: 1.6rem !important; }
+.tournament-detail-wrap .gap-6, .tournament-detail-wrap .gap-8 { gap: 1rem !important; }
+.tournament-detail-wrap .p-6 { padding: 1rem !important; }
+.tournament-detail-wrap .p-4 { padding: 0.7rem !important; }
+.tournament-detail-wrap .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+.tournament-detail-wrap .py-6 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+.tournament-detail-wrap .mb-6, .tournament-detail-wrap .mb-8 { margin-bottom: 0.75rem !important; }
+.tournament-detail-wrap .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem !important; }
+.tournament-detail-wrap .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem !important; }
+.tournament-detail-wrap .btn-gaming-primary,
+.tournament-detail-wrap button, .tournament-detail-wrap .btn { font-size: 0.8rem !important; padding: 0.4rem 1rem !important; }
+.tournament-detail-wrap .w-12 { width: 2.5rem !important; }
+.tournament-detail-wrap .h-12 { height: 2.5rem !important; }
+.tournament-detail-wrap .w-16 { width: 3rem !important; }
+.tournament-detail-wrap .h-16 { height: 3rem !important; }
+@media (max-width: 768px) {
+    .tournament-detail-wrap { padding: 0 0.5rem; }
+    .tournament-detail-wrap h1 { font-size: 1.2rem !important; }
+    .tournament-detail-wrap h2 { font-size: 0.95rem !important; }
+    .tournament-detail-wrap h3 { font-size: 0.85rem !important; }
+    .tournament-detail-wrap p, .tournament-detail-wrap li, .tournament-detail-wrap .text-sm { font-size: 0.78rem !important; }
+    .tournament-detail-wrap .text-xs { font-size: 0.65rem !important; }
+    .tournament-detail-wrap .text-lg { font-size: 0.85rem !important; }
+    .tournament-detail-wrap .text-xl { font-size: 0.9rem !important; }
+    .tournament-detail-wrap .text-2xl { font-size: 1rem !important; }
+    .tournament-detail-wrap .text-3xl { font-size: 1.15rem !important; }
+    .tournament-detail-wrap .text-4xl { font-size: 1.3rem !important; }
+    .tournament-detail-wrap .gap-6, .tournament-detail-wrap .gap-8 { gap: 0.6rem !important; }
+    .tournament-detail-wrap .p-6 { padding: 0.7rem !important; }
+    .tournament-detail-wrap .px-6 { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
+    .tournament-detail-wrap .py-8 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+    .tournament-detail-wrap .mb-6, .tournament-detail-wrap .mb-8 { margin-bottom: 0.5rem !important; }
+    .tournament-detail-wrap .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem !important; }
+    .tournament-detail-wrap .btn, .tournament-detail-wrap button { font-size: 0.72rem !important; padding: 0.3rem 0.7rem !important; }
+    /* ── Mobile-specific layout fixes ── */
+    /* Tab nav: horizontal scroll on mobile */
+    .tournament-detail-wrap .gaming-tab-nav {
+        overflow-x: auto !important; -webkit-overflow-scrolling: touch !important;
+        flex-wrap: nowrap !important; gap: 0.25rem !important; padding-bottom: 0.25rem !important;
+    }
+    .tournament-detail-wrap .gaming-tab-nav::-webkit-scrollbar { height: 2px; }
+    .tournament-detail-wrap .gaming-tab-nav::-webkit-scrollbar-thumb { background: #DC2626; border-radius: 4px; }
+    .tournament-detail-wrap .gaming-tab-item {
+        font-size: 0.72rem !important; padding: 0.4rem 0.6rem !important; white-space: nowrap !important; flex-shrink: 0 !important;
+    }
+    .tournament-detail-wrap .gaming-tab-item .material-symbols-outlined { font-size: 14px !important; }
+    /* Hero section: compact */
+    .tournament-detail-wrap .hero-section .py-16 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+    .tournament-detail-wrap .hero-section .flex-col { gap: 0.75rem !important; }
+    /* Stats: 2-col on mobile */
+    .tournament-detail-wrap .grid-cols-2 { gap: 0.4rem !important; }
+    .tournament-detail-wrap .gaming-stat-item { padding: 0.4rem !important; }
+    .tournament-detail-wrap .gaming-stat-number { font-size: 1rem !important; }
+    .tournament-detail-wrap .gaming-stat-description { font-size: 0.65rem !important; }
+    /* Info cards: tighter padding */
+    .tournament-detail-wrap .gaming-info-card { padding: 0.6rem !important; }
+    .tournament-detail-wrap .gaming-section-title { font-size: 0.85rem !important; }
+    /* Sidebar: full width always on mobile */
+    .tournament-detail-wrap .lg\\:col-span-1 { width: 100% !important; }
+    .tournament-detail-wrap .sidebar-card { padding: 0.6rem !important; }
+    .tournament-detail-wrap .sidebar-card .text-lg { font-size: 0.82rem !important; }
+    /* Bracket / standings tables */
+    .tournament-detail-wrap .bracket-container { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+    .tournament-detail-wrap table { font-size: 0.72rem !important; }
+    .tournament-detail-wrap table th, .tournament-detail-wrap table td { padding: 0.3rem 0.4rem !important; }
+    /* Participant list compact */
+    .tournament-detail-wrap .participant-item { padding: 0.4rem 0.5rem !important; }
+    .tournament-detail-wrap .participant-item .w-10, .tournament-detail-wrap .participant-item .h-10 { width: 1.8rem !important; height: 1.8rem !important; }
+    /* Breadcrumb compact */
+    .tournament-detail-wrap .max-w-7xl .py-3 { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+    /* Prize cards compact */
+    .tournament-detail-wrap .prize-card { padding: 0.5rem !important; }
+    .tournament-detail-wrap .prize-amount { font-size: 1rem !important; }
+}
 </style>
 {% endblock %}
 
@@ -868,8 +970,8 @@ nav[aria-label="Breadcrumb"] a {
 <div class="min-h-screen bg-background-dark">
     <!-- Gaming Breadcrumb Navigation -->
     <nav class="bg-[#0A0A0A]/90 backdrop-blur-sm border-b border-[#DC2626]/30 relative z-[50]" aria-label="Breadcrumb" style="pointer-events: auto;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center space-x-2 py-3 text-sm">
+        <div class="page-wrap">
+            <div class="flex items-center space-x-2" style="padding:0.5rem 0;">
                 <a href="{% url 'tournaments:list' %}" 
                    class="text-gray-400 hover:text-[#DC2626] transition-colors flex items-center gap-1 min-h-[44px] min-w-[44px] px-2"
                    style="pointer-events: auto; cursor: pointer; position: relative; z-index: 51;">
@@ -925,7 +1027,7 @@ nav[aria-label="Breadcrumb"] a {
             <div class="hero-overlay-radial bg-radial-gradient from-transparent via-black/20 to-black/40"></div>
         </div>
         
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        <div class="relative page-wrap" style="padding-top:var(--space-xl);padding-bottom:var(--space-xl);">
             <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
                 <!-- Tournament Information -->
                 <div class="flex-1 space-y-6">
@@ -944,7 +1046,7 @@ nav[aria-label="Breadcrumb"] a {
                         
                         <!-- Enhanced Featured Tournament Badge -->
                         {% if tournament.is_featured %}
-                            <span class="gaming-featured-badge" 
+                            <span class="gaming-featured-badge border-gold" 
                                   aria-label="Featured tournament"
                                   data-featured="true">
                                 <span class="featured-icon material-symbols-outlined text-sm" aria-hidden="true">star</span>
@@ -959,6 +1061,14 @@ nav[aria-label="Breadcrumb"] a {
                                   aria-label="Tournament type: {{ tournament.get_tournament_type_display }}">
                                 <span class="material-symbols-outlined text-sm" aria-hidden="true">category</span>
                                 <span>{{ tournament.get_tournament_type_display }}</span>
+                            </span>
+                        {% endif %}
+                        <!-- Imported from External Badge -->
+                        {% if external_reference %}
+                            <span class="gaming-imported-badge" 
+                                  aria-label="Imported from {{ external_reference.provider.name }}">
+                                <span class="material-symbols-outlined text-sm" aria-hidden="true">sports_esports</span>
+                                <span>Imported from {{ external_reference.provider.name }}</span>
                             </span>
                         {% endif %}
                     </div>
@@ -1025,7 +1135,7 @@ nav[aria-label="Breadcrumb"] a {
                                 {{ "emoji_events"|material_icon:"text-primary" }}
                                 <div class="meta-content">
                                     <span class="meta-label text-xs text-gray-400 block">Prize Pool</span>
-                                    <span class="meta-value font-medium text-yellow-400">{{ prize_display.formatted_amount }}</span>
+                                    <span class="meta-value font-medium text-gold">{{ prize_display.formatted_amount }}</span>
                                 </div>
                             </div>
                             {% endif %}
@@ -1259,7 +1369,7 @@ nav[aria-label="Breadcrumb"] a {
     </section>
 
     <!-- Main Content -->
-    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main" aria-label="Tournament details and information">
+    <main id="main-content" class="page-wrap tournament-detail-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);" role="main" aria-label="Tournament details and information">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Main Content Area -->
             <div class="lg:col-span-2 space-y-8">
@@ -1274,6 +1384,12 @@ nav[aria-label="Breadcrumb"] a {
                         <button id="bracket-tab-button" class="gaming-tab-item" data-tab="bracket" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
                             <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">account_tree</span>
                             Bracket
+                        </button>
+                        {% endif %}
+                        {% if tournament.brackets.exists or tournament.status == 'in_progress' %}
+                        <button id="standings-tab-button" class="gaming-tab-item" data-tab="standings" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
+                            <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;vertical-align:middle;">leaderboard</span>
+                            Standings
                         </button>
                         {% endif %}
                         <button id="participants-tab-button" class="gaming-tab-item" data-tab="participants" role="tab" aria-selected="false" tabindex="-1" style="pointer-events: auto !important; cursor: pointer !important; position: relative; z-index: 101 !important;">
@@ -1432,7 +1548,15 @@ nav[aria-label="Breadcrumb"] a {
                                                         <div class="text-center mb-4">
                                                             <div class="bg-gray-700/50 rounded-lg p-2">
                                                                 <h5 class="text-sm font-bold text-white">
-                                                                    {% if round_num == bracket.total_rounds %}
+                                                                    {% if bracket.bracket_type == 'finals' %}
+                                                                        {% if round_num == 1 %}
+                                                                        🏆 Grand Finals
+                                                                        {% elif round_num == 2 %}
+                                                                        🔄 Bracket Reset
+                                                                        {% else %}
+                                                                        Round {{ round_num }}
+                                                                        {% endif %}
+                                                                    {% elif round_num == bracket.total_rounds %}
                                                                         🏆 Finals
                                                                     {% elif round_num == bracket.total_rounds|add:"-1" %}
                                                                         🥈 Semi-Finals
@@ -1556,6 +1680,28 @@ nav[aria-label="Breadcrumb"] a {
                         </div>
                     </div>
                     {% endif %}
+
+                    <!-- Standings Tab -->
+                    <div id="standings-tab" class="tab-pane" role="tabpanel" aria-labelledby="standings-tab-button" data-tab="standings">
+                        <div class="gaming-info-card">
+                            <div class="flex items-center justify-between mb-6" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+                                <h3 class="gaming-section-title" style="margin-bottom:0;">
+                                    <span class="material-symbols-outlined">leaderboard</span>
+                                    Pool Standings
+                                </h3>
+                                <a href="{% url 'tournaments:standings' tournament.slug %}" class="advance-btn" style="padding:8px 18px;font-size:0.85rem;background:rgba(220,38,38,0.15);color:#DC2626;border:1px solid rgba(220,38,38,0.3);border-radius:8px;text-decoration:none;font-weight:600;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">open_in_new</span>
+                                    Full Standings
+                                </a>
+                            </div>
+                            <div id="standings-content">
+                                <p style="color:#9CA3AF;text-align:center;padding:40px 0;">
+                                    <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:12px;">leaderboard</span>
+                                    Load standings from the dedicated page.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Enhanced Participants Tab -->
                     <div id="participants-tab" class="tab-pane" role="tabpanel" aria-labelledby="participants-tab-button">
@@ -1739,12 +1885,15 @@ nav[aria-label="Breadcrumb"] a {
                                                 <span class="material-symbols-outlined text-sm">groups</span>
                                                 <span>View Team</span>
                                             </a>
-                                        {% else %}
-                                            <button class="action-btn view-profile" 
-                                                    disabled
-                                                    aria-label="View {{ participant.display_name }} profile">
-                                                <span class="material-symbols-outlined text-sm">person</span>
-                                                <span>View Profile</span>
+                                        {% endif %}
+                                        
+                                        <!-- Message participant -->
+                                        {% if user.is_authenticated and participant.user and participant.user != user %}
+                                            <button class="action-btn msg-participant-btn" 
+                                                    data-user-id="{{ participant.user.id }}"
+                                                    aria-label="Message {{ participant.display_name }}">
+                                                <span class="material-symbols-outlined text-sm">chat</span>
+                                                <span>Message</span>
                                             </button>
                                         {% endif %}
                                         

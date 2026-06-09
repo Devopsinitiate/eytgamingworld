@@ -27,6 +27,23 @@ body { background: #0A0A0A; }
   pointer-events: none;
 }
 
+/* ── FEATURED SCROLL ── */
+.featured-scroll{display:flex;gap:1rem;overflow-x:auto;padding-bottom:0.5rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.featured-scroll::-webkit-scrollbar{display:none}
+.featured-scroll > *{scroll-snap-align:start;flex-shrink:0;width:200px}
+.featured-card{background:#111827;border:1px solid rgba(220,38,38,0.15);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.2s;text-decoration:none}
+.featured-card:hover{border-color:#DC2626;transform:translateY(-2px);box-shadow:0 4px 20px rgba(220,38,38,0.15)}
+.featured-card-img{width:100%;aspect-ratio:1;object-fit:cover;background:#0A0A0A}
+.featured-card-body{padding:0.625rem 0.75rem}
+.featured-card-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.featured-card-price{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;color:#DC2626}
+
+/* ── CATEGORY CHIPS ── */
+.cat-chips{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.cat-chip{display:inline-flex;align-items:center;gap:0.35rem;padding:0.45rem 0.9rem;background:#111827;border:1px solid rgba(220,38,38,0.2);border-radius:9999px;color:#9CA3AF;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;text-decoration:none;transition:all 0.15s}
+.cat-chip:hover{border-color:#DC2626;color:#DC2626;background:rgba(220,38,38,0.06)}
+.cat-chip.active{background:rgba(220,38,38,0.15);border-color:#DC2626;color:#fff}
+
 /* ── CARDS ── */
 .g-card {
   background: #111827;
@@ -87,6 +104,18 @@ body { background: #0A0A0A; }
 }
 .btn-clear:hover { border-color: #374151; color: #9CA3AF; }
 
+/* ── MOBILE FILTER TOGGLE ── */
+.filter-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:40}
+.filter-drawer{position:fixed;top:0;left:0;bottom:0;width:300px;max-width:85vw;background:#0A0A0A;z-index:50;transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;border-right:1px solid rgba(220,38,38,0.2)}
+.filter-drawer.open{transform:translateX(0)}
+.filter-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid rgba(55,65,81,0.5);position:sticky;top:0;background:#0A0A0A;z-index:1}
+.filter-drawer-header h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:0.85rem;color:#fff;margin:0}
+.filter-drawer-close{background:none;border:none;color:#6B7280;cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center}
+.filter-drawer-close:hover{color:#fff;background:rgba(220,38,38,0.1)}
+.filter-toggle-btn{display:none;align-items:center;gap:0.4rem;padding:0.55rem 1rem;background:#111827;border:1px solid rgba(220,38,38,0.2);border-radius:3px;color:#9CA3AF;font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;transition:all 0.15s}
+.filter-toggle-btn:hover{border-color:#DC2626;color:#DC2626}
+@media(max-width:1023px){.filter-toggle-btn{display:inline-flex}.desktop-filter{display:none!important}}
+
 /* ── SORT BAR ── */
 .sort-select {
   background: #111827; border: 1px solid rgba(220,38,38,0.25);
@@ -122,6 +151,8 @@ body { background: #0A0A0A; }
   object-fit: cover; transition: transform 0.35s ease;
 }
 .product-card:hover .product-img-wrap img { transform: scale(1.05); }
+.product-wishlist-btn{position:absolute;top:0.75rem;left:0.75rem;z-index:3;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.55);border:1px solid rgba(220,38,38,0.2);color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(4px)}
+.product-wishlist-btn:hover,.product-wishlist-btn.active{color:#DC2626;border-color:#DC2626;background:rgba(220,38,38,0.15)}
 .product-badge {
   position: absolute; top: 0.75rem; right: 0.75rem;
   padding: 0.2rem 0.65rem;
@@ -130,6 +161,7 @@ body { background: #0A0A0A; }
   letter-spacing: 0.05em; border-radius: 2px; z-index: 2;
   transform: skewX(-6deg);
 }
+.badge-new{background:rgba(220,38,38,0.2);border:1px solid rgba(220,38,38,0.5);color:#fca5a5}
 .badge-low { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #FBBF24; }
 .badge-out { background: rgba(107,114,128,0.15); border: 1px solid #374151; color: #9CA3AF; }
 .product-body { padding: 1rem 1.125rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
@@ -178,6 +210,18 @@ body { background: #0A0A0A; }
   cursor: not-allowed; pointer-events: none;
   box-shadow: none; transform: skewX(-6deg);
 }
+.btn-quick-add{position:absolute;bottom:0.75rem;right:0.75rem;z-index:3;width:34px;height:34px;border-radius:50%;background:rgba(220,38,38,0.85);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;opacity:0;transform:translateY(4px)}
+.product-card:hover .btn-quick-add{opacity:1;transform:translateY(0)}
+.btn-quick-add:hover{background:#DC2626;transform:translateY(-1px)!important;box-shadow:0 0 16px rgba(220,38,38,0.5)}
+.btn-quick-add.added{opacity:1;transform:translateY(0);background:rgba(34,197,94,0.85)}
+.btn-quick-add.added:hover{background:#22c55e;box-shadow:0 0 16px rgba(34,197,94,0.5)}
+
+/* ── TOAST ── */
+.store-toast{position:fixed;bottom:2rem;right:2rem;z-index:99999;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:0.85rem 1.25rem;display:flex;align-items:center;gap:10px;font-size:0.9rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.3s ease;pointer-events:none;max-width:360px}
+.store-toast.show{transform:translateY(0);opacity:1}
+.store-toast.success{border-color:#16a34a}
+.store-toast.error{border-color:#DC2626}
+.store-toast.wishlist{border-color:#DC2626}
 
 /* ── CART BUTTON ── */
 .btn-cart {
@@ -223,7 +267,7 @@ body { background: #0A0A0A; }
 
 {% block body %}
 <div style="background:#0A0A0A;min-height:100vh;">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
 
   <!-- Hero -->
   <div class="store-hero">
@@ -243,12 +287,71 @@ body { background: #0A0A0A; }
         View Cart
       </a>
     </div>
+
+    {% if featured_products %}
+    <div class="mt-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;color:#DC2626;" aria-hidden="true">local_fire_department</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:0.75rem;color:#6B7280">Featured</span>
+      </div>
+      <div class="featured-scroll">
+        {% for p in featured_products %}
+        <a href="{% url 'store:product_detail' p.slug %}" class="featured-card">
+          {% if p.primary_images %}
+          <img src="{{ p.primary_images.0.image.url }}" alt="{{ p.primary_images.0.alt_text }}" class="featured-card-img" loading="lazy">
+          {% else %}
+          <div class="featured-card-img" style="display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2.5rem;color:#374151;">inventory_2</span>
+          </div>
+          {% endif %}
+          <div class="featured-card-body">
+            <div class="featured-card-name">{{ p.name }}</div>
+            <div class="featured-card-price">${{ p.price }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Category quick-chips -->
+  {% if categories %}
+  <div class="cat-chips">
+    <a href="{% url 'store:product_list' %}" class="cat-chip {% if not selected_category %}active{% endif %}">All</a>
+    {% for cat in categories %}
+    <a href="{% url 'store:product_list' %}?category={{ cat.slug }}" class="cat-chip {% if selected_category.id == cat.id %}active{% endif %}">{{ cat.name }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Filter toggle (mobile) -->
+  <div class="flex items-center gap-3 mb-4 lg:mb-0">
+    <button class="filter-toggle-btn" onclick="openFilterDrawer()">
+      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">tune</span>
+      Filters
+      {% if search_query or selected_category or min_price or max_price %}
+      <span style="font-size:0.65rem;color:#DC2626;">●</span>
+      {% endif %}
+    </button>
+  </div>
+
+  <!-- Filter modal overlay + drawer (mobile) — populated via JS clone -->
+  <div class="filter-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+  <div class="filter-drawer" id="filterDrawer">
+    <div class="filter-drawer-header">
+      <h3>Filters</h3>
+      <button class="filter-drawer-close" onclick="closeFilterDrawer()" aria-label="Close filters">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.3rem;">close</span>
+      </button>
+    </div>
+    <div id="filterDrawerBody"></div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 pb-12">
 
-    <!-- Filter Sidebar -->
-    <div class="lg:col-span-1">
+    <!-- Desktop sidebar -->
+    <div class="lg:col-span-1 desktop-filter" id="desktopFilter">
       <div class="g-card">
         <div class="filter-section" style="padding-top:1.25rem;">
           <p class="filter-section-title">
@@ -337,10 +440,11 @@ body { background: #0A0A0A; }
       </div>
 
       {% if products %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div class="grid-auto-phi">
         {% for product in products %}
-        <div class="product-card">
+        <div class="product-card" data-product-id="{{ product.id }}">
           <div class="product-img-wrap">
+            <a href="{% url 'store:product_detail' product.slug %}">
             {% if product.primary_images %}
               <img src="{{ product.primary_images.0.image.url }}" alt="{{ product.primary_images.0.alt_text }}" loading="lazy">
             {% else %}
@@ -348,15 +452,32 @@ body { background: #0A0A0A; }
                 <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:4rem;color:#374151;" aria-hidden="true">inventory_2</span>
               </div>
             {% endif %}
+            </a>
             {% if not product.is_in_stock %}
             <span class="product-badge badge-out">Out of Stock</span>
             {% elif product.is_low_stock %}
             <span class="product-badge badge-low">Low Stock</span>
+            {% elif product in featured_products %}
+            <span class="product-badge badge-gold text-gold border-gold bg-gold-subtle">Featured</span>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <button class="product-wishlist-btn {% if product.id in wishlist_product_ids %}active{% endif %}"
+                    onclick="toggleWishlist('{{ product.id }}', this)"
+                    aria-label="{% if product.id in wishlist_product_ids %}Remove from{% else %}Add to{% endif %} wishlist">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' {% if product.id in wishlist_product_ids %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">favorite</span>
+            </button>
+            {% endif %}
+            {% if product.is_in_stock %}
+            <button class="btn-quick-add" onclick="quickAdd('{{ product.id }}', this)" aria-label="Quick add to cart">
+              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">add_shopping_cart</span>
+            </button>
             {% endif %}
           </div>
           <div class="product-body">
             <p class="product-cat">{{ product.category.name }}</p>
-            <h3 class="product-name">{{ product.name }}</h3>
+            <a href="{% url 'store:product_detail' product.slug %}" style="text-decoration:none;">
+              <h3 class="product-name">{{ product.name }}</h3>
+            </a>
             <p class="product-price">${{ product.price }}</p>
             {% if product.is_in_stock %}
             <div class="product-stock stock-in">
@@ -421,4 +542,103 @@ body { background: #0A0A0A; }
   </div>
 </div>
 </div>
+
+<!-- Toast -->
+<div class="store-toast" id="storeToast"></div>
+
+<script>
+const CSRF_TOKEN = '{{ csrf_token }}';
+
+function showToast(msg, type) {
+  const t = document.getElementById('storeToast');
+  const icon = type === 'success' ? 'check_circle' : type === 'wishlist' ? 'favorite' : 'error';
+  const cls = type === 'success' ? 'success' : type === 'wishlist' ? 'wishlist' : 'error';
+  const color = type === 'success' ? '#16a34a' : type === 'wishlist' ? '#DC2626' : '#DC2626';
+  t.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:18px;font-style:normal;font-weight:normal;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;line-height:1;color:' + color + ';">' + icon + '</span> ' + msg;
+  t.className = 'store-toast ' + cls + ' show';
+  setTimeout(() => { t.className = 'store-toast'; }, 3000);
+}
+
+async function postJSON(url, data) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+function getCSRF() {
+  return CSRF_TOKEN;
+}
+
+async function quickAdd(productId, btn) {
+  if (btn.classList.contains('added')) return;
+  try {
+    const data = await postJSON('{% url "store:add_to_cart" %}', {product_id: productId, quantity: 1});
+    if (data.success) {
+      btn.classList.add('added');
+      btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-feature-settings:\'liga\' 1;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">check</span>';
+      showToast('Added to cart!', 'success');
+      const cartCount = document.getElementById('cartCount');
+      if (cartCount && data.cart_summary) cartCount.textContent = data.cart_summary.item_count;
+      setTimeout(() => {
+        btn.classList.remove('added');
+        btn.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-feature-settings:\'liga\' 1;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;">add_shopping_cart</span>';
+      }, 2000);
+    } else {
+      showToast(data.error || 'Could not add to cart', 'error');
+    }
+  } catch(e) {
+    showToast('Network error. Please try again.', 'error');
+  }
+}
+
+async function toggleWishlist(productId, btn) {
+  const span = btn.querySelector('span');
+  const isActive = btn.classList.contains('active');
+  try {
+    if (isActive) {
+      const data = await postJSON('{% url "store:remove_from_wishlist" %}', {product_id: productId});
+      if (data.success) {
+        btn.classList.remove('active');
+        span.style.fontVariationSettings = "'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20";
+        showToast('Removed from wishlist', 'wishlist');
+      } else {
+        showToast(data.error || 'Could not update wishlist', 'error');
+      }
+    } else {
+      const data = await postJSON('{% url "store:add_to_wishlist" %}', {product_id: productId});
+      if (data.success) {
+        btn.classList.add('active');
+        span.style.fontVariationSettings = "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20";
+        showToast('Added to wishlist!', 'wishlist');
+      } else {
+        showToast(data.error || 'Could not update wishlist', 'error');
+      }
+    }
+  } catch(e) {
+    showToast('Network error. Please try again.', 'error');
+  }
+}
+
+function openFilterDrawer() {
+  const drawer = document.getElementById('filterDrawer');
+  const overlay = document.getElementById('filterOverlay');
+  const body = document.getElementById('filterDrawerBody');
+  const source = document.getElementById('desktopFilter');
+  if (source && !body.hasChildNodes()) {
+    body.innerHTML = source.innerHTML;
+  }
+  overlay.style.display = 'block';
+  drawer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFilterDrawer() {
+  document.getElementById('filterOverlay').style.display = 'none';
+  document.getElementById('filterDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
 {% endblock %}

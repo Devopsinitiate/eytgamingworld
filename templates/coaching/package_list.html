@@ -1,0 +1,75 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Coaching Packages — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#080808;}
+.pk-hero{text-align:center;padding:2.5rem 1rem 1.5rem;}
+.pk-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;}
+.pk-hero p{color:#9ca3af;font-size:.95rem;margin-top:.5rem;max-width:480px;margin-left:auto;margin-right:auto;}
+.pk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;max-width:1100px;margin:0 auto;padding:0 1rem 3rem;}
+.pk-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;padding:1.5rem;border-top:3px solid #dc2626;transition:all .2s;display:flex;flex-direction:column;}
+.pk-card:hover{border-color:#2a2a2a;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+.pk-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;}
+.pk-card-header h2{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;margin:0;}
+.pk-coach{font-size:.8rem;color:#6b7280;margin-top:2px;}
+.pk-game{display:inline-block;padding:2px 8px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:4px;color:#f87171;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.pk-price{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#dc2626;}
+.pk-detail{display:flex;align-items:center;gap:8px;padding:.5rem 0;border-bottom:1px solid #1a1a1a;font-size:.85rem;color:#d1d5db;}
+.pk-detail:last-of-type{border-bottom:none;}
+.pk-detail .ms{color:#6b7280;width:20px;text-align:center;}
+.pk-desc{color:#9ca3af;font-size:.85rem;margin:.75rem 0;flex:1;}
+.pk-btn{margin-top:1rem;padding:10px 18px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-align:center;text-decoration:none;border:1px solid rgba(220,38,38,.4);transition:all .2s;display:block;}
+.pk-btn:hover{box-shadow:0 0 18px rgba(220,38,38,.45);color:#fff;}
+.pk-empty{text-align:center;padding:4rem 1rem;color:#6b7280;}
+.pk-empty .ms{font-size:4rem;display:block;margin-bottom:1rem;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pk-hero">
+  <h1>Coaching Packages</h1>
+  <p>Multi-session packages at discounted rates from verified coaches.</p>
+</div>
+
+{% if packages %}
+<div class="pk-grid">
+  {% for pkg in packages %}
+  <div class="pk-card">
+    <div class="pk-card-header">
+      <div>
+        <h2>{{ pkg.name }}</h2>
+        <div class="pk-coach">by {{ pkg.coach.user.get_display_name }}</div>
+      </div>
+      <span class="pk-game">{{ pkg.game.name }}</span>
+    </div>
+    <div class="pk-price">${{ pkg.total_price }}</div>
+    <div class="pk-detail"><span class="ms">schedule</span> {{ pkg.number_of_sessions }} sessions</div>
+    <div class="pk-detail"><span class="ms">timer</span> Valid for {{ pkg.valid_for_days }} days</div>
+    <div class="pk-detail"><span class="ms">hourglass_bottom</span> {{ pkg.session_duration }} min per session</div>
+    {% if pkg.description %}<div class="pk-desc">{{ pkg.description|truncatewords:30 }}</div>{% endif %}
+    <a href="{% url 'coaching:purchase_package' pk=pkg.pk %}" class="pk-btn">Purchase Package</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="pk-empty">
+  <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;">redeem</span>
+  <p>No coaching packages available right now. Check back later!</p>
+</div>
+{% endif %}
+
+{% if is_paginated %}
+<div style="display:flex;justify-content:center;gap:8px;padding:1rem;max-width:1100px;margin:0 auto;">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}" class="btn-outline" style="padding:8px 16px;border-radius:6px;border:1px solid #2a2a2a;color:#9ca3af;text-decoration:none;font-size:.85rem;">Previous</a>
+  {% endif %}
+  <span style="padding:8px 16px;color:#6b7280;font-size:.85rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}" class="btn-outline" style="padding:8px 16px;border-radius:6px;border:1px solid #2a2a2a;color:#9ca3af;text-decoration:none;font-size:.85rem;">Next</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

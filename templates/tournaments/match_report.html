@@ -1,13 +1,243 @@
-{% extends "layouts/dashboard_base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Report Match Score - {{ match.tournament.name }}{% endblock %}
 
-{% block content %}
-<div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-2 text-gray-400 text-sm mb-4">
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
+<link rel="stylesheet" href="{% static 'css/mobile-responsive.css' %}">
+<style>
+    .report-container {
+        background: linear-gradient(135deg, #0A0A0A 0%, #1F1F1F 100%);
+        min-height: 100vh;
+        position: relative;
+    }
+    .report-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, transparent 50%, rgba(6, 182, 212, 0.05) 100%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .report-container > * { position: relative; z-index: 1; }
+
+    .gaming-card {
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(31, 31, 31, 0.95) 100%);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(220, 38, 38, 0.4);
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .gaming-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.15), transparent);
+        transition: left 0.5s ease;
+    }
+    .gaming-card:hover::before { left: 100%; }
+    .gaming-card:hover {
+        border-color: rgba(220, 38, 38, 0.8);
+        box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .gaming-heading {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #DC2626;
+        text-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+    }
+
+    .vs-divider {
+        background: linear-gradient(135deg, #DC2626, #991B1B);
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+        width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900; font-size: 1.25rem;
+        color: white;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        z-index: 10;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        margin: 0 auto;
+    }
+
+    .participant-card {
+        background: rgba(31, 31, 31, 0.6);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .participant-card.winner {
+        border-color: rgba(16, 185, 129, 0.6);
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(16, 185, 129, 0.05);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+    }
+    .participant-card.loser { opacity: 0.6; }
+
+    .gaming-input {
+        background: rgba(31, 31, 31, 0.8) !important;
+        border: 2px solid rgba(220, 38, 38, 0.3) !important;
+        color: white !important;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem !important;
+        font-weight: 800 !important;
+        text-align: center !important;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+    }
+    .gaming-input:focus {
+        border-color: #DC2626 !important;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.3) !important;
+        outline: none !important;
+    }
+
+    .gaming-btn {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        position: relative;
+        overflow: hidden;
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .gaming-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    .gaming-btn:hover::before { left: 100%; }
+    .gaming-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
+    }
+
+    .gaming-btn-secondary {
+        background: rgba(31, 31, 31, 0.8);
+        border: 2px solid rgba(220, 38, 38, 0.3);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #DC2626;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .gaming-btn-secondary:hover {
+        border-color: #DC2626;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        color: #DC2626;
+        transform: translateY(-2px);
+    }
+
+    .status-badge {
+        display: inline-flex; align-items: center; gap: 0.375rem;
+        padding: 0.25rem 0.75rem; border-radius: 9999px;
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.05em; font-family: 'Barlow Condensed', sans-serif;
+    }
+    .status-badge.completed {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10B981;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+    .status-badge.live {
+        background: rgba(220, 38, 38, 0.2);
+        color: #DC2626;
+        border: 1px solid rgba(220, 38, 38, 0.5);
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.3); }
+        50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.6); }
+    }
+
+    .participant-avatar {
+        width: 3rem; height: 3rem;
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900; font-size: 1rem;
+        color: white;
+        box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+        border: 2px solid rgba(220, 38, 38, 0.3);
+    }
+    .participant-avatar.winner {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .gaming-label {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #DC2626;
+    }
+
+    .info-item {
+        border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+        padding: 0.75rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .info-item:last-child { border-bottom: none; }
+    .info-label { color: #6B7280; font-size: 0.875rem; }
+    .info-value { color: #F3F4F6; font-weight: 600; }
+
+    .important-notice {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        border-radius: 0.5rem;
+    }
+
+    .breadcrumb a { transition: color 0.3s ease; }
+    .breadcrumb a:hover { color: #DC2626; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="report-container">
+    <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb flex items-center gap-2 text-gray-400 text-sm mb-6">
             <a href="{% url 'tournaments:list' %}" class="hover:text-primary">Tournaments</a>
             <span class="material-symbols-outlined text-xs">chevron_right</span>
             <a href="{% url 'tournaments:detail' match.tournament.slug %}" class="hover:text-primary">{{ match.tournament.name }}</a>
@@ -16,222 +246,302 @@
             <span class="material-symbols-outlined text-xs">chevron_right</span>
             <span class="text-white">Report Score</span>
         </div>
-        <h1 class="text-white text-3xl font-bold mb-2">Report Match Score</h1>
-        <p class="text-gray-400">Round {{ match.round_number }}, Match {{ match.match_number }}</p>
-    </div>
 
-    <!-- Match Information Card -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
-        <h2 class="text-white text-xl font-bold mb-4">Match Information</h2>
-        
-        <div class="space-y-4">
-            <!-- Tournament -->
-            <div class="flex items-center justify-between">
-                <span class="text-gray-400">Tournament:</span>
-                <span class="text-white font-medium">{{ match.tournament.name }}</span>
-            </div>
-            
-            <!-- Round & Match -->
-            <div class="flex items-center justify-between">
-                <span class="text-gray-400">Round:</span>
-                <span class="text-white font-medium">Round {{ match.round_number }}, Match {{ match.match_number }}</span>
-            </div>
-            
-            <!-- Format -->
-            <div class="flex items-center justify-between">
-                <span class="text-gray-400">Format:</span>
-                <span class="text-white font-medium">Best of {{ match.tournament.best_of }}</span>
-            </div>
-            
-            {% if match.scheduled_time %}
-            <!-- Scheduled Time -->
-            <div class="flex items-center justify-between">
-                <span class="text-gray-400">Scheduled:</span>
-                <span class="text-white font-medium">{{ match.scheduled_time|date:"M d, Y g:i A" }}</span>
-            </div>
-            {% endif %}
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-2" style="font-family: 'Barlow Condensed', sans-serif;">
+                Report <span class="text-primary" style="color: #DC2626; text-shadow: 0 0 15px rgba(220, 38, 38, 0.4);">Match Score</span>
+            </h1>
+            <p class="text-gray-400 text-lg">Round {{ match.round_number }}, Match {{ match.match_number }}</p>
         </div>
-    </div>
 
-    <!-- Participants Card -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
-        <h2 class="text-white text-xl font-bold mb-4">Participants</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Participant 1 -->
-            <div class="bg-background-dark rounded-lg p-4 border border-card-border-dark">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary text-2xl">person</span>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">{{ match.participant1.display_name }}</h3>
-                        <p class="text-gray-400 text-sm">Participant 1</p>
-                    </div>
+        <!-- Match Information Card -->
+        <div class="gaming-card p-6 mb-6">
+            <h2 class="gaming-heading text-xl mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined">info</span>
+                Match Information
+            </h2>
+            <div class="space-y-1">
+                <div class="info-item">
+                    <span class="info-label">Tournament:</span>
+                    <span class="info-value">{{ match.tournament.name }}</span>
                 </div>
-                {% if match.participant1.seed %}
-                <div class="text-sm text-gray-400">
-                    <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
-                    Seed: {{ match.participant1.seed }}
+                <div class="info-item">
+                    <span class="info-label">Round:</span>
+                    <span class="info-value">Round {{ match.round_number }}, Match {{ match.match_number }}</span>
                 </div>
-                {% endif %}
-            </div>
-            
-            <!-- VS Divider -->
-            <div class="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-card-dark border-2 border-card-border-dark rounded-full items-center justify-center">
-                <span class="text-gray-400 font-bold">VS</span>
-            </div>
-            
-            <!-- Participant 2 -->
-            <div class="bg-background-dark rounded-lg p-4 border border-card-border-dark">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary text-2xl">person</span>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">{{ match.participant2.display_name }}</h3>
-                        <p class="text-gray-400 text-sm">Participant 2</p>
-                    </div>
+                <div class="info-item">
+                    <span class="info-label">Format:</span>
+                    <span class="info-value">Best of {{ match.tournament.best_of }}</span>
                 </div>
-                {% if match.participant2.seed %}
-                <div class="text-sm text-gray-400">
-                    <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
-                    Seed: {{ match.participant2.seed }}
+                {% if match.scheduled_time %}
+                <div class="info-item">
+                    <span class="info-label">Scheduled:</span>
+                    <span class="info-value">{{ match.scheduled_time|date:"M d, Y g:i A" }}</span>
                 </div>
                 {% endif %}
             </div>
         </div>
-    </div>
 
-    <!-- Score Report Form -->
-    <div class="bg-card-dark border border-card-border-dark rounded-lg p-6 mb-6">
-        <h2 class="text-white text-xl font-bold mb-4">Report Score</h2>
-        
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            <!-- Display Form Errors -->
-            {% if form.non_field_errors %}
-            <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
-                <div class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-red-500">error</span>
-                    <div class="flex-1">
-                        <h3 class="text-red-500 font-bold mb-1">Error</h3>
-                        {% for error in form.non_field_errors %}
-                        <p class="text-red-400 text-sm">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Score Inputs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Participant 1 Score -->
+        {% if match.status == 'completed' %}
+        <!-- Already Completed Banner -->
+        <div class="gaming-card p-6 mb-6" style="border-color: rgba(16, 185, 129, 0.4);">
+            <div class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-green-400 text-3xl">check_circle</span>
                 <div>
-                    <label for="{{ form.score_p1.id_for_label }}" class="block text-white font-medium mb-2">
-                        {{ match.participant1.display_name }} Score
-                    </label>
-                    <input type="number" 
-                           name="{{ form.score_p1.name }}" 
-                           id="{{ form.score_p1.id_for_label }}"
-                           min="0"
-                           value="{{ form.score_p1.value|default:'' }}"
-                           class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
-                           placeholder="0"
-                           required>
-                    {% if form.score_p1.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.score_p1.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <!-- Participant 2 Score -->
-                <div>
-                    <label for="{{ form.score_p2.id_for_label }}" class="block text-white font-medium mb-2">
-                        {{ match.participant2.display_name }} Score
-                    </label>
-                    <input type="number" 
-                           name="{{ form.score_p2.name }}" 
-                           id="{{ form.score_p2.id_for_label }}"
-                           min="0"
-                           value="{{ form.score_p2.value|default:'' }}"
-                           class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
-                           placeholder="0"
-                           required>
-                    {% if form.score_p2.errors %}
-                    <p class="text-red-400 text-sm mt-1">{{ form.score_p2.errors.0 }}</p>
+                    <h3 class="text-green-400 font-bold text-lg" style="font-family: 'Barlow Condensed', sans-serif;">
+                        Match Completed
+                    </h3>
+                    <p class="text-green-300 text-sm mt-1">
+                        Winner: <span class="font-bold">{{ match.winner.display_name }}</span>
+                        ({{ match.score_p1 }} - {{ match.score_p2 }})
+                    </p>
+                    {% if user == match.tournament.organizer or user.role == 'admin' %}
+                    <p class="text-gray-400 text-sm mt-2">
+                        As an organizer, you can still update the score if needed.
+                    </p>
                     {% endif %}
                 </div>
             </div>
-            
-            <!-- Notes (Optional) -->
-            {% if form.notes %}
-            <div>
-                <label for="{{ form.notes.id_for_label }}" class="block text-white font-medium mb-2">
-                    Notes (Optional)
-                </label>
-                <textarea name="{{ form.notes.name }}" 
-                          id="{{ form.notes.id_for_label }}"
-                          rows="3"
-                          class="w-full bg-background-dark text-white border border-card-border-dark rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          placeholder="Add any notes about the match...">{{ form.notes.value|default:'' }}</textarea>
-                {% if form.notes.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.notes.help_text }}</p>
-                {% endif %}
-                {% if form.notes.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ form.notes.errors.0 }}</p>
-                {% endif %}
-            </div>
-            {% endif %}
-            
-            <!-- Important Notice -->
-            <div class="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4">
-                <div class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-yellow-500">info</span>
-                    <div class="flex-1">
-                        <h3 class="text-yellow-500 font-bold mb-1">Important</h3>
-                        <ul class="text-yellow-400 text-sm space-y-1">
-                            <li>• Scores cannot be tied - there must be a winner</li>
-                            <li>• Once submitted, the winner will advance to the next round</li>
-                            <li>• If there's a dispute, you can file one after submission</li>
-                        </ul>
+        </div>
+        {% endif %}
+
+        <!-- Participants Section -->
+        <div class="gaming-card p-6 mb-6">
+            <h2 class="gaming-heading text-xl mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined">groups</span>
+                Participants
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <!-- Participant 1 -->
+                <div class="participant-card p-4 {% if match.winner == match.participant1 %}winner{% elif match.status == 'completed' %}loser{% endif %}">
+                    <div class="flex items-center gap-4">
+                        <div class="participant-avatar {% if match.winner == match.participant1 %}winner{% endif %}">
+                            {{ match.participant1.display_name|first|upper }}
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-lg" style="font-family: 'Barlow Condensed', sans-serif;">
+                                {{ match.participant1.display_name }}
+                                {% if match.winner == match.participant1 %}
+                                <span class="material-symbols-outlined text-green-400 align-middle text-xl">emoji_events</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-gray-400 text-sm">Participant 1</div>
+                            {% if match.participant1.seed %}
+                            <div class="text-gray-500 text-xs mt-1">
+                                <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
+                                Seed: {{ match.participant1.seed }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VS Divider -->
+                <div class="hidden md:flex items-center justify-center">
+                    <div class="vs-divider">VS</div>
+                </div>
+
+                <!-- Participant 2 -->
+                <div class="participant-card p-4 {% if match.winner == match.participant2 %}winner{% elif match.status == 'completed' %}loser{% endif %}">
+                    <div class="flex items-center gap-4">
+                        <div class="participant-avatar {% if match.winner == match.participant2 %}winner{% endif %}">
+                            {{ match.participant2.display_name|first|upper }}
+                        </div>
+                        <div>
+                            <div class="text-white font-bold text-lg" style="font-family: 'Barlow Condensed', sans-serif;">
+                                {{ match.participant2.display_name }}
+                                {% if match.winner == match.participant2 %}
+                                <span class="material-symbols-outlined text-green-400 align-middle text-xl">emoji_events</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-gray-400 text-sm">Participant 2</div>
+                            {% if match.participant2.seed %}
+                            <div class="text-gray-500 text-xs mt-1">
+                                <span class="material-symbols-outlined text-xs align-middle">military_tech</span>
+                                Seed: {{ match.participant2.seed }}
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-4">
-                <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    Submit Score
-                </button>
-                <a href="{% url 'tournaments:bracket' match.tournament.slug %}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Match Status -->
-    {% if match.status == 'completed' %}
-    <div class="bg-green-500/10 border border-green-500/50 rounded-lg p-4">
-        <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-green-500">check_circle</span>
-            <div class="flex-1">
-                <h3 class="text-green-500 font-bold mb-1">Match Completed</h3>
-                <p class="text-green-400 text-sm">
-                    This match has already been completed. 
-                    Winner: <span class="font-bold">{{ match.winner.display_name }}</span> 
-                    ({{ match.score_p1 }} - {{ match.score_p2 }})
-                </p>
-                {% if user == match.tournament.organizer or user.role == 'admin' %}
-                <p class="text-green-400 text-sm mt-2">
-                    As an organizer, you can still update the score if needed.
-                </p>
-                {% endif %}
-            </div>
         </div>
+
+        <!-- Score Report Form -->
+        <div class="gaming-card p-6 mb-6">
+            <h2 class="gaming-heading text-xl mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined">edit_note</span>
+                Report Score
+            </h2>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Display Form Errors -->
+                {% if form.non_field_errors %}
+                <div class="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-500">error</span>
+                        <div class="flex-1">
+                            <h3 class="text-red-500 font-bold mb-1" style="font-family: 'Barlow Condensed', sans-serif;">Error</h3>
+                            {% for error in form.non_field_errors %}
+                            <p class="text-red-400 text-sm">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Score Inputs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Participant 1 Score -->
+                    <div>
+                        <label for="{{ form.score_p1.id_for_label }}" class="gaming-label block mb-3">
+                            {{ match.participant1.display_name }} Score
+                        </label>
+                        <input type="number"
+                               name="{{ form.score_p1.name }}"
+                               id="{{ form.score_p1.id_for_label }}"
+                               min="0" max="99"
+                               value="{{ form.score_p1.value|default:'' }}"
+                               class="gaming-input w-full"
+                               placeholder="0"
+                               required>
+                        {% if form.score_p1.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.score_p1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Participant 2 Score -->
+                    <div>
+                        <label for="{{ form.score_p2.id_for_label }}" class="gaming-label block mb-3">
+                            {{ match.participant2.display_name }} Score
+                        </label>
+                        <input type="number"
+                               name="{{ form.score_p2.name }}"
+                               id="{{ form.score_p2.id_for_label }}"
+                               min="0" max="99"
+                               value="{{ form.score_p2.value|default:'' }}"
+                               class="gaming-input w-full"
+                               placeholder="0"
+                               required>
+                        {% if form.score_p2.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.score_p2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- FGC Character / Stage Selection (only if characters exist for this game) -->
+                {% if form.character_p1 %}
+                <div class="border-t border-gray-800 pt-6">
+                    <h3 class="gaming-heading text-lg mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">sports_esports</span>
+                        Character & Stage Selection
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="{{ form.character_p1.id_for_label }}" class="gaming-label block mb-2">
+                                {{ form.character_p1.label }}
+                            </label>
+                            <select name="{{ form.character_p1.name }}" id="{{ form.character_p1.id_for_label }}"
+                                    class="fgc-select w-full bg-gray-800/80 text-white border border-gray-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                                <option value="">-- Select --</option>
+                                {% for char in form.character_p1.field.queryset %}
+                                <option value="{{ char.id }}" {% if form.character_p1.value|stringformat:'s' == char.id|stringformat:'s' %}selected{% endif %}>{{ char.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="{{ form.character_p2.id_for_label }}" class="gaming-label block mb-2">
+                                {{ form.character_p2.label }}
+                            </label>
+                            <select name="{{ form.character_p2.name }}" id="{{ form.character_p2.id_for_label }}"
+                                    class="fgc-select w-full bg-gray-800/80 text-white border border-gray-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                                <option value="">-- Select --</option>
+                                {% for char in form.character_p2.field.queryset %}
+                                <option value="{{ char.id }}" {% if form.character_p2.value|stringformat:'s' == char.id|stringformat:'s' %}selected{% endif %}>{{ char.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="{{ form.stage.id_for_label }}" class="gaming-label block mb-2">
+                                {{ form.stage.label }}
+                            </label>
+                            <select name="{{ form.stage.name }}" id="{{ form.stage.id_for_label }}"
+                                    class="fgc-select w-full bg-gray-800/80 text-white border border-gray-700 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                                <option value="">-- Select --</option>
+                                {% for stage in form.stage.field.queryset %}
+                                <option value="{{ stage.id }}" {% if form.stage.value|stringformat:'s' == stage.id|stringformat:'s' %}selected{% endif %}>{{ stage.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Notes -->
+                <div>
+                    <label for="{{ form.notes.id_for_label }}" class="gaming-label block mb-3">
+                        Notes <span class="text-gray-500 font-normal normal-case">(Optional)</span>
+                    </label>
+                    <textarea name="{{ form.notes.name }}"
+                              id="{{ form.notes.id_for_label }}"
+                              rows="3"
+                              class="w-full bg-gray-800/80 text-white border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition"
+                              placeholder="Add any notes about the match...">{{ form.notes.value|default:'' }}</textarea>
+                    {% if form.notes.help_text %}
+                    <p class="text-gray-400 text-sm mt-1">{{ form.notes.help_text }}</p>
+                    {% endif %}
+                    {% if form.notes.errors %}
+                    <p class="text-red-400 text-sm mt-1">{{ form.notes.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- DQ Checkbox -->
+                <div class="flex items-center gap-3 p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+                    <input type="checkbox"
+                           name="{{ form.is_dq.name }}"
+                           id="{{ form.is_dq.id_for_label }}"
+                           class="w-5 h-5 rounded border-gray-600 bg-gray-800 text-red-500 focus:ring-red-500/50"
+                           {% if form.is_dq.value %}checked{% endif %}>
+                    <label for="{{ form.is_dq.id_for_label }}" class="gaming-label cursor-pointer flex-1">
+                        Disqualification (DQ)
+                        <span class="block text-gray-400 text-sm font-normal normal-case mt-1">
+                            {{ form.is_dq.help_text }}
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Important Notice -->
+                <div class="important-notice p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-yellow-500">info</span>
+                        <div class="flex-1">
+                            <h3 class="text-yellow-500 font-bold mb-1" style="font-family: 'Barlow Condensed', sans-serif;">Important</h3>
+                            <ul class="text-yellow-400 text-sm space-y-1">
+                                <li>• Scores cannot be tied — there must be a winner</li>
+                                <li>• Once submitted, the winner will immediately advance to the next round</li>
+                                <li>• If there's a dispute, you can file one after submission</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-4 pt-2">
+                    <button type="submit" class="gaming-btn flex-1 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Submit Score
+                    </button>
+                    <a href="{% url 'tournaments:bracket' match.tournament.slug %}" class="gaming-btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
     </div>
-    {% endif %}
 </div>
 {% endblock %}

@@ -690,27 +690,33 @@ def seed_participants_api(request, slug):
     # Validate and update in atomic transaction
     try:
         with transaction.atomic():
+            # First pass: collect participant lookups
             for seed_data in seeds:
                 participant_id = seed_data.get('participant_id')
                 seed_value = seed_data.get('seed')
                 
-                # Validate participant_id is provided
                 if not participant_id:
                     return JsonResponse({
                         'success': False,
                         'error': 'Missing participant_id in seed data'
                     }, status=400)
                 
-                # Validate seed value - must be positive integer or null
-                if seed_value is not None:
-                    if not isinstance(seed_value, int) or seed_value <= 0:
-                        return JsonResponse({
-                            'success': False,
-                            'error': 'Invalid seed value',
-                            'details': {'invalid_seeds': [seed_value]}
-                        }, status=400)
+                if seed_value is not None and (not isinstance(seed_value, int) or seed_value <= 0):
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Invalid seed value',
+                        'details': {'invalid_seeds': [seed_value]}
+                    }, status=400)
+            
+            # Collect all current seed holders for swap support
+            seed_map = {}
+            for p in tournament.participants.filter(status='confirmed').exclude(seed=None):
+                seed_map[p.seed] = p
+            
+            for seed_data in seeds:
+                participant_id = seed_data.get('participant_id')
+                seed_value = seed_data.get('seed')
                 
-                # Get participant - must exist, belong to tournament, and be confirmed
                 try:
                     participant = tournament.participants.get(
                         id=participant_id, 
@@ -722,14 +728,18 @@ def seed_participants_api(request, slug):
                         'error': 'Participant not found or not confirmed'
                     }, status=400)
                 
-                # Store old seed for audit log
                 old_seed = participant.seed
                 
-                # Update seed
-                participant.seed = seed_value
-                participant.save()
+                # If another participant already holds this seed, swap seeds
+                if seed_value is not None and seed_value in seed_map and seed_map[seed_value].id != participant.id:
+                    existing = seed_map[seed_value]
+                    existing.seed = old_seed
+                    existing.save(update_fields=['seed'])
+                    seed_map[old_seed] = existing
                 
-                # Create audit log entry with tournament and participant names
+                participant.seed = seed_value
+                participant.save(update_fields=['seed'])
+                
                 LogEntry.objects.create(
                     user_id=request.user.id,
                     content_type_id=ContentType.objects.get_for_model(Participant).pk,

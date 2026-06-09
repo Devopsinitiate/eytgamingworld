@@ -176,12 +176,73 @@
         border: 2px solid rgba(34, 197, 94, 0.5);
         box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
     }
+
+    /* ── Compact / zoom-out ── */
+    .pref-wrap { max-width: 800px; margin: 0 auto; }
+    .pref-wrap h1.gaming-header { font-size: 1.8rem; }
+    .pref-wrap .text-5xl, .pref-wrap .text-6xl { font-size: 1.8rem; }
+    .pref-wrap .text-lg { font-size: 0.85rem; }
+    .pref-wrap .text-2xl { font-size: 1.05rem; }
+    .pref-wrap .text-3xl { font-size: 1.3rem; }
+    .pref-wrap .text-base { font-size: 0.82rem; }
+    .pref-wrap .neon-card { padding: 1rem; }
+    .pref-wrap .neon-card .mb-6 { margin-bottom: 0.6rem; }
+    .pref-wrap .neon-card .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.3rem; }
+    .pref-wrap .neon-card .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.2rem; }
+    .pref-wrap .neon-card .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pref-wrap .neon-card .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+    .pref-wrap .pl-4 { padding-left: 0.75rem; }
+    .pref-wrap .px-8 { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .pref-wrap .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pref-wrap .mb-12 { margin-bottom: 1.5rem; }
+    .pref-wrap .mb-6 { margin-bottom: 0.6rem; }
+    .pref-wrap .py-6 { padding-top: 1rem; padding-bottom: 1rem; }
+    .pref-wrap .gap-4 { gap: 0.6rem; }
+    .pref-wrap .mt-1 { margin-top: 0.15rem; }
+    .pref-wrap .text-sm { font-size: 0.78rem; }
+    .pref-wrap .font-semibold { font-size: 0.85rem; }
+    .pref-wrap .gaming-toggle { width: 40px; height: 22px; }
+    .pref-wrap .gaming-slider:before { height: 16px; width: 16px; }
+    .pref-wrap input:checked + .gaming-slider:before { transform: translateX(18px); }
+    .pref-wrap .gaming-checkbox { width: 16px; height: 16px; }
+    .pref-wrap .gaming-checkbox:checked::after { font-size: 11px; }
+    .pref-wrap .skewed-button { padding: 0.5rem 1.25rem; }
+    .pref-wrap .skewed-button-text { font-size: 0.82rem; }
+    .pref-wrap input[type="time"] { padding: 0.4rem 0.75rem !important; font-size: 0.82rem; }
+
+    @media (max-width: 768px) {
+        .pref-wrap h1.gaming-header { font-size: 1.25rem; }
+        .pref-wrap .text-5xl, .pref-wrap .text-6xl { font-size: 1.25rem; }
+        .pref-wrap .text-lg { font-size: 0.78rem; }
+        .pref-wrap .text-2xl { font-size: 0.92rem; }
+        .pref-wrap .text-3xl { font-size: 1.1rem; }
+        .pref-wrap .text-base { font-size: 0.78rem; }
+        .pref-wrap .neon-card { padding: 0.7rem; }
+        .pref-wrap .neon-card .mb-6 { margin-bottom: 0.4rem; }
+        .pref-wrap .mb-12 { margin-bottom: 1rem; }
+        .pref-wrap .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .pref-wrap .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .pref-wrap .grid-cols-1 { gap: 0.5rem; }
+        .pref-wrap .flex-col { gap: 0.5rem; }
+        .pref-wrap .gaming-header { font-size: 1.25rem; }
+        /* Back button compact */
+        .pref-wrap .mb-6 .inline-flex { font-size: 0.78rem; }
+        .pref-wrap .mb-6 .material-symbols-outlined { font-size: 18px; }
+        /* Breadcrumb compact */
+        .pref-wrap .flex-wrap.gap-2 { gap: 0.3rem !important; }
+        .pref-wrap .flex-wrap.gap-2 a, .pref-wrap .flex-wrap.gap-2 span { font-size: 0.75rem; }
+        /* Quiet hours: stack */
+        .pref-wrap .sm\\:grid-cols-2 { display: flex; flex-direction: column; gap: 0.5rem; }
+        /* Buttons full width on mobile */
+        .pref-wrap .sm\\:flex-row { flex-direction: column; }
+        .pref-wrap .sm\\:flex-row a, .pref-wrap .sm\\:flex-row button { width: 100%; text-align: center; }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="min-h-screen bg-deep-black py-6 lg:py-10">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="page-wrap pref-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
         
         <!-- Back Button -->
         <div class="mb-6">

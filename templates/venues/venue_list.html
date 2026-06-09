@@ -140,36 +140,13 @@
         box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
     }
 
-    /* Responsive Grid */
-    @media (max-width: 768px) {
-        .venue-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .venue-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (min-width: 1025px) {
-        .venue-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    @media (min-width: 1536px) {
-        .venue-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
+    /* Grid handled by .grid-auto-phi */
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="min-h-screen bg-deep-black py-8 px-4">
-    <div class="max-w-7xl mx-auto">
+    <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
         <!-- Back Button and Navigation -->
         <div class="mb-6">
             <a href="{% url 'dashboard:home' %}" class="inline-flex items-center gap-2 text-gray-400 hover:text-electric-red transition-colors group">
@@ -267,7 +244,7 @@
                 <div id="filter-content" class="filter-content">
                     <div class="filter-panel rounded-lg p-6 lg:sticky lg:top-4">
                         <div class="filter-panel-content">
-                            <h2 class="font-barlow text-2xl font-bold uppercase tracking-tight text-white mb-6">
+                            <h2 class="font-barlow text-2xl font-bold uppercase tracking-tight text-gold mb-6">
                                 Filters
                             </h2>
                         
@@ -379,7 +356,7 @@
                     <span class="text-white font-bold">{{ page_obj.paginator.count }}</span> venue{{ page_obj.paginator.count|pluralize }} found
                 </div>
 
-                <div class="venue-grid grid gap-6" role="list" aria-label="Available venues">
+                <div class="grid-auto-phi" role="list" aria-label="Available venues">
                     {% for venue in page_obj %}
                     {% include 'venues/components/venue_card.html' with venue=venue %}
                     {% empty %}

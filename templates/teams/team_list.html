@@ -12,7 +12,7 @@
 <!-- Include Skeleton Loaders -->
 {% include "dashboard/components/skeleton_loaders.html" %}
 
-<div class="max-w-7xl content-loaded">
+<div class="content-loaded">
     <!-- Gaming Header -->
     <div class="mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -74,7 +74,7 @@
 
     <!-- Skeleton for teams -->
     <div class="skeleton-loader" id="skeleton-teams">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid-auto-phi">
             {% for i in "123456" %}
             <div class="skeleton-card">
                 <div class="skeleton-card-content">
@@ -98,7 +98,7 @@
 
     <!-- Team List -->
     {% if teams %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 content-loaded" role="list" aria-label="Teams list">
+    <div class="grid-auto-phi content-loaded" role="list" aria-label="Teams list">
         {% for team in teams %}
             {% include "teams/components/team_card_gaming.html" with team=team %}
         {% endfor %}

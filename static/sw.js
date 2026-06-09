@@ -147,3 +147,28 @@ self.addEventListener('push', event => {
         );
     }
 });
+
+// Notification click event - open the relevant page
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+
+    const urlToOpen = event.notification.data && event.notification.data.url
+        ? event.notification.data.url
+        : '/notifications/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then(windowClients => {
+                // Check if there's already a window/tab open with the target URL
+                for (let client of windowClients) {
+                    if (client.url === urlToOpen && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                // If not, open a new window/tab
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
+    );
+});

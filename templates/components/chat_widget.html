@@ -1,0 +1,186 @@
+{% load static %}
+<div x-data="chatWidget()"
+     x-init="init()"
+     @new-message.window="onNewMessage($event)"
+     class="chat-root">
+
+    <!-- FAB button -->
+    <button class="chat-fab" @click="togglePanel()" :class="{ 'open': panelOpen }" aria-label="Chat">
+        <span class="material-symbols-outlined">chat</span>
+        <span class="chat-fab-badge" x-show="totalUnread > 0" x-text="totalUnread > 99 ? '99+' : totalUnread"></span>
+    </button>
+
+    <!-- Overlay -->
+    <div class="chat-overlay" :class="{ 'open': panelOpen }" @click="closePanel()"></div>
+
+    <!-- Panel -->
+    <div class="chat-panel" :class="{ 'open': panelOpen }">
+        <template x-if="!activeConv && !showGroupForm">
+            <!-- Conversation list -->
+            <div>
+                <div class="chat-header">
+                    <h3>Messages</h3>
+                    <div class="chat-header-actions">
+                        <button @click="startGroupCreation()" title="New Group">
+                            <span class="material-symbols-outlined">group_add</span>
+                        </button>
+                        <button @click="closePanel()" title="Close">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Player search -->
+                <div class="chat-player-search-wrap">
+                    <span class="material-symbols-outlined chat-search-icon">search</span>
+                    <input type="text" class="chat-player-search"
+                           x-model="playerSearchQuery" @input.debounce.300ms="searchPlayers()"
+                           placeholder="Search players to message...">
+                </div>
+                <!-- Search results -->
+                <template x-if="playerSearchResults.length > 0">
+                    <div class="chat-player-results">
+                        <template x-for="user in playerSearchResults" :key="user.id">
+                            <div class="chat-player-result-item" @click="startPlayerConversation(user.id)">
+                                <div class="chat-user-result-avatar" x-text="(user.display_name || user.username)[0].toUpperCase()"></div>
+                                <div class="chat-user-result-info">
+                                    <div class="chat-user-result-name" x-text="user.display_name || user.username"></div>
+                                    <div class="chat-user-result-username" x-text="'@' + user.username"></div>
+                                </div>
+                                <span class="material-symbols-outlined" style="font-size:16px;color:#dc2626;">chat</span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <!-- Error -->
+                <div class="chat-search-error" x-show="searchError" x-text="searchError"></div>
+                <!-- Conversation list -->
+                <div class="chat-conv-list">
+                    <template x-for="conv in conversations" :key="conv.id">
+                        <div class="chat-conv-item" @click="openConversation(conv)">
+                            <div class="chat-conv-avatar"
+                                 :class="{ 'online': conv.type === 'direct' && conv.other_user?.is_online, 'group-avatar': conv.type === 'group' }"
+                                 x-text="conv.type === 'group' ? (conv.title || 'G')[0].toUpperCase() : (conv.other_user?.display_name || '?')[0]"></div>
+                            <div class="chat-conv-info">
+                                <div class="chat-conv-name" x-text="conv.type === 'group' ? (conv.title || 'Group') : (conv.other_user?.display_name || 'Unknown')"></div>
+                                <div class="chat-conv-preview" x-text="conv.last_message?.content || 'No messages yet'"></div>
+                            </div>
+                            <div class="chat-conv-meta">
+                                <div class="chat-conv-time" x-text="conv.last_message ? formatTime(conv.last_message.created_at) : ''"></div>
+                                <div class="chat-conv-unread" x-show="conv.unread_count > 0" x-text="conv.unread_count"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="chat-empty" x-show="conversations.length === 0">
+                        <span class="material-symbols-outlined">forum</span>
+                        <p>No conversations yet.<br>Search for a player above to start chatting!</p>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template x-if="showGroupForm">
+            <!-- Group creation form -->
+            <div class="chat-group-form">
+                <div class="chat-header">
+                    <button class="chat-back-btn" @click="cancelGroupCreation()" title="Back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h3>New Group</h3>
+                    <div class="chat-header-actions">
+                        <button @click="closePanel()" title="Close">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-group-body">
+                    <div class="chat-group-selected" x-show="selectedUsers.length > 0">
+                        <template x-for="user in selectedUsers" :key="user.id">
+                            <span class="chat-user-chip">
+                                <span x-text="user.display_name || user.username"></span>
+                                <button class="chat-chip-remove" @click="toggleUser(user)">
+                                    <span class="material-symbols-outlined">close</span>
+                                </button>
+                            </span>
+                        </template>
+                    </div>
+                    <input type="text" class="chat-group-title-input"
+                           x-model="groupTitle" placeholder="Group title (optional)">
+                    <div class="chat-user-search-wrap">
+                        <span class="material-symbols-outlined chat-search-icon">search</span>
+                        <input type="text" class="chat-user-search"
+                               x-model="searchQuery" @input.debounce.300ms="searchUsers()"
+                               placeholder="Search players...">
+                    </div>
+                    <div class="chat-user-results" x-show="searchResults.length > 0">
+                        <template x-for="user in searchResults" :key="user.id">
+                            <div class="chat-user-result-item" @click="toggleUser(user)">
+                                <div class="chat-user-result-avatar" x-text="(user.display_name || user.username)[0].toUpperCase()"></div>
+                                <div class="chat-user-result-info">
+                                    <div class="chat-user-result-name" x-text="user.display_name || user.username"></div>
+                                    <div class="chat-user-result-username" x-text="'@' + user.username"></div>
+                                </div>
+                                <span class="material-symbols-outlined chat-user-add-icon">add_circle</span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="chat-empty" x-show="searchQuery.length >= 2 && searchResults.length === 0">
+                        <p>No players found.</p>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <button class="chat-send-btn chat-create-btn"
+                            @click="createGroup()"
+                            :disabled="selectedUsers.length === 0"
+                            x-text="'Create (' + selectedUsers.length + ')'"></button>
+                </div>
+            </div>
+        </template>
+
+        <template x-if="activeConv">
+            <!-- Active conversation -->
+            <div style="display:flex;flex-direction:column;height:100%;">
+                <div class="chat-header">
+                    <button class="chat-back-btn" @click="backToList()" title="Back">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <div>
+                        <h3 x-text="activeConv.type === 'group' ? (activeConv.title || 'Group') : (activeConv.other_user?.display_name || 'Chat')"></h3>
+                        <div class="chat-header-sub" x-show="activeConv.type === 'group'" style="font-size:11px;color:#888;">
+                            <span x-text="activeConv.participants?.length + ' participants'"></span>
+                        </div>
+                    </div>
+                    <div class="chat-header-actions">
+                        <button @click="closePanel()" title="Close">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-messages" x-ref="msgContainer" @scroll.throttle="onScroll">
+                    <template x-for="msg in messages" :key="msg.id">
+                        <div class="chat-msg" :class="msg.sender_id === currentUserId ? 'sent' : 'received'">
+                            <div class="chat-msg-sender" x-show="activeConv.type === 'group' && msg.sender_id !== currentUserId" x-text="msg.sender?.display_name || 'Unknown'"></div>
+                            <div x-text="msg.content"></div>
+                            <div class="chat-msg-meta">
+                                <span class="chat-msg-time" x-text="formatTime(msg.created_at)"></span>
+                                <span class="chat-msg-seen" x-show="msg.sender_id === currentUserId && msg.read_by?.length > 0"
+                                      x-text="msg.read_by.length === 1 ? 'Seen' : 'Seen by ' + msg.read_by.length"></span>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="chat-loading" x-show="loadingMessages">
+                        <div class="chat-loading-dot"></div>
+                        <div class="chat-loading-dot"></div>
+                        <div class="chat-loading-dot"></div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" x-model="newMessage" @keydown.enter="sendMessage()"
+                           placeholder="Type a message..." :disabled="sending">
+                    <button class="chat-send-btn" @click="sendMessage()" :disabled="sending || !newMessage.trim()">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>

@@ -22,6 +22,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Prefetch
 from django.urls import reverse
 from django.core.cache import cache
+from django.conf import settings as django_settings
 from decimal import Decimal, InvalidOperation
 import json
 
@@ -153,6 +154,20 @@ def product_list(request):
         categories = Category.objects.filter(parent=None).prefetch_related('children')
         cache.set(categories_cache_key, categories, 60 * 15)  # Cache for 15 minutes
     
+    # Featured products (site-wide, cached separately)
+    featured = cache.get('store_featured_products')
+    if featured is None:
+        featured = list(
+            Product.objects.filter(is_active=True, is_featured=True)
+            .select_related('category')
+            .prefetch_related(Prefetch(
+                'images',
+                queryset=ProductImage.objects.filter(is_primary=True).order_by('-is_primary', 'display_order'),
+                to_attr='primary_images'
+            ))[:6]
+        )
+        cache.set('store_featured_products', featured, 60 * 15)
+
     # Build context
     context = {
         'products': products_page,
@@ -163,10 +178,27 @@ def product_list(request):
         'max_price': max_price,
         'sort_by': sort_by,
         'total_products': paginator.count,
+        'featured_products': featured,
     }
     
-    # Cache the context for 5 minutes
-    cache.set(cache_key, context, 60 * 5)
+    # Build user-specific data (never cached)
+    if request.user.is_authenticated:
+        from .models import WishlistItem
+        product_ids = [p.id for p in products_page.object_list]
+        wishlist_ids = set(
+            WishlistItem.objects.filter(
+                wishlist__user=request.user,
+                product_id__in=product_ids
+            ).values_list('product_id', flat=True)
+        )
+    else:
+        wishlist_ids = set()
+
+    context['wishlist_product_ids'] = wishlist_ids
+
+    # Cache a copy of site-wide data only
+    cache_copy = {k: v for k, v in context.items() if k != 'wishlist_product_ids'}
+    cache.set(cache_key, cache_copy, 60 * 5)
     
     return render(request, 'store/product_list.html', context)
 
@@ -190,6 +222,13 @@ def product_detail(request, slug):
     cache_key = f'product_detail_{slug}'
     cached_context = cache.get(cache_key)
     if cached_context:
+        if request.user.is_authenticated:
+            from .models import WishlistItem
+            cached_context['in_wishlist'] = WishlistItem.objects.filter(
+                wishlist__user=request.user, product__slug=slug
+            ).exists()
+        else:
+            cached_context['in_wishlist'] = False
         return render(request, 'store/product_detail.html', cached_context)
     
     # Get product with related data
@@ -211,15 +250,37 @@ def product_detail(request, slug):
     # Check stock availability
     has_stock = product.is_in_stock or any(v.is_in_stock for v in variants)
     
+    # Related products (same category, exclude current)
+    related = Product.objects.filter(
+        is_active=True, category=product.category
+    ).exclude(id=product.id).select_related('category').prefetch_related(
+        Prefetch(
+            'images',
+            queryset=ProductImage.objects.filter(is_primary=True).order_by('-is_primary', 'display_order'),
+            to_attr='primary_images'
+        )
+    )[:4]
+
     context = {
         'product': product,
         'images': images,
         'variants': variants,
         'has_stock': has_stock,
+        'related_products': related,
     }
     
-    # Cache for 10 minutes
-    cache.set(cache_key, context, 60 * 10)
+    # Add user-specific data
+    if request.user.is_authenticated:
+        from .models import WishlistItem
+        context['in_wishlist'] = WishlistItem.objects.filter(
+            wishlist__user=request.user, product=product
+        ).exists()
+    else:
+        context['in_wishlist'] = False
+
+    # Cache a copy of site-wide data only
+    cache_copy = {k: v for k, v in context.items() if k != 'in_wishlist'}
+    cache.set(cache_key, cache_copy, 60 * 10)
     
     return render(request, 'store/product_detail.html', context)
 
@@ -794,6 +855,8 @@ def checkout_payment(request):
         'tax': tax,
         'total': total,
         'shipping_info': shipping_info,
+        'STRIPE_PUBLISHABLE_KEY': getattr(django_settings, 'STRIPE_PUBLISHABLE_KEY', ''),
+        'PAYSTACK_PUBLIC_KEY': getattr(django_settings, 'PAYSTACK_PUBLIC_KEY', ''),
     }
     
     return render(request, 'store/checkout_payment.html', context)
@@ -1094,14 +1157,6 @@ def stripe_confirm_payment(request):
                 total=total
             )
             
-            # Reserve inventory
-            for item in cart.items.all():
-                InventoryManager.reserve_stock(
-                    item.product,
-                    item.variant,
-                    item.quantity
-                )
-            
             # Clear cart
             CartManager.clear_cart(cart)
             
@@ -1387,12 +1442,22 @@ def paystack_verify(request):
         
         # Create order with transaction safety
         with transaction.atomic():
+            # Calculate totals
+            subtotal = CartManager.calculate_total(cart)
+            shipping_cost = Decimal(request.session.get('shipping_cost', '10.00'))
+            tax = (subtotal * Decimal('0.10')).quantize(Decimal('0.01'))
+            total = subtotal + shipping_cost + tax
+
             order = OrderManager.create_order(
                 user=request.user,
                 cart=cart,
                 shipping_info=shipping_info,
                 payment_method='paystack',
-                payment_intent_id=reference
+                payment_intent_id=reference,
+                subtotal=subtotal,
+                shipping_cost=shipping_cost,
+                tax=tax,
+                total=total
             )
             
             # Store order number in session for confirmation page

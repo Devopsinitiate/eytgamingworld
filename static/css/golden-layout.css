@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════
+   EYTGaming Golden Ratio Utilities
+   Depends on design-system.css for CSS variables
+   ═══════════════════════════════════════════════ */
+
+/* ── Wide Bracket Wrapper ── */
+.bracket-wrapper-wide {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--eyt-gold-dark, #ca8a04) transparent;
+}
+
+/* ── Neon Effects ── */
+.neon-red-glow {
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.5), inset 0 0 10px rgba(220, 38, 38, 0.2);
+}
+
+.neon-red-glow-lg {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.4), inset 0 0 15px rgba(220, 38, 38, 0.3);
+}
+
+.neon-cyan-glow {
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+/* ── Gold Premium Card ── */
+.card-gold-premium {
+  background: #0A0A0A;
+  border: 2px solid rgba(234, 179, 8, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-gold-premium::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--eyt-gold, #eab308) 0%, var(--eyt-gold-light, #fde047) 50%, var(--eyt-gold-dark, #ca8a04) 100%);
+}
+
+.card-gold-premium:hover {
+  border-color: var(--eyt-gold, #eab308);
+  box-shadow: 0 0 25px rgba(234, 179, 8, 0.15);
+}
+
+/* ── Gold Button ── */
+.btn-gaming-gold {
+  background: linear-gradient(135deg, var(--eyt-gold, #eab308) 0%, var(--eyt-gold-dark, #ca8a04) 100%);
+  color: #0A0A0A;
+  font-family: var(--font-header, 'Barlow Condensed', sans-serif);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+  padding: 0.45rem 1.25rem;
+  border-radius: 0.375rem;
+  transform: skewX(-12deg);
+  box-shadow: 0 0 20px var(--eyt-gold-glow, rgba(234, 179, 8, 0.25));
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-gaming-gold:hover {
+  transform: skewX(0deg);
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.45);
+  background: linear-gradient(135deg, var(--eyt-gold-light, #fde047) 0%, var(--eyt-gold, #eab308) 100%);
+}
+
+.btn-gaming-gold > * {
+  display: inline-block;
+  transform: skewX(12deg);
+}
+
+.btn-gaming-gold:hover > * {
+  transform: skewX(0deg);
+}

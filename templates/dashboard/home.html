@@ -58,9 +58,9 @@
     </div>
 
     <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left Column - Activity & Upcoming Events -->
-        <div class="lg:col-span-2 space-y-6">
+    <div class="grid-golden">
+        <!-- Left Column - Activity & Upcoming Events (61.8%) -->
+        <div class="space-y-6">
             <!-- Activity Feed Component -->
             {% include 'dashboard/components/activity_feed_gaming.html' %}
 
@@ -160,12 +160,12 @@
             {% include 'dashboard/components/recommendations_gaming.html' %}
 
             <!-- Payment Summary Section -->
-            <div class="card-gaming">
+            <div class="card-gaming card-gold-premium">
                 <div class="card-gaming-content">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="gaming-subheader text-xl text-white">PAYMENT VAULT</h2>
                         <a href="{% url 'payments:history' %}"
-                            class="text-electric-red hover:text-neon-cyan text-sm font-bold transition-colors uppercase"
+                            class="text-gold hover:text-gold-light text-sm font-bold transition-colors uppercase"
                             aria-label="View payment history">
                             VIEW ALL →
                         </a>
@@ -238,23 +238,23 @@
     </div>
 
     <!-- Merch Teaser Section -->
-    <div class="card-gaming">
+    <div class="card-gaming card-gold-premium">
         <div class="card-gaming-content">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="gaming-subheader text-2xl text-white">MERCH DROP</h2>
-                <a href="{% url 'store:product_list' %}" class="btn-gaming-ghost px-4 py-2 text-sm" aria-label="View all merch">
-                    SHOP ALL →
+                <a href="{% url 'store:product_list' %}" class="btn-gaming-gold text-sm" aria-label="View all merch">
+                    <span>SHOP ALL →</span>
                 </a>
             </div>
             {% if featured_products %}
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;">
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.618rem;">
                 {% for product in featured_products %}
                 {% with primary_image=product.images.all|first %}
                 <a href="{% url 'store:product_detail' product.slug %}"
-                   class="block card-gaming-flat hover:neon-border-red transition-all group overflow-hidden rounded-lg"
+                   class="block card-gaming-flat hover:neon-border-gold transition-all group overflow-hidden rounded-lg"
                    style="text-decoration:none;">
-                    <!-- Product Image -->
-                    <div style="position:relative;width:100%;padding-top:100%;background:#0a0a0a;overflow:hidden;">
+                    <!-- Product Image in Golden aspect ratio portrait -->
+                    <div class="aspect-golden-portrait relative bg-[#0a0a0a] overflow-hidden" style="width:100%;">
                         {% if primary_image %}
                         <img src="{{ primary_image.image.url }}"
                              alt="{{ primary_image.alt_text|default:product.name }}"
@@ -281,7 +281,7 @@
                     <!-- Product Info -->
                     <div style="padding:0.75rem;">
                         <p class="text-white gaming-body" style="font-size:0.875rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ product.name }}</p>
-                        <p class="text-electric-red gaming-stat" style="font-size:1rem;font-weight:900;margin-top:4px;">₦{{ product.price }}</p>
+                        <p class="text-gold gaming-stat" style="font-size:1rem;font-weight:900;margin-top:4px;">₦{{ product.price }}</p>
                     </div>
                 </a>
                 {% endwith %}

@@ -29,65 +29,18 @@ def check_tournament_start_times():
     """
     Check for tournaments that should start soon and update their status.
     Runs every 5 minutes via Celery Beat.
+    Delegates to utils for the core logic; sends notifications afterward.
     """
-    now = timezone.now()
-    
-    # Move tournaments from draft to registration when registration_start time is reached
-    tournaments_to_open_registration = Tournament.objects.filter(
-        status='draft',
-        registration_start__lte=now,
-        registration_end__gt=now  # Ensure registration period hasn't ended
-    )
-    
-    for tournament in tournaments_to_open_registration:
-        tournament.status = 'registration'
-        tournament.published_at = now
-        tournament.save()
-        
-        # Notify organizer that registration opened automatically
-        send_registration_opened_notification.delay(tournament.id)
-    
-    # Move tournaments from registration to check-in when registration ends and check-in starts
-    tournaments_to_check_in = Tournament.objects.filter(
-        status='registration',
-        registration_end__lte=now,
-        check_in_start__lte=now
-    )
-    
-    for tournament in tournaments_to_check_in:
-        tournament.status = 'check_in'
-        tournament.save()
-        
-        # Notify participants that check-in is open
-        send_check_in_notifications.delay(tournament.id)
-    
-    # Move tournaments from check-in to in_progress when start time is reached
-    tournaments_to_start = Tournament.objects.filter(
-        status='check_in',
-        start_datetime__lte=now
-    )
-    
-    for tournament in tournaments_to_start:
-        # Check if minimum participants are checked in
-        if tournament.total_checked_in >= tournament.min_participants:
-            tournament.status = 'in_progress'
-            tournament.save()
-            
-            # Generate bracket and start tournament
-            from tournaments.services.bracket_generator import BracketGenerator
-            try:
-                generator = BracketGenerator(tournament)
-                generator.generate_bracket()
-                
-                # Notify participants that tournament has started
-                send_tournament_start_notifications.delay(tournament.id)
-            except Exception as e:
-                # Log error but don't fail the status update
-                print(f"Error generating bracket for tournament {tournament.id}: {e}")
-        else:
-            # Tournament doesn't have enough participants, consider cancelling or postponing
-            # For now, we'll leave it in check_in status
-            pass
+    from .utils import check_and_advance_tournament_statuses
+
+    results = check_and_advance_tournament_statuses()
+
+    for tid in results['draft_ids']:
+        send_registration_opened_notification.delay(tid)
+    for tid in results['checkin_ids']:
+        send_check_in_notifications.delay(tid)
+    for tid in results['inprogress_ids']:
+        send_tournament_start_notifications.delay(tid)
 
 
 @shared_task

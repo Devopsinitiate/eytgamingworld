@@ -51,6 +51,10 @@ app.conf.beat_schedule = {
         'task': 'dashboard.tasks.cleanup_old_activities',
         'schedule': crontab(hour=3, minute=30, day_of_week=0),  # Weekly on Sunday at 3:30 AM
     },
+    'sync-active-tournament-standings': {
+        'task': 'integrations.tasks.sync_active_tournament_standings',
+        'schedule': crontab(minute='*/15'),  # Every 15 minutes
+    },
 }
 
 

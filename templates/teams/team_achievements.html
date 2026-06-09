@@ -1,233 +1,225 @@
 {% extends "layouts/dashboard_base.html" %}
-
+{% load static %}
 {% block title %}{{ team.name }} - Achievements - EYTGaming{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<style>
+.ta-page{background:#080808;min-height:100vh;padding:1.5rem 1.5rem 3rem}
+.ta-card{background:#0d1117;border:1px solid #1f2937;border-radius:0.875rem;position:relative;overflow:hidden}
+.ta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,0.3) 60%,transparent 100%)}
+.ta-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.9375rem;color:#fff;display:flex;align-items:center;gap:0.5rem;padding-bottom:0.75rem;border-bottom:1px solid #111827}
+.ta-section-title::before{content:'';width:3px;height:1rem;background:#b91c1c;border-radius:2px;box-shadow:0 0 6px rgba(185,28,28,0.6);flex-shrink:0}
+.ta-stat-card{background:#0d1117;border:1px solid #1f2937;border-radius:0.875rem;padding:1.25rem;position:relative;overflow:hidden;transition:border-color 0.2s}
+.ta-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,0.3) 60%,transparent 100%)}
+.ta-stat-card:hover{border-color:rgba(185,28,28,0.25)}
+.ta-stat-value{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2rem;color:#fff;line-height:1}
+.ta-stat-label{font-size:0.75rem;color:#4b5563;text-transform:uppercase;letter-spacing:0.06em;margin-top:0.25rem}
+.ta-ach{border-radius:0.875rem;padding:1.5rem;text-align:center;position:relative;overflow:hidden;border:1px solid #1f2937;background:#080808;transition:border-color 0.2s}
+.ta-ach:hover{border-color:rgba(185,28,28,0.3)}
+.ta-ach-icon{font-size:3.5rem;margin-bottom:0.75rem;display:block}
+.ta-ach-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:#fff;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.375rem}
+.ta-ach-desc{font-size:0.8rem;color:#6b7280;line-height:1.5;margin-bottom:0.75rem}
+.ta-ach-date{font-size:0.7rem;color:#4b5563}
+.ta-ach-tournament{border-color:rgba(185,28,28,0.2)}
+.ta-ach-tournament:hover{border-color:rgba(185,28,28,0.5)}
+.ta-ach-performance{border-color:rgba(16,185,129,0.2)}
+.ta-ach-performance:hover{border-color:rgba(16,185,129,0.5)}
+.ta-ach-milestone{border-color:rgba(139,92,246,0.2)}
+.ta-ach-milestone:hover{border-color:rgba(139,92,246,0.5)}
+.ta-ach-meta{padding-top:0.75rem;border-top:1px solid #1f2937;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.ta-ach-meta-red{color:#fca5a5}
+.ta-ach-meta-green{color:#6ee7b7}
+.ta-ach-meta-purple{color:#c4b5fd}
+.ta-btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:0.5rem;font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;cursor:pointer;transition:all 0.15s;border:none;text-decoration:none}
+.ta-btn-primary{background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%);color:#fff}
+.ta-btn-primary:hover{background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);box-shadow:0 0 20px rgba(185,28,28,0.4);color:#fff}
+.ta-progress-bar{width:100%;background:#1f2937;border-radius:9999px;height:6px;overflow:hidden}
+.ta-progress-fill{height:100%;border-radius:9999px;background:linear-gradient(90deg,#b91c1c,#dc2626);transition:width 0.4s ease}
+.ta-back-btn{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:0.5rem;color:#6b7280;transition:all 0.15s;text-decoration:none;flex-shrink:0}
+.ta-back-btn:hover{background:rgba(185,28,28,0.1);color:#fff}
+.ta-page-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(1.5rem,3vw,2rem);color:#fff;line-height:1;letter-spacing:0.03em}
+.ta-page-title span{color:#b91c1c}
+.ta-subtitle{font-size:0.85rem;color:#6b7280;margin-top:0.25rem}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl">
-    <!-- Page Header -->
-    <div class="mb-6 md:mb-8">
-        <div class="flex items-center gap-3 md:gap-4 mb-4">
-            <a href="{% url 'teams:detail' slug=team.slug %}" class="text-gray-400 hover:text-white transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center">
-                <span class="material-symbols-outlined">arrow_back</span>
+<div class="ta-page">
+    <div class="page-wrap">
+        <div class="flex items-center gap-3 mb-6">
+            <a href="{% url 'teams:detail' slug=team.slug %}" class="ta-back-btn" aria-label="Back to team">
+                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_back</span>
             </a>
             <div>
-                <h1 class="text-white text-2xl md:text-3xl font-bold">Team Achievements</h1>
-                <p class="text-gray-400 text-sm md:text-base">{{ team.name }} [{{ team.tag }}]</p>
+                <h1 class="ta-page-title">Team <span>Achievements</span></h1>
+                <p class="ta-subtitle">{{ team.name }} [{{ team.tag }}]</p>
             </div>
         </div>
-    </div>
-    
-    <!-- Achievement Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-xs md:text-sm">Total</span>
-                <span class="material-symbols-outlined text-primary text-lg md:text-xl">military_tech</span>
-            </div>
-            <p class="text-white text-2xl md:text-3xl font-bold">{{ achievements.count }}</p>
-        </div>
-        
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-xs md:text-sm">Tournament</span>
-                <span class="material-symbols-outlined text-green-500 text-lg md:text-xl">emoji_events</span>
-            </div>
-            <p class="text-white text-2xl md:text-3xl font-bold">{{ tournament_achievements_count }}</p>
-        </div>
-        
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-4 md:p-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-400 text-xs md:text-sm">Latest</span>
-                <span class="material-symbols-outlined text-blue-500 text-lg md:text-xl">schedule</span>
-            </div>
-            {% if latest_achievement %}
-            <p class="text-white text-base md:text-lg font-bold">{{ latest_achievement.earned_at|timesince }} ago</p>
-            {% else %}
-            <p class="text-gray-400 text-sm">None yet</p>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Achievement Categories -->
-    <div class="space-y-8">
-        <!-- Tournament Achievements -->
-        {% if tournament_achievements %}
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <h2 class="text-white text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined">emoji_events</span>
-                Tournament Achievements
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for achievement in tournament_achievements %}
-                <div class="bg-background-dark rounded-lg p-6 border-2 border-primary/20 hover:border-primary/40 transition-colors">
-                    <div class="text-center mb-4">
-                        <div class="text-6xl mb-3">{{ achievement.icon }}</div>
-                        <h3 class="text-white text-lg font-bold mb-2">{{ achievement.title }}</h3>
-                        <p class="text-gray-400 text-sm mb-3">{{ achievement.description }}</p>
-                        <p class="text-gray-500 text-xs">Earned {{ achievement.earned_at|date:"M d, Y" }}</p>
-                    </div>
-                    
-                    {% if achievement.metadata %}
-                    <div class="pt-4 border-t border-gray-700">
-                        <p class="text-gray-400 text-xs">
-                            {% if achievement.metadata.tournament_id %}
-                            <span class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">info</span>
-                                Tournament Achievement
-                            </span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    {% endif %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div class="ta-stat-card">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="ta-stat-label">Total</span>
+                    <span class="material-symbols-outlined" style="font-size:1.25rem;color:#b91c1c;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">military_tech</span>
                 </div>
-                {% endfor %}
+                <p class="ta-stat-value">{{ achievements.count }}</p>
             </div>
-        </div>
-        {% endif %}
-        
-        <!-- Performance Achievements -->
-        {% if performance_achievements %}
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <h2 class="text-white text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined">trending_up</span>
-                Performance Achievements
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for achievement in performance_achievements %}
-                <div class="bg-background-dark rounded-lg p-6 border-2 border-green-500/20 hover:border-green-500/40 transition-colors">
-                    <div class="text-center mb-4">
-                        <div class="text-6xl mb-3">{{ achievement.icon }}</div>
-                        <h3 class="text-white text-lg font-bold mb-2">{{ achievement.title }}</h3>
-                        <p class="text-gray-400 text-sm mb-3">{{ achievement.description }}</p>
-                        <p class="text-gray-500 text-xs">Earned {{ achievement.earned_at|date:"M d, Y" }}</p>
-                    </div>
-                    
-                    {% if achievement.metadata.count or achievement.metadata.streak %}
-                    <div class="pt-4 border-t border-gray-700">
-                        <p class="text-green-400 text-sm font-bold text-center">
-                            {% if achievement.metadata.count %}
-                            {{ achievement.metadata.count }} in a row
-                            {% elif achievement.metadata.streak %}
-                            {{ achievement.metadata.streak }} match streak
-                            {% endif %}
-                        </p>
-                    </div>
-                    {% endif %}
+            <div class="ta-stat-card">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="ta-stat-label">Tournament</span>
+                    <span class="material-symbols-outlined" style="font-size:1.25rem;color:#10b981;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">emoji_events</span>
                 </div>
-                {% endfor %}
+                <p class="ta-stat-value">{{ tournament_achievements_count }}</p>
             </div>
-        </div>
-        {% endif %}
-        
-        <!-- Milestone Achievements -->
-        {% if milestone_achievements %}
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-6">
-            <h2 class="text-white text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined">flag</span>
-                Milestone Achievements
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for achievement in milestone_achievements %}
-                <div class="bg-background-dark rounded-lg p-6 border-2 border-purple-500/20 hover:border-purple-500/40 transition-colors">
-                    <div class="text-center mb-4">
-                        <div class="text-6xl mb-3">{{ achievement.icon }}</div>
-                        <h3 class="text-white text-lg font-bold mb-2">{{ achievement.title }}</h3>
-                        <p class="text-gray-400 text-sm mb-3">{{ achievement.description }}</p>
-                        <p class="text-gray-500 text-xs">Earned {{ achievement.earned_at|date:"M d, Y" }}</p>
-                    </div>
-                    
-                    {% if achievement.metadata.tournaments_played %}
-                    <div class="pt-4 border-t border-gray-700">
-                        <p class="text-purple-400 text-sm font-bold text-center">
-                            {{ achievement.metadata.tournaments_played }} Tournaments
-                        </p>
-                    </div>
-                    {% elif achievement.metadata.max_members %}
-                    <div class="pt-4 border-t border-gray-700">
-                        <p class="text-purple-400 text-sm font-bold text-center">
-                            {{ achievement.metadata.max_members }} Members
-                        </p>
-                    </div>
-                    {% endif %}
+            <div class="ta-stat-card">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="ta-stat-label">Latest</span>
+                    <span class="material-symbols-outlined" style="font-size:1.25rem;color:#10b981;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">schedule</span>
                 </div>
-                {% endfor %}
+                {% if latest_achievement %}
+                <p class="ta-stat-value" style="font-size:1.1rem">{{ latest_achievement.earned_at|timesince }} ago</p>
+                {% else %}
+                <p class="text-gray-400 text-sm">None yet</p>
+                {% endif %}
             </div>
         </div>
-        {% endif %}
-        
-        <!-- Empty State -->
+
         {% if not achievements %}
-        <div class="bg-card-dark border border-card-border-dark rounded-lg p-12 text-center">
-            <div class="text-6xl mb-4">🏆</div>
-            <h3 class="text-white text-xl font-bold mb-2">No Achievements Yet</h3>
-            <p class="text-gray-400 mb-6">Start competing in tournaments to earn achievements!</p>
-            <a href="{% url 'tournaments:list' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors">
-                <span class="material-symbols-outlined">emoji_events</span>
+        <div class="ta-card p-12 text-center">
+            <div style="font-size:4rem;margin-bottom:1rem;display:block;">🏆</div>
+            <h2 class="ta-page-title" style="font-size:1.5rem;margin-bottom:0.5rem">No <span>Achievements</span></h2>
+            <p class="ta-subtitle" style="margin-bottom:1.5rem">Start competing in tournaments to earn achievements!</p>
+            <a href="{% url 'tournaments:list' %}" class="ta-btn ta-btn-primary">
+                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">emoji_events</span>
                 Browse Tournaments
             </a>
         </div>
-        {% endif %}
-    </div>
-    
-    <!-- Progressive Achievements (Future) -->
-    <div class="mt-8 bg-card-dark border border-card-border-dark rounded-lg p-6">
-        <h2 class="text-white text-xl font-bold mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined">insights</span>
-            Progress Towards Next Achievements
-        </h2>
-        
-        <div class="space-y-4">
-            <!-- Tournament Participation Progress -->
-            <div class="bg-background-dark rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-white font-medium">Tournament Participation</span>
-                    <span class="text-gray-400 text-sm">{{ team.tournaments_played }} / 
-                        {% if team.tournaments_played < 10 %}10{% elif team.tournaments_played < 50 %}50{% else %}100{% endif %}
-                    </span>
+        {% else %}
+
+        <div class="space-y-6">
+            {% if tournament_achievements %}
+            <div class="ta-card p-6">
+                <h2 class="ta-section-title">
+                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">emoji_events</span>
+                    Tournament Achievements
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for ach in tournament_achievements %}
+                    <div class="ta-ach ta-ach-tournament">
+                        <span class="ta-ach-icon">{{ ach.icon }}</span>
+                        <h3 class="ta-ach-title">{{ ach.title }}</h3>
+                        <p class="ta-ach-desc">{{ ach.description }}</p>
+                        <p class="ta-ach-date">Earned {{ ach.earned_at|date:"M d, Y" }}</p>
+                        {% if ach.metadata.tournament_id %}
+                        <div class="ta-ach-meta ta-ach-meta-red">Tournament Achievement</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    {% if team.tournaments_played < 10 %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 10 100 %}%"></div>
-                    {% elif team.tournaments_played < 50 %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 50 100 %}%"></div>
-                    {% else %}
-                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.tournaments_played 100 100 %}%"></div>
-                    {% endif %}
-                </div>
-                <p class="text-gray-400 text-xs mt-2">
-                    {% if team.tournaments_played < 10 %}
-                    {{ team.tournaments_played }}/10 tournaments to "Experienced"
-                    {% elif team.tournaments_played < 50 %}
-                    {{ team.tournaments_played }}/50 tournaments to "Veterans"
-                    {% elif team.tournaments_played < 100 %}
-                    {{ team.tournaments_played }}/100 tournaments to "Legends"
-                    {% else %}
-                    All tournament milestones achieved!
-                    {% endif %}
-                </p>
             </div>
-            
-            <!-- Roster Progress -->
-            <div class="bg-background-dark rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-white font-medium">Team Roster</span>
-                    <span class="text-gray-400 text-sm">{{ team.member_count }} / {{ team.max_members }}</span>
+            {% endif %}
+
+            {% if performance_achievements %}
+            <div class="ta-card p-6">
+                <h2 class="ta-section-title">
+                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">trending_up</span>
+                    Performance Achievements
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for ach in performance_achievements %}
+                    <div class="ta-ach ta-ach-performance">
+                        <span class="ta-ach-icon">{{ ach.icon }}</span>
+                        <h3 class="ta-ach-title">{{ ach.title }}</h3>
+                        <p class="ta-ach-desc">{{ ach.description }}</p>
+                        <p class="ta-ach-date">Earned {{ ach.earned_at|date:"M d, Y" }}</p>
+                        {% if ach.metadata.count or ach.metadata.streak %}
+                        <div class="ta-ach-meta ta-ach-meta-green">
+                            {% if ach.metadata.count %}{{ ach.metadata.count }} in a row{% elif ach.metadata.streak %}{{ ach.metadata.streak }} match streak{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full" style="width: {% widthratio team.member_count team.max_members 100 %}%"></div>
+            </div>
+            {% endif %}
+
+            {% if milestone_achievements %}
+            <div class="ta-card p-6">
+                <h2 class="ta-section-title">
+                    <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">flag</span>
+                    Milestone Achievements
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for ach in milestone_achievements %}
+                    <div class="ta-ach ta-ach-milestone">
+                        <span class="ta-ach-icon">{{ ach.icon }}</span>
+                        <h3 class="ta-ach-title">{{ ach.title }}</h3>
+                        <p class="ta-ach-desc">{{ ach.description }}</p>
+                        <p class="ta-ach-date">Earned {{ ach.earned_at|date:"M d, Y" }}</p>
+                        {% if ach.metadata.tournaments_played %}
+                        <div class="ta-ach-meta ta-ach-meta-purple">{{ ach.metadata.tournaments_played }} Tournaments</div>
+                        {% elif ach.metadata.max_members %}
+                        <div class="ta-ach-meta ta-ach-meta-purple">{{ ach.metadata.max_members }} Members</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
-                <p class="text-gray-400 text-xs mt-2">
-                    {% if team.is_full %}
-                    Full roster achieved! 🎉
-                    {% else %}
-                    {{ team.member_count }}/{{ team.max_members }} members — keep recruiting to unlock "Full Roster"
-                    {% endif %}
-                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="ta-card p-6 mt-6">
+            <h2 class="ta-section-title">
+                <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">insights</span>
+                Progress Towards Next Achievements
+            </h2>
+            <div class="space-y-4">
+                <div style="background:#080808;border:1px solid #1f2937;border-radius:0.625rem;padding:1rem">
+                    <div class="flex items-center justify-between mb-2">
+                        <span style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.04em">Tournament Participation</span>
+                        <span style="color:#6b7280;font-size:0.8rem">{{ team.tournaments_played }} / {% if team.tournaments_played < 10 %}10{% elif team.tournaments_played < 50 %}50{% else %}100{% endif %}</span>
+                    </div>
+                    <div class="ta-progress-bar">
+                        {% if team.tournaments_played < 10 %}
+                        <div class="ta-progress-fill" style="width:{% widthratio team.tournaments_played 10 100 %}%"></div>
+                        {% elif team.tournaments_played < 50 %}
+                        <div class="ta-progress-fill" style="width:{% widthratio team.tournaments_played 50 100 %}%"></div>
+                        {% else %}
+                        <div class="ta-progress-fill" style="width:{% widthratio team.tournaments_played 100 100 %}%"></div>
+                        {% endif %}
+                    </div>
+                    <p style="color:#4b5563;font-size:0.75rem;margin-top:0.5rem">
+                        {% if team.tournaments_played < 10 %}
+                        {{ team.tournaments_played }}/10 tournaments to "Experienced"
+                        {% elif team.tournaments_played < 50 %}
+                        {{ team.tournaments_played }}/50 tournaments to "Veterans"
+                        {% elif team.tournaments_played < 100 %}
+                        {{ team.tournaments_played }}/100 tournaments to "Legends"
+                        {% else %}
+                        All tournament milestones achieved!
+                        {% endif %}
+                    </p>
+                </div>
+                <div style="background:#080808;border:1px solid #1f2937;border-radius:0.625rem;padding:1rem">
+                    <div class="flex items-center justify-between mb-2">
+                        <span style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.04em">Team Roster</span>
+                        <span style="color:#6b7280;font-size:0.8rem">{{ team.member_count }} / {{ team.max_members }}</span>
+                    </div>
+                    <div class="ta-progress-bar">
+                        <div class="ta-progress-fill" style="width:{% widthratio team.member_count team.max_members 100 %}%"></div>
+                    </div>
+                    <p style="color:#4b5563;font-size:0.75rem;margin-top:0.5rem">
+                        {% if team.is_full %}
+                        Full roster achieved!
+                        {% else %}
+                        {{ team.member_count }}/{{ team.max_members }} members — keep recruiting to unlock "Full Roster"
+                        {% endif %}
+                    </p>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

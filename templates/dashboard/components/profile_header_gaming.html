@@ -86,9 +86,11 @@
                         <button class="btn-gaming-secondary">
                             <span class="btn-gaming-text">ADD FRIEND</span>
                         </button>
-                        <button class="btn-gaming-secondary">
+                        {% if user.is_authenticated %}
+                        <button class="btn-gaming-secondary" data-user-id="{{ profile_owner.id }}">
                             <span class="btn-gaming-text">MESSAGE</span>
                         </button>
+                        {% endif %}
                         {% endif %}
                     </div>
                 </div>

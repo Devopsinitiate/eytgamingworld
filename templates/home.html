@@ -12,6 +12,25 @@
 <meta name="keywords" content="esports, gaming, tournaments, coaching, EYTGaming, competitive gaming, Nigeria esports">
 {% endblock %}
 
+{% block extra_css %}
+<style>
+/* Golden Wide Layout / zoom-out for landing page */
+#landing-page section { padding: var(--space-xl) var(--space-md) !important; }
+#landing-page h1 { font-size: var(--font-size-3xl) !important; }
+#landing-page h2 { font-size: var(--font-size-2xl) !important; }
+#landing-page h3 { font-size: var(--font-size-lg) !important; }
+#landing-page p, #landing-page li { font-size: var(--font-size-sm) !important; }
+#landing-page .container, #landing-page .max-w-7xl { max-width: var(--layout-max-width) !important; }
+@media (max-width: 768px) {
+    #landing-page section { padding: var(--space-md) var(--space-sm) !important; }
+    #landing-page h1 { font-size: var(--font-size-xl) !important; }
+    #landing-page h2 { font-size: var(--font-size-lg) !important; }
+    #landing-page h3 { font-size: var(--font-size-base) !important; }
+    #landing-page p, #landing-page li { font-size: var(--font-size-xs) !important; }
+}
+</style>
+{% endblock %}
+
 {% block navigation %}
 <!-- Use custom landing page navigation -->
 {% include "partials/navigation.html" %}

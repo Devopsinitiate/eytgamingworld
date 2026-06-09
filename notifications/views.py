@@ -1,13 +1,19 @@
 """
 Notification views
 """
+import json
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+from django.conf import settings
 
-from .models import Notification, NotificationPreference
+from .models import Notification, NotificationPreference, Device
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -159,6 +165,85 @@ def notification_preferences(request):
     }
     
     return render(request, 'notifications/preferences.html', context)
+
+
+@login_required
+@require_POST
+def subscribe_push(request):
+    """Subscribe the current user's browser to push notifications"""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    subscription_info = data.get('subscription')
+    user_agent = data.get('user_agent', '')
+    device_name = data.get('device_name', '')
+
+    if not subscription_info or not subscription_info.get('endpoint'):
+        return JsonResponse({'success': False, 'error': 'Missing subscription data'}, status=400)
+
+    # Check if this subscription already exists
+    existing = Device.objects.filter(
+        user=request.user,
+        subscription_info__endpoint=subscription_info['endpoint']
+    ).first()
+
+    if existing:
+        # Re-activate if it was inactive
+        if not existing.is_active:
+            existing.is_active = True
+            existing.subscription_info = subscription_info
+            existing.save(update_fields=['is_active', 'subscription_info', 'updated_at'])
+        return JsonResponse({'success': True, 'message': 'Subscription already exists'})
+
+    Device.objects.create(
+        user=request.user,
+        subscription_info=subscription_info,
+        user_agent=user_agent[:500] if user_agent else '',
+        device_name=device_name[:200] if device_name else '',
+    )
+
+    logger.info(f'Push subscription added for user {request.user.id}')
+    return JsonResponse({'success': True, 'message': 'Subscribed to push notifications'})
+
+
+@login_required
+@require_POST
+def unsubscribe_push(request):
+    """Unsubscribe the current user's browser from push notifications"""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    endpoint = data.get('endpoint')
+
+    if endpoint:
+        Device.objects.filter(
+            user=request.user,
+            subscription_info__endpoint=endpoint
+        ).update(is_active=False)
+    else:
+        # Unsubscribe all devices
+        Device.objects.filter(user=request.user).update(is_active=False)
+
+    logger.info(f'Push subscription removed for user {request.user.id}')
+    return JsonResponse({'success': True, 'message': 'Unsubscribed from push notifications'})
+
+
+@login_required
+@require_POST
+def test_push(request):
+    """Send a test push notification to the current user"""
+    notification = Notification.create_notification(
+        user=request.user,
+        title='Test Notification',
+        message='This is a test push notification from EYTGaming!',
+        notification_type='system',
+        delivery_methods=['push'],
+    )
+    return JsonResponse({'success': True, 'notification_id': str(notification.id)})
 
 
 @login_required

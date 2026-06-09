@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Organizer Application Status — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+.os-page { background:#0A0A0A; min-height:100vh; padding:4rem 0; }
+.os-card {
+  background:#111;border:1px solid #1f1f1f;border-radius:12px;
+  padding:2rem;position:relative;overflow:hidden;
+  max-width:600px;margin:0 auto;
+}
+.os-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#DC2626,#ef4444,#DC2626);
+}
+.os-status-dot {
+  width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;
+}
+.os-timeline { position:relative;padding-left:28px; }
+.os-timeline::before {
+  content:'';position:absolute;left:11px;top:4px;bottom:4px;
+  width:2px;background:#2a2a2a;
+}
+.os-timeline-item { position:relative;padding-bottom:1.25rem; }
+.os-timeline-item:last-child { padding-bottom:0; }
+.os-timeline-dot {
+  position:absolute;left:-22px;top:4px;
+  width:16px;height:16px;border-radius:50%;border:2px solid #2a2a2a;
+  background:#0d0d0d;
+}
+.os-timeline-dot.active { border-color:#DC2626;background:#DC2626; }
+.os-timeline-dot.approved { border-color:#22c55e;background:#22c55e; }
+.os-timeline-dot.rejected { border-color:#ef4444;background:#ef4444; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="os-page">
+  <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
+
+    {% if messages %}
+    <div style="margin-bottom:1.5rem;max-width:600px;margin-left:auto;margin-right:auto;">
+      {% for message in messages %}
+      <div style="display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;border-radius:8px;font-size:.875rem;margin-bottom:.5rem;
+                  {% if message.tags == 'success' %}background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac;
+                  {% elif message.tags == 'error' %}background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#fca5a5;
+                  {% else %}background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#93c5fd;{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="os-card">
+
+      {% if not applications %}
+        {# No applications #}
+        <div style="text-align:center;">
+          <div style="width:64px;height:64px;border-radius:50%;margin:0 auto 1rem;
+                      background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);
+                      display:flex;align-items:center;justify-content:center;">
+            <span style="font-family:'Material Symbols Outlined';font-size:30px;color:#DC2626;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">
+              emoji_events
+            </span>
+          </div>
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;
+                     text-transform:uppercase;color:#fff;margin:0 0 .5rem;">
+            No Application Found
+          </h3>
+          <p style="color:#6b7280;font-size:.85rem;margin-bottom:1.5rem;">
+            You haven't submitted an organizer application yet.
+          </p>
+          <a href="{% url 'accounts:become_organizer' %}"
+             style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;
+                    background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;
+                    font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;
+                    text-transform:uppercase;text-decoration:none;
+                    border:1px solid rgba(220,38,38,.4);box-shadow:0 0 16px rgba(220,38,38,.3);">
+            Apply Now
+          </a>
+        </div>
+
+      {% else %}
+        {# Has applications — show latest status #}
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <div style="width:64px;height:64px;border-radius:50%;margin:0 auto 1rem;
+                      display:flex;align-items:center;justify-content:center;
+                      {% if latest.status == 'approved' %}background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);
+                      {% elif latest.status == 'rejected' %}background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+                      {% else %}background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);{% endif %}">
+            {% if latest.status == 'approved' %}
+            <span style="font-family:'Material Symbols Outlined';font-size:30px;color:#22c55e;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">check_circle</span>
+            {% elif latest.status == 'rejected' %}
+            <span style="font-family:'Material Symbols Outlined';font-size:30px;color:#ef4444;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">cancel</span>
+            {% else %}
+            <span style="font-family:'Material Symbols Outlined';font-size:30px;color:#DC2626;
+                         font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;line-height:1;">hourglass_top</span>
+            {% endif %}
+          </div>
+
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;
+                     text-transform:uppercase;color:#fff;margin:0 0 .25rem;">
+            {% if latest.status == 'approved' %}
+              Application Approved
+            {% elif latest.status == 'rejected' %}
+              Application Not Approved
+            {% else %}
+              Application Under Review
+            {% endif %}
+          </h3>
+
+          <p style="color:#6b7280;font-size:.85rem;margin:0;">
+            Submitted {{ latest.submitted_at|date:"F j, Y" }}
+          </p>
+        </div>
+
+        {# Status-specific content #}
+        {% if latest.status == 'pending' %}
+        <div style="background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);border-radius:8px;padding:1rem;margin-bottom:1.25rem;text-align:center;">
+          <p style="color:#9ca3af;font-size:.85rem;margin:0;">
+            Your application is in the queue. Our team typically responds within 2 business days.
+            You'll receive an email when your status changes.
+          </p>
+          <p style="color:#555;font-size:.75rem;margin-top:8px;">
+            Submitted: {{ latest.submitted_at|date:"F j, Y g:i A" }}
+          </p>
+        </div>
+        {% elif latest.status == 'approved' %}
+        <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:8px;padding:1rem;margin-bottom:1.25rem;text-align:center;">
+          <p style="color:#86efac;font-size:.9rem;margin:0 0 8px;font-weight:600;">
+            🎉 Congratulations! Your organizer application has been approved.
+          </p>
+          <p style="color:#9ca3af;font-size:.82rem;margin:0;">
+            You now have full organizer access. Check your email for onboarding info.
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="{% url 'tournaments:create' %}"
+             style="flex:1;text-align:center;padding:12px;border-radius:8px;
+                    background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;
+                    font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;
+                    text-transform:uppercase;text-decoration:none;">
+            Create Tournament
+          </a>
+          <a href="{% url 'accounts:two_factor_setup' %}"
+             style="flex:1;text-align:center;padding:12px;border-radius:8px;
+                    background:transparent;color:#9ca3af;
+                    font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;
+                    text-transform:uppercase;text-decoration:none;border:1px solid #2a2a2a;">
+            Set Up 2FA
+          </a>
+        </div>
+        {% elif latest.status == 'rejected' %}
+        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:8px;padding:1rem;margin-bottom:1.25rem;">
+          <p style="color:#fca5a5;font-size:.85rem;font-weight:600;margin:0 0 8px;">Reason:</p>
+          <p style="color:#9ca3af;font-size:.82rem;margin:0;">
+            {{ latest.rejection_reason|default:"Your application did not meet our requirements at this time." }}
+          </p>
+          <p style="color:#555;font-size:.75rem;margin-top:12px;">
+            Reviewed: {{ latest.reviewed_at|date:"F j, Y" }}
+          </p>
+        </div>
+        <div style="text-align:center;">
+          {% if user.can_organize_tournaments %}
+          <p style="color:#9ca3af;font-size:.82rem;">
+            It looks like you already have organizer access. Visit the dashboard to get started.
+          </p>
+          <a href="{% url 'dashboard:home' %}" style="color:#DC2626;font-size:.85rem;text-decoration:none;">
+            Go to Dashboard →
+          </a>
+          {% else %}
+          <p style="color:#555;font-size:.78rem;">
+            You may submit a new application after 30 days.
+          </p>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {# Application list (show all past applications if multiple) #}
+        {% if applications|length > 1 %}
+        <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #1a1a1a;">
+          <h4 style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;
+                     text-transform:uppercase;letter-spacing:.06em;color:#555;margin:0 0 .75rem;">
+            Previous Applications
+          </h4>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            {% for app in applications %}
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0d0d0d;border:1px solid #1f1f1f;border-radius:6px;">
+              <span style="color:#9ca3af;font-size:.78rem;">{{ app.submitted_at|date:"M j, Y" }}</span>
+              <span style="font-size:.75rem;font-weight:600;
+                {% if app.status == 'approved' %}color:#22c55e;
+                {% elif app.status == 'rejected' %}color:#ef4444;
+                {% else %}color:#f59e0b;{% endif %}">
+                {{ app.get_status_display }}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div style="margin-top:1.5rem;text-align:center;">
+          <a href="{% url 'dashboard:home' %}" style="color:#555;font-size:.82rem;text-decoration:none;">
+            ← Back to Dashboard
+          </a>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

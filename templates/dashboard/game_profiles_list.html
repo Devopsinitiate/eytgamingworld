@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
     .material-symbols-outlined {
@@ -16,7 +16,7 @@
 
 {% block content %}
 <main class="flex-1 p-8">
-    <div class="max-w-6xl mx-auto">
+    <div class="page-wrap">
         <!-- Page Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>

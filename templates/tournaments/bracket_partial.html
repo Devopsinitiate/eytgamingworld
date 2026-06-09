@@ -1,11 +1,11 @@
 {% load static %}
 {% load custom_filters %}
 
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
 
 <style>
-/* ── Icon base ─────────────────────────────────────────── */
 .bp-root .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
     font-weight: 400;
@@ -19,10 +19,10 @@
     word-wrap: normal;
     direction: ltr;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'liga' 1;
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ── Design tokens ─────────────────────────────────────── */
 .bp-root {
     --red:      #DC2626;
     --red-d:    #991B1B;
@@ -52,21 +52,59 @@
     font-family: var(--font-body);
     color: var(--text);
     background: var(--bg0);
+    padding: 1.5rem;
 }
 
-/* ── Bracket section ───────────────────────────────────── */
-.bp-section { margin-bottom: 3rem; }
+.bp-section { margin-bottom: 2.5rem; }
 
-/* ── Section header ────────────────────────────────────── */
+/* ── Filter bar ───────────────────────────────────── */
+.bp-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1.25rem;
+}
+.bp-filter-btn {
+    padding: .45rem 1rem;
+    font-family: var(--font-head);
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    border: 1px solid var(--line);
+    background: var(--bg2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+.bp-filter-btn:hover { border-color: var(--line-red); color: var(--text); }
+.bp-filter-btn.is-active {
+    background: var(--red-a);
+    color: var(--red);
+    border-color: var(--line-red);
+}
+.bp-filter-btn .material-symbols-outlined { font-size: .85rem; }
+.bp-filter-divider {
+    width: 1px; height: 1.5rem;
+    background: var(--line);
+    margin: 0 .25rem;
+    flex-shrink: 0;
+}
+
+/* ── Section header ──────────────────────────────── */
 .bp-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.25rem 1.5rem;
+    padding: 1.1rem 1.5rem;
     background: var(--bg1);
     border: 1px solid var(--line);
     border-left: 3px solid var(--red);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     position: relative;
     overflow: hidden;
 }
@@ -79,17 +117,17 @@
 }
 .bp-header-left { display: flex; align-items: center; gap: .875rem; position: relative; }
 .bp-header-icon {
-    width: 2.75rem; height: 2.75rem;
+    width: 2.5rem; height: 2.5rem;
     background: var(--red-a);
     border: 1px solid var(--line-red);
     display: flex; align-items: center; justify-content: center;
     color: var(--red);
     flex-shrink: 0;
 }
-.bp-header-icon .material-symbols-outlined { font-size: 1.375rem; }
+.bp-header-icon .material-symbols-outlined { font-size: 1.25rem; }
 .bp-header-title {
     font-family: var(--font-head);
-    font-size: 1.5rem;
+    font-size: 1.375rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: .06em;
@@ -97,24 +135,23 @@
     line-height: 1;
 }
 .bp-header-sub {
-    font-size: .72rem;
+    font-size: .7rem;
     color: var(--muted);
-    margin-top: .25rem;
+    margin-top: .2rem;
     text-transform: uppercase;
     letter-spacing: .04em;
 }
-.bp-header-right { display: flex; align-items: center; gap: 2rem; position: relative; }
+.bp-header-right { display: flex; align-items: center; gap: 1.5rem; position: relative; }
 
-/* live indicator */
 .bp-live-dot {
-    display: flex; align-items: center; gap: .4rem;
+    display: flex; align-items: center; gap: .35rem;
     font-family: var(--font-head);
-    font-size: .8rem; font-weight: 700;
+    font-size: .75rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: .08em;
     color: var(--green);
 }
 .bp-live-dot-pip {
-    width: 7px; height: 7px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--green);
     box-shadow: 0 0 8px var(--green);
@@ -124,22 +161,20 @@
     0%,100% { opacity:1; transform:scale(1); }
     50%      { opacity:.4; transform:scale(1.4); }
 }
-
-/* stat block */
 .bp-stat { text-align: right; }
 .bp-stat-val {
     font-family: var(--font-mono);
-    font-size: 1.125rem; font-weight: 700;
+    font-size: 1rem; font-weight: 700;
     color: var(--red);
     line-height: 1;
 }
 .bp-stat-lbl {
-    font-size: .65rem; color: var(--muted);
+    font-size: .62rem; color: var(--muted);
     text-transform: uppercase; letter-spacing: .06em;
-    margin-top: .2rem;
+    margin-top: .15rem;
 }
 
-/* ── Scroll container ──────────────────────────────────── */
+/* ── Scroll container ────────────────────────────── */
 .bp-scroll-wrap {
     background: var(--bg1);
     border: 1px solid var(--line);
@@ -147,7 +182,7 @@
 }
 .bp-scroll {
     overflow-x: auto;
-    padding: 2rem 2rem 2.5rem;
+    padding: 1.5rem 1.5rem 2rem;
     scrollbar-width: thin;
     scrollbar-color: var(--red) var(--bg0);
 }
@@ -163,24 +198,21 @@
     isolation: isolate;
 }
 
-/* ── Round column ──────────────────────────────────────── */
 .bp-round {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    min-width: 270px;
+    min-width: 260px;
     position: relative;
     z-index: 2;
 }
-
 .bp-round-gap {
-    width: 3rem;
+    width: 2.5rem;
     flex-shrink: 0;
     position: relative;
     align-self: stretch;
 }
 
-/* SVG connector overlay — drawn by JS */
 .bp-connectors-svg {
     position: absolute;
     top: 0; left: 0;
@@ -193,7 +225,7 @@
 /* round label */
 .bp-round-label {
     text-align: center;
-    padding: .625rem 1rem;
+    padding: .55rem 1rem;
     background: var(--bg2);
     border: 1px solid var(--line);
     border-top: 2px solid var(--red);
@@ -201,20 +233,21 @@
 }
 .bp-round-label h3 {
     font-family: var(--font-head);
-    font-size: .875rem; font-weight: 900;
+    font-size: .85rem; font-weight: 900;
     text-transform: uppercase; letter-spacing: .08em;
     color: var(--red);
     line-height: 1;
 }
-.bp-round-label p { font-size: .68rem; color: var(--muted); margin-top: .25rem; }
+.bp-round-label p { font-size: .65rem; color: var(--muted); margin-top: .25rem; }
 
-/* ── Match card ────────────────────────────────────────── */
+/* ── Match card ──────────────────────────────────── */
 .bp-card {
     background: var(--bg2);
     border: 1px solid var(--line);
     overflow: hidden;
     transition: border-color .2s, box-shadow .2s, transform .15s;
     position: relative;
+    display: block;
 }
 .bp-card::before {
     content: '';
@@ -237,41 +270,40 @@
     box-shadow: 0 0 24px rgba(220,38,38,.18);
 }
 .bp-card.is-live::before { background: var(--red); animation: bp-live-bar 2s infinite; }
+.bp-card.is-hidden { display: none; }
 @keyframes bp-live-bar {
     0%,100% { opacity:1; }
     50%      { opacity:.4; }
 }
-
-/* card top bar */
 .bp-card-top {
     display: flex; align-items: center; justify-content: space-between;
-    padding: .55rem .875rem;
+    padding: .5rem .75rem;
     border-bottom: 1px solid var(--line);
     background: var(--bg3);
 }
 .bp-match-num {
     font-family: var(--font-head);
-    font-size: .7rem; font-weight: 700;
+    font-size: .68rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: .1em;
     color: var(--muted);
 }
 .bp-match-time {
-    font-size: .68rem; color: var(--muted);
+    font-size: .65rem; color: var(--muted);
     background: rgba(255,255,255,.04);
     border: 1px solid var(--line);
-    padding: .15rem .5rem;
+    padding: .12rem .45rem;
 }
 
 /* status badge */
 .bp-badge {
-    display: inline-flex; align-items: center; gap: .25rem;
-    padding: .2rem .55rem;
+    display: inline-flex; align-items: center; gap: .2rem;
+    padding: .18rem .5rem;
     font-family: var(--font-head);
-    font-size: .68rem; font-weight: 700;
+    font-size: .65rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: .07em;
     border: 1px solid transparent;
 }
-.bp-badge .material-symbols-outlined { font-size: .8rem; }
+.bp-badge .material-symbols-outlined { font-size: .75rem; }
 .bp-badge-completed { background: rgba(16,185,129,.1);  color: var(--green); border-color: rgba(16,185,129,.25); }
 .bp-badge-live      { background: var(--red-a);          color: var(--red);   border-color: var(--line-red); animation: bp-badge-glow 2s infinite; }
 .bp-badge-ready     { background: rgba(6,182,212,.1);    color: var(--cyan);  border-color: rgba(6,182,212,.25); }
@@ -282,12 +314,11 @@
     50%      { box-shadow: 0 0 10px rgba(220,38,38,.4); }
 }
 
-/* participants */
-.bp-participants { padding: .75rem .875rem; display: flex; flex-direction: column; gap: .375rem; }
+.bp-participants { padding: .65rem .75rem; display: flex; flex-direction: column; gap: .3rem; }
 
 .bp-slot {
     display: flex; align-items: center; justify-content: space-between;
-    padding: .6rem .75rem;
+    padding: .5rem .65rem;
     background: rgba(255,255,255,.025);
     border: 1px solid transparent;
     transition: background .2s, border-color .2s;
@@ -297,30 +328,28 @@
     border-color: rgba(16,185,129,.18);
 }
 .bp-slot.is-loser { opacity: .45; }
-.bp-slot-left { display: flex; align-items: center; gap: .625rem; flex: 1; min-width: 0; }
+.bp-slot-left { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; }
 
-/* avatar */
 .bp-avatar {
-    width: 2rem; height: 2rem;
+    width: 1.75rem; height: 1.75rem;
     background: linear-gradient(135deg, var(--red) 0%, var(--red-d) 100%);
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-head);
-    font-size: .8rem; font-weight: 900;
+    font-size: .72rem; font-weight: 900;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 0 10px rgba(220,38,38,.25);
+    box-shadow: 0 0 8px rgba(220,38,38,.25);
 }
 .bp-avatar.is-tbd {
     background: var(--bg4);
     box-shadow: none;
     color: var(--muted);
 }
-.bp-avatar.is-tbd .material-symbols-outlined { font-size: .9rem; }
+.bp-avatar.is-tbd .material-symbols-outlined { font-size: .85rem; }
 
-/* name / team */
 .bp-name {
     font-family: var(--font-head);
-    font-size: .95rem; font-weight: 700;
+    font-size: .88rem; font-weight: 700;
     letter-spacing: .02em;
     color: var(--text);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -331,54 +360,65 @@
     font-style: italic;
     font-family: var(--font-body);
     font-weight: 400;
-    font-size: .85rem;
+    font-size: .8rem;
+}
+.bp-seed {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    min-width: 18px; height: 14px;
+    padding: 0 3px;
+    font-size: 8px; font-weight: 700;
+    font-family: var(--font-mono);
+    border-radius: 2px;
+    background: rgba(220,38,38,.2);
+    color: #EF4444;
+    border: 1px solid rgba(220,38,38,.25);
+    flex-shrink: 0;
 }
 .bp-team {
-    font-size: .68rem; color: var(--muted);
+    font-size: .65rem; color: var(--muted);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-top: .1rem;
+    margin-top: .08rem;
 }
-.bp-winner-icon { color: var(--red); font-size: 1rem; flex-shrink: 0; }
-.bp-winner-icon .material-symbols-outlined { font-size: 1rem; }
+.bp-winner-icon { color: var(--red); font-size: .9rem; flex-shrink: 0; }
+.bp-winner-icon .material-symbols-outlined { font-size: .9rem; }
 
-/* score */
 .bp-score {
     font-family: var(--font-mono);
-    font-size: 1.125rem; font-weight: 700;
-    min-width: 1.75rem; text-align: center;
+    font-size: 1rem; font-weight: 700;
+    min-width: 1.5rem; text-align: center;
     flex-shrink: 0;
     color: var(--muted);
 }
 .bp-score.is-winner { color: var(--red); }
 .bp-score.is-loser  { color: var(--muted); opacity: .5; }
 
-/* VS divider */
 .bp-vs {
-    display: flex; align-items: center; gap: .5rem;
-    padding: 0 .75rem;
+    display: flex; align-items: center; gap: .4rem;
+    padding: 0 .65rem;
 }
 .bp-vs-line { flex: 1; height: 1px; background: var(--line); }
 .bp-vs-text {
     font-family: var(--font-head);
-    font-size: .7rem; font-weight: 900;
+    font-size: .65rem; font-weight: 900;
     letter-spacing: .14em;
     color: rgba(220,38,38,.4);
 }
 
-/* report score button */
+/* report score */
 .bp-report-wrap {
-    padding: .75rem .875rem;
+    padding: .65rem .75rem;
     border-top: 1px solid var(--line);
     background: var(--bg3);
 }
 .bp-report-btn {
-    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
     width: 100%;
-    padding: .6rem 1rem;
+    padding: .5rem 1rem;
     background: linear-gradient(135deg, var(--red) 0%, var(--red-d) 100%);
     color: #fff;
     font-family: var(--font-head);
-    font-size: .8rem; font-weight: 700;
+    font-size: .75rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: .08em;
     text-decoration: none;
     transition: opacity .2s, transform .15s, box-shadow .2s;
@@ -390,9 +430,9 @@
     box-shadow: 0 4px 20px rgba(220,38,38,.5);
     color: #fff;
 }
-.bp-report-btn .material-symbols-outlined { font-size: 1rem; }
+.bp-report-btn .material-symbols-outlined { font-size: .9rem; }
 
-/* ── Grand Final card ──────────────────────────────────── */
+/* ── Grand Final card ────────────────────────────── */
 .bp-card.is-final {
     border-color: rgba(220,38,38,.35);
     box-shadow: 0 0 40px rgba(220,38,38,.15), var(--shadow);
@@ -400,64 +440,113 @@
 .bp-card.is-final::before { background: var(--red); }
 .bp-final-banner {
     display: flex; align-items: center; justify-content: space-between;
-    padding: .75rem 1rem;
+    padding: .65rem .875rem;
     background: linear-gradient(135deg, var(--red) 0%, var(--red-d) 100%);
     color: #fff;
 }
 .bp-final-banner-title {
     font-family: var(--font-head);
-    font-size: 1rem; font-weight: 900;
+    font-size: .9rem; font-weight: 900;
     text-transform: uppercase; letter-spacing: .1em;
     font-style: italic;
 }
-.bp-final-banner .material-symbols-outlined { font-size: 1.25rem; }
+.bp-final-banner .material-symbols-outlined { font-size: 1.125rem; }
 
-/* ── Empty state ───────────────────────────────────────── */
+/* ── Empty state ─────────────────────────────────── */
 .bp-empty {
     display: flex; flex-direction: column; align-items: center;
-    padding: 4rem 2rem; text-align: center;
+    padding: 3.5rem 2rem; text-align: center;
     background: var(--bg1);
     border: 1px solid var(--line);
     border-top: 2px solid var(--red);
 }
 .bp-empty-icon {
-    width: 4rem; height: 4rem;
+    width: 3.5rem; height: 3.5rem;
     background: var(--red-a);
     border: 1px solid var(--line-red);
     display: flex; align-items: center; justify-content: center;
     color: var(--red);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
 }
-.bp-empty-icon .material-symbols-outlined { font-size: 1.75rem; }
+.bp-empty-icon .material-symbols-outlined { font-size: 1.5rem; }
 .bp-empty h3 {
     font-family: var(--font-head);
-    font-size: 1.375rem; font-weight: 900;
+    font-size: 1.25rem; font-weight: 900;
     text-transform: uppercase; letter-spacing: .06em;
-    color: var(--text); margin-bottom: .5rem;
+    color: var(--text); margin-bottom: .4rem;
 }
-.bp-empty p { font-size: .875rem; color: var(--muted); max-width: 28rem; line-height: 1.6; }
+.bp-empty p { font-size: .85rem; color: var(--muted); max-width: 28rem; line-height: 1.6; }
 
-/* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 640px) {
-    .bp-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .bp-header-right { gap: 1.25rem; }
-    .bp-round { min-width: 230px; }
+    .bp-root { padding: .75rem; }
+    .bp-header { flex-direction: column; align-items: flex-start; gap: .75rem; }
+    .bp-header-right { gap: 1rem; }
+    .bp-round { min-width: 220px; }
 }
 </style>
 
 <div class="bp-root">
+
+{# ── Bracket type filter tabs ── #}
+{% if brackets|length > 1 %}
+<div class="bp-filters">
+    <button class="bp-filter-btn is-active" data-bp-filter-bracket="all">
+        <span class="material-symbols-outlined">schema</span> All Brackets
+    </button>
+    {% for bracket in brackets %}
+    <button class="bp-filter-btn" data-bp-filter-bracket="{{ bracket.id }}">
+        {% if bracket.bracket_type == 'main' %}
+        <span class="material-symbols-outlined">emoji_events</span>
+        {% elif bracket.bracket_type == 'losers' %}
+        <span class="material-symbols-outlined">replay</span>
+        {% elif bracket.bracket_type == 'finals' %}
+        <span class="material-symbols-outlined">military_tech</span>
+        {% else %}
+        <span class="material-symbols-outlined">emoji_events</span>
+        {% endif %}
+        {{ bracket.name }}
+    </button>
+    {% endfor %}
+</div>
+{% endif %}
+
+{# ── Match status filter tabs ── #}
+<div class="bp-filters">
+    <button class="bp-filter-btn is-active" data-bp-filter-status="all">
+        All Matches
+    </button>
+    <button class="bp-filter-btn" data-bp-filter-status="in_progress">
+        <span class="material-symbols-outlined">radio_button_checked</span> Live
+    </button>
+    <button class="bp-filter-btn" data-bp-filter-status="completed">
+        <span class="material-symbols-outlined">check_circle</span> Completed
+    </button>
+    <button class="bp-filter-btn" data-bp-filter-status="pending">
+        <span class="material-symbols-outlined">schedule</span> Pending
+    </button>
+    <button class="bp-filter-btn" data-bp-filter-status="ready">
+        <span class="material-symbols-outlined">play_circle</span> Ready
+    </button>
+</div>
+
 {% for bracket in brackets %}
-<div class="bp-section" id="bracket-{{ bracket.id }}">
+<div class="bp-section bp-section-bracket" data-bracket-id="{{ bracket.id }}">
 
     {# ── Header ── #}
     <div class="bp-header">
         <div class="bp-header-left">
             <div class="bp-header-icon">
+                {% if bracket.bracket_type == 'finals' %}
+                <span class="material-symbols-outlined">military_tech</span>
+                {% elif bracket.bracket_type == 'losers' %}
+                <span class="material-symbols-outlined">replay</span>
+                {% else %}
                 <span class="material-symbols-outlined">emoji_events</span>
+                {% endif %}
             </div>
             <div>
                 <div class="bp-header-title">{{ bracket.name }}</div>
-                <div class="bp-header-sub">{{ bracket.total_rounds }} rounds &bull; {{ bracket.matches.count }} matches</div>
+                <div class="bp-header-sub">{{ bracket.total_rounds }} rounds &bull; {{ matches_by_bracket|get_item:bracket.id|length }} rounds, {{ bracket.matches.count }} matches</div>
             </div>
         </div>
         <div class="bp-header-right">
@@ -478,7 +567,7 @@
                 <svg class="bp-connectors-svg" aria-hidden="true"></svg>
                 {% for round_num, matches in matches_by_bracket|get_item:bracket.id|dict_items %}
 
-                {# Gap connector between rounds (not before first) #}
+                {# Gap connector between rounds #}
                 {% if not forloop.first %}
                 <div class="bp-round-gap"></div>
                 {% endif %}
@@ -488,12 +577,26 @@
                     {# Round label #}
                     <div class="bp-round-label">
                         <h3>
-                            {% if forloop.last %}
-                                <span class="material-symbols-outlined" style="font-size:.9rem;vertical-align:middle;">emoji_events</span>
+                            {% if bracket.bracket_type == 'finals' %}
+                                {% if forloop.first %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">emoji_events</span>
+                                Grand Finals
+                                {% elif forloop.last %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">replay</span>
+                                Bracket Reset
+                                {% endif %}
+                            {% elif forloop.last %}
+                                {% if bracket.bracket_type == 'losers' %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">military_tech</span>
+                                {% else %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">emoji_events</span>
+                                {% endif %}
                                 Grand Final
                             {% elif forloop.revcounter == 2 %}Semi-Finals
                             {% elif forloop.revcounter == 3 %}Quarter-Finals
-                            {% else %}Round {{ round_num }}{% endif %}
+                            {% else %}
+                                {% if bracket.bracket_type == 'losers' %}Losers {% endif %}Round {{ round_num }}
+                            {% endif %}
                         </h3>
                         <p>{{ matches|length }} match{{ matches|length|pluralize:"es" }}</p>
                     </div>
@@ -503,7 +606,7 @@
                     <div class="bp-card {% if match.status == 'completed' %}is-completed{% elif match.status == 'in_progress' %}is-live{% endif %}{% if forloop.parentloop.last %} is-final{% endif %}"
                          data-match-id="{{ match.id }}" data-status="{{ match.status }}">
 
-                        {# Grand Final banner — shown only in the last round column #}
+                        {# Grand Final banner #}
                         {% if forloop.parentloop.last %}
                         <div class="bp-final-banner">
                             <span class="bp-final-banner-title">Championship Match</span>
@@ -513,8 +616,10 @@
 
                         {# Top bar #}
                         <div class="bp-card-top">
-                            <div style="display:flex;align-items:center;gap:.5rem;">
-                                <span class="bp-match-num">Match {{ match.match_number }}</span>
+                            <div style="display:flex;align-items:center;gap:.45rem;">
+                                <span class="bp-match-num">
+                                    {% if match.match_letter %}M{{ match.match_letter }}{% else %}Match {{ match.match_number }}{% endif %}
+                                </span>
                                 {% if match.scheduled_time %}
                                 <span class="bp-match-time">{{ match.scheduled_time|date:"M d, g:i A" }}</span>
                                 {% endif %}
@@ -548,7 +653,12 @@
                                     {% if match.participant1 %}
                                     <div class="bp-avatar">{{ match.participant1.display_name|first|upper }}</div>
                                     <div style="min-width:0;">
-                                        <div class="bp-name">{{ match.participant1.display_name }}</div>
+                                        <div class="flex items-center gap-1.5" style="display:flex;align-items:center;gap:4px;">
+                                            {% if match.participant1.seed %}
+                                            <span class="bp-seed">#{{ match.participant1.seed }}</span>
+                                            {% endif %}
+                                            <span class="bp-name">{{ match.participant1.display_name }}</span>
+                                        </div>
                                         {% if match.participant1.team %}<div class="bp-team">{{ match.participant1.team.name }}</div>{% endif %}
                                     </div>
                                     {% if match.winner == match.participant1 %}
@@ -577,7 +687,12 @@
                                     {% if match.participant2 %}
                                     <div class="bp-avatar">{{ match.participant2.display_name|first|upper }}</div>
                                     <div style="min-width:0;">
-                                        <div class="bp-name">{{ match.participant2.display_name }}</div>
+                                        <div class="flex items-center gap-1.5" style="display:flex;align-items:center;gap:4px;">
+                                            {% if match.participant2.seed %}
+                                            <span class="bp-seed">#{{ match.participant2.seed }}</span>
+                                            {% endif %}
+                                            <span class="bp-name">{{ match.participant2.display_name }}</span>
+                                        </div>
                                         {% if match.participant2.team %}<div class="bp-team">{{ match.participant2.team.name }}</div>{% endif %}
                                     </div>
                                     {% if match.winner == match.participant2 %}
@@ -635,70 +750,53 @@
   var LINE_COLOR = 'rgba(220,38,38,0.35)';
   var LINE_WIDTH = 1.5;
 
+  /* ── SVG Connectors ─────────────────────────────── */
   function drawBracketLines(roundsEl) {
     var svg = roundsEl.querySelector('.bp-connectors-svg');
     if (!svg) return;
-
-    // Clear previous paths
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     var rounds = Array.from(roundsEl.querySelectorAll('.bp-round'));
     if (rounds.length < 2) return;
-
     var containerRect = roundsEl.getBoundingClientRect();
 
     for (var r = 0; r < rounds.length - 1; r++) {
       var currentRound = rounds[r];
-      var nextRound    = rounds[r + 1];
-
-      var currentCards = Array.from(currentRound.querySelectorAll('.bp-card'));
-      var nextCards    = Array.from(nextRound.querySelectorAll('.bp-card'));
+      var nextRound = rounds[r + 1];
+      var currentCards = Array.from(currentRound.querySelectorAll('.bp-card:not(.is-hidden)'));
+      var nextCards = Array.from(nextRound.querySelectorAll('.bp-card:not(.is-hidden)'));
 
       if (!currentCards.length || !nextCards.length) continue;
 
-      // Pair up: every 2 cards in current round feed 1 card in next round
       var pairsCount = Math.ceil(currentCards.length / 2);
-
       for (var p = 0; p < pairsCount; p++) {
         var cardA = currentCards[p * 2];
         var cardB = currentCards[p * 2 + 1];
         var cardNext = nextCards[p];
-
         if (!cardNext) continue;
 
-        var rectA    = cardA    ? cardA.getBoundingClientRect()    : null;
-        var rectB    = cardB    ? cardB.getBoundingClientRect()    : null;
+        var rectA = cardA ? cardA.getBoundingClientRect() : null;
+        var rectB = cardB ? cardB.getBoundingClientRect() : null;
         var rectNext = cardNext.getBoundingClientRect();
 
-        // Mid-Y of each source card (or just cardA if no cardB)
         var midA = rectA ? (rectA.top + rectA.bottom) / 2 - containerRect.top : null;
         var midB = rectB ? (rectB.top + rectB.bottom) / 2 - containerRect.top : null;
         var midNext = (rectNext.top + rectNext.bottom) / 2 - containerRect.top;
-
-        // X positions relative to container
-        var xRight = (rectA || rectB).right - containerRect.left;  // right edge of source card
-        var xLeft  = rectNext.left - containerRect.left;            // left edge of next card
-        var xMid   = (xRight + xLeft) / 2;                         // midpoint in the gap
+        var xRight = (rectA || rectB).right - containerRect.left;
+        var xLeft = rectNext.left - containerRect.left;
+        var xMid = (xRight + xLeft) / 2;
 
         if (midA !== null) {
-          drawElbow(svg, xRight, midA, xMid, midNext, LINE_COLOR, LINE_WIDTH);
+          drawLine(svg, xRight, midA, xMid, midA, LINE_COLOR, LINE_WIDTH);
+          drawLine(svg, xMid, midA, xMid, midNext, LINE_COLOR, LINE_WIDTH);
         }
         if (midB !== null) {
-          drawElbow(svg, xRight, midB, xMid, midNext, LINE_COLOR, LINE_WIDTH);
+          drawLine(svg, xRight, midB, xMid, midB, LINE_COLOR, LINE_WIDTH);
+          drawLine(svg, xMid, midB, xMid, midNext, LINE_COLOR, LINE_WIDTH);
         }
-        // Vertical join line in the gap
-        if (midA !== null && midB !== null) {
-          drawLine(svg, xMid, midA, xMid, midB, LINE_COLOR, LINE_WIDTH);
-        }
-        // Horizontal from gap midpoint to next card
         drawLine(svg, xMid, midNext, xLeft, midNext, LINE_COLOR, LINE_WIDTH);
       }
     }
-  }
-
-  function drawElbow(svg, x1, y1, x2, y2, color, width) {
-    // Horizontal from card right to gap mid, then vertical to join point
-    drawLine(svg, x1, y1, x2, y1, color, width);
   }
 
   function drawLine(svg, x1, y1, x2, y2, color, width) {
@@ -713,13 +811,68 @@
     svg.appendChild(line);
   }
 
-  function initAll() {
+  function redrawAllConnectors() {
     document.querySelectorAll('.bp-rounds[data-bracket-id]').forEach(function (el) {
       drawBracketLines(el);
     });
   }
 
-  // Run after layout is stable
+  /* ── Bracket type filter ────────────────────────── */
+  function initBracketFilter() {
+    var btns = document.querySelectorAll('[data-bp-filter-bracket]');
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var target = this.getAttribute('data-bp-filter-bracket');
+        btns.forEach(function (b) { b.classList.remove('is-active'); });
+        this.classList.add('is-active');
+        document.querySelectorAll('.bp-section-bracket').forEach(function (section) {
+          if (target === 'all' || section.getAttribute('data-bracket-id') === target) {
+            section.style.display = '';
+          } else {
+            section.style.display = 'none';
+          }
+        });
+        requestAnimationFrame(redrawAllConnectors);
+      });
+    });
+  }
+
+  /* ── Match status filter ────────────────────────── */
+  function initStatusFilter() {
+    var btns = document.querySelectorAll('[data-bp-filter-status]');
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var filter = this.getAttribute('data-bp-filter-status');
+        btns.forEach(function (b) { b.classList.remove('is-active'); });
+        this.classList.add('is-active');
+
+        var shown = 0;
+        document.querySelectorAll('.bp-card[data-status]').forEach(function (card) {
+          var status = card.getAttribute('data-status');
+          var match = false;
+          if (filter === 'all') match = true;
+          else if (filter === 'pending' && (status === 'pending' || status === 'scheduled')) match = true;
+          else match = (status === filter);
+
+          if (match) {
+            card.classList.remove('is-hidden');
+            shown++;
+          } else {
+            card.classList.add('is-hidden');
+          }
+        });
+        requestAnimationFrame(redrawAllConnectors);
+      });
+    });
+  }
+
+  /* ── Init ───────────────────────────────────────── */
+  function initAll() {
+    initBracketFilter();
+    initStatusFilter();
+    redrawAllConnectors();
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(function () { requestAnimationFrame(initAll); });
@@ -728,19 +881,14 @@
     requestAnimationFrame(function () { requestAnimationFrame(initAll); });
   }
 
-  // Re-draw on resize
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(initAll, 100);
+    resizeTimer = setTimeout(redrawAllConnectors, 100);
   });
-
-  // Re-draw if bracket is inside a tab that becomes visible
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden) { requestAnimationFrame(initAll); }
+    if (!document.hidden) { requestAnimationFrame(redrawAllConnectors); }
   });
-
-  // Expose for external callers (e.g. tab switch)
-  window.redrawBracketLines = initAll;
+  window.redrawBracketLines = redrawAllConnectors;
 })();
 </script>

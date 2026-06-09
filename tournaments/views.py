@@ -24,6 +24,7 @@ from core.models import Game
 from .models import Tournament, Participant, Match, Bracket, MatchDispute, Payment
 from .forms import TournamentForm, MatchReportForm, DisputeForm
 from .services.bracket import generate_bracket
+from .services.bracket_generator import BracketGenerator
 from .cache_utils import TournamentCache
 from .security import (
     TournamentAccessControl, 
@@ -688,7 +689,15 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tournament = self.object
-        
+
+        # Fallback: advance tournament status if Celery Beat is offline
+        # Cache-throttled to once per 5 minutes per tournament
+        if tournament.status in ('draft', 'registration', 'check_in'):
+            from .utils import should_attempt_fallback, check_and_advance_tournament_statuses
+            if should_attempt_fallback(tournament.id):
+                check_and_advance_tournament_statuses()
+                tournament.refresh_from_db()
+
         # Enhanced context data using the mixin (Requirements 4.1, 4.2, 4.3, 4.4, 4.5)
         enhanced_context = self.get_tournament_context(tournament)
         context.update(enhanced_context)
@@ -714,6 +723,12 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         # Enhanced context data for template rendering fixes (Requirements 2.1, 2.2, 2.3, 2.4, 2.5)
         context.update(self.get_enhanced_tournament_context(tournament))
         
+        # Add external tournament reference for start.gg badge
+        try:
+            context['external_reference'] = tournament.external_references.first()
+        except AttributeError:
+            context['external_reference'] = None
+
         # Add current time for template comparisons
         context['now'] = timezone.now()
         
@@ -752,7 +767,8 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
         
         # Add bracket data for bracket tab display
         if tournament.brackets.exists():
-            context['brackets'] = tournament.brackets.all()
+            bracket_order = {'main': 0, 'losers': 1, 'finals': 2, 'groups': 3}
+            context['brackets'] = sorted(tournament.brackets.all(), key=lambda b: bracket_order.get(b.bracket_type, 99))
             
             # Get all matches organized by bracket and round (same as BracketView)
             context['matches_by_bracket'] = {}
@@ -2107,8 +2123,9 @@ class BracketView(DetailView):
         context = super().get_context_data(**kwargs)
         tournament = self.object
         
-        # Get all brackets
-        context['brackets'] = tournament.brackets.all()
+        # Get all brackets, ordered: winners → losers → finals → groups
+        bracket_order = {'main': 0, 'losers': 1, 'finals': 2, 'groups': 3}
+        context['brackets'] = sorted(tournament.brackets.all(), key=lambda b: bracket_order.get(b.bracket_type, 99))
         
         # Get all matches organized by bracket and round
         context['matches_by_bracket'] = {}
@@ -2132,8 +2149,9 @@ def bracket_json(request, slug):
     """Return bracket data as JSON for dynamic rendering"""
     tournament = get_object_or_404(Tournament, slug=slug)
     
+    bracket_order = {'main': 0, 'losers': 1, 'finals': 2, 'groups': 3}
     brackets_data = []
-    for bracket in tournament.brackets.all():
+    for bracket in sorted(tournament.brackets.all(), key=lambda b: bracket_order.get(b.bracket_type, 99)):
         matches = []
         for match in bracket.matches.select_related('participant1', 'participant2', 'winner'):
             matches.append({
@@ -2173,8 +2191,9 @@ def bracket_partial(request, slug):
     """Return partial bracket HTML for HTMX polling updates"""
     tournament = get_object_or_404(Tournament, slug=slug)
     
-    # Get all brackets
-    brackets = tournament.brackets.all()
+    # Order brackets: winners first, then losers, then finals/groups
+    bracket_order = {'main': 0, 'losers': 1, 'finals': 2, 'groups': 3}
+    brackets = sorted(tournament.brackets.all(), key=lambda b: bracket_order.get(b.bracket_type, 99))
     
     # Get all matches organized by bracket and round
     matches_by_bracket = {}
@@ -2195,6 +2214,155 @@ def bracket_partial(request, slug):
         'tournament': tournament,
         'brackets': brackets,
         'matches_by_bracket': matches_by_bracket,
+    })
+
+
+@login_required
+def bracket_standings(request, slug):
+    tournament = get_object_or_404(Tournament, slug=slug)
+    is_organizer = tournament.organizer == request.user or request.user.role == 'admin'
+    participants_list = list(tournament.participants.select_related('user').all())
+    generator = BracketGenerator(tournament, participants_list)
+
+    pool_brackets = tournament.brackets.filter(bracket_type='groups').order_by('name')
+    swiss_rr_bracket = tournament.brackets.filter(
+        bracket_type='main'
+    ).filter(
+        tournament__format__in=['swiss', 'round_robin']
+    ).first() if not pool_brackets.exists() else None
+
+    is_swiss_rr_mode = swiss_rr_bracket is not None
+    advance_count = getattr(tournament, 'pool_advance_count', 8 if is_swiss_rr_mode else 2)
+    advance_count = min(advance_count, 16) if advance_count else (8 if is_swiss_rr_mode else 2)
+
+    # Handle advance POST action
+    if request.method == 'POST' and request.POST.get('action') == 'advance':
+        if not is_organizer:
+            return HttpResponseForbidden()
+        try:
+            if is_swiss_rr_mode and swiss_rr_bracket:
+                pending = swiss_rr_bracket.matches.filter(
+                    status__in=['pending', 'ready']
+                ).count()
+                if pending > 0:
+                    messages.error(request, f'Not all matches completed ({pending} still pending).')
+                else:
+                    playoffs = generator.advance_from_standings(swiss_rr_bracket, advance_count)
+                    messages.success(
+                        request,
+                        f'Finals bracket generated! Top {advance_count} players advanced from {tournament.get_format_display()}.'
+                    )
+            else:
+                all_complete = all(
+                    pb.matches.filter(status__in=['pending', 'ready']).count() == 0
+                    for pb in pool_brackets
+                )
+                if not all_complete:
+                    messages.error(request, 'Not all pool matches have been completed yet.')
+                else:
+                    playoffs = generator.advance_from_pools(list(pool_brackets), advance_count)
+                    messages.success(
+                        request,
+                        f'Playoffs bracket generated! Top {advance_count} from each pool advanced.'
+                    )
+        except Exception as e:
+            messages.error(request, 'Failed to advance: {}'.format(str(e)))
+        return redirect('tournaments:standings', slug=slug)
+
+    # Build standings data
+    standings_data = []
+    playoffs_bracket = None
+
+    source_brackets = pool_brackets if not is_swiss_rr_mode else [swiss_rr_bracket]
+
+    for bracket in source_brackets:
+        matches = bracket.matches.filter(status='completed').select_related(
+            'participant1', 'participant2', 'winner'
+        )
+        total_matches = bracket.matches.count()
+        completed_matches = matches.count()
+        all_complete = total_matches > 0 and completed_matches == total_matches
+
+        bracket_participants = bracket.participants.select_related('user').all() if hasattr(bracket, 'participants') else Participant.objects.filter(bracket=bracket).select_related('user')
+
+        player_map = {}
+        for p in bracket_participants:
+            player_map[p.id] = {
+                'participant': p,
+                'display_name': p.user.get_full_name() or p.user.username if hasattr(p, 'user') and p.user else str(p),
+                'matches_won': 0,
+                'matches_lost': 0,
+                'games_won': 0,
+                'games_lost': 0,
+            }
+
+        for match in matches:
+            if not match.winner:
+                continue
+            p1_id = match.participant1_id if match.participant1 else None
+            p2_id = match.participant2_id if match.participant2 else None
+            winner_id = match.winner_id
+            score_p1 = match.participant1_score or 0
+            score_p2 = match.participant2_score or 0
+
+            if p1_id and p1_id in player_map:
+                if winner_id == p1_id:
+                    player_map[p1_id]['matches_won'] += 1
+                else:
+                    player_map[p1_id]['matches_lost'] += 1
+                player_map[p1_id]['games_won'] += score_p1
+                player_map[p1_id]['games_lost'] += score_p2
+
+            if p2_id and p2_id in player_map:
+                if winner_id == p2_id:
+                    player_map[p2_id]['matches_won'] += 1
+                else:
+                    player_map[p2_id]['matches_lost'] += 1
+                player_map[p2_id]['games_won'] += score_p2
+                player_map[p2_id]['games_lost'] += score_p1
+
+        standings_list = sorted(
+            player_map.values(),
+            key=lambda x: (x['matches_won'], x['games_won'] - x['games_lost']),
+            reverse=True,
+        )
+
+        for entry in standings_list:
+            gd = entry['games_won'] - entry['games_lost']
+            total_games = entry['games_won'] + entry['games_lost']
+            entry['game_diff'] = max(gd, 0)
+            entry['win_pct'] = round((entry['games_won'] / total_games * 100)) if total_games > 0 else 0
+
+        total_matches_count = bracket.matches.count()
+        status_class = 'complete' if all_complete else ('in-progress' if completed_matches > 0 else 'pending')
+        status_label = 'Complete' if all_complete else ('In Progress' if completed_matches > 0 else 'Pending')
+
+        standings_data.append({
+            'name': bracket.name,
+            'bracket': bracket,
+            'standings': standings_list,
+            'all_complete': all_complete,
+            'completed': completed_matches,
+            'total': total_matches_count,
+            'status_class': status_class,
+            'status_label': status_label,
+        })
+
+    can_advance = is_organizer and all(s.get('all_complete') for s in standings_data) if standings_data else False
+
+    playoffs = tournament.brackets.filter(
+        bracket_type__in=['single_elim', 'double_elim']
+    ).first()
+
+    return render(request, 'tournaments/standings.html', {
+        'tournament': tournament,
+        'pool_brackets': pool_brackets,
+        'pool_standings': standings_data,
+        'advance_count': advance_count,
+        'can_advance': can_advance,
+        'playoffs_bracket': playoffs,
+        'is_organizer': is_organizer,
+        'is_swiss_rr_mode': is_swiss_rr_mode,
     })
 
 
@@ -2225,6 +2393,12 @@ class MatchDetailView(DetailView):
     template_name = 'tournaments/match_detail.html'
     context_object_name = 'match'
 
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'tournament', 'participant1', 'participant2',
+            'winner', 'loser'
+        ).prefetch_related('disputes')
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -2243,26 +2417,43 @@ def match_report_score(request, pk):
         return HttpResponseForbidden("You don't have permission to report this match score")
     
     if request.method == 'POST':
-        form = MatchReportForm(request.POST)
+        form = MatchReportForm(request.POST, match=match)
         if form.is_valid():
             score_p1 = form.cleaned_data['score_p1']
             score_p2 = form.cleaned_data['score_p2']
+            is_dq = form.cleaned_data.get('is_dq', False)
             
-            success, message = match.report_score(score_p1, score_p2, request.user)
+            success, message = match.report_score(score_p1, score_p2, request.user, is_dq=is_dq)
             
             if success:
+                # Save FGC GameSlot data if provided
+                char_p1 = form.cleaned_data.get('character_p1')
+                char_p2 = form.cleaned_data.get('character_p2')
+                stage = form.cleaned_data.get('stage')
+                if char_p1 or char_p2 or stage:
+                    from .models import GameSlot
+                    GameSlot.objects.update_or_create(
+                        match=match, slot_number=1,
+                        defaults={
+                            'character_p1': char_p1,
+                            'character_p2': char_p2,
+                            'stage': stage,
+                        }
+                    )
                 log_security_event(
                     'MATCH_SCORE_REPORTED',
                     request.user,
                     f'Reported score for match {match.id}: {score_p1}-{score_p2}',
                     'INFO'
                 )
+                from .live_updates import trigger_match_update
+                trigger_match_update(match.id)
                 messages.success(request, message)
                 return redirect('tournaments:bracket', slug=match.tournament.slug)
             else:
                 messages.error(request, message)
     else:
-        form = MatchReportForm()
+        form = MatchReportForm(match=match)
     
     return render(request, 'tournaments/match_report.html', {
         'match': match,
@@ -2307,10 +2498,13 @@ def tournament_start(request, slug):
     if not (tournament.organizer == request.user or request.user.role == 'admin'):
         return HttpResponseForbidden()
     
-    if tournament.start_tournament():
-        messages.success(request, 'Tournament started and bracket generated!')
-    else:
-        messages.error(request, 'Unable to start tournament')
+    try:
+        if tournament.start_tournament():
+            messages.success(request, 'Tournament started and bracket generated!')
+        else:
+            messages.error(request, 'Unable to start tournament. Make sure the tournament is in check-in status with checked-in participants.')
+    except ValueError as e:
+        messages.error(request, f'Failed to start tournament: {e}')
     
     return redirect('tournaments:bracket', slug=slug)
 
@@ -2769,6 +2963,11 @@ def generate_bracket(request, slug):
         # Delete existing brackets
         tournament.brackets.all().delete()
         
+        # Auto-check-in all confirmed participants before generating bracket
+        confirmed = tournament.participants.filter(status='confirmed')
+        for p in confirmed:
+            p.check_in_participant(force=True)
+        
         # Generate new bracket
         bracket = tournament.create_bracket()
         
@@ -2806,7 +3005,31 @@ def generate_bracket(request, slug):
         logger.error(f'Bracket generation failed for tournament {slug}: {str(e)}')
         messages.error(request, 'An error occurred while generating the bracket. Please try again.')
         return redirect('tournaments:detail', slug=slug)
-        return redirect('tournaments:detail', slug=slug)
+
+
+import hashlib
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+EXPECTED_TOKEN = hashlib.sha256(settings.SECRET_KEY.encode()).hexdigest()[:16]
+
+
+@csrf_exempt
+def cron_check(request, token):
+    """
+    Public endpoint for external cron monitors to trigger tournament status
+    advancement (fallback when Celery Beat is offline).
+
+    Token is first 16 chars of SHA256(SECRET_KEY) — no extra config needed.
+    Call: GET /tournaments/cron/<token>/
+    """
+    if token != EXPECTED_TOKEN:
+        return JsonResponse({'error': 'Invalid token'}, status=403)
+
+    from .utils import check_and_advance_tournament_statuses
+    results = check_and_advance_tournament_statuses()
+    return JsonResponse({'status': 'ok', 'results': results})
 
 
 class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -2863,12 +3086,31 @@ class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             seed_value = request.POST.get('seed')
             if participant_id and seed_value:
                 try:
+                    seed = int(seed_value)
+                except (TypeError, ValueError):
+                    messages.error(request, 'Invalid seed value')
+                    return redirect('tournaments:participants', slug=tournament.slug)
+
+                # Validate seed range
+                if seed < 1 or seed > tournament.max_participants:
+                    messages.error(request, f'Seed must be between 1 and {tournament.max_participants}')
+                    return redirect('tournaments:participants', slug=tournament.slug)
+
+                try:
                     participant = Participant.objects.get(id=participant_id, tournament=tournament)
-                    participant.seed = int(seed_value)
-                    participant.save()
-                    messages.success(request, f'Seed {seed_value} assigned to {participant.display_name}')
-                except (Participant.DoesNotExist, ValueError):
-                    messages.error(request, 'Invalid participant or seed value')
+                except Participant.DoesNotExist:
+                    messages.error(request, 'Participant not found')
+                    return redirect('tournaments:participants', slug=tournament.slug)
+
+                # If another participant already has this seed, swap seeds
+                existing = Participant.objects.filter(tournament=tournament, seed=seed).exclude(id=participant.id).first()
+                if existing:
+                    existing.seed = participant.seed
+                    existing.save()
+
+                participant.seed = seed
+                participant.save()
+                messages.success(request, f'Seed {seed} assigned to {participant.display_name}')
         
         elif action == 'check_in':
             if participant_id:
@@ -2901,36 +3143,6 @@ class ParticipantListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
                 except Participant.DoesNotExist:
                     messages.error(request, 'Participant not found')
         
-        return redirect('tournaments:participants', slug=tournament.slug)
-
-        try:
-            seed = int(seed_value)
-        except (TypeError, ValueError):
-            messages.error(request, 'Invalid seed value')
-            return redirect('tournaments:participants', slug=tournament.slug)
-
-        # Validate seed range
-        if seed < 1 or seed > tournament.max_participants:
-            messages.error(request, f'Seed must be between 1 and {tournament.max_participants}')
-            return redirect('tournaments:participants', slug=tournament.slug)
-
-        try:
-            participant = Participant.objects.get(id=participant_id, tournament=tournament)
-        except Participant.DoesNotExist:
-            messages.error(request, 'Participant not found')
-            return redirect('tournaments:participants', slug=tournament.slug)
-
-        # If another participant already has this seed, swap seeds with them
-        existing = Participant.objects.filter(tournament=tournament, seed=seed).exclude(id=participant.id).first()
-        if existing:
-            # Swap seeds: existing gets participant's old seed (may be None)
-            existing.seed = participant.seed
-            existing.save()
-
-        participant.seed = seed
-        participant.save()
-
-        messages.success(request, f'Seed {seed} assigned to {participant.display_name}')
         return redirect('tournaments:participants', slug=tournament.slug)
 
 

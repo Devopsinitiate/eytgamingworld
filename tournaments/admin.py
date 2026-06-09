@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tournament, Participant, Match, Bracket, MatchDispute, Payment, WebhookEvent
+from .models import Tournament, Participant, Match, Bracket, MatchDispute, Payment, WebhookEvent, FGCGame, Character, Stage, GameSlot
 import json
 
 
@@ -22,7 +22,7 @@ class ParticipantInline(admin.TabularInline):
     extra = 0
     fields = ['user', 'team', 'status', 'checked_in', 'seed', 'final_placement']
     readonly_fields = ['registered_at']
-    raw_id_fields = ['user', 'team']
+    autocomplete_fields = ['user', 'team']
     
     def get_readonly_fields(self, request, obj=None):
         """Make seed readonly if tournament has started"""
@@ -207,7 +207,7 @@ class ParticipantAdmin(admin.ModelAdmin):
     list_filter = ['status', 'checked_in', 'tournament__game', 'registered_at']
     search_fields = ['user__username', 'user__email', 'team__name', 
                      'tournament__name']
-    raw_id_fields = ['tournament', 'user', 'team']
+    autocomplete_fields = ['tournament', 'user', 'team']
     ordering = ['tournament', 'seed', 'registered_at']
     
     fieldsets = (
@@ -465,3 +465,31 @@ class WebhookEventAdmin(admin.ModelAdmin):
             return str(obj.payload)
 
     payload_pretty.short_description = 'payload'
+
+
+@admin.register(FGCGame)
+class FGCGameAdmin(admin.ModelAdmin):
+    list_display = ('game', 'default_best_of')
+    search_fields = ('game__name',)
+
+
+@admin.register(Character)
+class CharacterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'game', 'is_active', 'order')
+    list_filter = ('game', 'is_active')
+    search_fields = ('name', 'game__name')
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(Stage)
+class StageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'game', 'is_active')
+    list_filter = ('game', 'is_active')
+    search_fields = ('name', 'game__name')
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(GameSlot)
+class GameSlotAdmin(admin.ModelAdmin):
+    list_display = ('match', 'slot_number', 'character_p1', 'character_p2', 'stage', 'winner')
+    list_filter = ('match__bracket__tournament',)

@@ -75,7 +75,7 @@
       <!-- CTA Button (Desktop) -->
       <div class="hidden md:flex items-center gap-4">
         {% if user.is_authenticated %}
-        <a href="{% url 'dashboard:profile_view' user.username %}"
+        <a href="{% url 'dashboard:home' %}"
           class="nav-cta px-10 py-3 bg-red-600 text-white font-black uppercase italic tracking-tighter hover:bg-white hover:text-black transition-all transform -skew-x-12">
           <span class="inline-block skew-x-12">Dashboard</span>
         </a>
@@ -172,7 +172,7 @@
       <!-- Mobile CTA -->
       <div class="mt-8 space-y-4">
         {% if user.is_authenticated %}
-        <a href="{% url 'dashboard:profile_view' user.username %}"
+        <a href="{% url 'dashboard:home' %}"
           class="block w-full text-center px-10 py-4 bg-red-600 text-white font-black uppercase italic tracking-tighter hover:bg-white hover:text-black transition-all touch-manipulation">
           Dashboard
         </a>

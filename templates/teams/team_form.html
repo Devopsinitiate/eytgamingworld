@@ -1,0 +1,130 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Create Team — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#0A0A0A;}
+.tf-wrap{max-width:680px;margin:2rem auto;padding:0 1rem 3rem;}
+.tf-header{text-align:center;padding:1.5rem 0;}
+.tf-header h1{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;}
+.tf-header p{color:#9ca3af;font-size:.9rem;margin-top:.4rem;}
+.tf-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;padding:2rem;border-top:3px solid #dc2626;}
+.tf-group{margin-bottom:1.25rem;}
+.tf-group label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#dc2626;margin-bottom:.5rem;}
+.tf-group input,.tf-group select,.tf-group textarea{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;color:#fff;font-size:.875rem;}
+.tf-group input:focus,.tf-group select:focus,.tf-group textarea:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.2);}
+.tf-group textarea{resize:vertical;min-height:100px;}
+.tf-group .helptext{display:block;color:#6b7280;font-size:.75rem;margin-top:4px;}
+.tf-group .errorlist{list-style:none;padding:0;margin:0 0 6px;}
+.tf-group .errorlist li{color:#ef4444;font-size:.78rem;}
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.tf-checkboxes{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.tf-checkbox{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;}
+.tf-checkbox input[type="checkbox"]{accent-color:#dc2626;width:16px;height:16px;}
+.tf-checkbox label{cursor:pointer;color:#d1d5db;font-size:.82rem;}
+.tf-btn{width:100%;padding:12px 18px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid rgba(220,38,38,.4);transition:all .2s;margin-top:.5rem;}
+.tf-btn:hover{box-shadow:0 0 20px rgba(220,38,38,.5);}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tf-wrap">
+  <div class="tf-header">
+    <h1>Create Team</h1>
+    <p>Assemble your squad and dominate the competition.</p>
+  </div>
+  <div class="tf-card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:12px;margin-bottom:1rem;">
+        {% for e in form.non_field_errors %}<p style="color:#ef4444;font-size:.85rem;">{{ e }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="tf-row">
+        {% for field in form %}
+          {% if field.name in 'name tag' %}
+          <div class="tf-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% for field in form %}
+        {% if field.name in 'game description' %}
+        <div class="tf-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="tf-row">
+        {% for field in form %}
+          {% if field.name in 'logo banner' %}
+          <div class="tf-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="tf-row">
+        {% for field in form %}
+          {% if field.name == 'max_members' %}
+          <div class="tf-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+        <div></div>
+      </div>
+
+      <div class="tf-group">
+        <label style="margin-bottom:.75rem;">Settings</label>
+        <div class="tf-checkboxes">
+          {% for field in form %}
+            {% if field.name in 'requires_approval is_recruiting is_public' %}
+            <div class="tf-checkbox">
+              {{ field }}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      {% for field in form %}
+        {% if field.name in 'discord_server twitter_url twitch_url' %}
+        <div class="tf-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+
+      <button type="submit" class="tf-btn">
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;">groups</span>
+        Create Team
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

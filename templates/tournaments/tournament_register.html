@@ -1,241 +1,175 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Register for {{ tournament.name }}{% endblock %}
+{% block title %}Register - {{ tournament.name }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
-<link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
+{{ block.super }}
 <style>
-    .registration-form {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #e5e7eb;
-    }
-    
-    .form-input-custom {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #374151;
-        border-radius: 0.375rem;
-        font-size: 1rem;
-        background-color: #1f1f1f;
-        color: white;
-    }
-    
-    .form-input-custom:focus {
-        outline: none;
-        border-color: var(--eyt-primary);
-        box-shadow: 0 0 0 3px var(--eyt-primary-alpha-20);
-    }
-    
-    .tournament-info-card {
-        background-color: #1f1f1f;
-        border: 1px solid #374151;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .team-option-card {
-        border: 1px solid #374151;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background-color: #111827;
-        position: relative;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-    }
-    
-    .team-option-card:hover {
-        border-color: var(--eyt-primary);
-        background-color: #1f1f1f;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    
-    .team-option-card:active {
-        transform: translateY(0);
-    }
-    
-    .team-option-card.selected {
-        border-color: var(--eyt-primary);
-        background-color: #1f1f1f;
-        box-shadow: 0 0 10px var(--eyt-primary-alpha-20);
-    }
-    
-    .team-option-card:focus {
-        outline: 2px solid var(--eyt-primary);
-        outline-offset: 2px;
-    }
-    
-    /* Ensure radio indicators are properly styled */
-    .radio-indicator {
-        border: 2px solid #6b7280;
-        transition: all 0.2s ease;
-    }
-    
-    .radio-indicator.border-primary {
-        border-color: var(--eyt-primary) !important;
-    }
-    
-    .radio-indicator.border-gray-600 {
-        border-color: #6b7280 !important;
-    }
-    
-    .dot {
-        background-color: var(--eyt-primary);
-        transition: transform 0.2s ease;
-    }
-    
-    .dot.scale-0 {
-        transform: scale(0);
-    }
-    
-    .dot.scale-100 {
-        transform: scale(1);
-    }
-    
-    /* Ensure proper spacing and layout */
-    .team-option-card .flex {
-        pointer-events: none; /* Prevent child elements from interfering with clicks */
-    }
-    
-    .team-option-card h4,
-    .team-option-card p {
-        pointer-events: none;
-    }
-
-    .rules-container {
-        border: 1px solid #374151;
-        border-radius: 0.375rem;
-        padding: 1rem;
-        max-height: 256px;
-        overflow-y: auto;
-        background-color: #111827;
-        margin-bottom: 1rem;
-        color: #d1d5db;
-    }
+.input-gaming {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: #0a0a0a;
+    border: 1px solid rgba(220, 38, 38, .15);
+    border-radius: 6px;
+    color: #f3f4f6;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color .2s;
+}
+.input-gaming:focus {
+    border-color: #DC2626;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, .15);
+}
+.input-gaming:read-only {
+    background: rgba(255, 255, 255, .04);
+    color: #6B7280;
+    cursor: not-allowed;
+}
+.rules-box {
+    border: 1px solid rgba(220, 38, 38, .1);
+    border-radius: 6px;
+    padding: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #0a0a0a;
+    font-size: 0.78rem;
+    color: #9CA3AF;
+    line-height: 1.6;
+}
+.rules-box::-webkit-scrollbar { width: 4px; }
+.rules-box::-webkit-scrollbar-track { background: transparent; }
+.rules-box::-webkit-scrollbar-thumb { background: rgba(220, 38, 38, .3); border-radius: 2px; }
+.team-card {
+    border: 1px solid rgba(220, 38, 38, .12);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all .2s;
+    background: #0d1117;
+    position: relative;
+    user-select: none;
+}
+.team-card:hover {
+    border-color: rgba(220, 38, 38, .35);
+    background: #111;
+    box-shadow: 0 2px 12px rgba(220, 38, 38, .08);
+}
+.team-card.selected {
+    border-color: #DC2626;
+    background: #111;
+    box-shadow: 0 0 16px rgba(220, 38, 38, .12);
+}
+.team-card .flex { pointer-events: none; }
+.team-card h4, .team-card p { pointer-events: none; }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-background-dark py-8">
-    <div class="registration-form">
-        <!-- Breadcrumbs -->
-        <nav class="mb-6 flex items-center text-sm">
-            <a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition-colors">Home</a>
-            <span class="mx-2 text-gray-600">/</span>
-            <a href="{% url 'tournaments:list' %}" class="text-gray-400 hover:text-white transition-colors">Tournaments</a>
-            <span class="mx-2 text-gray-600">/</span>
-            <a href="{% url 'tournaments:detail' tournament.slug %}" class="text-gray-400 hover:text-white transition-colors">{{ tournament.name }}</a>
-            <span class="mx-2 text-gray-600">/</span>
-            <span class="text-primary font-medium">Register</span>
+<div class="min-h-screen bg-background-dark py-6 px-4">
+    <div class="max-w-2xl mx-auto content-loaded">
+
+        {% comment %}<!-- Breadcrumbs -->{% endcomment %}
+        <nav class="flex items-center gap-2 text-xs text-gray-500 mb-6 font-barlow uppercase tracking-wider">
+            <a href="{% url 'home' %}" class="hover:text-electric-red transition-colors">Home</a>
+            <span class="text-gray-700">/</span>
+            <a href="{% url 'tournaments:list' %}" class="hover:text-electric-red transition-colors">Tournaments</a>
+            <span class="text-gray-700">/</span>
+            <a href="{% url 'tournaments:detail' tournament.slug %}" class="hover:text-electric-red transition-colors truncate max-w-[200px]">{{ tournament.name }}</a>
+            <span class="text-gray-700">/</span>
+            <span class="text-electric-red font-semibold">Register</span>
         </nav>
 
-        <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-white mb-2">Tournament Registration</h1>
-            <p class="text-gray-400">Complete your registration for {{ tournament.name }}</p>
+        {% comment %}<!-- Header -->{% endcomment %}
+        <div class="mb-6">
+            <h1 class="gaming-header text-2xl text-electric-red mb-1">Tournament Registration</h1>
+            <p class="gaming-body text-gray-400 text-sm">Complete your entry for <span class="text-white font-medium">{{ tournament.name }}</span></p>
         </div>
 
-        <!-- Tournament Information -->
-        <div class="tournament-info-card">
-            <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary">info</span>
+        {% comment %}<!-- Tournament info card -->{% endcomment %}
+        <div class="g-card p-4 mb-6" style="border-top:2px solid #DC2626;">
+            <h2 class="gaming-subheader text-electric-red text-sm mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">info</span>
                 Tournament Details
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">Tournament</span>
-                    <span class="font-medium text-white">{{ tournament.name }}</span>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                    <span class="text-gray-600 uppercase tracking-wider block">Tournament</span>
+                    <span class="font-semibold text-white">{{ tournament.name }}</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">Game</span>
-                    <span class="font-medium text-white">{{ tournament.game.name }}</span>
+                <div>
+                    <span class="text-gray-600 uppercase tracking-wider block">Game</span>
+                    <span class="font-semibold text-white">{{ tournament.game.name }}</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">Start Date</span>
-                    <span class="font-medium text-white">{{ tournament.start_datetime|date:"M d, Y g:i A" }}</span>
+                <div>
+                    <span class="text-gray-600 uppercase tracking-wider block">Start Date</span>
+                    <span class="font-semibold text-white">{{ tournament.start_datetime|date:"M d, Y g:i A" }}</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">Entry Fee</span>
-                    <span class="font-medium text-white">
-                        {% if tournament.entry_fee %}
-                            ${{ tournament.entry_fee }}
-                        {% else %}
-                            <span class="text-green-500">Free</span>
-                        {% endif %}
+                <div>
+                    <span class="text-gray-600 uppercase tracking-wider block">Entry Fee</span>
+                    <span class="font-semibold text-white">
+                        {% if tournament.entry_fee %}${{ tournament.entry_fee }}{% else %}<span class="text-green-500">Free</span>{% endif %}
                     </span>
                 </div>
                 {% if tournament.max_participants %}
-                <div class="flex flex-col">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider">Participants</span>
-                    <span class="font-medium text-white">{{ tournament.total_registered }}/{{ tournament.max_participants }}</span>
+                <div>
+                    <span class="text-gray-600 uppercase tracking-wider block">Participants</span>
+                    <span class="font-semibold text-white">{{ tournament.total_registered }}/{{ tournament.max_participants }}</span>
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Messages -->
+        {% comment %}<!-- Messages -->{% endcomment %}
         {% if messages %}
         <div class="mb-6 space-y-2">
             {% for message in messages %}
-            <div class="p-4 rounded-lg flex items-center gap-3 {% if message.tags == 'error' %}bg-red-900/20 border border-red-800 text-red-200{% else %}bg-green-900/20 border border-green-800 text-green-200{% endif %}">
-                <span class="material-symbols-outlined">{% if message.tags == 'error' %}error{% else %}check_circle{% endif %}</span>
+            <div class="flex items-center gap-3 p-3 rounded-lg text-xs font-medium
+                        {% if message.tags == 'error' %}bg-red-900/20 border border-red-800/30 text-red-300{% else %}bg-green-900/20 border border-green-800/30 text-green-300{% endif %}">
+                <span class="material-symbols-outlined text-sm">{% if message.tags == 'error' %}error{% else %}check_circle{% endif %}</span>
                 {{ message }}
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <!-- Registration Form -->
-        <form method="post" action="{% url 'tournaments:register' tournament.slug %}" class="space-y-6">
+        {% comment %}<!-- Registration Form -->{% endcomment %}
+        <form method="post" action="{% url 'tournaments:register' tournament.slug %}">
             {% csrf_token %}
 
-            <!-- Player Information -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-group">
-                    <label for="display_name">Display Name</label>
-                    <input type="text" id="display_name" name="display_name" value="{{ user.get_display_name }}" readonly
-                           class="form-input-custom bg-surface-dark/50 text-gray-400 cursor-not-allowed border-dashed">
-                    <p class="mt-1 text-xs text-gray-500">How you'll appear in the tournament</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" value="{{ user.email }}" readonly
-                           class="form-input-custom bg-surface-dark/50 text-gray-400 cursor-not-allowed border-dashed">
+            <div class="g-card p-4 mb-6" style="border-top:2px solid #DC2626;">
+                <h2 class="gaming-subheader text-electric-red text-sm mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">person</span>
+                    Your Information
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="display_name" class="block text-gray-400 text-xs font-barlow uppercase tracking-wider mb-1.5">Display Name</label>
+                        <input type="text" id="display_name" name="display_name" value="{{ user.get_display_name }}" readonly class="input-gaming">
+                        <p class="text-gray-600 text-xs mt-1">How you'll appear in the tournament</p>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-400 text-xs font-barlow uppercase tracking-wider mb-1.5">Email Address</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" readonly class="input-gaming">
+                    </div>
                 </div>
             </div>
 
             {% if tournament.is_team_based %}
-            <div class="form-group">
-                <label class="text-lg font-semibold text-white mb-3 block">Select Your Team</label>
+            <div class="g-card p-4 mb-6" style="border-top:2px solid #DC2626;">
+                <h2 class="gaming-subheader text-electric-red text-sm mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">groups</span>
+                    Select Your Team
+                </h2>
+
                 {% if user_teams and not teams_wrong_game %}
-                <div class="grid grid-cols-1 gap-3" id="team-selection-container">
+                <div class="space-y-2" id="team-selection-container">
                     {% for team in user_teams %}
-                    <div class="team-option-card group" data-team-id="{{ team.id }}" role="button" tabindex="0" aria-label="Select {{ team.name }}">
+                    <div class="team-card" data-team-id="{{ team.id }}" role="button" tabindex="0" aria-label="Select {{ team.name }}">
                         <input type="radio" name="team" value="{{ team.id }}" id="team_{{ team.id }}" class="hidden" required>
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-surface-dark flex items-center justify-center text-primary font-bold text-xl overflow-hidden">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-[#0a0a0a] flex items-center justify-center text-electric-red font-bold text-base overflow-hidden border border-white/5">
                                     {% if team.logo %}
                                     <img src="{{ team.logo.url }}" alt="{{ team.name }}" class="w-full h-full object-cover">
                                     {% else %}
@@ -243,54 +177,55 @@
                                     {% endif %}
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-white group-hover:text-primary transition-colors">{{ team.name }}</h4>
-                                    <p class="text-xs text-gray-500">{{ team.members.count }} Members &bull; {{ team.game.name }}</p>
+                                    <h4 class="font-barlow text-sm font-bold text-white uppercase tracking-wider">{{ team.name }}</h4>
+                                    <p class="text-xs text-gray-500">{{ team.members.count }} Member{{ team.members.count|pluralize }}</p>
                                 </div>
                             </div>
-                            <div class="radio-indicator w-6 h-6 border-2 border-gray-600 rounded-full flex items-center justify-center transition-all">
-                                <div class="dot w-3 h-3 bg-primary rounded-full scale-0 transition-transform"></div>
+                            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                                 style="border-color: #6B7280;">
+                                <div class="w-2.5 h-2.5 rounded-full transition-all duration-200 scale-0" style="background: #DC2626;"></div>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
-                <p class="mt-2 text-sm text-gray-500">Team must have at least {{ tournament.team_size }} active member{{ tournament.team_size|pluralize }}</p>
+                <p class="text-xs text-gray-500 mt-2">Team must have at least {{ tournament.team_size }} active member{{ tournament.team_size|pluralize }}</p>
+
                 {% elif teams_wrong_game and user_teams %}
-                <div class="p-4 rounded-lg bg-yellow-900/20 border border-yellow-700 text-yellow-200">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="material-symbols-outlined">warning</span>
-                        <span class="font-bold">Wrong Game</span>
+                <div class="p-3 rounded-lg text-xs" style="background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-amber-400 text-sm">warning</span>
+                        <span class="font-barlow uppercase tracking-wider text-amber-400 text-xs font-bold">Wrong Game</span>
                     </div>
-                    <p class="text-sm mb-2">
-                        You are a captain of the following team{{ user_teams.count|pluralize }}, but
-                        {% if user_teams.count == 1 %}it is{% else %}they are{% endif %}
-                        not registered for <strong>{{ tournament.game.name }}</strong>:
+                    <p class="text-gray-400 mb-2">
+                        You're a captain of {% if user_teams.count == 1 %}a team{% else %}teams{% endif %}
+                        that {{ user_teams.count|pluralize:"is,are" }} not registered for <strong class="text-white">{{ tournament.game.name }}</strong>.
                     </p>
-                    <ul class="text-sm list-disc list-inside mb-4 text-yellow-300">
+                    <ul class="text-xs list-disc list-inside mb-3 text-amber-300 space-y-0.5">
                         {% for team in user_teams %}
                         <li>{{ team.name }} ({{ team.game.name }})</li>
                         {% endfor %}
                     </ul>
-                    <p class="text-sm">To register, create or join a team that plays <strong>{{ tournament.game.name }}</strong>.</p>
-                    <a href="{% url 'teams:create' %}" class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-yellow-700 hover:bg-yellow-600 text-white rounded-lg transition-colors text-sm font-medium">
-                        <span class="material-symbols-outlined text-sm">add</span>
-                        Create a {{ tournament.game.name }} Team
+                    <a href="{% url 'teams:create' %}" class="btn-gaming-primary text-xs py-1.5 px-3 inline-flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-xs">add</span>
+                        Create {{ tournament.game.name }} Team
                     </a>
                 </div>
+
                 {% else %}
-                <div class="p-4 rounded-lg bg-red-900/20 border border-red-800 text-red-200">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="material-symbols-outlined">warning</span>
-                        <span class="font-bold">Team Required</span>
+                <div class="p-3 rounded-lg text-xs" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-electric-red text-sm">warning</span>
+                        <span class="font-barlow uppercase tracking-wider text-electric-red text-xs font-bold">Team Required</span>
                     </div>
-                    <p class="text-sm mb-2">You need to be a captain or co-captain of an active <strong>{{ tournament.game.name }}</strong> team to register.</p>
-                    <div class="flex flex-wrap gap-2 mt-3">
-                        <a href="{% url 'teams:create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm">add</span>
-                            Create a Team
+                    <p class="text-gray-400 mb-3">You need to be a captain or co-captain of an active <strong class="text-white">{{ tournament.game.name }}</strong> team to register.</p>
+                    <div class="flex gap-2">
+                        <a href="{% url 'teams:create' %}" class="btn-gaming-primary text-xs py-1.5 px-3 inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-xs">add</span>
+                            Create Team
                         </a>
-                        <a href="{% url 'teams:list' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium">
-                            <span class="material-symbols-outlined text-sm">groups</span>
+                        <a href="{% url 'teams:list' %}" class="btn-gaming-secondary text-xs py-1.5 px-3 inline-flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-xs">groups</span>
                             Browse Teams
                         </a>
                     </div>
@@ -299,46 +234,41 @@
             </div>
             {% endif %}
 
-            <!-- Tournament Rules Agreement -->
             {% if tournament.rules %}
-            <div class="form-group">
-                <label class="text-lg font-semibold text-white mb-3 block">Tournament Rules</label>
-                <div class="rules-container">
-                    {{ tournament.rules|linebreaks }}
-                </div>
-                <label class="flex items-start gap-3 cursor-pointer group">
-                    <div class="relative flex items-center mt-1">
-                        <input type="checkbox" id="rules_agreed" name="rules_agreed" required 
-                               class="peer appearance-none w-5 h-5 border-2 border-gray-600 rounded checked:bg-primary checked:border-primary transition-all">
-                        <span class="material-symbols-outlined absolute text-white text-base scale-0 peer-checked:scale-100 transition-transform pointer-events-none">check</span>
-                    </div>
-                    <span class="text-gray-300 text-sm select-none group-hover:text-white transition-colors">
-                        I have read and agree to the tournament rules and terms of service <span class="text-primary">*</span>
+            <div class="g-card p-4 mb-6" style="border-top:2px solid #DC2626;">
+                <h2 class="gaming-subheader text-electric-red text-sm mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">description</span>
+                    Tournament Rules
+                </h2>
+                <div class="rules-box mb-3">{{ tournament.rules|linebreaks }}</div>
+                <label class="flex items-start gap-2.5 cursor-pointer group">
+                    <input type="checkbox" id="rules_agreed" name="rules_agreed" required
+                           class="mt-0.5 appearance-none w-4 h-4 rounded border-2 transition-all flex-shrink-0"
+                           style="border-color:#6B7280;"
+                           onchange="this.style.borderColor=this.checked?'#DC2626':'#6B7280';this.style.background=this.checked?'#DC2626':'transparent'">
+                    <span class="text-xs text-gray-400 select-none group-hover:text-gray-200 transition-colors">
+                        I have read and agree to the tournament rules and terms of service <span class="text-electric-red">*</span>
                     </span>
                 </label>
             </div>
             {% endif %}
 
-            <!-- Form Actions -->
-            <div class="flex flex-col sm:flex-row gap-4 items-center justify-between pt-6 border-t border-white/10">
-                <a href="{% url 'tournaments:detail' tournament.slug %}" 
-                   class="w-full sm:w-auto px-6 py-3 text-gray-400 hover:text-white transition-colors font-medium text-center">
-                    Cancel Registration
+            {% comment %}<!-- Actions -->{% endcomment %}
+            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between pt-4" style="border-top:1px solid rgba(255,255,255,.06);">
+                <a href="{% url 'tournaments:detail' tournament.slug %}"
+                   class="text-xs text-gray-500 hover:text-white transition-colors font-barlow uppercase tracking-wider">
+                    &larr; Back to Tournament
                 </a>
-                
-                {% if tournament.is_team_based and not user_teams %}
-                <button type="button" disabled 
-                        class="w-full sm:w-auto px-10 py-3 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed font-bold">
-                    Register Now
-                </button>
-                {% elif tournament.is_team_based and teams_wrong_game %}
-                <button type="button" disabled 
-                        class="w-full sm:w-auto px-10 py-3 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed font-bold">
+
+                {% if tournament.is_team_based and not user_teams or tournament.is_team_based and teams_wrong_game %}
+                <button type="button" disabled
+                        class="btn-gaming-primary text-xs py-2 px-6 opacity-40 cursor-not-allowed">
                     Register Now
                 </button>
                 {% else %}
-                <button type="submit" 
-                        class="w-full sm:w-auto px-10 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 transform hover:-translate-y-0.5 transition-all">
+                <button type="submit"
+                        class="btn-gaming-primary text-xs py-2 px-6">
+                    <span class="material-symbols-outlined text-sm mr-1">how_to_reg</span>
                     Confirm Registration
                 </button>
                 {% endif %}
@@ -348,163 +278,42 @@
 </div>
 
 <script>
-// Enhanced team selection functionality
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Tournament registration form loaded');
-    
-    // Initialize team selection
-    initializeTeamSelection();
-    
-    // Add form validation
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', validateForm);
-    }
-});
-
-function initializeTeamSelection() {
-    const teamCards = document.querySelectorAll('.team-option-card');
-    console.log('Found team cards:', teamCards.length);
-    
+    const teamCards = document.querySelectorAll('.team-card');
     teamCards.forEach(card => {
-        // Add click event listener
         card.addEventListener('click', function(e) {
-            e.preventDefault();
-            const teamId = this.getAttribute('data-team-id');
-            console.log('Team card clicked:', teamId);
-            selectTeam(teamId);
+            const teamId = this.dataset.teamId;
+            if (!teamId) return;
+
+            document.querySelectorAll('.team-card').forEach(c => {
+                c.classList.remove('selected');
+                c.querySelector('input[type="radio"]').checked = false;
+                const indicator = c.querySelector('.rounded-full');
+                if (indicator) {
+                    indicator.style.borderColor = '#6B7280';
+                    const dot = indicator.querySelector('.rounded-full');
+                    if (dot) dot.style.transform = 'scale(0)';
+                }
+            });
+
+            this.classList.add('selected');
+            const radio = document.getElementById('team_' + teamId);
+            if (radio) radio.checked = true;
+            const indicator = this.querySelector('.rounded-full');
+            if (indicator) {
+                indicator.style.borderColor = '#DC2626';
+                const dot = indicator.querySelector('.rounded-full');
+                if (dot) dot.style.transform = 'scale(1)';
+            }
         });
-        
-        // Add keyboard support
+
         card.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                const teamId = this.getAttribute('data-team-id');
-                console.log('Team card activated via keyboard:', teamId);
-                selectTeam(teamId);
+                this.click();
             }
-        });
-        
-        // Add hover effects
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
         });
     });
-}
-
-function selectTeam(teamId) {
-    console.log('selectTeam called with:', teamId);
-    
-    if (!teamId) {
-        console.error('No team ID provided');
-        return;
-    }
-    
-    try {
-        // Remove selection from all team options
-        document.querySelectorAll('.team-option-card').forEach(option => {
-            option.classList.remove('selected');
-            option.setAttribute('aria-selected', 'false');
-            
-            const indicator = option.querySelector('.radio-indicator');
-            const dot = option.querySelector('.dot');
-            
-            if (indicator) {
-                indicator.classList.remove('border-primary');
-                indicator.classList.add('border-gray-600');
-            }
-            
-            if (dot) {
-                dot.classList.remove('scale-100');
-                dot.classList.add('scale-0');
-            }
-        });
-
-        // Select the clicked team
-        const selectedCard = document.querySelector(`[data-team-id="${teamId}"]`);
-        const radioButton = document.getElementById(`team_${teamId}`);
-        
-        console.log('Selected card:', selectedCard);
-        console.log('Radio button:', radioButton);
-        
-        if (selectedCard && radioButton) {
-            // Update card appearance
-            selectedCard.classList.add('selected');
-            selectedCard.setAttribute('aria-selected', 'true');
-            
-            const indicator = selectedCard.querySelector('.radio-indicator');
-            const dot = selectedCard.querySelector('.dot');
-            
-            if (indicator) {
-                indicator.classList.remove('border-gray-600');
-                indicator.classList.add('border-primary');
-            }
-            
-            if (dot) {
-                dot.classList.remove('scale-0');
-                dot.classList.add('scale-100');
-            }
-
-            // Check the radio button
-            radioButton.checked = true;
-            radioButton.dispatchEvent(new Event('change'));
-            
-            console.log('Team selected successfully:', teamId);
-            
-            // Show success feedback
-            showSelectionFeedback(selectedCard);
-            
-        } else {
-            console.error('Could not find selected card or radio button for team:', teamId);
-        }
-        
-    } catch (error) {
-        console.error('Error in selectTeam:', error);
-    }
-}
-
-function showSelectionFeedback(card) {
-    // Add a brief visual feedback
-    card.style.boxShadow = '0 0 20px var(--eyt-primary-alpha-40)';
-    setTimeout(() => {
-        card.style.boxShadow = '0 0 10px var(--eyt-primary-alpha-20)';
-    }, 300);
-}
-
-function validateForm(e) {
-    const form = e.target;
-    const isTeamTournament = document.getElementById('team-selection-container') !== null;
-    
-    if (isTeamTournament) {
-        const selectedTeam = form.querySelector('input[name="team"]:checked');
-        if (!selectedTeam) {
-            e.preventDefault();
-            alert('Please select a team to register.');
-            return false;
-        }
-        console.log('Form validation passed - team selected:', selectedTeam.value);
-    }
-    
-    // Check rules agreement if required
-    const rulesCheckbox = form.querySelector('input[name="rules_agreed"]');
-    if (rulesCheckbox && !rulesCheckbox.checked) {
-        e.preventDefault();
-        alert('Please agree to the tournament rules.');
-        return false;
-    }
-    
-    console.log('Form validation passed');
-    return true;
-}
-
-// Legacy function for backward compatibility
-function selectTeam_legacy(teamId) {
-    console.log('Legacy selectTeam called, redirecting to new function');
-    selectTeam(teamId);
-}
+});
 </script>
 {% endblock %}

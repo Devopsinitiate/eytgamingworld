@@ -1,0 +1,38 @@
+# Code owners define who is responsible for reviewing changes in specific areas.
+# Each line is a file pattern followed by one or more owners.
+# Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @eytgaming/core
+
+# Security-sensitive areas - requires security team review
+/config/settings.py @eytgaming/security
+/security/ @eytgaming/security
+/payments/ @eytgaming/security
+/accounts/ @eytgaming/security
+
+# Core infrastructure
+/config/ @eytgaming/core
+/core/ @eytgaming/core
+/api/ @eytgaming/core
+
+# Feature areas
+/tournaments/ @eytgaming/tournaments
+/coaching/ @eytgaming/coaching
+/teams/ @eytgaming/teams
+/venues/ @eytgaming/venues
+/store/ @eytgaming/store
+/dashboard/ @eytgaming/core
+/notifications/ @eytgaming/core
+
+# Infrastructure & CI
+/.github/ @eytgaming/infra
+/Dockerfile* @eytgaming/infra
+/docker-compose* @eytgaming/infra
+/.pre-commit-config.yaml @eytgaming/infra
+/pyproject.toml @eytgaming/infra
+
+# Documentation
+/docs/ @eytgaming/docs
+/CONTRIBUTING.md @eytgaming/docs
+/README.md @eytgaming/docs

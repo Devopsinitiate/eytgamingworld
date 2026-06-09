@@ -23,7 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-)6&8w(h5*v(y-#3b11*j%5%*c%z^2iz1(lu7d+^ru@(7l@_n%3')
+SECRET_KEY = config('SECRET_KEY')
+if not SECRET_KEY:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('SECRET_KEY must be set in environment')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -37,7 +40,7 @@ if DEBUG:
         'django_ratelimit.W001',  # Cache backend not officially supported
     ]
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,8da9-102-89-32-49.ngrok-free.app', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,345b-102-89-76-84.ngrok-free.app', cast=Csv())
 
 # Site URL for email notifications and absolute URLs
 # In production, set this in your .env file: SITE_URL=https://yourdomain.com
@@ -75,6 +78,8 @@ INSTALLED_APPS = [
     'crispy_tailwind',
     'widget_tweaks',
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'corsheaders',
     'django_htmx',
     'django_extensions',
@@ -84,8 +89,13 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_ratelimit',
+    'django_filters',
 
-
+    # Two-Factor Authentication
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_static',
+    'two_factor',
 
      # Local apps
     'core.apps.CoreConfig',
@@ -99,6 +109,9 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'dashboard.apps.DashboardConfig',
     'store.apps.StoreConfig',
+    'chat',
+    'integrations',
+    'health',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +130,10 @@ MIDDLEWARE = [
     'security.middleware.AuditLogMiddleware',
     # Store rate limiting middleware
     'store.middleware.RateLimitMiddleware',
+    # Two-Factor Authentication
+    'django_otp.middleware.OTPMiddleware',
+    # Enforce 2FA for admin/organizer roles
+    'accounts.middleware.TwoFactorMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -133,6 +150,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'core.context_processors.site_settings',
+                'accounts.context_processors.two_factor_status',
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
@@ -266,19 +284,33 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular (OpenAPI/Swagger)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'EYTGaming API',
+    'DESCRIPTION': 'API for the EYTGaming esports tournament and gaming community platform.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000', cast=Csv())
 
-# Celery Configuration
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/1')
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# Celery Configuration (disabled if no broker URL — e.g. PythonAnywhere free)
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
+if CELERY_BROKER_URL:
+    CELERY_RESULT_BACKEND = 'django-db'
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
+    CELERY_TIMEZONE = TIME_ZONE
+    CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Cache
 # Use Redis in production, fallback to database cache in development
@@ -298,18 +330,31 @@ if DEBUG:
         }
     }
 else:
-    # Production: Use Redis cache
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': config('REDIS_URL', default='redis://localhost:6379/0'),
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            },
-            'KEY_PREFIX': 'eytgaming',
-            'TIMEOUT': 300,  # 5 minutes default timeout
+    # Production: Use Redis cache if REDIS_URL is set, else database cache
+    redis_url = config('REDIS_URL', default=None)
+    if redis_url:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': redis_url,
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                },
+                'KEY_PREFIX': 'eytgaming',
+                'TIMEOUT': 300,
+            }
         }
-    }
+    else:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+                'LOCATION': 'django_cache_table',
+                'TIMEOUT': 300,
+                'OPTIONS': {
+                    'MAX_ENTRIES': 1000
+                }
+            }
+        }
 
 # Session
 # Use database sessions for reliability (works without Redis)
@@ -324,11 +369,6 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@eytgaming.com')
-
-# Stripe
-STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
-STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
 
 # CSRF Trusted Origins (for ngrok and production)
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
@@ -369,17 +409,19 @@ else:
     CSRF_COOKIE_SECURE = False
     
 # Sentry - only initialize if DSN is provided and not a placeholder
-    sentry_dsn = config('SENTRY_DSN', default=None)
-    if sentry_dsn and sentry_dsn != 'your_sentry_dsn' and sentry_dsn.startswith('https://'):
-        import sentry_sdk
-        from sentry_sdk.integrations.django import DjangoIntegration
-        
-        sentry_sdk.init(
-            dsn=sentry_dsn,
-            integrations=[DjangoIntegration()],
-            traces_sample_rate=0.1,
-            send_default_pii=False,
-        )
+sentry_dsn = config('SENTRY_DSN', default=None)
+if sentry_dsn and sentry_dsn != 'your_sentry_dsn' and sentry_dsn.startswith('https://'):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.2,
+        profiles_sample_rate=0.1,
+        send_default_pii=False,
+        environment='production' if not DEBUG else 'development',
+    )
 
 # Django Debug Toolbar (Development only)
 if DEBUG:
@@ -412,16 +454,16 @@ YOUTUBE_URL = config('YOUTUBE_URL', default='https://youtube.com/@eytgaming')
 # ==============================================================================
 # STRIPE PAYMENT CONFIGURATION
 # ==============================================================================
-
 STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
 STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
 STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
 
 # ==============================================================================
 # Paystack Payment Configuration
-PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', '')
-PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', '')
-PAYSTACK_WEBHOOK_SECRET = config('PAYSTACK_WEBHOOK_SECRET', '')
+# ==============================================================================
+PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
+PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='')
+PAYSTACK_WEBHOOK_SECRET = config('PAYSTACK_WEBHOOK_SECRET', default='')
 # ==============================================================================
 
 
@@ -450,6 +492,11 @@ MAX_NOTIFICATIONS_PER_USER = 1000
 
 # Notification expiry (days)
 NOTIFICATION_EXPIRY_DAYS = 90
+
+# Web Push Notification (VAPID) settings
+VAPID_PUBLIC_KEY = config('VAPID_PUBLIC_KEY', default='')
+VAPID_PRIVATE_KEY = config('VAPID_PRIVATE_KEY', default='')
+VAPID_CLAIM_EMAIL = config('VAPID_CLAIM_EMAIL', default='push@eytgaming.com')
 
 # ==============================================================================
 # SECURITY SETTINGS
@@ -485,6 +532,28 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
 # CELERY_TIMEZONE = TIME_ZONE
+
+# ==============================================================================
+# STRUCTURED LOGGING (structlog)
+# ==============================================================================
+
+import structlog
+
+structlog.configure(
+    processors=[
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        structlog.processors.TimeStamper(fmt='iso'),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.dev.ConsoleRenderer() if DEBUG else structlog.processors.JSONRenderer(),
+    ],
+    wrapper_class=structlog.stdlib.BoundLogger,
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
 
 # ==============================================================================
 # LOGGING CONFIGURATION
@@ -551,6 +620,14 @@ LOGGING = {
             'format': '{asctime} [{levelname}] {module} - {message}',
             'style': '{',
         },
+        'structlog_json': {
+            '()': structlog.stdlib.ProcessorFormatter,
+            'processor': structlog.processors.JSONRenderer(),
+        },
+        'structlog_console': {
+            '()': structlog.stdlib.ProcessorFormatter,
+            'processor': structlog.dev.ConsoleRenderer(),
+        },
     },
     'filters': {
         'require_debug_true': {
@@ -561,7 +638,7 @@ LOGGING = {
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'structlog_console' if DEBUG else 'structlog_json',
         },
         'file': file_handler_config,
         'security_file': security_handler_config,
@@ -589,6 +666,9 @@ LOGGING = {
         },
     },
 }
+
+# Ensure structlog processes stdlib log records through the chain
+structlog.stdlib.ProcessorFormatter.wrap_for_formatter = True
 
 
 # ==============================================================================
@@ -618,13 +698,13 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # CSRF protection for store forms
-# Note: CSRF_COOKIE_HTTPONLY should be False to allow JavaScript access for AJAX requests
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token for AJAX
-CSRF_COOKIE_SAMESITE = 'Lax'  # Prevent CSRF attacks via cross-site requests
-CSRF_USE_SESSIONS = False  # Use cookie-based CSRF tokens for better performance
-CSRF_COOKIE_NAME = 'csrftoken'  # Standard cookie name
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Header name for AJAX requests
-CSRF_FAILURE_VIEW = 'store.views.csrf_failure'  # Custom CSRF failure view
+# CSRF token is served via GET /api/csrf-token/ for AJAX requests so the
+# cookie can remain HTTPOnly (not readable by JavaScript, preventing XSS exfiltration).
+CSRF_COOKIE_HTTPONLY = True  # Prevent XSS from reading CSRF cookie
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_FAILURE_VIEW = 'store.views.csrf_failure'
 
 # HTTPS enforcement in production
 if not DEBUG:

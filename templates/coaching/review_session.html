@@ -1,0 +1,120 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Review Session — {{ session.game.name }} — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#0A0A0A;}
+.rv-card{background:#111;border:1px solid #1f1f1f;border-radius:8px;padding:28px;max-width:640px;margin:3rem auto;border-top:3px solid #eab308;}
+.rv-icon{width:64px;height:64px;border-radius:50%;background:rgba(234,179,8,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:#eab308;}
+.rv-title{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;text-align:center;margin-bottom:.5rem;}
+.rv-sub{text-align:center;color:#9ca3af;font-size:.9rem;margin-bottom:1.5rem;}
+.rv-section{margin-bottom:1.5rem;}
+.rv-section-title{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#dc2626;margin-bottom:.75rem;}
+.rv-field{margin-bottom:1rem;}
+.rv-field label{display:block;font-size:.8rem;color:#9ca3af;margin-bottom:.3rem;}
+.rv-field select,.rv-field input,.rv-field textarea{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;color:#fff;font-size:.875rem;}
+.rv-field select:focus,.rv-field input:focus,.rv-field textarea:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.2);}
+.rv-field textarea{resize:vertical;min-height:120px;}
+.rv-star-group{display:flex;gap:1rem;flex-wrap:wrap;}
+.rv-star-item{flex:1;min-width:120px;}
+.rv-star-item label{display:block;font-size:.78rem;color:#9ca3af;margin-bottom:.4rem;}
+.rv-star-item .star-options{display:flex;gap:4px;}
+.rv-star-item .star-options input[type="radio"]{display:none;}
+.rv-star-item .star-options label{cursor:pointer;font-size:1.3rem;color:#4b5563;transition:color .15s;}
+.rv-star-item .star-options input[type="radio"]:checked ~ label,
+.rv-star-item .star-options label:hover,
+.rv-star-item .star-options label:hover ~ label{color:#fbbf24;}
+.rv-checkbox{display:flex;align-items:center;gap:10px;padding:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;margin-bottom:.75rem;cursor:pointer;}
+.rv-checkbox input[type="checkbox"]{accent-color:#dc2626;width:18px;height:18px;}
+.rv-checkbox label{cursor:pointer;color:#d1d5db;font-size:.875rem;flex:1;}
+.rv-btns{display:flex;gap:12px;margin-top:1.5rem;}
+.rv-btn{width:100%;padding:10px 18px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.rv-btn-primary{background:#dc2626;color:#fff;}
+.rv-btn-primary:hover{background:#b91c1c;box-shadow:0 0 16px rgba(220,38,38,.4);}
+.rv-btn-cancel{background:transparent;color:#6b7280;border:1px solid #2a2a2a;text-decoration:none;}
+.rv-btn-cancel:hover{border-color:#dc2626;color:#fff;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rv-card">
+  <div class="rv-icon"><span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;">star</span></div>
+  <h1 class="rv-title">Review Your Session</h1>
+  <p class="rv-sub">How was your session with {{ session.coach.user.get_display_name }}?</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="rv-section" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:12px;margin-bottom:1rem;">
+      {% for error in form.non_field_errors %}<p style="color:#ef4444;font-size:.85rem;">{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="rv-section">
+      <div class="rv-section-title">Ratings</div>
+      <div class="rv-star-group">
+        {% for field in form %}
+          {% if field.name in 'rating communication_rating knowledge_rating patience_rating' %}
+          <div class="rv-star-item">
+            <label>{{ field.label }}</label>
+            <div class="star-options">
+              {% for value, label_text in field.field.choices %}
+              <input type="radio" name="{{ field.name }}" id="{{ field.id_for_label }}_{{ value }}" value="{{ value }}" {% if field.value == value %}checked{% endif %}>
+              <label for="{{ field.id_for_label }}_{{ value }}">{{ label_text }}</label>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="rv-section">
+      <div class="rv-section-title">Your Feedback</div>
+      {% for field in form %}
+        {% if field.name == 'title' %}
+        <div class="rv-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}" placeholder="Summarize your experience">
+          {% if field.errors %}<p style="color:#ef4444;font-size:.75rem;margin-top:4px;">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% elif field.name == 'review' %}
+        <div class="rv-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" placeholder="Tell others about your experience...">{{ field.value|default:'' }}</textarea>
+          {% if field.errors %}<p style="color:#ef4444;font-size:.75rem;margin-top:4px;">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="rv-section">
+      <div class="rv-section-title">Additional</div>
+      {% for field in form %}
+        {% if field.name == 'would_recommend' %}
+        <div class="rv-checkbox">
+          {{ field }}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        </div>
+        {% elif field.name == 'improvement_seen' %}
+        <div class="rv-checkbox">
+          {{ field }}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="rv-btns">
+      <button type="submit" class="rv-btn rv-btn-primary">
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;">rate_review</span>
+        Submit Review
+      </button>
+      <a href="{% url 'coaching:session_detail' pk=session.pk %}" class="rv-btn rv-btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

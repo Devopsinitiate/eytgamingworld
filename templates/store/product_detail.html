@@ -18,11 +18,44 @@
 <link rel="stylesheet" href="{% static 'css/product-detail-fix.css' %}">
 <style>
 body { background: #0A0A0A; }
+
+/* ── Wishlist ── */
+.pd-wishlist-btn{position:absolute;top:1rem;right:1rem;z-index:5;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.6);border:1px solid rgba(220,38,38,0.2);color:#6B7280;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(4px)}
+.pd-wishlist-btn:hover,.pd-wishlist-btn.active{color:#DC2626;border-color:#DC2626;background:rgba(220,38,38,0.15)}
+
+/* ── Share ── */
+.pd-share{display:flex;align-items:center;gap:0.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(220,38,38,0.1)}
+.pd-share-label{font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6B7280}
+.pd-share-btn{width:34px;height:34px;border-radius:50%;background:#1a1a1a;border:1px solid #333;color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;text-decoration:none}
+.pd-share-btn:hover{border-color:#DC2626;color:#DC2626;background:rgba(220,38,38,0.06)}
+
+/* ── Features list ── */
+.pd-features{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem;padding:1rem;background:rgba(20,20,20,0.6);border:1px solid rgba(220,38,38,0.08);border-radius:4px}
+.pd-feature{display:flex;align-items:flex-start;gap:0.5rem;font-family:'Inter',sans-serif;font-size:0.85rem;color:#aaa;line-height:1.5}
+.pd-feature span:first-child{color:#22c55e;flex-shrink:0;margin-top:1px}
+
+/* ── Related products ── */
+.related-scroll{display:flex;gap:1rem;overflow-x:auto;padding-bottom:0.5rem;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.related-scroll::-webkit-scrollbar{display:none}
+.related-scroll > *{scroll-snap-align:start;flex-shrink:0;width:185px}
+.related-card{background:#111827;border:1px solid rgba(220,38,38,0.15);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.2s;text-decoration:none}
+.related-card:hover{border-color:#DC2626;transform:translateY(-2px);box-shadow:0 4px 20px rgba(220,38,38,0.15)}
+.related-card-img{width:100%;aspect-ratio:1;object-fit:cover;background:#0A0A0A}
+.related-card-body{padding:0.625rem 0.75rem}
+.related-card-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;color:#fff;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.related-card-price{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;color:#DC2626}
+
+/* ── Toast ── */
+.pd-toast{position:fixed;bottom:2rem;right:2rem;z-index:99999;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:0.85rem 1.25rem;display:flex;align-items:center;gap:10px;font-size:0.9rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.3s ease;pointer-events:none}
+.pd-toast.show{transform:translateY(0);opacity:1}
+.pd-toast.success{border-color:#16a34a}
+.pd-toast.error{border-color:#DC2626}
+.pd-toast.wishlist{border-color:#DC2626}
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8 store-product-detail">
+<div class="page-wrap store-product-detail" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
@@ -44,6 +77,12 @@ body { background: #0A0A0A; }
                         <img id="mainImage" src="{{ images.0.image.url }}" alt="{{ images.0.alt_text }}" class="main-image">
                     {% else %}
                         <img id="mainImage" src="{% static 'images/placeholder-product.png' %}" alt="{{ product.name }}" class="main-image">
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <button class="pd-wishlist-btn {% if in_wishlist %}active{% endif %}"
+                            onclick="toggleWishlistDetail()" aria-label="Toggle wishlist">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' {% if in_wishlist %}1{% else %}0{% endif %},'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.3rem;">favorite</span>
+                    </button>
                     {% endif %}
                 </div>
 
@@ -89,6 +128,14 @@ body { background: #0A0A0A; }
 
                 <!-- Description -->
                 <div class="product-description">{{ product.description }}</div>
+
+                <!-- Key Features -->
+                <div class="pd-features">
+                    <div class="pd-feature"><span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">check</span> Official EYTGaming merchandise — 100% authentic</div>
+                    <div class="pd-feature"><span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">check</span> Fast delivery across Nigeria</div>
+                    <div class="pd-feature"><span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">check</span> Secure checkout via Paystack &amp; Stripe</div>
+                    <div class="pd-feature"><span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">check</span> Easy returns within 14 days</div>
+                </div>
 
                 <!-- Alert Messages -->
                 <div id="alertContainer"></div>
@@ -144,6 +191,23 @@ body { background: #0A0A0A; }
                             Back to Store
                         </a>
                     </div>
+                </div>
+
+                <!-- Share -->
+                <div class="pd-share">
+                    <span class="pd-share-label">Share</span>
+                    <button class="pd-share-btn" onclick="shareProduct('copy')" title="Copy link">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">link</span>
+                    </button>
+                    <a class="pd-share-btn" href="https://twitter.com/intent/tweet?text={{ product.name }}&url={{ request.build_absolute_uri }}" target="_blank" rel="noopener" title="Share on Twitter">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">alternate_email</span>
+                    </a>
+                    <a class="pd-share-btn" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener" title="Share on Facebook">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">facebook</span>
+                    </a>
+                    <button class="pd-share-btn" onclick="shareProduct('share')" title="Share via device">
+                        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;">share</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -235,8 +299,37 @@ body { background: #0A0A0A; }
     </div>
 </div>
 
+    {% if related_products %}
+    <!-- Related Products -->
+    <div class="product-detail-container">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(220,38,38,0.15);">
+            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.75rem;color:#DC2626;">category</span>
+            <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:1.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#fff;margin:0;">Related Products</h2>
+        </div>
+        <div class="related-scroll">
+            {% for p in related_products %}
+            <a href="{% url 'store:product_detail' p.slug %}" class="related-card">
+                {% if p.primary_images %}
+                <img src="{{ p.primary_images.0.image.url }}" alt="{{ p.primary_images.0.alt_text }}" class="related-card-img" loading="lazy">
+                {% else %}
+                <div class="related-card-img" style="display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2.5rem;color:#374151;">inventory_2</span>
+                </div>
+                {% endif %}
+                <div class="related-card-body">
+                    <div class="related-card-name">{{ p.name }}</div>
+                    <div class="related-card-price">${{ p.price }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
 <form id="csrfForm" style="display:none">{% csrf_token %}</form>
 <script>
+    let inWishlistFlag = {% if in_wishlist %}true{% else %}false{% endif %};
+
     const productId   = '{{ product.id }}';
     const productSlug = '{{ product.slug }}';
     const productPrice = parseFloat('{{ product.price }}');
@@ -441,6 +534,69 @@ body { background: #0A0A0A; }
         if (pagination.has_next)
             html += `<button onclick="loadReviews(${pagination.current_page + 1})">Next</button>`;
         container.innerHTML = html;
+    }
+
+    function showPdToast(msg, type) {
+        const t = document.getElementById('pdToast') || (() => {
+            const el = document.createElement('div');
+            el.id = 'pdToast';
+            el.className = 'pd-toast';
+            document.body.appendChild(el);
+            return el;
+        })();
+        const icon = type === 'success' ? 'check_circle' : type === 'wishlist' ? 'favorite' : 'error';
+        const cls = type === 'success' ? 'success' : type === 'wishlist' ? 'wishlist' : 'error';
+        const color = type === 'success' ? '#16a34a' : '#DC2626';
+        t.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:18px;font-style:normal;font-weight:normal;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;line-height:1;color:' + color + ';">' + icon + '</span> ' + msg;
+        t.className = 'pd-toast ' + cls + ' show';
+        setTimeout(() => { t.className = 'pd-toast'; }, 3000);
+    }
+
+    async function toggleWishlistDetail() {
+        const btn = document.querySelector('.pd-wishlist-btn');
+        const span = btn.querySelector('span');
+        try {
+            if (inWishlistFlag) {
+                const data = await fetch('{% url "store:remove_from_wishlist" %}', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken')},
+                    body: JSON.stringify({product_id: productId})
+                }).then(r => r.json());
+                if (data.success) {
+                    inWishlistFlag = false;
+                    btn.classList.remove('active');
+                    span.style.fontVariationSettings = "'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24";
+                    showPdToast('Removed from wishlist', 'wishlist');
+                }
+            } else {
+                const data = await fetch('{% url "store:add_to_wishlist" %}', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken')},
+                    body: JSON.stringify({product_id: productId})
+                }).then(r => r.json());
+                if (data.success) {
+                    inWishlistFlag = true;
+                    btn.classList.add('active');
+                    span.style.fontVariationSettings = "'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24";
+                    showPdToast('Added to wishlist!', 'wishlist');
+                }
+            }
+        } catch(e) {
+            showPdToast('Network error. Please try again.', 'error');
+        }
+    }
+
+    function shareProduct(mode) {
+        const url = window.location.href;
+        if (mode === 'copy') {
+            navigator.clipboard.writeText(url).then(() => {
+                showPdToast('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                showPdToast('Could not copy link', 'error');
+            });
+        } else if (mode === 'share' && navigator.share) {
+            navigator.share({title: '{{ product.name }}', url: url}).catch(() => {});
+        }
     }
 
     updateQuantityDisplay();

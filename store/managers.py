@@ -451,7 +451,8 @@ class OrderManager:
     
     @staticmethod
     @transaction.atomic
-    def create_order(user, cart, shipping_info, payment_method, payment_intent_id):
+    def create_order(user, cart, shipping_info, payment_method, payment_intent_id,
+                     subtotal=None, shipping_cost=None, tax=None, total=None):
         """
         Create order from cart with transaction safety.
         
@@ -479,6 +480,10 @@ class OrderManager:
                 - shipping_phone
             payment_method: Payment method ('stripe' or 'paystack')
             payment_intent_id: Payment gateway transaction ID
+            subtotal: Pre-calculated subtotal (optional, recalculated if not given)
+            shipping_cost: Pre-calculated shipping cost (optional, defaults to $10.00)
+            tax: Pre-calculated tax (optional, defaults to 10% of subtotal)
+            total: Pre-calculated total (optional, sum of above)
             
         Returns:
             Order: The created order object
@@ -501,13 +506,11 @@ class OrderManager:
             if not shipping_info.get(field):
                 raise ValidationError(f"Missing required field: {field}")
         
-        # Calculate order totals
-        subtotal = Decimal('0.00')
+        # Get cart items
         cart_items = cart.items.select_related('product', 'variant').all()
         
         # Reserve stock for all items first (will raise InsufficientStockError if any fail)
         for cart_item in cart_items:
-            # Check availability before reserving
             if not cart_item.is_available:
                 raise ValidationError(
                     f"{cart_item.product.name} is no longer available"
@@ -524,21 +527,26 @@ class OrderManager:
                     f"Available: {available}, Requested: {cart_item.quantity}"
                 )
             
-            # Reserve stock (atomic operation with row-level locking)
             InventoryManager.reserve_stock(
                 cart_item.product,
                 cart_item.variant,
                 cart_item.quantity
             )
-            
-            # Calculate subtotal
-            subtotal += cart_item.total_price
         
-        # Calculate shipping and tax (simplified for now)
-        # TODO: Implement proper shipping cost calculation based on location
-        shipping_cost = Decimal('10.00')  # Flat rate for now
-        tax = (subtotal * Decimal('0.10')).quantize(Decimal('0.01'))  # 10% tax rate, rounded to 2 decimal places
-        total = subtotal + shipping_cost + tax
+        # Use provided totals or calculate
+        if subtotal is None:
+            subtotal = Decimal('0.00')
+            for cart_item in cart_items:
+                subtotal += cart_item.total_price
+        
+        if shipping_cost is None:
+            shipping_cost = Decimal('10.00')
+        
+        if tax is None:
+            tax = (subtotal * Decimal('0.10')).quantize(Decimal('0.01'))
+        
+        if total is None:
+            total = subtotal + shipping_cost + tax
         
         # Generate unique order number
         order_number = OrderManager.generate_order_number()

@@ -23,6 +23,7 @@ urlpatterns = [
     path('<slug:slug>/bracket/', views.BracketView.as_view(), name='bracket'),
     path('<slug:slug>/bracket/json/', views.bracket_json, name='bracket_json'),
     path('<slug:slug>/bracket/partial/', views.bracket_partial, name='bracket_partial'),
+    path('<slug:slug>/standings/', views.bracket_standings, name='standings'),
     path('<slug:slug>/bracket-preview-data/', views.bracket_preview_data, name='bracket_preview_data'),
     
     # Match management
@@ -84,4 +85,7 @@ urlpatterns = [
     
     # Page view tracking endpoint
     path('<slug:slug>/view/', analytics_views.track_page_view, name='track_page_view'),
+
+    # Cron fallback for external monitors (when Celery Beat is offline)
+    path('cron/<str:token>/', views.cron_check, name='cron_check'),
 ]

@@ -132,6 +132,10 @@
     </div>
     <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
       {% if not is_own_profile %}
+      <button class="pv-btn-primary" data-user-id="{{ profile_owner.id }}">
+        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-size:15px;text-transform:none;letter-spacing:0;">chat</span>
+        Send Message
+      </button>
       <div class="pv-share-wrap">
         <button class="pv-btn-ghost">
           <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-size:15px;text-transform:none;letter-spacing:0;">share</span>
@@ -446,6 +450,19 @@
         {% if is_own_profile %}
         <a href="{% url 'dashboard:settings_profile' %}" style="display:inline-block;margin-top:.5rem;font-size:.78rem;color:#dc2626;text-decoration:none;font-weight:700;">Add social links →</a>
         {% endif %}
+        {% endif %}
+
+        <!-- Send Message button -->
+        {% if user.is_authenticated and profile_owner != user %}
+        <button class="action-btn msg-participant-btn" data-user-id="{{ profile_owner.id }}"
+                style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 16px;
+                       background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;border:none;border-radius:6px;
+                       font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;
+                       text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:opacity .2s;"
+                onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          <span class="material-symbols-outlined" style="font-size:14px;">chat</span>
+          Send Message
+        </button>
         {% endif %}
       </div>
 

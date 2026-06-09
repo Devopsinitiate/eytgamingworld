@@ -5,8 +5,11 @@ A comprehensive web platform for managing local and online gaming leagues, tourn
 ## 🌟 Features
 
 ### Core Modules
-- **Tournament Management**: Single/Double elimination, Swiss, Round-robin brackets
-- **League System**: Seasonal leagues with standings and scheduling
+- **Tournament Engine**: Single/Double elimination, Swiss, Round-robin, Group Stage + Playoffs with pool standings
+- **FGC Game Data**: Character & stage tracking per match (Tekken 8, Guilty Gear Strive, and more)
+- **Live Updates**: WebSocket + SSE bracket updates pushed in real time
+- **Manual Seeding**: Organizer-controlled participant seeding with drag-and-row reordering
+- **Bracket UX**: Seed badges, match cards, player advancing highlights
 - **Coaching Platform**: Book coaching sessions with integrated payments
 - **Team Management**: Create and manage gaming teams
 - **Venue Support**: Local event management with QR check-in
@@ -194,21 +197,24 @@ API endpoints will be available at `/api/` (coming soon with DRF integration)
 - [x] User authentication & profiles
 - [x] Core models
 
-### Phase 2 - Tournament Engine (In Progress)
-- [ ] Bracket generation
-- [ ] Match reporting
-- [ ] Live bracket updates
-- [ ] Check-in system
+### Phase 2 - Tournament Engine ✅
+- [x] Bracket generation (single/double elim, Swiss, RR, group stage)
+- [x] Match reporting with FGC character/stage selection
+- [x] Live bracket updates via WebSocket/SSE
+- [x] Check-in system
+- [x] Manual seeding with drag-and-drop
+- [x] Pool standings with "Advance to Playoffs" button
+- [x] Bracket UX with seed badges and match cards
 
-### Phase 3 - Coaching System
+### Phase 3 - Coaching System (In Progress)
 - [ ] Tutor profiles & calendar
-- [ ] Booking system
-- [ ] Payment integration
-- [ ] Video call integration
+- [x] Booking system
+- [x] Payment integration
+- [x] Video call integration
 
 ### Phase 4 - Polish & Features
 - [ ] Team system
-- [ ] Venue management
+- [x] Venue management
 - [ ] Mobile app (React Native)
 - [ ] Advanced analytics
 
@@ -228,6 +234,10 @@ This project is proprietary. All rights reserved.
 
 - **Developer**: [Your Name]
 - **Organization**: EYTGaming
+
+## 📁 Archived Docs
+
+Historical implementation reports and task-completion notes have been moved to `docs/_archive/`.
 
 ## 📞 Support
 

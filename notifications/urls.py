@@ -20,4 +20,9 @@ urlpatterns = [
     
     # Preferences
     path('preferences/', views.notification_preferences, name='preferences'),
+    
+    # Push notification subscription
+    path('subscribe/', views.subscribe_push, name='subscribe_push'),
+    path('unsubscribe/', views.unsubscribe_push, name='unsubscribe_push'),
+    path('test-push/', views.test_push, name='test_push'),
 ]

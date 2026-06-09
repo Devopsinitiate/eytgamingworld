@@ -107,7 +107,12 @@
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div class="cd-price" style="margin-bottom:.6rem;">${{ coach.hourly_rate }}/hr</div>
-        {% if coach.is_available %}
+        {% if request.user == coach.user %}
+        <div class="cd-verified" style="padding:8px 14px;font-size:.8rem;">
+          <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18;text-transform:none;letter-spacing:0;">person</span>
+          This is you
+        </div>
+        {% elif coach.is_available %}
         <a href="{% url 'coaching:book_session' coach_pk=coach.pk %}" class="cd-book-btn">
           <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px;text-transform:none;letter-spacing:0;">calendar_add_on</span>
           Book Session
@@ -139,7 +144,7 @@
 {% if games %}
 <div class="g-card">
   <h2 class="g-card-title">Games &amp; Expertise</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
+  <div class="grid-auto-phi">
     {% for expertise in games %}
     <div class="g-inner-card">
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
@@ -153,7 +158,7 @@
         <div>
           <div style="color:#fff;font-weight:600;font-size:.9rem;">{{ expertise.game.name }}</div>
           {% if expertise.rank %}
-          <span style="display:inline-block;padding:2px 8px;border-radius:4px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#f87171;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;line-height:1.6;">{{ expertise.get_rank_display }}</span>
+          <span class="text-gold" style="display:inline-block;padding:2px 8px;border-radius:4px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;line-height:1.6;">{{ expertise.get_rank_display }}</span>
           {% endif %}
         </div>
       </div>
@@ -175,7 +180,7 @@
 {% if packages %}
 <div class="g-card">
   <h2 class="g-card-title">Coaching Packages</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
+  <div class="grid-auto-phi">
     {% for package in packages %}
     <div class="g-inner-card" style="display:flex;flex-direction:column;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.5rem;">

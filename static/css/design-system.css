@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════════
+   EYTGaming Design System — v2.0
+   Golden-ratio-based tokens, compact & wide layout
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* ── Golden Ratio Constants ── */
+  --golden: 1.61803398875;
+  --golden-inv: 0.61803398875;
+  --golden-sqrt: 1.27201964951;
+
+  /* ── Brand Colors ── */
+  --eyt-primary: #b91c1c;
+  --eyt-red: #b91c1c;
+  --eyt-red-dark: #991b1b;
+  --eyt-red-light: #dc2626;
+  --eyt-red-hover: #7f1d1d;
+  --eyt-gold: #eab308;
+  --eyt-gold-dark: #ca8a04;
+  --eyt-gold-light: #fde047;
+  --eyt-gold-glow: rgba(234, 179, 8, 0.25);
+
+  --background-dark: #0a0a0a;
+  --surface-dark: #111318;
+  --card-dark: #1f1f1f;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  --eyt-primary-alpha-5: rgba(185, 28, 28, 0.05);
+  --eyt-primary-alpha-10: rgba(185, 28, 28, 0.1);
+  --eyt-primary-alpha-20: rgba(185, 28, 28, 0.2);
+  --eyt-primary-alpha-30: rgba(185, 28, 28, 0.3);
+  --eyt-primary-alpha-40: rgba(185, 28, 28, 0.4);
+  --eyt-primary-alpha-50: rgba(185, 28, 28, 0.5);
+  --eyt-primary-alpha-80: rgba(185, 28, 28, 0.8);
+
+  /* ── Typography (√φ scale, base 13px UI / 12px dense) ── */
+  --font-header: 'Barlow Condensed', sans-serif;
+  --font-body: 'Spline Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+
+  --text-xs: 0.625rem;     /* 10px — labels, badges, meta */
+  --text-sm: 0.75rem;      /* 12px — dense body, nav, buttons */
+  --text-base: 0.8125rem;  /* 13px — body text, reading content */
+  --text-lg: 1.125rem;     /* 18px — section headers (h2) */
+  --text-xl: 1.375rem;     /* 22px — page titles (h1) */
+  --text-2xl: 1.75rem;     /* 28px — hero subheads */
+  --text-3xl: 2.25rem;     /* 36px — hero main */
+
+  /* ── Spacing (Fibonacci-compact) ── */
+  --space-xs: 0.25rem;     /*  4px */
+  --space-sm: 0.5rem;      /*  8px */
+  --space-md: 0.75rem;     /* 12px */
+  --space-lg: 1rem;        /* 16px */
+  --space-xl: 1.5rem;      /* 24px */
+  --space-2xl: 2.5rem;     /* 40px */
+
+  /* ── Layout ── */
+  --layout-max-width: 1720px;
+  --nav-height: 48px;
+  --sidebar-width: 200px;
+  --sidebar-collapsed: 56px;
+}
+
+/* ═══════════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════════ */
+
+html { color-scheme: dark; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--background-dark);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY TOKENS
+   ═══════════════════════════════════════════════ */
+
+h1, h2, h3, h4, h5, h6,
+.gaming-header, .gaming-subheader,
+.nav-label, .nav-section-title {
+  font-family: var(--font-header);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+h1 { font-size: var(--text-xl); font-weight: 900; }
+h2 { font-size: var(--text-lg); font-weight: 800; }
+h3 { font-size: var(--text-base); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════
+   LAYOUT — PAGE WRAP
+   ═══════════════════════════════════════════════ */
+
+.page-wrap {
+  max-width: var(--layout-max-width);
+  width: 95%;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .page-wrap { width: 100%; padding: 0 var(--space-sm); }
+}
+
+/* ═══════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════ */
+
+.nav-main {
+  height: var(--nav-height);
+  background: var(--background-dark);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.25);
+}
+
+.nav-main .nav-link {
+  font-family: var(--font-header);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  text-decoration: none;
+}
+
+.nav-main .nav-link:hover,
+.nav-main .nav-link.active {
+  color: #fff;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+/* ═══════════════════════════════════════════════
+   GOLDEN-RATIO GRIDS
+   ═══════════════════════════════════════════════ */
+
+.grid-golden {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.grid-golden-rev {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 1024px) {
+  .grid-golden { grid-template-columns: 1.618fr 1fr; gap: var(--space-lg); }
+  .grid-golden-rev { grid-template-columns: 1fr 1.618fr; gap: var(--space-lg); }
+}
+
+.grid-auto-phi {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+/* ═══════════════════════════════════════════════
+   ASPECT RATIOS
+   ═══════════════════════════════════════════════ */
+
+.aspect-phi { aspect-ratio: 1.618 / 1; }
+.aspect-phi-port { aspect-ratio: 1 / 1.618; }
+
+/* ═══════════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════════ */
+
+.card-phi {
+  background: var(--surface-dark);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: var(--space-md);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card-phi:hover {
+  border-color: rgba(220, 38, 38, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════
+   GOLD ACCENT UTILITIES
+   ═══════════════════════════════════════════════ */
+
+.text-gold { color: var(--eyt-gold); }
+.border-gold { border-color: var(--eyt-gold); }
+.bg-gold-subtle { background: rgba(234, 179, 8, 0.1); }
+
+.badge-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: var(--text-xs, 0.625rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    color: var(--eyt-gold);
+}
+
+/* ═══════════════════════════════════════════════
+   RED ACCENT UTILITIES
+   ═══════════════════════════════════════════════ */
+
+.text-red-accent { color: var(--eyt-red-light); }
+.border-red-accent { border-color: var(--eyt-red-light); }
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(220, 38, 38, 0.3); border-radius: 2px; }

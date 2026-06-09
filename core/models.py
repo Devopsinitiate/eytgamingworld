@@ -81,6 +81,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     date_of_birth = models.DateField(null=True, blank=True)
     last_login = models.DateTimeField(null=True, blank=True)
+
+    # Chat presence
+    is_online = models.BooleanField(default=False, help_text="Whether user is currently online")
+    last_seen = models.DateTimeField(null=True, blank=True, help_text="When user was last active")
     
     # Contact & Location
     phone_number = models.CharField(max_length=20, blank=True)
@@ -154,6 +158,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     onboarding_completed = models.BooleanField(
         default=False,
         help_text="Whether user has completed onboarding"
+    )
+    two_factor_grace_started_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When the 2FA grace period started (null = not started yet)"
     )
     
     objects = UserManager()

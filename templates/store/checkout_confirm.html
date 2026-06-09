@@ -6,7 +6,7 @@
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
 <style>
-    body { background:#080808; font-family:'Space Grotesk',sans-serif; }
+    body { background:#080808; }
     .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-style:italic; text-transform:uppercase; font-size:clamp(2rem,5vw,3rem); letter-spacing:0.06em; color:#fff; line-height:1; }
     .page-title span { color:#4ade80; }
     .g-card { background:#0d1117; border:1px solid #1f2937; border-radius:0.75rem; overflow:hidden; position:relative; }
@@ -20,11 +20,12 @@
     .btn-ghost { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.875rem 1.25rem; background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:0.5rem; font-size:0.875rem; text-decoration:none; transition:all 0.15s; }
     .btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
     .divider { border:none; border-top:1px solid #111827; margin:1.25rem 0; }
+    .timeline-dot { width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8 max-w-3xl">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
     <div class="text-center mb-8">
         <div class="success-ring">
             <span class="material-symbols-outlined" style="font-size:2.5rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;display:inline-block;line-height:1;white-space:nowrap;">check_circle</span>
@@ -34,16 +35,15 @@
     </div>
 
     <div class="g-card p-6 md:p-8 mb-6">
-        <!-- Order number -->
         <div class="text-center mb-6 pb-6" style="border-bottom:1px solid #111827;">
             <p class="text-gray-500 text-sm mb-1">Order Number</p>
             <p class="order-number">{{ order.order_number }}</p>
             <p class="text-gray-500 text-xs mt-1">{{ order.created_at|date:"F d, Y — g:i A" }}</p>
         </div>
 
-        <!-- Status -->
+        <!-- Status + Timeline -->
         <div class="flex items-center gap-3 mb-6">
-            <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:rgba(6,78,59,0.2);border:1px solid rgba(74,222,128,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <div class="timeline-dot" style="background:rgba(6,78,59,0.2);border:1px solid rgba(74,222,128,0.3);">
                 <span class="material-symbols-outlined" style="font-size:1.25rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">check</span>
             </div>
             <div>
@@ -51,6 +51,17 @@
                 <p class="text-gray-500 text-xs">We'll send you an email when your order ships</p>
             </div>
         </div>
+
+        <!-- Estimated Delivery -->
+        {% if order.created_at %}
+        <div style="background:rgba(30,58,138,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:0.5rem;padding:0.875rem 1rem;display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;">
+            <span class="material-symbols-outlined" style="font-size:1.25rem;color:#93c5fd;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">local_shipping</span>
+            <div>
+                <p class="text-blue-300 font-semibold text-sm">Estimated Delivery</p>
+                <p class="text-gray-400 text-xs">{{ order.created_at|date:"M d, Y"|default:"Processing" }} — <span style="color:#9ca3af;">{{ order.created_at|timeuntil|default:"Today" }}</span></p>
+            </div>
+        </div>
+        {% endif %}
 
         <hr class="divider">
 
@@ -92,7 +103,7 @@
                     </div>
                     <div class="text-right flex-shrink-0">
                         <p class="text-gray-500 text-xs">₦{{ item.unit_price }} each</p>
-                        <p class="gaming-header text-2xl text-electric-red">₦{{ item.total_price }}</p> 
+                        <p class="text-white font-bold" style="font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;color:#DC2626;">₦{{ item.total_price }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -129,10 +140,14 @@
     <!-- Actions -->
     <div class="flex flex-col sm:flex-row gap-3 mb-6">
         <a href="{% url 'store:product_list' %}" class="btn-ghost flex-1">Continue Shopping</a>
-        <a href="#" class="btn-primary flex-1">
-            <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">receipt_long</span>
-            View Order Details
+        <a href="{% url 'dashboard:home' %}" class="btn-ghost flex-1">
+            <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">dashboard</span>
+            Dashboard
         </a>
+        <button class="btn-primary flex-1" onclick="navigator.clipboard.writeText('{{ order.order_number }}').then(function(){var t=document.getElementById('copyToast');t.innerHTML='<span style=\"font-family:Material Symbols Outlined;font-size:18px;font-style:normal;font-weight:normal;font-variation-settings:\\'FILL\\' 1,\\'wght\\' 400,\\'GRAD\\' 0,\\'opsz\\' 24;line-height:1;color:#16a34a;\">check_circle</span> Order number copied!';t.className='pd-toast show';setTimeout(function(){t.className='pd-toast'},2500);})">
+            <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">receipt_long</span>
+            Copy Order #
+        </button>
     </div>
 
     <!-- Email notice -->
@@ -144,4 +159,10 @@
         <p class="text-gray-500 text-xs">We've sent a confirmation email to your registered address with your order details.</p>
     </div>
 </div>
+
+<div class="pd-toast" id="copyToast" style="position:fixed;bottom:2rem;right:2rem;z-index:99999;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:0.85rem 1.25rem;display:flex;align-items:center;gap:10px;font-size:0.9rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:all 0.3s ease;pointer-events:none;transform:translateY(100px);opacity:0;"></div>
+<style>
+.pd-toast.show{transform:translateY(0)!important;opacity:1!important}
+.pd-toast{border-color:#16a34a!important;transition:all 0.3s ease!important}
+</style>
 {% endblock %}

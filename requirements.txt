@@ -96,3 +96,14 @@ wcwidth==0.2.14
 webencodings==0.5.1
 whitenoise==6.11.0
 reportlab
+pywebpush==2.3.0
+py-vapid==1.9.4
+django-otp==1.7.0
+django-two-factor-auth==1.18.1
+qrcode==8.2
+pip-audit
+structlog
+drf-spectacular==0.28.0
+django-filter
+pytest-playwright
+locust

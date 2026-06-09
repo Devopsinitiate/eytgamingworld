@@ -1,0 +1,33 @@
+{% load static %}
+{% if notifications %}
+<div style="max-height:360px;overflow-y:auto;">
+  {% for n in notifications %}
+  <a href="{% if n.action_url %}{{ n.action_url }}{% else %}{% url 'notifications:detail' n.id %}{% endif %}"
+     style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;text-decoration:none;border-bottom:1px solid #1f1f1f;transition:background .15s;{% if not n.read %}background:rgba(220,38,38,.04);{% endif %}"
+     onmouseover="this.style.background='rgba(220,38,38,.08)'" onmouseout="this.style.background='{% if not n.read %}rgba(220,38,38,.04){% else %}transparent{% endif %}'"
+     onclick="markNotifRead('{{ n.id }}')">
+    <div style="width:36px;height:36px;border-radius:50%;background:rgba(220,38,38,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <span class="material-symbols-outlined" style="font-size:1.1rem;color:#f87171;text-transform:none;letter-spacing:0;">
+        {% if n.notification_type == 'tournament' %}emoji_events{% elif n.notification_type == 'coaching' %}school{% elif n.notification_type == 'team' %}groups{% elif n.notification_type == 'payment' %}payments{% elif n.notification_type == 'match' %}sports_esports{% elif n.notification_type == 'achievement' %}stars{% elif n.notification_type == 'security' %}shield{% else %}notifications{% endif %}
+      </span>
+    </div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;{% if not n.read %}padding-right:8px;{% endif %}">{{ n.title }}</div>
+      <div style="color:#9ca3af;font-size:.75rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ n.message|truncatewords:15 }}</div>
+      <div style="color:#6b7280;font-size:.68rem;margin-top:4px;">{{ n.created_at|timesince }} ago</div>
+    </div>
+    {% if not n.read %}
+    <div style="width:8px;height:8px;border-radius:50%;background:#dc2626;flex-shrink:0;margin-top:4px;"></div>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+<div style="padding:10px 16px;border-top:1px solid #1f1f1f;text-align:center;">
+  <a href="{% url 'notifications:list' %}" style="color:#dc2626;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;display:block;">View All</a>
+</div>
+{% else %}
+<div style="padding:2.5rem 1.5rem;text-align:center;">
+  <span class="material-symbols-outlined" style="font-size:2.5rem;color:#4b5563;display:block;margin-bottom:.75rem;text-transform:none;letter-spacing:0;">notifications_none</span>
+  <div style="color:#6b7280;font-size:.85rem;">No notifications yet</div>
+</div>
+{% endif %}

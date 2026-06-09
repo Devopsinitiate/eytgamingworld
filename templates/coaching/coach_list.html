@@ -14,7 +14,7 @@
 <!-- Include Skeleton Loaders -->
 {% include "dashboard/components/skeleton_loaders.html" %}
 
-<div class="max-w-7xl content-loaded">
+<div class="content-loaded">
     <!-- Gaming Header -->
     <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -34,7 +34,7 @@
 
     <!-- Gaming Coach List -->
     {% if coaches %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid-auto-phi">
         {% for coach in coaches %}
             {% include "coaching/components/coach_card_gaming.html" with coach=coach %}
         {% endfor %}

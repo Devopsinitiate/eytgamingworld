@@ -36,9 +36,17 @@
 
 /* Player cards */
 .pd-card { background:#111; border:1px solid #1f1f1f; border-radius:10px;
-           overflow:hidden; text-decoration:none; display:block;
-           transition:border-color .2s, transform .2s; }
+           position:relative; transition:border-color .2s, transform .2s; }
 .pd-card:hover { border-color:#dc2626; transform:translateY(-3px); }
+.pd-card-link { text-decoration:none; display:block; }
+.pd-card-link:hover .pd-card-banner { opacity:.8; }
+.pd-msg-btn { position:absolute; top:8px; right:8px; width:32px; height:32px;
+              border-radius:50%; border:none; background:#dc2626; color:#fff;
+              cursor:pointer; display:flex; align-items:center; justify-content:center;
+              opacity:0; transition:opacity .2s; z-index:5; }
+.pd-card:hover .pd-msg-btn, .pd-msg-btn:focus { opacity:1; }
+.pd-msg-btn:hover { background:#b91c1c; transform:scale(1.1); }
+.pd-msg-btn .material-symbols-outlined { font-size:16px; font-feature-settings:'liga' 1; }
 .pd-card-banner { height:60px; background:linear-gradient(135deg,#1a0000,#0d0d0d);
                   position:relative; overflow:hidden; }
 .pd-card-banner img { width:100%; height:100%; object-fit:cover; opacity:.5; }
@@ -137,63 +145,70 @@
   </div>
 
   {# Grid #}
-  <div class="container mx-auto px-4 py-8">
+  <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
 
     {% if players_page.object_list %}
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">
-      {% for user in players_page.object_list %}
-      {% if user.username %}
-      <a href="{% url 'dashboard:profile_view' username=user.username %}" class="pd-card">
-        {# Banner #}
-        <div class="pd-card-banner">
-          {% if user.banner %}
-          <img src="{{ user.banner.url }}" alt="">
-          {% endif %}
-        </div>
-        {# Avatar #}
-        <div class="pd-card-avatar">
-          {% if user.avatar %}
-          <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}">
-          {% else %}
-          <div class="pd-card-avatar-init">{{ user.get_display_name|first|upper }}</div>
-          {% endif %}
-        </div>
-        <div class="pd-card-body">
-          <div class="pd-card-name">{{ user.get_display_name }}</div>
-          <div class="pd-card-role">
-            {{ user.get_skill_level_display }}
-            {% if user.country %} · {{ user.country }}{% endif %}
-          </div>
-          <div class="pd-card-level">
-            <span style="font-family:'Material Symbols Outlined';font-size:13px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">bolt</span>
-            LVL {{ user.level }}
-          </div>
-          {# Game tags #}
-          {% with gps=user.game_profiles.all %}
-          {% if gps %}
-          <div class="pd-card-games">
-            {% for gp in gps|slice:":3" %}
-            <span class="pd-game-tag">{{ gp.game.name }}</span>
-            {% endfor %}
-            {% if gps.count > 3 %}
-            <span class="pd-game-tag">+{{ gps.count|add:"-3" }}</span>
+      {% for player in players_page.object_list %}
+      {% if player.username %}
+      <div class="pd-card">
+        <a href="{% url 'dashboard:profile_view' username=player.username %}" class="pd-card-link">
+          {# Banner #}
+          <div class="pd-card-banner">
+            {% if player.banner %}
+            <img src="{{ player.banner.url }}" alt="">
             {% endif %}
           </div>
-          {% endif %}
-          {% endwith %}
-          {# Stats #}
-          <div class="pd-card-stats">
-            <div class="pd-stat">
-              <div class="pd-stat-val">{{ user.total_points }}</div>
-              <div class="pd-stat-lbl">Points</div>
+          {# Avatar #}
+          <div class="pd-card-avatar">
+            {% if player.avatar %}
+            <img src="{{ player.avatar.url }}" alt="{{ player.get_display_name }}">
+            {% else %}
+            <div class="pd-card-avatar-init">{{ player.get_display_name|first|upper }}</div>
+            {% endif %}
+          </div>
+          <div class="pd-card-body">
+            <div class="pd-card-name">{{ player.get_display_name }}</div>
+            <div class="pd-card-role">
+              {{ player.get_skill_level_display }}
+              {% if player.country %} · {{ player.country }}{% endif %}
             </div>
-            <div class="pd-stat">
-              <div class="pd-stat-val">{{ user.level }}</div>
-              <div class="pd-stat-lbl">Level</div>
+            <div class="pd-card-level">
+              <span style="font-family:'Material Symbols Outlined';font-size:13px;font-feature-settings:'liga' 1;text-transform:none;letter-spacing:0;">bolt</span>
+              LVL {{ player.level }}
+            </div>
+            {# Game tags #}
+            {% with gps=player.game_profiles.all %}
+            {% if gps %}
+            <div class="pd-card-games">
+              {% for gp in gps|slice:":3" %}
+              <span class="pd-game-tag">{{ gp.game.name }}</span>
+              {% endfor %}
+              {% if gps.count > 3 %}
+              <span class="pd-game-tag">+{{ gps.count|add:"-3" }}</span>
+              {% endif %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            {# Stats #}
+            <div class="pd-card-stats">
+              <div class="pd-stat">
+                <div class="pd-stat-val">{{ player.total_points }}</div>
+                <div class="pd-stat-lbl">Points</div>
+              </div>
+              <div class="pd-stat">
+                <div class="pd-stat-val">{{ player.level }}</div>
+                <div class="pd-stat-lbl">Level</div>
+              </div>
             </div>
           </div>
-        </div>
-      </a>
+        </a>
+        {% if request.user.is_authenticated and player.id != request.user.id %}
+        <button class="pd-msg-btn" data-user-id="{{ player.id }}" aria-label="Message {{ player.get_display_name }}">
+          <span class="material-symbols-outlined">chat</span>
+        </button>
+        {% endif %}
+      </div>
       {% endif %}
       {% endfor %}
     </div>

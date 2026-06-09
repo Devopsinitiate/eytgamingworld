@@ -6,10 +6,9 @@
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
 <style>
-    body { background:#080808; font-family:'Space Grotesk',sans-serif; }
+    body { background:#080808; }
     .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-style:italic; text-transform:uppercase; font-size:clamp(1.75rem,4vw,2.5rem); letter-spacing:0.06em; color:#fff; line-height:1; }
     .page-title span { color:#b91c1c; }
-    /* Steps */
     .step-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:2rem; }
     .step { display:flex; align-items:center; gap:0.75rem; padding:0.875rem 1rem; border-radius:0.625rem; background:#0d1117; border:1px solid #1f2937; }
     .step.active { border-color:rgba(185,28,28,0.5); background:rgba(185,28,28,0.06); }
@@ -19,21 +18,22 @@
     .step.done .step-label { color:#4ade80; }
     .step-sub { font-size:0.7rem; color:#4b5563; }
     .step.active .step-sub { color:#6b7280; }
-    /* Cards */
     .g-card { background:#0d1117; border:1px solid #1f2937; border-radius:0.75rem; overflow:hidden; position:relative; }
     .g-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#b91c1c 0%,rgba(185,28,28,0.2) 100%); }
-    /* Order item */
     .order-item { background:#080808; border:1px solid #111827; border-radius:0.5rem; padding:0.875rem; }
-    /* Buttons */
     .btn-primary { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.875rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:0.06em; text-decoration:none; transition:all 0.15s; cursor:pointer; }
     .btn-primary:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 20px rgba(185,28,28,0.4); color:#fff; }
     .btn-ghost { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.75rem 1.25rem; background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:0.5rem; font-size:0.875rem; text-decoration:none; transition:all 0.15s; }
     .btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
+    .coupon-input { flex:1; background:#080808; border:1px solid #1f2937; border-radius:0.5rem; padding:0.625rem 0.875rem; color:#e5e7eb; font-size:0.875rem; transition:border-color 0.15s; }
+    .coupon-input:focus { outline:none; border-color:#b91c1c; }
+    .btn-coupon { padding:0.625rem 1rem; background:transparent; border:1px solid #1f2937; border-radius:0.5rem; color:#9ca3af; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; }
+    .btn-coupon:hover { border-color:#b91c1c; color:#b91c1c; }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8 max-w-6xl">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
     <div class="mb-6">
         <a href="{% url 'store:cart' %}" class="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-300 text-sm mb-4 transition-colors">
             <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_back</span>
@@ -43,10 +43,9 @@
         <p class="text-gray-500 text-sm mt-1">Review your order and proceed to shipping</p>
     </div>
 
-    <!-- Steps -->
     <div class="step-bar">
         <div class="step active">
-            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#4b5563;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">shopping_cart</span>
+            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#b91c1c;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">shopping_cart</span>
             <div><p class="step-label">Review Cart</p><p class="step-sub">Current step</p></div>
         </div>
         <div class="step">
@@ -83,7 +82,7 @@
                             <p class="text-gray-400 text-sm">Qty: <span class="text-white font-semibold">{{ item.quantity }}</span></p>
                             <div class="text-right">
                                 <p class="text-gray-500 text-xs">${{ item.unit_price }} each</p>
-                                <p class="gaming-header text-2xl text-electric-red">${{ item.total_price }}</p>
+                                <p class="text-white font-bold" style="font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;color:#DC2626;">${{ item.total_price }}</p>
                             </div>
                         </div>
                     </div>
@@ -107,10 +106,20 @@
                     <div style="border-top:1px solid #111827;padding-top:0.75rem;">
                         <div class="flex justify-between text-white font-bold">
                             <span>Subtotal</span>
-                            <span class="gaming-header text-2xl text-electric-red">${{ subtotal }}</span>
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;color:#DC2626;">${{ subtotal }}</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- Coupon Code -->
+                <div style="background:#080808;border:1px solid #111827;border-radius:0.5rem;padding:0.75rem;margin-bottom:1.25rem;">
+                    <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:0.75rem;color:#9ca3af;margin-bottom:0.5rem;">Have a coupon?</p>
+                    <div class="flex gap-2">
+                        <input type="text" class="coupon-input" placeholder="Enter code" id="couponInput">
+                        <button class="btn-coupon" onclick="alert('Coupon functionality coming soon!')">Apply</button>
+                    </div>
+                </div>
+
                 <a href="{% url 'store:checkout_shipping' %}" class="btn-primary">
                     <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">local_shipping</span>
                     Continue to Shipping

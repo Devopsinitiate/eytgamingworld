@@ -1,0 +1,56 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Purchase — {{ package.name }} — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#0A0A0A;}
+.pp-card{background:#111;border:1px solid #1f1f1f;border-radius:8px;max-width:520px;margin:3rem auto;overflow:hidden;}
+.pp-header{background:linear-gradient(135deg,#1a0000,#0d0d0d);padding:2rem;text-align:center;border-bottom:1px solid #1f1f1f;}
+.pp-header .icon{width:56px;height:56px;border-radius:50%;background:rgba(220,38,38,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.8rem;color:#dc2626;}
+.pp-header h1{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:.25rem;}
+.pp-header .coach{color:#9ca3af;font-size:.85rem;}
+.pp-body{padding:1.5rem 2rem;}
+.pp-row{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px solid #1a1a1a;font-size:.875rem;}
+.pp-row:last-child{border-bottom:none;}
+.pp-row .lbl{color:#6b7280;}
+.pp-row .val{color:#fff;font-weight:500;}
+.pp-total{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800;color:#dc2626;text-align:center;padding:.75rem 0;}
+.pp-footer{padding:0 2rem 2rem;}
+.pp-btn{width:100%;padding:12px 18px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid rgba(220,38,38,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.pp-btn:hover{box-shadow:0 0 20px rgba(220,38,38,.5);}
+.pp-btn:disabled{opacity:.5;cursor:not-allowed;}
+.pp-back{display:block;text-align:center;margin-top:1rem;color:#6b7280;font-size:.85rem;text-decoration:none;}
+.pp-back:hover{color:#fff;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pp-card">
+  <div class="pp-header">
+    <div class="icon"><span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;">shopping_cart</span></div>
+    <h1>{{ package.name }}</h1>
+    <p class="coach">by {{ package.coach.user.get_display_name }} · {{ package.game.name }}</p>
+  </div>
+  <div class="pp-body">
+    <div class="pp-row"><span class="lbl">Sessions</span><span class="val">{{ package.number_of_sessions }}</span></div>
+    <div class="pp-row"><span class="lbl">Duration per session</span><span class="val">{{ package.session_duration }} min</span></div>
+    <div class="pp-row"><span class="lbl">Valid for</span><span class="val">{{ package.valid_for_days }} days</span></div>
+    {% if package.description %}
+    <div style="padding:.7rem 0;font-size:.85rem;color:#9ca3af;border-bottom:1px solid #1a1a1a;">{{ package.description }}</div>
+    {% endif %}
+    <div class="pp-total">${{ package.total_price }}</div>
+  </div>
+  <div class="pp-footer">
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="pp-btn">
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;">lock</span>
+        Pay ${{ package.total_price }}
+      </button>
+    </form>
+    <a href="{% url 'coaching:package_list' %}" class="pp-back">← Back to packages</a>
+  </div>
+</div>
+{% endblock %}

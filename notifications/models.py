@@ -2,9 +2,64 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils import timezone
 import uuid
 
 User = get_user_model()
+
+
+class Device(models.Model):
+    """Web Push subscription for a user's device/browser"""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='push_devices',
+        help_text="User who owns this device"
+    )
+
+    # Web Push subscription data (JSON blob from browser)
+    subscription_info = models.JSONField(
+        help_text="Push subscription object from browser (endpoint, keys, etc.)"
+    )
+
+    # Device identification
+    user_agent = models.TextField(
+        blank=True,
+        help_text="Browser user agent string"
+    )
+    device_name = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Friendly device name (e.g., 'Chrome on Windows')"
+    )
+
+    # Status
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this subscription is still valid"
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_used_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Last time push was sent to this device"
+    )
+
+    class Meta:
+        db_table = 'push_devices'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+        ]
+        verbose_name = 'Push Device'
+        verbose_name_plural = 'Push Devices'
+
+    def __str__(self):
+        return f"{self.user.get_display_name()} - {self.device_name or 'Unknown Device'}"
 
 
 class Notification(models.Model):
@@ -200,12 +255,35 @@ class Notification(models.Model):
             logger.error(f"Failed to send email notification: {e}")
     
     def send_push(self):
-        """Send push notification (placeholder for future implementation)"""
-        # TODO: Implement push notification logic
-        from django.utils import timezone
-        self.push_sent = True
-        self.push_sent_at = timezone.now()
-        self.save(update_fields=['push_sent', 'push_sent_at'])
+        """Send push notification to all active devices for the user"""
+        from .services import send_web_push_notification
+
+        devices = Device.objects.filter(user=self.user, is_active=True)
+        if not devices.exists():
+            return
+
+        sent_count = 0
+        for device in devices:
+            success = send_web_push_notification(
+                subscription_info=device.subscription_info,
+                title=self.title,
+                body=self.message,
+                url=self.action_url or '/notifications/',
+                notification_id=str(self.id),
+            )
+            if success:
+                sent_count += 1
+                device.last_used_at = timezone.now()
+                device.save(update_fields=['last_used_at'])
+            else:
+                # Mark device as inactive if push fails (subscription expired)
+                device.is_active = False
+                device.save(update_fields=['is_active'])
+
+        if sent_count > 0:
+            self.push_sent = True
+            self.push_sent_at = timezone.now()
+            self.save(update_fields=['push_sent', 'push_sent_at'])
 
 
 class NotificationPreference(models.Model):

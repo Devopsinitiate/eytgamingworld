@@ -6,7 +6,7 @@
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
 <style>
-    body { background:#080808; font-family:'Space Grotesk',sans-serif; }
+    body { background:#080808; }
     .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-style:italic; text-transform:uppercase; font-size:clamp(2rem,5vw,3rem); letter-spacing:0.06em; color:#fff; line-height:1; }
     .page-title span { color:#b91c1c; }
     .wish-card { background:#0d1117; border:1px solid #1f2937; border-radius:0.75rem; overflow:hidden; position:relative; transition:all 0.2s; }
@@ -18,14 +18,19 @@
     .btn-remove-wish:hover { background:rgba(185,28,28,0.2); border-color:#b91c1c; }
     .btn-add-cart { display:flex; align-items:center; justify-content:center; gap:0.375rem; flex:1; padding:0.625rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.875rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; }
     .btn-add-cart:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 16px rgba(185,28,28,0.4); }
+    .btn-add-cart.added { background:rgba(34,197,94,0.8); }
     .btn-view-wish { display:flex; align-items:center; justify-content:center; padding:0.625rem 0.75rem; background:transparent; border:1px solid #1f2937; border-radius:0.5rem; color:#9ca3af; transition:all 0.15s; text-decoration:none; }
     .btn-view-wish:hover { border-color:#374151; color:#e5e7eb; }
     .empty-card { background:#0d1117; border:1px solid #1f2937; border-radius:0.75rem; padding:5rem 2rem; text-align:center; }
+    .wish-toast{position:fixed;bottom:2rem;right:2rem;z-index:99999;background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:0.85rem 1.25rem;display:flex;align-items:center;gap:10px;font-size:0.9rem;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.3s ease;pointer-events:none}
+    .wish-toast.show{transform:translateY(0);opacity:1}
+    .wish-toast.success{border-color:#16a34a}
+    .wish-toast.error{border-color:#DC2626}
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
     <div class="mb-8">
         <a href="{% url 'store:product_list' %}" class="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-300 text-sm mb-4 transition-colors">
             <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_back</span>
@@ -68,7 +73,7 @@
                 </div>
                 <div class="flex gap-2">
                     {% if item.is_available %}
-                    <button class="btn-add-cart" onclick="addToCart('{{ item.product.id }}')">
+                    <button class="btn-add-cart" onclick="addToCart('{{ item.product.id }}', this)">
                         <span class="material-symbols-outlined" style="font-size:0.875rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">shopping_cart</span>
                         Add to Cart
                     </button>
@@ -94,7 +99,18 @@
     {% endif %}
 </div>
 
+<div class="wish-toast" id="wishToast"></div>
+
 <script>
+    function showWishToast(msg, type) {
+        const t = document.getElementById('wishToast');
+        const icon = type === 'success' ? 'check_circle' : 'error';
+        const color = type === 'success' ? '#16a34a' : '#DC2626';
+        t.innerHTML = '<span style="font-family:\'Material Symbols Outlined\';font-size:18px;font-style:normal;font-weight:normal;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;line-height:1;color:' + color + ';">' + icon + '</span> ' + msg;
+        t.className = 'wish-toast ' + type + ' show';
+        setTimeout(() => { t.className = 'wish-toast'; }, 3000);
+    }
+
     async function removeFromWishlist(productId) {
         try {
             const r = await fetch('{% url "store:remove_from_wishlist" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'}, body:JSON.stringify({product_id:productId}) });
@@ -102,16 +118,22 @@
             if (d.success) {
                 const el = document.querySelector('[data-product-id="' + productId + '"]');
                 if (el) { el.style.cssText += 'opacity:0;transform:scale(0.9);transition:all 0.25s;'; setTimeout(() => { el.remove(); if (d.item_count === 0) location.reload(); }, 250); }
-            } else { alert('Error: ' + d.error); }
-        } catch { alert('An error occurred.'); }
+                showWishToast('Removed from wishlist', 'success');
+            } else { showWishToast(d.error || 'Could not remove item', 'error'); }
+        } catch { showWishToast('An error occurred.', 'error'); }
     }
 
-    async function addToCart(productId) {
+    async function addToCart(productId, btn) {
         try {
             const r = await fetch('{% url "store:add_to_cart" %}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'}, body:JSON.stringify({product_id:productId,quantity:1}) });
             const d = await r.json();
-            if (d.success) { alert('Added to cart!'); } else { alert('Error: ' + d.error); }
-        } catch { alert('An error occurred.'); }
+            if (d.success) {
+                if (btn) { btn.classList.add('added'); btn.innerHTML = 'Added!'; setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = \'<span class="material-symbols-outlined" style="font-size:0.875rem;font-family:Material Symbols Outlined!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:liga 1;font-variation-settings:FILL 0,wght 400,GRAD 0,opsz 20;display:inline-block;line-height:1;white-space:nowrap;">shopping_cart</span> Add to Cart\'; }, 2000); }
+                showWishToast('Added to cart!', 'success');
+                const cartCount = document.getElementById('cartCount');
+                if (cartCount && d.cart_summary) cartCount.textContent = d.cart_summary.item_count;
+            } else { showWishToast(d.error || 'Could not add to cart', 'error'); }
+        } catch { showWishToast('An error occurred.', 'error'); }
     }
 </script>
 {% endblock %}

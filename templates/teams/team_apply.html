@@ -1,0 +1,41 @@
+{% extends "layouts/dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Apply — {{ team.name }} — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<style>
+body{background:#0A0A0A;}
+.ta-wrap{max-width:480px;margin:3rem auto;padding:0 1rem;}
+.ta-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;padding:2rem;text-align:center;border-top:3px solid #3b82f6;}
+.ta-icon{width:64px;height:64px;border-radius:50%;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:#3b82f6;}
+.ta-title{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;margin-bottom:.5rem;}
+.ta-team{font-size:1.1rem;color:#d1d5db;margin-bottom:.5rem;}
+.ta-game{display:inline-block;padding:3px 10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:4px;color:#f87171;font-size:.75rem;font-weight:600;text-transform:uppercase;margin-bottom:1.5rem;}
+.ta-desc{color:#9ca3af;font-size:.85rem;margin-bottom:1.5rem;}
+.ta-btn{width:100%;padding:12px 18px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid rgba(59,130,246,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.ta-btn:hover{box-shadow:0 0 20px rgba(59,130,246,.5);}
+.ta-back{display:block;text-align:center;margin-top:1rem;color:#6b7280;font-size:.85rem;text-decoration:none;}
+.ta-back:hover{color:#fff;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ta-wrap">
+  <div class="ta-card">
+    <div class="ta-icon"><span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;text-transform:none;letter-spacing:0;">handshake</span></div>
+    <h1 class="ta-title">Apply to Join</h1>
+    <p class="ta-team">{{ team.name }}</p>
+    {% if team.game %}<span class="ta-game">{{ team.game.name }}</span>{% endif %}
+    {% if team.description %}<p class="ta-desc">{{ team.description|truncatewords:40 }}</p>{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="ta-btn">
+        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;text-transform:none;letter-spacing:0;">person_add</span>
+        Send Application
+      </button>
+    </form>
+    <a href="{% url 'teams:detail' slug=team.slug %}" class="ta-back">← Back to team</a>
+  </div>
+</div>
+{% endblock %}

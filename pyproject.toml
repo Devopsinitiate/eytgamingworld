@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "eytgaming"
+version = "1.0.0"
+description = "EYTGaming — esports tournament and gaming community platform"
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming
+    "W",  # pycodestyle warnings
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+    "PL", # pylint
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "PLR0913",  # Allow reasonable number of function args
+    "PLR0911",  # Allow many return statements
+    "PLR0912",  # Allow many branches
+    "PLR0915",  # Allow many statements
+]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = [
+    "django.*",
+    "django_ratelimit.*",
+    "allauth.*",
+    "stripe.*",
+    "celery.*",
+    "bleach.*",
+    "crispy_forms.*",
+    "rest_framework.*",
+    "corsheaders.*",
+    "guardian.*",
+    "django_otp.*",
+    "two_factor.*",
+    "qrcode.*",
+    "pywebpush.*",
+    "py_vapid.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+testpaths = [
+    "tests",
+    "accounts/tests.py",
+    "tournaments/tests.py",
+    "tournaments/tests",
+    "coaching/tests.py",
+    "teams/tests.py",
+    "venues/tests.py",
+    "venues/test_*.py",
+    "payments/tests.py",
+    "notifications/tests.py",
+    "dashboard/tests/",
+    "dashboard/test_*.py",
+    "store/tests/",
+    "store/tests.py",
+    "core/tests/",
+    "security/tests.py",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

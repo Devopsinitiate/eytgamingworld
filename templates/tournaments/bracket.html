@@ -5,7 +5,7 @@
 {% block title %}{{ tournament.name }} - Interactive Bracket{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
+
 <link rel="stylesheet" href="{% static 'css/mobile-responsive.css' %}">
 <!-- Dashboard Gaming CSS for consistent styling -->
 <link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
@@ -419,7 +419,7 @@
 <div class="bracket-container">
     <!-- Navigation Header -->
     <div class="bracket-navigation py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Top Row: Back Button and Quick Nav -->
             <div class="flex items-center justify-between mb-4">
                 <a href="{% url 'tournaments:detail' tournament.slug %}"
@@ -489,7 +489,7 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% if not brackets %}
         <!-- No Bracket Yet -->
         <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-white/10 p-12 text-center">
@@ -595,7 +595,7 @@
             </div>
 
             <!-- Bracket Container with Horizontal Scroll -->
-            <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden">
+            <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden bracket-wrapper-wide">
                 <div class="overflow-x-auto">
                     <div id="bracket-container" class="p-6 min-w-max" style="transform-origin: top left;">
                         <div class="flex space-x-8 relative">

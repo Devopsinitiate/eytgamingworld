@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification — {{ notification.title }} — EYTGaming{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+body{background:#0A0A0A;color:#fff;font-family:'Inter',sans-serif;}
+.nd-wrap{max-width:640px;margin:3rem auto;padding:0 1rem;}
+.nd-card{background:#111;border:1px solid #1f1f1f;border-radius:10px;overflow:hidden;}
+.nd-bar{height:3px;background:linear-gradient(90deg,#dc2626,#ef4444,#dc2626);}
+.nd-body{padding:2rem;}
+.nd-meta{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;font-size:.8rem;color:#6b7280;}
+.nd-type{padding:3px 10px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:rgba(220,38,38,.1);color:#f87171;border:1px solid rgba(220,38,38,.2);}
+.nd-priority{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.7rem;font-weight:600;text-transform:uppercase;}
+.nd-priority-high{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.nd-priority-urgent{background:rgba(239,68,68,.25);color:#ef4444;border:1px solid rgba(239,68,68,.4);animation:pulse 2s infinite;}
+.nd-priority-normal{background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2);}
+.nd-priority-low{background:rgba(107,114,128,.1);color:#6b7280;border:1px solid rgba(107,114,128,.2);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.nd-title{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#fff;margin-bottom:.75rem;}
+.nd-msg{color:#d1d5db;font-size:.95rem;line-height:1.7;margin-bottom:1.5rem;white-space:pre-wrap;}
+.nd-time{color:#6b7280;font-size:.82rem;}
+.nd-actions{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #1f1f1f;display:flex;gap:10px;flex-wrap:wrap;}
+.nd-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;cursor:pointer;border:1px solid;transition:all .2s;}
+.nd-btn-primary{background:#dc2626;color:#fff;border-color:#dc2626;}
+.nd-btn-primary:hover{box-shadow:0 0 16px rgba(220,38,38,.4);}
+.nd-btn-outline{background:transparent;color:#9ca3af;border-color:#2a2a2a;}
+.nd-btn-outline:hover{border-color:#dc2626;color:#fff;}
+.nd-btn-danger{background:transparent;color:#ef4444;border-color:rgba(239,68,68,.3);}
+.nd-btn-danger:hover{background:rgba(239,68,68,.1);}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="nd-wrap">
+  <div class="nd-card">
+    <div class="nd-bar"></div>
+    <div class="nd-body">
+      <div class="nd-meta">
+        <span class="nd-type">{{ notification.get_notification_type_display }}</span>
+        <span class="nd-priority nd-priority-{{ notification.priority }}">{{ notification.get_priority_display }}</span>
+        {% if notification.delivery_method %}
+        <span>{{ notification.get_delivery_method_display }}</span>
+        {% endif %}
+      </div>
+
+      <h1 class="nd-title">{{ notification.title }}</h1>
+      <div class="nd-msg">{{ notification.message|linebreaksbr }}</div>
+      <div class="nd-time">{{ notification.created_at|date:"F j, Y g:i A" }}</div>
+
+      <div class="nd-actions">
+        {% if notification.action_url %}
+        <a href="{{ notification.action_url }}" class="nd-btn nd-btn-primary">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;text-transform:none;letter-spacing:0;">open_in_new</span>
+          View Details
+        </a>
+        {% endif %}
+        <button onclick="markAsRead('{{ notification.id }}')" class="nd-btn nd-btn-outline">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;text-transform:none;letter-spacing:0;">done</span>
+          Mark Read
+        </button>
+        <button onclick="deleteNotification('{{ notification.id }}')" class="nd-btn nd-btn-danger">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;text-transform:none;letter-spacing:0;">delete</span>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:1.5rem;">
+    <a href="{% url 'notifications:list' %}" style="color:#6b7280;text-decoration:none;font-size:.85rem;">← Back to Notifications</a>
+  </div>
+</div>
+
+<script>
+function getCSRFToken() {
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+  if (csrf) return csrf.value;
+  const meta = document.querySelector('meta[name=csrf-token]');
+  return meta ? meta.getAttribute('content') : '';
+}
+
+async function markAsRead(id) {
+  await fetch('/notifications/' + id + '/read/', { method: 'POST', headers: {'X-CSRFToken': getCSRFToken(), 'X-Requested-With': 'XMLHttpRequest'} });
+  window.location.reload();
+}
+
+async function deleteNotification(id) {
+  if (!confirm('Delete this notification?')) return;
+  await fetch('/notifications/' + id + '/delete/', { method: 'POST', headers: {'X-CSRFToken': getCSRFToken(), 'X-Requested-With': 'XMLHttpRequest'} });
+  window.location.href = '{% url "notifications:list" %}';
+}
+</script>
+{% endblock %}

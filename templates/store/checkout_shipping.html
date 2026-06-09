@@ -6,7 +6,7 @@
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
 <style>
-    body { background:#080808; font-family:'Space Grotesk',sans-serif; }
+    body { background:#080808; }
     .page-title { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-style:italic; text-transform:uppercase; font-size:clamp(1.75rem,4vw,2.5rem); letter-spacing:0.06em; color:#fff; line-height:1; }
     .page-title span { color:#b91c1c; }
     .step-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:2rem; }
@@ -24,16 +24,19 @@
     .form-input { width:100%; background:#080808; border:1px solid #1f2937; border-radius:0.5rem; padding:0.625rem 0.875rem; color:#e5e7eb; font-size:0.875rem; transition:border-color 0.15s; }
     .form-input:focus { outline:none; border-color:#b91c1c; }
     .form-input.error { border-color:#ef4444; }
+    .form-input option { background:#080808; }
     .error-msg { color:#fca5a5; font-size:0.75rem; margin-top:0.25rem; }
-    .btn-primary { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.875rem 1.5rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; }
-    .btn-primary:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 20px rgba(185,28,28,0.4); }
+    .btn-primary { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.875rem; background:linear-gradient(135deg,#b91c1c 0%,#991b1b 100%); color:#fff; border:none; border-radius:0.5rem; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:1rem; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:all 0.15s; text-decoration:none; }
+    .btn-primary:hover { background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); box-shadow:0 0 20px rgba(185,28,28,0.4); color:#fff; }
     .btn-ghost { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.875rem 1.25rem; background:transparent; color:#9ca3af; border:1px solid #1f2937; border-radius:0.5rem; font-size:0.875rem; text-decoration:none; transition:all 0.15s; }
     .btn-ghost:hover { border-color:#374151; color:#e5e7eb; }
+    .summary-item { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 0; border-bottom:1px solid #111827; }
+    .summary-item:last-child { border-bottom:none; }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8 max-w-3xl">
+<div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
     <div class="mb-6">
         <h1 class="page-title">Shipping <span>Info</span></h1>
         <p class="text-gray-500 text-sm mt-1">Enter your delivery address</p>
@@ -45,7 +48,7 @@
             <div><p class="step-label">Review Cart</p><p class="step-sub">Completed</p></div>
         </div>
         <div class="step active">
-            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">local_shipping</span>
+            <span class="material-symbols-outlined" style="font-size:1.5rem;color:#b91c1c;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;flex-shrink:0;">local_shipping</span>
             <div><p class="step-label">Shipping</p><p class="step-sub">Current step</p></div>
         </div>
         <div class="step">
@@ -54,77 +57,122 @@
         </div>
     </div>
 
-    <div class="g-card p-6 md:p-8">
-        <form method="post" action="{% url 'store:checkout_shipping' %}">
-            {% csrf_token %}
-            <div class="space-y-5">
-                <div>
-                    <label for="shipping_name" class="form-label req">Full Name</label>
-                    <input type="text" id="shipping_name" name="shipping_name" value="{{ shipping_info.shipping_name|default:'' }}" class="form-input {% if errors.shipping_name %}error{% endif %}" required>
-                    {% if errors.shipping_name %}<p class="error-msg">{{ errors.shipping_name }}</p>{% endif %}
-                </div>
-                <div>
-                    <label for="shipping_address_line1" class="form-label req">Address Line 1</label>
-                    <input type="text" id="shipping_address_line1" name="shipping_address_line1" value="{{ shipping_info.shipping_address_line1|default:'' }}" class="form-input {% if errors.shipping_address_line1 %}error{% endif %}" placeholder="Street address, P.O. box" required>
-                    {% if errors.shipping_address_line1 %}<p class="error-msg">{{ errors.shipping_address_line1 }}</p>{% endif %}
-                </div>
-                <div>
-                    <label for="shipping_address_line2" class="form-label">Address Line 2 (Optional)</label>
-                    <input type="text" id="shipping_address_line2" name="shipping_address_line2" value="{{ shipping_info.shipping_address_line2|default:'' }}" class="form-input" placeholder="Apartment, suite, unit…">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label for="shipping_city" class="form-label req">City</label>
-                        <input type="text" id="shipping_city" name="shipping_city" value="{{ shipping_info.shipping_city|default:'' }}" class="form-input {% if errors.shipping_city %}error{% endif %}" required>
-                        {% if errors.shipping_city %}<p class="error-msg">{{ errors.shipping_city }}</p>{% endif %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Form -->
+        <div class="lg:col-span-2">
+            <div class="g-card p-6 md:p-8">
+                <form method="post" action="{% url 'store:checkout_shipping' %}">
+                    {% csrf_token %}
+                    <div class="space-y-5">
+                        <div>
+                            <label for="shipping_name" class="form-label req">Full Name</label>
+                            <input type="text" id="shipping_name" name="shipping_name" value="{{ shipping_info.shipping_name|default:'' }}" class="form-input {% if errors.shipping_name %}error{% endif %}" required>
+                            {% if errors.shipping_name %}<p class="error-msg">{{ errors.shipping_name }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="shipping_address_line1" class="form-label req">Address Line 1</label>
+                            <input type="text" id="shipping_address_line1" name="shipping_address_line1" value="{{ shipping_info.shipping_address_line1|default:'' }}" class="form-input {% if errors.shipping_address_line1 %}error{% endif %}" placeholder="Street address, P.O. box" required>
+                            {% if errors.shipping_address_line1 %}<p class="error-msg">{{ errors.shipping_address_line1 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="shipping_address_line2" class="form-label">Address Line 2 (Optional)</label>
+                            <input type="text" id="shipping_address_line2" name="shipping_address_line2" value="{{ shipping_info.shipping_address_line2|default:'' }}" class="form-input" placeholder="Apartment, suite, unit…">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="shipping_city" class="form-label req">City</label>
+                                <input type="text" id="shipping_city" name="shipping_city" value="{{ shipping_info.shipping_city|default:'' }}" class="form-input {% if errors.shipping_city %}error{% endif %}" required>
+                                {% if errors.shipping_city %}<p class="error-msg">{{ errors.shipping_city }}</p>{% endif %}
+                            </div>
+                            <div>
+                                <label for="shipping_state" class="form-label req">State / Province</label>
+                                <input type="text" id="shipping_state" name="shipping_state" value="{{ shipping_info.shipping_state|default:'' }}" class="form-input {% if errors.shipping_state %}error{% endif %}" required>
+                                {% if errors.shipping_state %}<p class="error-msg">{{ errors.shipping_state }}</p>{% endif %}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="shipping_postal_code" class="form-label req">Postal Code</label>
+                                <input type="text" id="shipping_postal_code" name="shipping_postal_code" value="{{ shipping_info.shipping_postal_code|default:'' }}" class="form-input {% if errors.shipping_postal_code %}error{% endif %}" required>
+                                {% if errors.shipping_postal_code %}<p class="error-msg">{{ errors.shipping_postal_code }}</p>{% endif %}
+                            </div>
+                            <div>
+                                <label for="shipping_country" class="form-label req">Country</label>
+                                <select id="shipping_country" name="shipping_country" class="form-input {% if errors.shipping_country %}error{% endif %}" required>
+                                    <option value="">Select Country</option>
+                                    <option value="Nigeria" {% if shipping_info.shipping_country == "Nigeria" %}selected{% endif %}>Nigeria</option>
+                                    <option value="Ghana" {% if shipping_info.shipping_country == "Ghana" %}selected{% endif %}>Ghana</option>
+                                    <option value="Kenya" {% if shipping_info.shipping_country == "Kenya" %}selected{% endif %}>Kenya</option>
+                                    <option value="South Africa" {% if shipping_info.shipping_country == "South Africa" %}selected{% endif %}>South Africa</option>
+                                    <option value="United States" {% if shipping_info.shipping_country == "United States" %}selected{% endif %}>United States</option>
+                                    <option value="United Kingdom" {% if shipping_info.shipping_country == "United Kingdom" %}selected{% endif %}>United Kingdom</option>
+                                    <option value="Canada" {% if shipping_info.shipping_country == "Canada" %}selected{% endif %}>Canada</option>
+                                    <option value="Other" {% if shipping_info.shipping_country == "Other" %}selected{% endif %}>Other</option>
+                                </select>
+                                {% if errors.shipping_country %}<p class="error-msg">{{ errors.shipping_country }}</p>{% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <label for="shipping_phone" class="form-label req">Phone Number</label>
+                            <input type="tel" id="shipping_phone" name="shipping_phone" value="{{ shipping_info.shipping_phone|default:'' }}" class="form-input {% if errors.shipping_phone %}error{% endif %}" placeholder="+234 XXX XXX XXXX" required>
+                            {% if errors.shipping_phone %}<p class="error-msg">{{ errors.shipping_phone }}</p>{% endif %}
+                            <p class="text-gray-600 text-xs mt-1">We'll use this to contact you about delivery</p>
+                        </div>
                     </div>
-                    <div>
-                        <label for="shipping_state" class="form-label req">State / Province</label>
-                        <input type="text" id="shipping_state" name="shipping_state" value="{{ shipping_info.shipping_state|default:'' }}" class="form-input {% if errors.shipping_state %}error{% endif %}" required>
-                        {% if errors.shipping_state %}<p class="error-msg">{{ errors.shipping_state }}</p>{% endif %}
+                    <div class="flex flex-col sm:flex-row gap-3 mt-8">
+                        <a href="{% url 'store:checkout_initiate' %}" class="btn-ghost flex-1">Back</a>
+                        <button type="submit" class="btn-primary flex-1">
+                            Continue to Payment
+                            <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_forward</span>
+                        </button>
                     </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                        <label for="shipping_postal_code" class="form-label req">Postal Code</label>
-                        <input type="text" id="shipping_postal_code" name="shipping_postal_code" value="{{ shipping_info.shipping_postal_code|default:'' }}" class="form-input {% if errors.shipping_postal_code %}error{% endif %}" required>
-                        {% if errors.shipping_postal_code %}<p class="error-msg">{{ errors.shipping_postal_code }}</p>{% endif %}
+                    <div class="flex items-center justify-center gap-1.5 mt-5 text-gray-600 text-xs">
+                        <span class="material-symbols-outlined" style="font-size:0.875rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">lock</span>
+                        Your information is secure and encrypted
                     </div>
-                    <div>
-                        <label for="shipping_country" class="form-label req">Country</label>
-                        <select id="shipping_country" name="shipping_country" class="form-input {% if errors.shipping_country %}error{% endif %}" required>
-                            <option value="">Select Country</option>
-                            <option value="Nigeria" {% if shipping_info.shipping_country == "Nigeria" %}selected{% endif %}>Nigeria</option>
-                            <option value="Ghana" {% if shipping_info.shipping_country == "Ghana" %}selected{% endif %}>Ghana</option>
-                            <option value="Kenya" {% if shipping_info.shipping_country == "Kenya" %}selected{% endif %}>Kenya</option>
-                            <option value="South Africa" {% if shipping_info.shipping_country == "South Africa" %}selected{% endif %}>South Africa</option>
-                            <option value="United States" {% if shipping_info.shipping_country == "United States" %}selected{% endif %}>United States</option>
-                            <option value="United Kingdom" {% if shipping_info.shipping_country == "United Kingdom" %}selected{% endif %}>United Kingdom</option>
-                            <option value="Canada" {% if shipping_info.shipping_country == "Canada" %}selected{% endif %}>Canada</option>
-                            <option value="Other" {% if shipping_info.shipping_country == "Other" %}selected{% endif %}>Other</option>
-                        </select>
-                        {% if errors.shipping_country %}<p class="error-msg">{{ errors.shipping_country }}</p>{% endif %}
-                    </div>
-                </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="lg:col-span-1">
+            <div class="g-card p-6">
+                <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;font-size:1.25rem;color:#fff;letter-spacing:0.05em;margin-bottom:1.25rem;">Order Summary</h2>
                 <div>
-                    <label for="shipping_phone" class="form-label req">Phone Number</label>
-                    <input type="tel" id="shipping_phone" name="shipping_phone" value="{{ shipping_info.shipping_phone|default:'' }}" class="form-input {% if errors.shipping_phone %}error{% endif %}" placeholder="+234 XXX XXX XXXX" required>
-                    {% if errors.shipping_phone %}<p class="error-msg">{{ errors.shipping_phone }}</p>{% endif %}
-                    <p class="text-gray-600 text-xs mt-1">We'll use this to contact you about delivery</p>
+                    {% for item in cart_items %}
+                    <div class="summary-item">
+                        {% if item.product.images.all %}
+                        <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" style="background:#080808;">
+                        {% else %}
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#080808;">
+                            <span class="material-symbols-outlined" style="font-size:1.25rem;color:#374151;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">image</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white text-sm font-semibold truncate">{{ item.product.name }}</p>
+                            <p class="text-gray-500 text-xs">Qty: {{ item.quantity }}</p>
+                        </div>
+                        <p class="text-white font-semibold text-sm flex-shrink-0">${{ item.total_price }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="border-top:1px solid #111827;padding-top:0.75rem;margin-top:0.5rem;">
+                    <div class="flex justify-between text-gray-400 text-sm mb-2"><span>Subtotal ({{ item_count }})</span><span class="text-white font-semibold">${{ subtotal }}</span></div>
+                    <div class="flex justify-between text-gray-400 text-sm mb-2"><span>Shipping</span><span class="text-gray-500">Calculated next</span></div>
+                    <div class="flex justify-between text-gray-400 text-sm mb-2"><span>Tax</span><span class="text-gray-500">Calculated next</span></div>
+                    <div style="border-top:1px solid #111827;padding-top:0.625rem;">
+                        <div class="flex justify-between text-white font-bold">
+                            <span>Total</span>
+                            <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.35rem;font-weight:800;color:#DC2626;">${{ subtotal }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-3 mt-8">
-                <a href="{% url 'store:checkout_initiate' %}" class="btn-ghost flex-1">Back</a>
-                <button type="submit" class="btn-primary flex-1">
-                    Continue to Payment
-                    <span class="material-symbols-outlined" style="font-size:1rem;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;white-space:nowrap;">arrow_forward</span>
-                </button>
-            </div>
-            <div class="flex items-center justify-center gap-1.5 mt-5 text-gray-600 text-xs">
+            <div class="flex items-center justify-center gap-1.5 mt-4 text-gray-600 text-xs">
                 <span class="material-symbols-outlined" style="font-size:0.875rem;color:#4ade80;font-family:'Material Symbols Outlined'!important;font-style:normal;font-weight:normal;text-transform:none!important;letter-spacing:0!important;font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;display:inline-block;line-height:1;white-space:nowrap;">lock</span>
-                Your information is secure and encrypted
+                Secure Checkout
             </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}

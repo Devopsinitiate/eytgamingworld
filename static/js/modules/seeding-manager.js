@@ -426,7 +426,7 @@ export class SeedingManager {
       
       // POST to API endpoint
       const response = await fetch(
-        `/api/tournaments/${this.tournamentSlug}/participants/seed/`,
+        `/tournaments/${this.tournamentSlug}/api/participants/seed/`,
         {
           method: 'POST',
           headers: {
@@ -486,7 +486,7 @@ export class SeedingManager {
     try {
       // POST to auto-seed API endpoint
       const response = await fetch(
-        `/api/tournaments/${this.tournamentSlug}/participants/auto-seed/`,
+        `/tournaments/${this.tournamentSlug}/api/participants/auto-seed/`,
         {
           method: 'POST',
           headers: {

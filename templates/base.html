@@ -88,31 +88,34 @@
         }
     </script>
 
-    <!-- Brand Colors CSS -->
-    <link rel="stylesheet" href="{% static 'css/brand-colors.css' %}">
+    <!-- Design System — Golden Ratio Tokens (load first) -->
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
 
-    <!-- Brand Consistency Fix - Ensures all pages use correct EYT colors -->
+    <!-- Brand Consistency Fix -->
     <link rel="stylesheet" href="{% static 'css/brand-consistency-fix.css' %}">
 
-    <!-- Breadcrumb Mobile Fix - Ensures breadcrumbs and navigation are clickable on mobile -->
+    <!-- Breadcrumb Mobile Fix -->
     <link rel="stylesheet" href="{% static 'css/breadcrumb-mobile-fix.css' %}">
 
-    <!-- Dashboard Gaming CSS - For mobile navigation on base.html pages -->
+    <!-- Dashboard Gaming CSS -->
     <link rel="stylesheet" href="{% static 'css/dashboard-gaming.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard-mobile.css' %}">
 
     <!-- Landing Page Custom Animations and Effects -->
     <link rel="stylesheet" href="{% static 'css/landing-page.css' %}">
 
-    <!-- Basic CSS -->
+    <!-- Chat Widget Styles -->
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+
+    <!-- Golden Ratio & Wide Layout Utilities -->
+    <link rel="stylesheet" href="{% static 'css/golden-layout.css' %}">
+
+    <!-- Basic Reset -->
     <style>
         body {
-            font-family: 'Spline Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
             background-color: #0a0a0a;
-            /* Pure dark background from brand */
         }
 
-        /* Add glow effect to primary buttons like in the design */
         .bg-primary,
         [class*="bg-primary"] {
             box-shadow: 0 0 20px rgba(185, 28, 28, 0.4);
@@ -129,67 +132,39 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-background-dark text-gray-100">
+<body class="bg-background-dark text-gray-100" data-user-id="{% if user.is_authenticated %}{{ user.id }}{% endif %}">
     {% block navigation %}
     <!-- Navigation -->
-    <nav class="bg-[#0a0a0a] shadow-sm border-b border-[#dc2626]/30 relative z-[100]" style="pointer-events: auto;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{% url 'home' %}" class="flex items-center gap-2">
-                        <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-8 w-8 rounded" style="border:1px solid rgba(220,38,38,.4);box-shadow:0 0 8px rgba(220,38,38,.3);">
-                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;text-shadow:0 0 12px rgba(220,38,38,.4);">EYTGaming</span>
+    <nav class="nav-main relative z-[100]" style="pointer-events: auto;">
+        <div class="page-wrap">
+            <div class="flex justify-between" style="height:var(--nav-height);">
+                <div class="flex items-center gap-2">
+                    <a href="{% url 'home' %}" class="flex items-center gap-2" style="text-decoration:none;">
+                        <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming" class="h-7 w-7 rounded" style="border:1px solid rgba(220,38,38,.4);box-shadow:0 0 8px rgba(220,38,38,.3);">
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fff;text-shadow:0 0 12px rgba(220,38,38,.4);">EYTGaming</span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-1">
-                    <a href="{% url 'tournaments:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">emoji_events</span>
-                        Tournaments
-                    </a>
-                    <a href="{% url 'teams:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">groups</span>
-                        Teams
-                    </a>
-                    <a href="{% url 'coaching:coach_list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">sports_esports</span>
-                        Coaching
-                    </a>
-                    <a href="{% url 'store:product_list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">shopping_bag</span>
-                        Store
-                    </a>
-                    <a href="{% url 'venues:list' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">location_on</span>
-                        Venues
-                    </a>
-                    <a href="{% url 'core:leaderboard' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">leaderboard</span>
-                        Leaderboard
-                    </a>
-                    <a href="{% url 'about' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">info</span>
-                        About
-                    </a>
+                <div class="hidden md:flex items-center gap-0.5">
+                    <a href="{% url 'tournaments:list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">emoji_events</span>Events</a>
+                    <a href="{% url 'teams:list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">groups</span>Teams</a>
+                    <a href="{% url 'core:player_directory' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">group</span>Players</a>
+                    <a href="{% url 'coaching:coach_list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">sports_esports</span>Coaching</a>
+                    <a href="{% url 'store:product_list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">shopping_bag</span>Store</a>
+                    <a href="{% url 'venues:list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">location_on</span>Venues</a>
+                    <a href="{% url 'core:leaderboard' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">leaderboard</span>Rankings</a>
+                    <a href="{% url 'about' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">info</span>About</a>
 
                     {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard:home' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">dashboard</span>
-                        Dashboard
-                    </a>
-                    <a href="{% url 'account_logout' %}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);transition:all .2s;">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;">logout</span>
-                        Logout
+                    <a href="{% url 'dashboard:home' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">dashboard</span>Dashboard</a>
+                    <a href="{% url 'account_logout' %}" class="nav-link" style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:4px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);">
+                        <span class="material-symbols-outlined" style="font-size:14px;">logout</span>Logout
                     </a>
                     {% else %}
-                    <a href="{% url 'account_login' %}" class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1 hover:bg-white/5">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;color:#dc2626;">login</span>
-                        Login
-                    </a>
-                    <a href="{% url 'account_signup' %}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);transition:all .2s;">
-                        <span class="material-symbols-outlined" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:15px;text-transform:none;letter-spacing:0;">person_add</span>
-                        Sign Up
+                    <a href="{% url 'account_login' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">login</span>Login</a>
+                    <a href="{% url 'account_signup' %}" class="nav-link" style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:4px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.4);box-shadow:0 0 12px rgba(220,38,38,.3);">
+                        <span class="material-symbols-outlined" style="font-size:14px;">person_add</span>Sign Up
                     </a>
                     {% endif %}
                 </div>
@@ -236,6 +211,11 @@
                         class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
                         <span class="material-symbols-outlined text-sm inline-block mr-2">groups</span>
                         Teams
+                    </a>
+                    <a href="{% url 'core:player_directory' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">group</span>
+                        Players
                     </a>
                 </div>
 
@@ -376,24 +356,52 @@
     </script>
     {% endblock navigation %}
 
+    <!-- Two-Factor Auth Nag Banner -->
+    {% if requires_2fa and not two_factor_dismissed %}
+    <div class="relative z-[9999]" style="background:linear-gradient(135deg,#1a0a0a,#2d1515);border-bottom:2px solid #DC2626;padding:10px 0;">
+      <div class="page-wrap flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span style="color:#DC2626;font-size:1.1rem;flex-shrink:0;">🔐</span>
+          <div>
+            <span style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Secure your account</span>
+            <span style="color:#9CA3AF;font-size:0.72rem;margin-left:8px;">2FA required for organizer/admin accounts</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <a href="{% url 'accounts:two_factor_setup' %}"
+             style="display:inline-flex;align-items:center;gap:4px;padding:5px 14px;border-radius:4px;background:linear-gradient(135deg,#DC2626,#b91c1c);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;border:1px solid rgba(220,38,38,.5);box-shadow:0 0 14px rgba(220,38,38,.3);transition:all .2s;cursor:pointer;">
+            Set Up Now
+          </a>
+          <form method="post" action="{% url 'accounts:two_factor_dismiss' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit"
+                    style="padding:5px 12px;border-radius:4px;background:transparent;color:#9CA3AF;font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:1px solid rgba(156,163,175,.25);cursor:pointer;transition:all .2s;">
+              Remind Later
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Main Content -->
-    <main>
+    <div class="page-wrap">
         {% block body %}{% endblock %}
-    </main>
+    </div>
 
     <!-- Footer -->
     {% block footer %}
     <footer style="background:#0A0A0A;border-top:1px solid #1f1f1f;position:relative;overflow:hidden;" class="hidden md:block">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#DC2626,transparent);"></div>
-      <div style="max-width:1200px;margin:0 auto;padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#DC2626;">EYTGAMING</span>
-          <span style="color:#374151;font-size:.75rem;">&copy; 2026 All rights reserved.</span>
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#DC2626,transparent);"></div>
+      <div class="page-wrap" style="padding-top:12px;padding-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#DC2626;">EYTGAMING</span>
+          <span style="color:#374151;font-size:.68rem;">&copy; 2026 All rights reserved.</span>
         </div>
-        <div style="display:flex;gap:16px;">
-          <a href="{% url 'privacy' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Privacy</a>
-          <a href="{% url 'terms' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Terms</a>
-          <a href="{% url 'about' %}" style="color:#4b5563;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">About</a>
+        <div style="display:flex;gap:12px;">
+          <a href="{% url 'privacy' %}" style="color:#4b5563;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Privacy</a>
+          <a href="{% url 'terms' %}" style="color:#4b5563;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">Terms</a>
+          <a href="{% url 'about' %}" style="color:#4b5563;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;" onmouseover="this.style.color='#DC2626';" onmouseout="this.style.color='#4b5563';">About</a>
         </div>
       </div>
     </footer>
@@ -404,9 +412,29 @@
     {% include "components/mobile_bottom_nav.html" %}
     {% endblock mobile_nav %}
 
+    <!-- Hidden CSRF token for JS (read by chat-widget.js) -->
+    <form id="csrf-form" method="post" style="display:none;" aria-hidden="true">{% csrf_token %}</form>
+
+    <!-- Chat Widget -->
+    {% if user.is_authenticated %}
+    {% include "components/chat_widget.html" %}
+    {% endif %}
+
+    <!-- VAPID Public Key for Push Notifications -->
+    <script>window.VAPID_PUBLIC_KEY = '{{ vapid_public_key|escapejs }}';</script>
+
     <!-- Landing Page JavaScript -->
     <script src="{% static 'js/landing-animations.js' %}"></script>
     <script src="{% static 'js/video-player.js' %}"></script>
+
+    <!-- Push Notification Registration -->
+    <script src="{% static 'js/push-notifications.js' %}"></script>
+
+    <!-- Alpine.js for reactive UI components (chat, notifications) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+
+    <!-- Chat Widget -->
+    <script src="{% static 'js/chat-widget.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

@@ -19,10 +19,16 @@ class TournamentForm(forms.ModelForm):
             'registration_end', 'requires_approval', 'registration_fee',
             'check_in_start', 'start_datetime', 'estimated_end',
             'prize_pool', 'prize_distribution', 'seeding_method',
-            'best_of', 'banner', 'thumbnail', 'is_public', 'is_featured',
+            'best_of', 'playoffs_format', 'banner', 'thumbnail', 'is_public', 'is_featured',
             'requires_verification', 'skill_requirement', 'stream_url',
             'discord_invite', 'venue'
         ]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        if instance and instance.format != 'group_stage':
+            self.fields.pop('playoffs_format', None)
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'rules': forms.Textarea(attrs={'rows': 6}),
@@ -206,7 +212,7 @@ class TournamentForm(forms.ModelForm):
 
 
 class MatchReportForm(forms.Form):
-    """Form for reporting match scores"""
+    """Form for reporting match scores with DQ support"""
     
     score_p1 = forms.IntegerField(
         min_value=0,
@@ -217,6 +223,11 @@ class MatchReportForm(forms.Form):
         min_value=0,
         label='Player 2 Score',
         widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    is_dq = forms.BooleanField(
+        required=False,
+        label='Mark as Disqualification',
+        help_text="Check if this match resulted in a DQ (the player with score 0 is disqualified)"
     )
     notes = forms.CharField(
         required=False,
@@ -233,6 +244,28 @@ class MatchReportForm(forms.Form):
                 self.fields['score_p1'].label = f'{match.participant1.display_name} Score'
             if match.participant2:
                 self.fields['score_p2'].label = f'{match.participant2.display_name} Score'
+            # Add FGC character/stage selection if game has FGC data
+            if match.tournament and match.tournament.game:
+                from .models import Character, Stage
+                game = match.tournament.game
+                chars = Character.objects.filter(game=game).order_by('order')
+                stages = Stage.objects.filter(game=game)
+                if chars.exists():
+                    self.fields['character_p1'] = forms.ModelChoiceField(
+                        queryset=chars, required=False,
+                        label=f'{match.participant1.display_name} Character',
+                        widget=forms.Select(attrs={'class': 'fgc-select'}),
+                    )
+                    self.fields['character_p2'] = forms.ModelChoiceField(
+                        queryset=chars, required=False,
+                        label=f'{match.participant2.display_name} Character',
+                        widget=forms.Select(attrs={'class': 'fgc-select'}),
+                    )
+                    self.fields['stage'] = forms.ModelChoiceField(
+                        queryset=stages, required=False,
+                        label='Stage',
+                        widget=forms.Select(attrs={'class': 'fgc-select'}),
+                    )
     
     def clean_notes(self):
         """Validate and sanitize match notes."""
@@ -245,8 +278,9 @@ class MatchReportForm(forms.Form):
         cleaned_data = super().clean()
         score_p1 = cleaned_data.get('score_p1')
         score_p2 = cleaned_data.get('score_p2')
+        is_dq = cleaned_data.get('is_dq')
         
-        if score_p1 == score_p2:
+        if not is_dq and score_p1 == score_p2:
             raise forms.ValidationError('Scores cannot be tied. There must be a winner.')
         
         return cleaned_data

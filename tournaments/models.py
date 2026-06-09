@@ -88,6 +88,10 @@ class Tournament(models.Model):
     
     best_of = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(7)],
                                    help_text="Best of X games per match")
+    playoffs_format = models.CharField(
+        max_length=20, choices=FORMAT_CHOICES, default='double_elim',
+        blank=True, help_text="Bracket format for playoffs after group stage"
+    )
     
     # Media
     banner = models.ImageField(upload_to='tournaments/banners/', null=True, blank=True)
@@ -433,9 +437,12 @@ class Tournament(models.Model):
         from django.db import transaction
         from .services import BracketGenerator
         
+        # Auto-check-in all confirmed participants
+        for p in self.participants.filter(status='confirmed', checked_in=False):
+            p.check_in_participant(force=True)
+        
         participants = list(self.participants.filter(checked_in=True, status='confirmed'))
         
-        # Validate we have participants
         if not participants:
             raise ValueError("Cannot generate bracket: No checked-in participants found")
         
@@ -451,10 +458,15 @@ class Tournament(models.Model):
                     return generator.generate_swiss_rounds()
                 elif self.format == 'round_robin':
                     return generator.generate_round_robin()
+                elif self.format == 'group_stage':
+                    pools = generator.generate_group_stage()
+                    # Calculate standings immediately for pools
+                    for pool in pools:
+                        generator.calculate_standings(pool)
+                    return pools
                 else:
                     raise ValueError(f"Unsupported tournament format: {self.format}")
         except ValueError as e:
-            # Re-raise with more context
             raise ValueError(f"Bracket generation failed: {str(e)}")
 
 
@@ -574,6 +586,8 @@ class Bracket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
+    standings_cache = models.JSONField(null=True, blank=True,
+                                        help_text="Cached standings for RR/Swiss brackets")
     
     class Meta:
         db_table = 'tournament_brackets'
@@ -591,6 +605,26 @@ class Bracket(models.Model):
     def total_matches(self):
         """Total number of matches in this bracket"""
         return self.matches.count()
+    
+    def calculate_standings(self):
+        """Calculate and cache standings for RR/Swiss brackets using BracketGenerator."""
+        from .services import BracketGenerator
+        participants = list(self.tournament.participants.filter(
+            matches__bracket=self
+        ).distinct())
+        if not participants:
+            return []
+        gen = BracketGenerator(self.tournament, participants)
+        standings = gen.calculate_standings(self)
+        self.standings_cache = [
+            {'participant_id': str(p.id), 'display_name': p.display_name,
+             'wins': p.matches_won, 'losses': p.matches_lost,
+             'game_wins': p.games_won, 'game_losses': p.games_lost,
+             'placement': p.final_placement}
+            for p in standings
+        ]
+        self.save(update_fields=['standings_cache'])
+        return standings
 
 
 class Match(CacheInvalidationMixin, models.Model):
@@ -612,6 +646,8 @@ class Match(CacheInvalidationMixin, models.Model):
     # Match position
     round_number = models.IntegerField()
     match_number = models.IntegerField(help_text="Position within round")
+    match_letter = models.CharField(max_length=4, blank=True, default='',
+                                     help_text="Alphabetical ID (A, B, C..., GF, GF2)")
     
     # Participants
     participant1 = models.ForeignKey(Participant, on_delete=models.CASCADE, 
@@ -672,52 +708,105 @@ class Match(CacheInvalidationMixin, models.Model):
         """Check if this is a bye match (only one participant)"""
         return (self.participant1 is not None) != (self.participant2 is not None)
     
-    def report_score(self, score_p1, score_p2, reporter=None):
-        """Report match result"""
+    def report_score(self, score_p1, score_p2, reporter=None, is_dq=False):
+        """Report match result with full state machine and bracket reset support."""
         if self.status == 'completed':
             return False, "Match already completed"
-        
+
         if not self.is_ready:
             return False, "Both participants must be assigned"
-        
+
         self.score_p1 = score_p1
         self.score_p2 = score_p2
-        
-        # Determine winner
-        if score_p1 > score_p2:
-            self.winner = self.participant1
-            self.loser = self.participant2
-        elif score_p2 > score_p1:
-            self.winner = self.participant2
-            self.loser = self.participant1
+
+        if is_dq:
+            # DQ: the disqualified player loses regardless of score
+            if self.participant1 == self._get_dq_participant():
+                self.winner = self.participant2
+                self.loser = self.participant1
+            else:
+                self.winner = self.participant1
+                self.loser = self.participant2
+            self.score_p1 = 0 if self.loser == self.participant1 else 1
+            self.score_p2 = 0 if self.loser == self.participant2 else 1
         else:
-            return False, "Scores cannot be tied"
-        
+            if score_p1 > score_p2:
+                self.winner = self.participant1
+                self.loser = self.participant2
+            elif score_p2 > score_p1:
+                self.winner = self.participant2
+                self.loser = self.participant1
+            else:
+                return False, "Scores cannot be tied"
+
         self.status = 'completed'
         self.completed_at = timezone.now()
         self.save()
-        
+
         # Update participant stats
         self.participant1.matches_won += 1 if self.winner == self.participant1 else 0
         self.participant1.matches_lost += 1 if self.loser == self.participant1 else 0
-        self.participant1.games_won += score_p1
-        self.participant1.games_lost += score_p2
+        self.participant1.games_won += self.score_p1
+        self.participant1.games_lost += self.score_p2
         self.participant1.save()
-        
+
         self.participant2.matches_won += 1 if self.winner == self.participant2 else 0
         self.participant2.matches_lost += 1 if self.loser == self.participant2 else 0
-        self.participant2.games_won += score_p2
-        self.participant2.games_lost += score_p1
+        self.participant2.games_won += self.score_p2
+        self.participant2.games_lost += self.score_p1
         self.participant2.save()
-        
-        # Update team statistics if team-based tournament (Requirement 13.3, 13.4)
+
+        # Update team statistics if team-based tournament
         if self.tournament.is_team_based:
             self._update_team_statistics()
-        
+
+        # Bracket Reset Detection (Double Elimination Grand Finals)
+        # If the losers bracket champion wins Set 1 of Grand Finals, activate bracket reset
+        if self.is_grand_finals and not self.bracket_reset:
+            # The winner of this set came from the LOSERS bracket
+            if self.next_match_winner and self.next_match_winner.bracket_reset:
+                # The next match is the bracket reset match — activate it
+                gf_reset = self.next_match_winner
+                # Fill the reset match with the same participants
+                gf_reset.participant1 = self.participant1
+                gf_reset.participant2 = self.participant2
+                gf_reset.status = 'ready'
+                gf_reset.save()
+
         # Progress bracket
         self.progress_bracket()
-        
+
         return True, "Match result recorded"
+
+    def _get_dq_participant(self):
+        """Return the participant who should be DQ'd (the one with score 0, or participant2)."""
+        if self.score_p1 == 0 and self.score_p2 > 0:
+            return self.participant1
+        if self.score_p2 == 0 and self.score_p1 > 0:
+            return self.participant2
+        return None
+
+    def disqualify(self, dq_participant):
+        """Disqualify a participant, awarding the win to their opponent."""
+        if self.status == 'completed':
+            return False, "Match already completed"
+        if not self.is_ready:
+            return False, "Both participants must be assigned"
+
+        if dq_participant == self.participant1:
+            return self.report_score(0, 1, is_dq=True)
+        elif dq_participant == self.participant2:
+            return self.report_score(1, 0, is_dq=True)
+        return False, "Participant not found in this match"
+
+    def call_match(self):
+        """Mark match as CALLABLE (ready to be called to the station)."""
+        if self.status != 'ready':
+            return False, "Match is not ready to be called"
+        self.status = 'in_progress'
+        self.started_at = timezone.now()
+        self.save()
+        return True, "Match called to station"
     
     def _update_team_statistics(self):
         """Update team statistics on match completion (Requirement 13.3, 13.4)"""
@@ -783,9 +872,9 @@ class Match(CacheInvalidationMixin, models.Model):
                 next_w.participant1 = self.winner
             elif not next_w.participant2:
                 next_w.participant2 = self.winner
-            # Fix #4: auto-set ready when both participants are now assigned
             if next_w.participant1 and next_w.participant2 and next_w.status == 'pending':
                 next_w.status = 'ready'
+            self._advance_walkover(next_w, self)
             next_w.save()
 
         if self.next_match_loser and self.loser:
@@ -794,10 +883,40 @@ class Match(CacheInvalidationMixin, models.Model):
                 next_l.participant1 = self.loser
             elif not next_l.participant2:
                 next_l.participant2 = self.loser
-            # Auto-set ready for losers bracket match too
             if next_l.participant1 and next_l.participant2 and next_l.status == 'pending':
                 next_l.status = 'ready'
+            self._advance_walkover(next_l, self)
             next_l.save()
+
+    def _advance_walkover(self, target, source):
+        """
+        Auto-advance a single-participant match as walkover
+        when all other feeder matches are permanently dead (bye/cancelled).
+        """
+        if not (target.participant1 and not target.participant2 and target.status == 'pending'):
+            return
+
+        feeders = list(target.previous_loser_matches.all()) + list(
+            target.previous_winner_matches.all()
+        )
+
+        for feeder in feeders:
+            if feeder.id == source.id:
+                continue
+            if feeder.status == 'cancelled':
+                continue
+            if feeder.status == 'completed' and feeder.is_bye:
+                continue
+            return
+
+        target.status = 'completed'
+        target.winner = target.participant1
+        target.score_p1 = 1
+        target.score_p2 = 0
+        target.save()
+
+        if target.next_match_winner:
+            target.progress_bracket()
 
 
 class MatchDispute(models.Model):
@@ -920,3 +1039,91 @@ class WebhookEvent(models.Model):
 
     def __str__(self):
         return f"WebhookEvent {self.provider} @ {self.received_at.isoformat()}"
+
+
+class FGCGame(models.Model):
+    """Fighting game specific details (extends core.Game with FGC metadata)."""
+
+    game = models.OneToOneField(Game, on_delete=models.CASCADE, related_name='fgc_details')
+    default_best_of = models.IntegerField(default=3, help_text="Default best-of rounds (3 or 5)")
+    supports_character_select = models.BooleanField(default=True)
+    supports_stage_select = models.BooleanField(default=True)
+    max_players_per_match = models.IntegerField(default=2)
+
+    class Meta:
+        db_table = 'fgc_games'
+        verbose_name = 'FGC Game'
+        verbose_name_plural = 'FGC Games'
+
+    def __str__(self):
+        return f"FGC: {self.game.name}"
+
+
+class Character(models.Model):
+    """Fighting game character (e.g. Ryu, Jin, Sol Badguy)."""
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='characters')
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120)
+    portrait = models.ImageField(upload_to='characters/portraits/', null=True, blank=True)
+    icon = models.ImageField(upload_to='characters/icons/', null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0, help_text="Display order on character select")
+
+    class Meta:
+        db_table = 'fgc_characters'
+        ordering = ['game', 'order', 'name']
+        unique_together = ['game', 'slug']
+
+    def __str__(self):
+        return f"{self.game.name} - {self.name}"
+
+
+class Stage(models.Model):
+    """Fighting game stage (e.g. Training Room, Colosseo)."""
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='stages')
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120)
+    image = models.ImageField(upload_to='stages/', null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'fgc_stages'
+        ordering = ['game', 'name']
+        unique_together = ['game', 'slug']
+
+    def __str__(self):
+        return f"{self.game.name} - {self.name}"
+
+
+class GameSlot(models.Model):
+    """Per-game metadata within a match set (start.gg 'games' array equivalent).
+
+    Stores character picks, stage selection, and per-game winner for each
+    individual game within a best-of-N set.
+    """
+
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='game_slots')
+    slot_number = models.IntegerField(help_text="Game number within the set (1-5 for Bo5)")
+
+    # Character picks
+    character_p1 = models.ForeignKey(Character, on_delete=models.SET_NULL,
+                                      null=True, blank=True, related_name='games_as_p1')
+    character_p2 = models.ForeignKey(Character, on_delete=models.SET_NULL,
+                                      null=True, blank=True, related_name='games_as_p2')
+
+    # Stage
+    stage = models.ForeignKey(Stage, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Result
+    winner = models.ForeignKey(Participant, on_delete=models.SET_NULL,
+                                null=True, blank=True, related_name='game_wins')
+
+    class Meta:
+        db_table = 'match_game_slots'
+        ordering = ['match', 'slot_number']
+        unique_together = ['match', 'slot_number']
+
+    def __str__(self):
+        return f"Game {self.slot_number} of Match {self.match.match_letter or self.match.id}"

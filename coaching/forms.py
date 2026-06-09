@@ -125,15 +125,19 @@ class BookingForm(forms.ModelForm):
         help_text='Select a time',
         required=True
     )
+    topics = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'placeholder': 'e.g. Positioning, Combos, Match-ups'
+        }),
+        required=False,
+        help_text='Comma-separated list of topics you want to focus on'
+    )
     
     class Meta:
         model = CoachingSession
         fields = ['game', 'session_type', 'duration_minutes', 'topics', 'student_notes']
         widgets = {
-            'topics': forms.Textarea(attrs={
-                'rows': 3,
-                'placeholder': '["Positioning", "Combos", "Match-ups"]'
-            }),
             'student_notes': forms.Textarea(attrs={
                 'rows': 4,
                 'placeholder': 'What would you like to work on?'
@@ -182,6 +186,26 @@ class BookingForm(forms.ModelForm):
         
         return choices
     
+    def clean_topics(self):
+        value = self.cleaned_data.get('topics')
+        if not value:
+            return []
+        value = value.strip()
+        if not value:
+            return []
+        # Try JSON parse first (in case user typed array format)
+        import json
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return [str(t).strip() for t in parsed if str(t).strip()]
+        except (json.JSONDecodeError, TypeError):
+            pass
+        # Fallback: split comma or newline-separated values
+        import re
+        items = re.split(r'[,\n]+', value)
+        return [t.strip() for t in items if t.strip()]
+
     def clean(self):
         cleaned_data = super().clean()
         time_value = cleaned_data.get('time')
