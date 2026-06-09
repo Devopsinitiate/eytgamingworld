@@ -16,7 +16,7 @@ click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
 crispy-tailwind==1.0.3
-cron_descriptor==2.0.6
+cron_descriptor==2.1.0
 cryptography==46.0.3
 decorator==5.2.1
 defusedxml==0.7.1
