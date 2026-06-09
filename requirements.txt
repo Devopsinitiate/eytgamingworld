@@ -51,7 +51,7 @@ iniconfig==2.3.0
 ipython==9.7.0
 ipython_pygments_lexers==1.1.1
 jedi==0.19.2
-jmespath==1.0.1
+jmespath==1.1.0
 kombu==5.5.4
 libsass==0.23.0
 matplotlib-inline==0.2.1
