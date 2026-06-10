@@ -29,8 +29,9 @@ class DashboardOnboarding {
     getDefaultSteps() {
         return [
             {
-                target: '.sidebar-gaming .flex.items-center.gap-3',
+                target: '.sidebar-gaming .flex.items-center.gap-2',
                 title: 'WELCOME TO EYTGAMING',
+                icon: 'stadia_controller',
                 content: 'This is your command center. Use the sidebar to navigate tournaments, teams, coaching, and more.',
                 position: 'right',
                 highlight: true
@@ -38,13 +39,15 @@ class DashboardOnboarding {
             {
                 findTarget: () => this.findNavByLabel('Dashboard'),
                 title: 'DASHBOARD',
+                icon: 'dashboard',
                 content: 'Your personal dashboard shows key stats, activity feed, quick actions, and recommendations.',
                 position: 'right',
                 highlight: true
             },
             {
-                findTarget: () => this.findNavByLabel('Tournaments'),
-                title: 'TOURNAMENTS',
+                findTarget: () => this.findNavByLabel('Events'),
+                title: 'EVENTS',
+                icon: 'emoji_events',
                 content: 'Browse, register, and track all gaming tournaments. View brackets, standings, and match schedules.',
                 position: 'right',
                 highlight: true
@@ -52,13 +55,15 @@ class DashboardOnboarding {
             {
                 findTarget: () => this.findNavByLabel('Teams'),
                 title: 'TEAMS',
+                icon: 'groups',
                 content: 'Create or join teams, manage members, and compete together in team-based events.',
                 position: 'right',
                 highlight: true
             },
             {
-                findTarget: () => this.findNavByLabel('Coaching'),
-                title: 'COACHING',
+                findTarget: () => this.findNavByLabel('Coach'),
+                title: 'COACH',
+                icon: 'school',
                 content: 'Book one-on-one coaching sessions with expert players to level up your skills.',
                 position: 'right',
                 highlight: true
@@ -66,6 +71,7 @@ class DashboardOnboarding {
             {
                 findTarget: () => this.findNavByLabel('Store'),
                 title: 'STORE',
+                icon: 'shopping_bag',
                 content: 'Shop for gaming gear, merchandise, and digital products to enhance your setup.',
                 position: 'right',
                 highlight: true
@@ -73,6 +79,7 @@ class DashboardOnboarding {
             {
                 target: '.stat-card-gaming.mobile-stat-card:first-child',
                 title: 'YOUR STATS',
+                icon: 'monitoring',
                 content: 'Track your tournament count, win rate, teams, and unread alerts at a glance.',
                 position: 'bottom',
                 highlight: true
@@ -80,6 +87,7 @@ class DashboardOnboarding {
             {
                 target: '#notif-bell-btn',
                 title: 'STAY UPDATED',
+                icon: 'notifications',
                 content: 'Never miss important updates. Check notifications for tournament alerts, team invites, and more.',
                 position: 'bottom',
                 highlight: true
@@ -191,7 +199,10 @@ class DashboardOnboarding {
 
         this.tooltip.innerHTML = `
 <div class="onboarding-progress">${this.config.steps.map((_, i) => `<div class="onboarding-progress-dot ${i === stepIndex ? 'active' : ''}"></div>`).join('')}</div>
-<h3 class="onboarding-title">${step.title}</h3>
+<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+${step.icon ? `<span class="material-symbols-outlined" style="font-size:1.8rem;color:#DC2626;">${step.icon}</span>` : ''}
+<h3 class="onboarding-title" style="margin-bottom:0;">${step.title}</h3>
+</div>
 <p class="onboarding-content">${step.content}</p>
 <div class="onboarding-actions">
 <button class="onboarding-btn onboarding-btn-secondary" id="tour-skip">SKIP TOUR</button>
