@@ -170,8 +170,8 @@ class DashboardOnboarding {
 @keyframes onboardFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes onboardFadeOut{from{opacity:1}to{opacity:0}}
 @keyframes onboardSlideIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-.onboarding-highlight{position:relative;z-index:9999!important;box-shadow:0 0 0 9999px rgba(0,0,0,0.8);border-radius:8px;animation:onboardPulse 2s ease-in-out infinite}
-@keyframes onboardPulse{0%,100%{box-shadow:0 0 0 9999px rgba(0,0,0,0.8),0 0 20px rgba(220,38,38,0.5)}50%{box-shadow:0 0 0 9999px rgba(0,0,0,0.8),0 0 40px rgba(220,38,38,0.8)}}
+.onboarding-highlight{position:relative;z-index:9999!important;box-shadow:0 0 0 9999px rgba(0,0,0,0.8);outline:3px solid #DC2626;outline-offset:2px;border-radius:8px;animation:onboardPulse 2s ease-in-out infinite}
+@keyframes onboardPulse{0%,100%{box-shadow:0 0 0 9999px rgba(0,0,0,0.8),0 0 20px rgba(220,38,38,0.5);outline-color:#DC2626}50%{box-shadow:0 0 0 9999px rgba(0,0,0,0.8),0 0 40px rgba(220,38,38,0.8);outline-color:#ef4444}}
 .onboarding-title{color:#DC2626;font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:900;text-transform:uppercase;font-style:italic;margin-bottom:0.5rem;}
 .onboarding-content{color:#D1D5DB;font-family:'Inter',sans-serif;font-size:0.9rem;line-height:1.6;margin-bottom:1.25rem;}
 .onboarding-progress{display:flex;gap:6px;margin-bottom:0.75rem;}
@@ -189,13 +189,39 @@ class DashboardOnboarding {
         document.head.appendChild(s);
     }
 
+    patchOverflow(target) {
+        this._overflowPatches = [];
+        let el = target.parentElement;
+        while (el && el !== document.body) {
+            const ov = getComputedStyle(el).overflow;
+            if (ov === 'hidden' || ov === 'clip') {
+                this._overflowPatches.push({ el, val: el.style.overflow });
+                el.style.overflow = 'visible';
+            }
+            el = el.parentElement;
+        }
+    }
+
+    restoreOverflow() {
+        if (this._overflowPatches) {
+            for (const p of this._overflowPatches) {
+                p.el.style.overflow = p.val;
+            }
+            this._overflowPatches = null;
+        }
+    }
+
     showStep(stepIndex) {
         const step = this.config.steps[stepIndex];
         if (!step) { this.end(); return; }
         document.querySelectorAll('.onboarding-highlight').forEach(el => el.classList.remove('onboarding-highlight'));
+        this.restoreOverflow();
         const target = this.resolveTarget(step);
         if (!target) { this.showStep(stepIndex + 1); return; }
-        if (step.highlight) target.classList.add('onboarding-highlight');
+        if (step.highlight) {
+            target.classList.add('onboarding-highlight');
+            this.patchOverflow(target);
+        }
 
         this.tooltip.innerHTML = `
 <div class="onboarding-progress">${this.config.steps.map((_, i) => `<div class="onboarding-progress-dot ${i === stepIndex ? 'active' : ''}"></div>`).join('')}</div>
@@ -302,6 +328,7 @@ ${step.icon ? `<span class="material-symbols-outlined" style="font-size:1.8rem;c
             window.removeEventListener('scroll', this._positionHandler, true);
             this._positionHandler = null;
         }
+        this.restoreOverflow();
         document.querySelectorAll('.onboarding-highlight').forEach(el => el.classList.remove('onboarding-highlight'));
         if (this.overlay) { this.overlay.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => this.overlay.remove(), 250); }
         if (this.tooltip) { this.tooltip.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => this.tooltip.remove(), 250); }
