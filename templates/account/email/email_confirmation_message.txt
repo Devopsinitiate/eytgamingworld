@@ -27,5 +27,5 @@ The EYTGaming Team
 
 ---
 EYTGaming - Where Champions Are Made
-{{ current_site.domain }}
+https://eytgaming.pythonanywhere.com
 {% endautoescape %}

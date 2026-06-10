@@ -1,5 +1,6 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.contrib.auth import get_user_model
+from django.conf import settings
 import re
 
 User = get_user_model()
@@ -82,3 +83,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 username = f"{base_username}_{counter}"
         
         return username
+
+    def format_email_subject(self, subject):
+        prefix = settings.ACCOUNT_EMAIL_SUBJECT_PREFIX or 'EYTGaming'
+        return f'[{prefix}] {subject}'
