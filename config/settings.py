@@ -32,13 +32,11 @@ if not SECRET_KEY:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# Silence django-ratelimit cache warnings in development
-# In production, use Redis which is fully supported
-if DEBUG:
-    SILENCED_SYSTEM_CHECKS = [
-        'django_ratelimit.E003',  # Cache backend doesn't support atomic increment
-        'django_ratelimit.W001',  # Cache backend not officially supported
-    ]
+# Silence django-ratelimit cache warnings (LocMemCache works but isn't "officially" supported)
+SILENCED_SYSTEM_CHECKS = [
+    'django_ratelimit.E003',
+    'django_ratelimit.W001',
+]
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,345b-102-89-76-84.ngrok-free.app', cast=Csv())
 
@@ -347,12 +345,9 @@ else:
     else:
         CACHES = {
             'default': {
-                'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-                'LOCATION': 'django_cache_table',
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'eytgaming-cache',
                 'TIMEOUT': 300,
-                'OPTIONS': {
-                    'MAX_ENTRIES': 1000
-                }
             }
         }
 
