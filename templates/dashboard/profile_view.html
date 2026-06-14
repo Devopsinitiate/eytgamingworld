@@ -159,10 +159,10 @@
         <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-size:15px;text-transform:none;letter-spacing:0;">edit</span>
         Edit Profile
       </a>
-      <a href="{% url 'dashboard:profile_export_pdf' %}" class="pv-btn-ghost" title="Download PDF">
+      <button id="exportPdfBtn" class="pv-btn-ghost" title="Download PDF" onclick="window.exportPdf(this)">
         <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-size:15px;text-transform:none;letter-spacing:0;">picture_as_pdf</span>
-        Export PDF
-      </a>
+        <span class="pdf-btn-text">Export PDF</span>
+      </button>
       <a href="{% url 'dashboard:settings_profile' %}" class="pv-btn-primary">
         <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-size:15px;text-transform:none;letter-spacing:0;">settings</span>
         Settings
@@ -478,5 +478,16 @@ document.querySelectorAll('.pv-xp-fill').forEach(function(el){
   var pts = parseInt(el.getAttribute('data-pts')||'0',10);
   el.style.width = (pts % 100) + '%';
 });
+</script>
+<script>
+window.exportPdf = function(btn) {
+  if (btn.dataset.loading === '1') return;
+  btn.dataset.loading = '1';
+  var txt = btn.querySelector('.pdf-btn-text');
+  txt.textContent = 'Generating…';
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+  window.location.href = '{% url "dashboard:profile_export_pdf" %}';
+};
 </script>
 {% endblock %}

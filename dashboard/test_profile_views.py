@@ -249,3 +249,52 @@ class ProfileExportTests(TestCase):
         # Should redirect to login
         assert response.status_code == 302
         assert '/accounts/login/' in response.url
+
+
+class ProfileExportPdfTests(TestCase):
+    """Tests for profile_export_pdf"""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email='test@test.com',
+            username='testuser',
+            password='testpass123'
+        )
+        self.user.first_name = 'John'
+        self.user.last_name = 'Doe'
+        self.user.bio = 'Test bio description'
+        self.user.save()
+
+    def test_export_pdf_requires_login(self):
+        response = self.client.get(reverse('dashboard:profile_export_pdf'))
+        assert response.status_code == 302
+        assert '/accounts/login/' in response.url
+
+    def test_export_pdf_success(self):
+        self.client.login(email='test@test.com', password='testpass123')
+        response = self.client.get(reverse('dashboard:profile_export_pdf'))
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'application/pdf'
+        assert 'attachment' in response['Content-Disposition']
+        assert 'testuser_eytgaming_' in response['Content-Disposition']
+        assert response.has_header('ETag')
+        assert response.has_header('Cache-Control')
+
+    def test_export_pdf_is_valid_pdf(self):
+        self.client.login(email='test@test.com', password='testpass123')
+        response = self.client.get(reverse('dashboard:profile_export_pdf'))
+        raw = response.content
+        assert raw.startswith(b'%PDF')
+        assert b'/Title' in raw
+        assert b'EYTGaming Profile' in raw
+
+    def test_export_pdf_etag_changes_on_new_data(self):
+        self.client.login(email='test@test.com', password='testpass123')
+        r1 = self.client.get(reverse('dashboard:profile_export_pdf'))
+        etag1 = r1['ETag']
+        self.user.bio = 'Updated bio content'
+        self.user.save()
+        r2 = self.client.get(reverse('dashboard:profile_export_pdf'))
+        etag2 = r2['ETag']
+        assert etag1 != etag2

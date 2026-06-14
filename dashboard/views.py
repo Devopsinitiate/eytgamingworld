@@ -16,6 +16,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db import models
+from django_ratelimit.decorators import ratelimit
 from datetime import timedelta
 from PIL import Image
 import io
@@ -729,6 +730,7 @@ def profile_export(request):
 
 
 @login_required
+@ratelimit(key='user', rate='10/h', method='GET', block=True)
 def profile_export_pdf(request):
     """Export user profile data as a styled PDF (gaming card format)."""
     from django.http import HttpResponse
@@ -738,23 +740,30 @@ def profile_export_pdf(request):
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
-    import io
+    from decimal import Decimal
+    import io, hashlib
 
     user = request.user
 
     # ── Gather data ──────────────────────────────────────────────────────────
-    game_profiles = UserGameProfile.objects.filter(user=user).select_related('game')
-    tournament_participations = Participant.objects.filter(
+    game_profiles = list(UserGameProfile.objects.filter(user=user).select_related('game'))
+    tournament_participations = list(Participant.objects.filter(
         user=user, status='confirmed'
-    ).select_related('tournament', 'tournament__game').order_by('-registered_at')[:20]
-    team_memberships = TeamMember.objects.filter(
+    ).select_related('tournament', 'tournament__game').order_by('-registered_at')[:50])
+    team_memberships = list(TeamMember.objects.filter(
         user=user, status='active'
-    ).select_related('team', 'team__game')
-    achievements = UserAchievement.objects.filter(
+    ).select_related('team', 'team__game'))
+    achievements = list(UserAchievement.objects.filter(
         user=user, is_completed=True
-    ).select_related('achievement').order_by('-earned_at')[:20]
+    ).select_related('achievement').order_by('-earned_at')[:50])
+    payments = list(user.payments.order_by('-created_at')[:20])
+    activities = list(user.activities.order_by('-created_at')[:20])
 
-    # ── Colour palette ────────────────────────────────────────────────────────
+    # ── Golden Ratio constants ────────────────────────────────────────────────
+    PHI = 1.61803398875
+    PHI_INV = 0.61803398875
+
+    # ── Colour palette (mapped from design-system.css) ────────────────────────
     BG       = colors.HexColor('#0A0A0A')
     CARD     = colors.HexColor('#111111')
     RED      = colors.HexColor('#DC2626')
@@ -762,223 +771,308 @@ def profile_export_pdf(request):
     WHITE    = colors.white
     GREY     = colors.HexColor('#9ca3af')
     GREY_DIM = colors.HexColor('#374151')
-    GOLD     = colors.HexColor('#facc15')
+    GOLD     = colors.HexColor('#eab308')
+    GOLD_DIM = colors.HexColor('#ca8a04')
 
-    # ── Styles ────────────────────────────────────────────────────────────────
-    styles = getSampleStyleSheet()
+    # ── Typography scale (√φ-based, mapped from design-system.css) ────────────
+    # --text-xs  (10px) → 7pt     labels, badges, meta
+    # --text-sm  (12px) → 9pt     dense body, nav, buttons
+    # --text-base(13px) → 10pt    body text
+    # --text-lg  (18px) → 14pt    section headers (h2)
+    # --text-xl  (22px) → 18pt    page titles (h1)
+    # --text-2xl (28px) → 22pt    hero subheads
 
-    def ps(name, **kw):
-        return ParagraphStyle(name, **kw)
+    def ps(name, font='Helvetica', size=10, color=WHITE, align=None, **kw):
+        if align is None:
+            align = kw.pop('alignment', TA_LEFT)
+        return ParagraphStyle(name, fontName=font, fontSize=size, textColor=color,
+                              alignment=align, **kw)
 
-    S_TITLE   = ps('title',   fontName='Helvetica-Bold', fontSize=22, textColor=WHITE,
-                   spaceAfter=2, alignment=TA_LEFT)
-    S_SUB     = ps('sub',     fontName='Helvetica',      fontSize=10, textColor=GREY,
-                   spaceAfter=6, alignment=TA_LEFT)
-    S_SECTION = ps('section', fontName='Helvetica-Bold', fontSize=9,  textColor=RED,
-                   spaceBefore=14, spaceAfter=4, alignment=TA_LEFT)
-    S_BODY    = ps('body',    fontName='Helvetica',      fontSize=9,  textColor=WHITE,
-                   spaceAfter=3, leading=13)
-    S_LABEL   = ps('label',   fontName='Helvetica-Bold', fontSize=8,  textColor=GREY)
-    S_VALUE   = ps('value',   fontName='Helvetica',      fontSize=9,  textColor=WHITE)
-    S_SMALL   = ps('small',   fontName='Helvetica',      fontSize=8,  textColor=GREY)
-    S_FOOTER  = ps('footer',  fontName='Helvetica',      fontSize=7,  textColor=GREY_DIM,
-                   alignment=TA_CENTER)
+    S_TITLE    = ps('title',   font='Helvetica-Bold', size=18, color=WHITE,
+                    spaceAfter=PHI_INV, alignment=TA_LEFT)
+    S_BRAND    = ps('brand',   font='Helvetica-Bold', size=14, color=GOLD,
+                    alignment=TA_RIGHT)
+    S_SUB      = ps('sub',     font='Helvetica',      size=9,  color=GREY,
+                    spaceAfter=6, alignment=TA_LEFT)
+    S_SECTION  = ps('section', font='Helvetica-Bold', size=10, color=RED,
+                    spaceBefore=14, spaceAfter=4, alignment=TA_LEFT)
+    S_BODY     = ps('body',    font='Helvetica',      size=9,  color=WHITE,
+                    spaceAfter=3, leading=13)
+    S_LABEL    = ps('label',   font='Helvetica-Bold', size=7,  color=GREY)
+    S_VALUE    = ps('value',   font='Helvetica',      size=9,  color=WHITE)
+    S_GOLD_VAL = ps('gold',    font='Helvetica-Bold', size=9,  color=GOLD)
+    S_RED_VAL  = ps('redval',  font='Helvetica-Bold', size=9,  color=RED)
+    S_FOOTER   = ps('footer',  font='Helvetica',      size=7,  color=GREY_DIM,
+                    alignment=TA_CENTER)
+
+    # ── φ-based spacing helpers ───────────────────────────────────────────────
+    def phi_gap(n=1):
+        """Return φ^n rounded to int, used for spacing."""
+        return int(round(PHI ** n))
+
+    # ── Gold label helper ─────────────────────────────────────────────────────
+    def gold_cell(text):
+        return Paragraph(f'<font color="#eab308"><b>{text}</b></font>', S_VALUE)
+
+    def red_cell(text):
+        return Paragraph(f'<font color="#DC2626"><b>{text}</b></font>', S_VALUE)
 
     # ── Table style helper ────────────────────────────────────────────────────
-    def table_style(header=True):
+    def table_style(header=True, gold_cols=None):
         cmds = [
-            ('BACKGROUND',  (0, 0), (-1, 0 if header else -1), CARD),
-            ('TEXTCOLOR',   (0, 0), (-1, -1), WHITE),
-            ('FONTNAME',    (0, 0), (-1, 0),  'Helvetica-Bold'),
-            ('FONTSIZE',    (0, 0), (-1, 0),  8),
-            ('FONTNAME',    (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE',    (0, 1), (-1, -1), 8),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#111111'), colors.HexColor('#161616')]),
-            ('GRID',        (0, 0), (-1, -1), 0.3, GREY_DIM),
-            ('TOPPADDING',  (0, 0), (-1, -1), 4),
-            ('BOTTOMPADDING',(0,0), (-1, -1), 4),
-            ('LEFTPADDING', (0, 0), (-1, -1), 6),
-            ('RIGHTPADDING',(0, 0), (-1, -1), 6),
-            ('LINEBELOW',   (0, 0), (-1, 0),  1, RED),
+            ('BACKGROUND',   (0, 0), (-1, 0 if header else -1), CARD),
+            ('TEXTCOLOR',    (0, 0), (-1, -1), WHITE),
+            ('FONTNAME',     (0, 0), (-1, 0),  'Helvetica-Bold'),
+            ('FONTSIZE',     (0, 0), (-1, 0),  8),
+            ('FONTNAME',     (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE',     (0, 1), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [CARD, colors.HexColor('#161616')]),
+            ('GRID',         (0, 0), (-1, -1), 0.3, GREY_DIM),
+            ('TOPPADDING',   (0, 0), (-1, -1), phi_gap(0)),
+            ('BOTTOMPADDING',(0, 0), (-1, -1), phi_gap(0)),
+            ('LEFTPADDING',  (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('LINEBELOW',    (0, 0), (-1, 0),  1, RED),
         ]
         if header:
             cmds.append(('TEXTCOLOR', (0, 0), (-1, 0), RED))
+        if gold_cols:
+            for col in gold_cols:
+                cmds.append(('TEXTCOLOR', (col, 0), (col, -1), GOLD))
         return TableStyle(cmds)
 
     # ── Build content ─────────────────────────────────────────────────────────
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=18*mm, rightMargin=18*mm,
-        topMargin=18*mm, bottomMargin=18*mm,
-        title=f"{user.get_display_name()} — EYTGaming Profile",
-        author='EYTGaming',
-    )
+    try:
+        buf = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buf, pagesize=A4,
+            leftMargin=18*mm, rightMargin=18*mm,
+            topMargin=18*mm, bottomMargin=18*mm,
+            title=f"{user.get_display_name()} — EYTGaming Profile",
+            author='EYTGaming',
+        )
 
-    W = A4[0] - 36*mm   # usable width
-    story = []
+        W = A4[0] - 36*mm   # usable width
+        story = []
 
-    # ── Header block ──────────────────────────────────────────────────────────
-    header_data = [[
-        Paragraph(f"<b>{user.get_display_name().upper()}</b>", S_TITLE),
-        Paragraph(f"<b>EYTGAMING</b>", ps('brand', fontName='Helvetica-Bold',
-                  fontSize=14, textColor=RED, alignment=TA_RIGHT)),
-    ]]
-    header_tbl = Table(header_data, colWidths=[W*0.7, W*0.3])
-    header_tbl.setStyle(TableStyle([
-        ('BACKGROUND',   (0,0), (-1,-1), BG),
-        ('VALIGN',       (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING',   (0,0), (-1,-1), 0),
-        ('BOTTOMPADDING',(0,0), (-1,-1), 0),
-    ]))
-    story.append(header_tbl)
+        # ── Header block ──────────────────────────────────────────────────────
+        header_data = [[
+            Paragraph(f"<b>{user.get_display_name().upper()}</b>", S_TITLE),
+            Paragraph(f"<b>EYTGAMING</b>", S_BRAND),
+        ]]
+        header_tbl = Table(header_data, colWidths=[W*PHI_INV, W*PHI_INV])
+        header_tbl.setStyle(TableStyle([
+            ('BACKGROUND',   (0,0), (-1,-1), BG),
+            ('VALIGN',       (0,0), (-1,-1), 'MIDDLE'),
+            ('TOPPADDING',   (0,0), (-1,-1), 0),
+            ('BOTTOMPADDING',(0,0), (-1,-1), 0),
+        ]))
+        story.append(header_tbl)
 
-    role_str = user.get_role_display() if hasattr(user, 'get_role_display') else user.role.title()
-    story.append(Paragraph(
-        f"@{user.username}  ·  {role_str}  ·  Level {user.level}  ·  {user.total_points} pts",
-        S_SUB
-    ))
-    story.append(HRFlowable(width=W, thickness=1, color=RED, spaceAfter=8))
+        role_str = user.get_role_display() if hasattr(user, 'get_role_display') else user.role.title()
+        story.append(Paragraph(
+            f"@{user.username}  ·  {role_str}  ·  Level {user.level}  ·  {user.total_points} pts",
+            S_SUB
+        ))
+        story.append(HRFlowable(width=W, thickness=1, color=RED, spaceAfter=phi_gap(2)))
 
-    # ── Bio ───────────────────────────────────────────────────────────────────
-    if user.bio:
-        story.append(Paragraph("BIO", S_SECTION))
-        story.append(Paragraph(user.bio, S_BODY))
+        # ── Bio ───────────────────────────────────────────────────────────────
+        if user.bio:
+            story.append(Paragraph("BIO", S_SECTION))
+            story.append(Paragraph(user.bio, S_BODY))
 
-    # ── Profile info grid ─────────────────────────────────────────────────────
-    story.append(Paragraph("PLAYER INFO", S_SECTION))
-    info_rows = []
-    fields = [
-        ("Full Name",    user.get_full_name() or "—"),
-        ("Email",        user.email),
-        ("Country",      user.country or "—"),
-        ("City",         user.city or "—"),
-        ("Skill Level",  user.get_skill_level_display() if hasattr(user, 'get_skill_level_display') else user.skill_level.title()),
-        ("Member Since", user.date_joined.strftime("%B %d, %Y") if user.date_joined else "—"),
-        ("Discord",      user.discord_username or "—"),
-        ("Steam ID",     user.steam_id or "—"),
-        ("Twitch",       user.twitch_username or "—"),
-    ]
-    # 2-column layout
-    for i in range(0, len(fields), 2):
-        left  = fields[i]
-        right = fields[i+1] if i+1 < len(fields) else ("", "")
-        info_rows.append([
-            Paragraph(left[0],  S_LABEL), Paragraph(left[1],  S_VALUE),
-            Paragraph(right[0], S_LABEL), Paragraph(right[1], S_VALUE),
-        ])
-    info_tbl = Table(info_rows, colWidths=[W*0.15, W*0.35, W*0.15, W*0.35])
-    info_tbl.setStyle(TableStyle([
-        ('BACKGROUND',   (0,0), (-1,-1), CARD),
-        ('ROWBACKGROUNDS',(0,0),(-1,-1), [CARD, colors.HexColor('#161616')]),
-        ('GRID',         (0,0), (-1,-1), 0.3, GREY_DIM),
-        ('TOPPADDING',   (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING',(0,0), (-1,-1), 4),
-        ('LEFTPADDING',  (0,0), (-1,-1), 6),
-        ('RIGHTPADDING', (0,0), (-1,-1), 6),
-    ]))
-    story.append(info_tbl)
-
-    # ── Game profiles ─────────────────────────────────────────────────────────
-    if game_profiles.exists():
-        story.append(Paragraph("GAME PROFILES / TRADEMARKS", S_SECTION))
-        gp_rows = [["Game", "IGN", "Rank", "MMR", "W/L", "Win %", "Tournaments"]]
-        for gp in game_profiles:
-            total = gp.matches_won + gp.matches_lost
-            win_pct = f"{round(gp.matches_won/total*100)}%" if total else "—"
-            gp_rows.append([
-                gp.game.name,
-                gp.in_game_name or "—",
-                gp.rank or "—",
-                str(gp.mmr),
-                f"{gp.matches_won}W / {gp.matches_lost}L",
-                win_pct,
-                str(gp.tournaments_won),
+        # ── Profile info grid ─────────────────────────────────────────────────
+        story.append(Paragraph("PLAYER INFO", S_SECTION))
+        info_rows = []
+        fields = [
+            ("Full Name",    user.get_full_name() or "—"),
+            ("Email",        user.email),
+            ("Country",      user.country or "—"),
+            ("City",         user.city or "—"),
+            ("Skill Level",  (user.get_skill_level_display() if hasattr(user, 'get_skill_level_display') else user.skill_level.title()) if user.skill_level else "—"),
+            ("Member Since", user.date_joined.strftime("%B %d, %Y") if user.date_joined else "—"),
+            ("Discord",      user.discord_username or "—"),
+            ("Steam ID",     user.steam_id or "—"),
+            ("Twitch",       user.twitch_username or "—"),
+        ]
+        for i in range(0, len(fields), 2):
+            left  = fields[i]
+            right = fields[i+1] if i+1 < len(fields) else ("", "")
+            info_rows.append([
+                Paragraph(left[0],  S_LABEL), Paragraph(left[1],  S_VALUE),
+                Paragraph(right[0], S_LABEL), Paragraph(right[1], S_VALUE),
             ])
-        gp_tbl = Table(gp_rows, colWidths=[W*0.18, W*0.16, W*0.12, W*0.1, W*0.14, W*0.1, W*0.2])
-        gp_tbl.setStyle(table_style())
-        story.append(gp_tbl)
+        info_tbl = Table(info_rows, colWidths=[W*0.15, W*0.35, W*0.15, W*0.35])
+        info_tbl.setStyle(TableStyle([
+            ('BACKGROUND',   (0,0), (-1,-1), CARD),
+            ('ROWBACKGROUNDS',(0,0),(-1,-1), [CARD, colors.HexColor('#161616')]),
+            ('GRID',         (0,0), (-1,-1), 0.3, GREY_DIM),
+            ('TOPPADDING',   (0,0), (-1,-1), phi_gap(0)),
+            ('BOTTOMPADDING',(0,0), (-1,-1), phi_gap(0)),
+            ('LEFTPADDING',  (0,0), (-1,-1), 6),
+            ('RIGHTPADDING', (0,0), (-1,-1), 6),
+        ]))
+        story.append(info_tbl)
 
-    # ── Tournament history ────────────────────────────────────────────────────
-    if tournament_participations.exists():
-        story.append(Paragraph("TOURNAMENT HISTORY", S_SECTION))
-        t_rows = [["Tournament", "Game", "Format", "Placement", "W", "L", "Prize"]]
-        for p in tournament_participations:
-            t = p.tournament
-            placement = f"#{p.final_placement}" if p.final_placement else "—"
-            prize = f"₦{p.prize_won:,.0f}" if p.prize_won else "—"
-            t_rows.append([
-                t.name[:28],
-                t.game.name[:14],
-                t.get_format_display(),
-                placement,
-                str(p.matches_won),
-                str(p.matches_lost),
-                prize,
-            ])
-        t_tbl = Table(t_rows, colWidths=[W*0.26, W*0.14, W*0.14, W*0.1, W*0.06, W*0.06, W*0.14])
-        t_tbl.setStyle(table_style())
-        story.append(t_tbl)
+        # ── Game profiles ─────────────────────────────────────────────────────
+        if game_profiles:
+            story.append(Paragraph("GAME PROFILES", S_SECTION))
+            gp_rows = [["Game", "IGN", "Rank", "MMR", "W/L", "Win %", "Tournaments"]]
+            for gp in game_profiles:
+                total = gp.matches_won + gp.matches_lost
+                win_pct = f"{round(gp.matches_won/total*100)}%" if total else "—"
+                gp_rows.append([
+                    gp.game.name,
+                    gp.in_game_name or "—",
+                    gp.rank or "—",
+                    str(gp.mmr),
+                    f"{gp.matches_won}W / {gp.matches_lost}L",
+                    win_pct,
+                    str(gp.tournaments_won),
+                ])
+            gp_tbl = Table(gp_rows, colWidths=[W*0.18, W*0.16, W*0.12, W*0.1, W*0.14, W*0.1, W*0.2])
+            gp_tbl.setStyle(table_style(gold_cols=[3]))
+            story.append(gp_tbl)
 
-    # ── Team memberships ──────────────────────────────────────────────────────
-    if team_memberships.exists():
-        story.append(Paragraph("TEAM MEMBERSHIPS", S_SECTION))
-        tm_rows = [["Team", "Game", "Role", "Joined"]]
-        for m in team_memberships:
-            tm_rows.append([
-                m.team.name,
-                m.team.game.name if m.team.game else "—",
-                m.get_role_display() if hasattr(m, 'get_role_display') else m.role.title(),
-                m.joined_at.strftime("%b %Y") if hasattr(m, 'joined_at') and m.joined_at else "—",
-            ])
-        tm_tbl = Table(tm_rows, colWidths=[W*0.35, W*0.25, W*0.2, W*0.2])
-        tm_tbl.setStyle(table_style())
-        story.append(tm_tbl)
+        # ── Tournament history ────────────────────────────────────────────────
+        if tournament_participations:
+            story.append(Paragraph("TOURNAMENT HISTORY", S_SECTION))
+            t_rows = [["Tournament", "Game", "Format", "Placement", "W", "L", "Prize"]]
+            for p in tournament_participations:
+                t = p.tournament
+                placement = f"#{p.final_placement}" if p.final_placement else "—"
+                prize = f"₦{p.prize_won:,.0f}" if p.prize_won else "—"
+                t_rows.append([
+                    t.name[:28],
+                    t.game.name[:14] if t.game else "—",
+                    t.get_format_display() if hasattr(t, 'get_format_display') else "—",
+                    placement,
+                    str(p.matches_won) if hasattr(p, 'matches_won') and p.matches_won else "—",
+                    str(p.matches_lost) if hasattr(p, 'matches_lost') and p.matches_lost else "—",
+                    prize,
+                ])
+            t_tbl = Table(t_rows, colWidths=[W*0.26, W*0.14, W*0.14, W*0.1, W*0.06, W*0.06, W*0.14])
+            t_tbl.setStyle(table_style(gold_cols=[6]))
+            story.append(t_tbl)
 
-    # ── Achievements ──────────────────────────────────────────────────────────
-    if achievements.exists():
-        story.append(Paragraph("ACHIEVEMENTS", S_SECTION))
-        ach_rows = [["Achievement", "Type", "Rarity", "Points", "Earned"]]
-        for ua in achievements:
-            a = ua.achievement
-            earned = ua.earned_at.strftime("%b %d, %Y") if ua.earned_at else "—"
-            ach_rows.append([
-                a.name,
-                a.get_achievement_type_display(),
-                a.get_rarity_display(),
-                str(a.points_reward),
-                earned,
-            ])
-        ach_tbl = Table(ach_rows, colWidths=[W*0.35, W*0.15, W*0.15, W*0.1, W*0.25])
-        ach_tbl.setStyle(table_style())
-        story.append(ach_tbl)
+        # ── Team memberships ──────────────────────────────────────────────────
+        if team_memberships:
+            story.append(Paragraph("TEAM MEMBERSHIPS", S_SECTION))
+            tm_rows = [["Team", "Game", "Role", "Joined"]]
+            for m in team_memberships:
+                tm_rows.append([
+                    m.team.name,
+                    m.team.game.name if m.team.game else "—",
+                    m.get_role_display() if hasattr(m, 'get_role_display') else m.role.title(),
+                    m.joined_at.strftime("%b %Y") if hasattr(m, 'joined_at') and m.joined_at else "—",
+                ])
+            tm_tbl = Table(tm_rows, colWidths=[W*0.35, W*0.25, W*0.2, W*0.2])
+            tm_tbl.setStyle(table_style())
+            story.append(tm_tbl)
 
-    # ── Footer ────────────────────────────────────────────────────────────────
-    story.append(Spacer(1, 12))
-    story.append(HRFlowable(width=W, thickness=0.5, color=GREY_DIM))
-    story.append(Spacer(1, 4))
-    story.append(Paragraph(
-        f"Generated by EYTGaming  ·  {timezone.now().strftime('%B %d, %Y at %H:%M UTC')}  ·  eytgaming.com",
-        S_FOOTER
-    ))
+        # ── Payment History ───────────────────────────────────────────────────
+        if payments:
+            story.append(Paragraph("PAYMENT HISTORY", S_SECTION))
+            pay_rows = [["Date", "Type", "Description", "Amount", "Status"]]
+            for pay in payments:
+                amt = f"₦{pay.amount:,.0f}" if pay.amount else "—"
+                pay_rows.append([
+                    pay.created_at.strftime("%b %d, %Y") if pay.created_at else "—",
+                    pay.get_payment_type_display() if hasattr(pay, 'get_payment_type_display') else pay.payment_type,
+                    pay.description[:40] if pay.description else "—",
+                    amt,
+                    pay.get_status_display() if hasattr(pay, 'get_status_display') else pay.status,
+                ])
+            pay_tbl = Table(pay_rows, colWidths=[W*0.18, W*0.18, W*0.32, W*0.14, W*0.18])
+            pay_tbl.setStyle(table_style(gold_cols=[3]))
+            story.append(pay_tbl)
 
-    # ── Page background callback ──────────────────────────────────────────────
-    def draw_bg(canvas, doc):
-        canvas.saveState()
-        canvas.setFillColor(BG)
-        canvas.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
-        # Red top bar
-        canvas.setFillColor(RED)
-        canvas.rect(0, A4[1]-4, A4[0], 4, fill=1, stroke=0)
-        canvas.restoreState()
+        # ── Activity History ────────────────────────────────────────────────────
+        if activities:
+            story.append(Paragraph("RECENT ACTIVITY", S_SECTION))
+            act_rows = [["Date", "Type", "Details"]]
+            for act in activities:
+                details = ""
+                if act.data:
+                    if isinstance(act.data, dict):
+                        details = " · ".join(f"{k}: {v}" for k, v in list(act.data.items())[:3])
+                act_rows.append([
+                    act.created_at.strftime("%b %d") if act.created_at else "—",
+                    act.get_activity_type_display() if hasattr(act, 'get_activity_type_display') else act.activity_type,
+                    details[:60] if details else "—",
+                ])
+            act_tbl = Table(act_rows, colWidths=[W*0.18, W*0.28, W*0.54])
+            act_tbl.setStyle(table_style())
+            story.append(act_tbl)
 
-    doc.build(story, onFirstPage=draw_bg, onLaterPages=draw_bg)
+        # ── Achievements ──────────────────────────────────────────────────────
+        if achievements:
+            story.append(Paragraph("ACHIEVEMENTS", S_SECTION))
+            ach_rows = [["Achievement", "Type", "Rarity", "Points", "Earned"]]
+            for ua in achievements:
+                a = ua.achievement
+                earned = ua.earned_at.strftime("%b %d, %Y") if ua.earned_at else "—"
+                # Gold accent on Legendary rarity
+                rarity_display = a.get_rarity_display()
+                if rarity_display.lower() == 'legendary':
+                    rarity_cell = gold_cell(rarity_display)
+                else:
+                    rarity_cell = Paragraph(rarity_display, S_VALUE)
+                ach_rows.append([
+                    a.name,
+                    a.get_achievement_type_display(),
+                    rarity_cell,
+                    str(a.points_reward),
+                    earned,
+                ])
+            ach_tbl = Table(ach_rows, colWidths=[W*0.30, W*0.15, W*0.15, W*0.10, W*0.30])
+            ach_tbl.setStyle(table_style(gold_cols=[2]))
+            story.append(ach_tbl)
 
-    buf.seek(0)
-    filename = f"{user.username}_eytgaming_{timezone.now().strftime('%Y%m%d')}.pdf"
-    response = HttpResponse(buf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return response
+        # ── Footer ────────────────────────────────────────────────────────────
+        story.append(Spacer(1, phi_gap(3)))
+        story.append(HRFlowable(width=W, thickness=0.5, color=GREY_DIM))
+        story.append(Spacer(1, phi_gap(0)))
+        story.append(Paragraph(
+            f"Generated by EYTGaming  ·  {timezone.now().strftime('%B %d, %Y at %H:%M UTC')}  ·  eytgaming.com",
+            S_FOOTER
+        ))
+
+        # ── Page background callback ──────────────────────────────────────────
+        def draw_bg(canvas, doc):
+            canvas.saveState()
+            canvas.setFillColor(BG)
+            canvas.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
+            # Red top bar
+            canvas.setFillColor(RED)
+            canvas.rect(0, A4[1]-3, A4[0], 3, fill=1, stroke=0)
+            # Gold accent stripe below red bar
+            canvas.setFillColor(GOLD)
+            canvas.rect(0, A4[1]-3.5, A4[0], 0.5, fill=1, stroke=0)
+            canvas.restoreState()
+
+        doc.build(story, onFirstPage=draw_bg, onLaterPages=draw_bg)
+
+        buf.seek(0)
+
+        # ── ETag from content hash + cache headers ────────────────────────────
+        pdf_bytes = buf.getvalue()
+        etag = hashlib.md5(pdf_bytes).hexdigest()
+
+        filename = f"{user.username}_eytgaming_{timezone.now().strftime('%Y%m%d')}.pdf"
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['ETag'] = f'W/"{etag}"'
+        response['Cache-Control'] = 'private, max-age=300'
+        return response
+
+    except Exception as e:
+        messages.error(
+            request,
+            "Could not generate PDF. Please try again later. "
+            "If the problem persists, contact support."
+        )
+        return redirect('dashboard:profile_view', username=user.username)
 
 
 @login_required
