@@ -167,6 +167,16 @@ class DashboardOnboarding {
         this.tooltip.setAttribute('aria-live', 'polite');
         this.tooltip.style.cssText = 'position:fixed;z-index:199999;background:linear-gradient(135deg,#0A0A0A 0%,#1F1F1F 100%);border:2px solid #DC2626;border-radius:10px;padding:1.25rem;max-width:380px;box-shadow:0 0 30px rgba(220,38,38,0.4),0 20px 40px rgba(0,0,0,0.5);visibility:hidden;';
 
+        this.tooltip.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            if (action === 'skip') this.end();
+            else if (action === 'prev') this.showStep(this.currentStep - 1);
+            else if (action === 'next') this.showStep(this.currentStep + 1);
+            else if (action === 'finish') this.complete();
+        });
+
         document.body.appendChild(this.overlay);
         document.body.appendChild(this.tooltip);
         this.injectStyles();
@@ -240,16 +250,6 @@ ${step.icon ? `<span class="material-symbols-outlined" style="font-size:1.8rem;c
     </div>
 </div>`;
         this.tooltip.style.visibility = 'hidden';
-
-        this.tooltip.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = e.currentTarget.dataset.action;
-                if (action === 'skip') this.end();
-                else if (action === 'prev') this.showStep(stepIndex - 1);
-                else if (action === 'next') this.showStep(stepIndex + 1);
-                else if (action === 'finish') this.complete();
-            });
-        });
 
         this.addTooltipArrow(target, step.position || 'right');
 
