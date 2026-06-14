@@ -392,8 +392,8 @@ ${step.icon ? `<span class="material-symbols-outlined" style="font-size:1.8rem;c
         }
         document.querySelectorAll('.onboarding-highlight').forEach(el => el.classList.remove('onboarding-highlight'));
         document.querySelectorAll('.onboarding-tooltip-arrow').forEach(el => el.remove());
-        if (this.overlay) { this.overlay.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => this.overlay.remove(), 250); this.overlay = null; }
-        if (this.tooltip) { this.tooltip.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => this.tooltip.remove(), 250); this.tooltip = null; }
+        if (this.overlay) { const o = this.overlay; o.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => o.remove(), 250); this.overlay = null; }
+        if (this.tooltip) { const t = this.tooltip; t.style.animation = 'onboardFadeOut 0.25s ease'; setTimeout(() => t.remove(), 250); this.tooltip = null; }
     }
 
     reset() { localStorage.removeItem(this.config.storageKey); }
