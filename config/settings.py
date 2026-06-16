@@ -107,6 +107,8 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'dashboard.apps.DashboardConfig',
     'store.apps.StoreConfig',
+    'celebrity.apps.CelebrityConfig',
+    'sponsorships.apps.SponsorshipsConfig',
     'chat',
     'integrations',
     'health',

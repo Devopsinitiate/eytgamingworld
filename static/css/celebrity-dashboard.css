@@ -1,0 +1,362 @@
+/* ── Celebrity Dashboard – Gold-on-Black Theme ──────────────────────────── */
+:root {
+  --celeb-bg-primary: #0a0a0a;
+  --celeb-bg-card: #111111;
+  --celeb-bg-card-hover: #1a1a1a;
+  --celeb-bg-surface: #161616;
+  --celeb-gold: #eab308;
+  --celeb-gold-light: #fde047;
+  --celeb-gold-dark: #ca8a04;
+  --celeb-gold-dim: rgba(234, 179, 8, 0.15);
+  --celeb-gold-subtle: rgba(234, 179, 8, 0.08);
+  --celeb-gold-glow: rgba(234, 179, 8, 0.25);
+  --celeb-border: rgba(234, 179, 8, 0.15);
+  --celeb-border-strong: rgba(234, 179, 8, 0.35);
+  --celeb-text: #f3f4f6;
+  --celeb-text-muted: #9ca3af;
+  --celeb-text-dim: #6b7280;
+}
+
+.celeb-sidebar {
+  background: var(--celeb-bg-primary);
+  border-right: 1px solid var(--celeb-border);
+}
+
+.celeb-sidebar .logo-container {
+  background: var(--celeb-bg-primary);
+  border-bottom: 1px solid var(--celeb-border);
+}
+
+.celeb-sidebar .nav-item-gaming.active {
+  background: var(--celeb-gold-dim);
+  border-left: 3px solid var(--celeb-gold);
+  color: var(--celeb-gold-light);
+}
+
+.celeb-sidebar .nav-item-gaming:hover {
+  background: var(--celeb-gold-subtle);
+  color: var(--celeb-gold-light);
+}
+
+.celeb-sidebar .nav-item-gaming.active .nav-icon {
+  color: var(--celeb-gold);
+}
+
+.celeb-sidebar .nav-section-title {
+  color: var(--celeb-gold-dark);
+}
+
+.celeb-content h1,
+.celeb-content h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.celeb-content h1 {
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-style: italic;
+  color: #fff;
+}
+
+.celeb-content h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--celeb-gold-light);
+}
+
+/* ── Cards ── */
+.celeb-card {
+  background: var(--celeb-bg-card);
+  border: 1px solid var(--celeb-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.celeb-card:hover {
+  border-color: var(--celeb-border-strong);
+  box-shadow: 0 0 20px var(--celeb-gold-dim);
+}
+
+.celeb-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--celeb-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.celeb-card-header h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--celeb-gold-light);
+}
+
+.celeb-card-body {
+  padding: 1.25rem;
+}
+
+/* ── Stats ── */
+.celeb-stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.celeb-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--celeb-text-muted);
+  margin-top: 0.25rem;
+}
+
+.celeb-stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.celeb-stat-trend.up { color: #22c55e; }
+.celeb-stat-trend.down { color: #ef4444; }
+
+/* ── Gold accent stat card ── */
+.celeb-stat-gold {
+  background: linear-gradient(135deg, rgba(234,179,8,0.08) 0%, rgba(10,10,10,0) 100%);
+  border: 1px solid var(--celeb-border-strong);
+}
+
+.celeb-stat-gold .celeb-stat-value {
+  color: var(--celeb-gold-light);
+}
+
+.celeb-stat-gold .celeb-stat-label {
+  color: var(--celeb-gold-dark);
+}
+
+/* ── Buttons ── */
+.celeb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.celeb-btn-primary {
+  background: linear-gradient(135deg, var(--celeb-gold) 0%, var(--celeb-gold-dark) 100%);
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.celeb-btn-primary:hover {
+  box-shadow: 0 0 24px var(--celeb-gold-glow);
+  transform: translateY(-1px);
+  color: #000;
+}
+
+.celeb-btn-outline {
+  background: transparent;
+  border: 1px solid var(--celeb-border-strong);
+  color: var(--celeb-gold-light);
+}
+
+.celeb-btn-outline:hover {
+  background: var(--celeb-gold-dim);
+  border-color: var(--celeb-gold);
+}
+
+.celeb-btn-ghost {
+  background: transparent;
+  color: var(--celeb-text-muted);
+}
+
+.celeb-btn-ghost:hover {
+  background: var(--celeb-gold-subtle);
+  color: var(--celeb-gold-light);
+}
+
+/* ── Tables ── */
+.celeb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.celeb-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--celeb-gold-dark);
+  border-bottom: 1px solid var(--celeb-border);
+  background: var(--celeb-bg-surface);
+}
+
+.celeb-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--celeb-text);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.celeb-table tbody tr:hover {
+  background: var(--celeb-gold-subtle);
+}
+
+/* ── Tiers ── */
+.celeb-tier-platinum {
+  color: var(--celeb-gold-light);
+  font-weight: 700;
+}
+
+.celeb-tier-gold {
+  color: var(--celeb-gold);
+  font-weight: 600;
+}
+
+.celeb-tier-silver {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.celeb-tier-bronze {
+  color: #cd7f32;
+  font-weight: 600;
+}
+
+.celeb-tier-unvalued {
+  color: #4b5563;
+}
+
+/* ── Activity feed ── */
+.celeb-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.celeb-activity-item:last-child {
+  border-bottom: none;
+}
+
+.celeb-activity-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--celeb-gold-dim);
+  color: var(--celeb-gold);
+  font-size: 1rem;
+}
+
+.celeb-activity-text {
+  font-size: 0.8125rem;
+  color: var(--celeb-text);
+  line-height: 1.4;
+}
+
+.celeb-activity-time {
+  font-size: 0.6875rem;
+  color: var(--celeb-text-dim);
+  margin-top: 0.125rem;
+}
+
+/* ── Gold divider ── */
+.celeb-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--celeb-gold), transparent);
+  border: none;
+  margin: 1.5rem 0;
+}
+
+/* ── Hero section ── */
+.celeb-hero {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border: 1px solid var(--celeb-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.celeb-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--celeb-gold), var(--celeb-gold-light), var(--celeb-gold), transparent);
+}
+
+.celeb-hero-glow {
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--celeb-gold-dim) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Badge ── */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .celeb-hero {
+    padding: 1.25rem;
+  }
+
+  .celeb-stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Neon gold glow effects ── */
+.neon-gold-glow {
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.15), 0 0 20px rgba(234, 179, 8, 0.05);
+}
+
+.neon-gold-grow-lg {
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.2), 0 0 40px rgba(234, 179, 8, 0.08);
+}
+
+.neon-border-gold {
+  border-color: rgba(234, 179, 8, 0.3) !important;
+}
+
+.hover\:neon-border-gold:hover {
+  border-color: rgba(234, 179, 8, 0.6) !important;
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.15);
+}

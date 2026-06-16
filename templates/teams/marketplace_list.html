@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Team Marketplace — EYTGaming{% endblock %}
+
+{% block body %}
+<div class="page-wrap" style="background:#0a0a0a;min-height:100vh;">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <a href="{% if user.is_authenticated and user.is_verified_personality %}{% url 'celebrity:home' %}{% else %}{% url 'teams:list' %}{% endif %}" class="btn-gaming-ghost flex items-center gap-1" style="color:#9ca3af;text-decoration:none;font-size:0.85rem;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+                    Back
+                </a>
+                <div>
+                    <h1 class="text-3xl font-black uppercase italic" style="font-family:'Barlow Condensed',sans-serif;color:#fff;">Team Marketplace</h1>
+                    <p class="text-gray-400 mt-1">Browse teams available for acquisition</p>
+                </div>
+            </div>
+            {% if user.is_authenticated and user.is_verified_personality %}
+            <a href="{% url 'celebrity:home' %}" class="btn-gaming-gold">My Studio</a>
+            {% endif %}
+        </div>
+
+        <form method="get" class="flex gap-4 mb-8">
+            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search teams..." class="flex-1 px-4 py-2 rounded-lg" style="background:#1a1a1a;border:1px solid rgba(234,179,8,0.2);color:#fff;">
+            <select name="game" class="px-4 py-2 rounded-lg" style="background:#1a1a1a;border:1px solid rgba(234,179,8,0.2);color:#fff;">
+                <option value="">All Games</option>
+                {% for game in games %}
+                <option value="{{ game.slug }}" {% if request.GET.game == game.slug %}selected{% endif %}>{{ game.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort" class="px-4 py-2 rounded-lg" style="background:#1a1a1a;border:1px solid rgba(234,179,8,0.2);color:#fff;">
+                <option value="-market_value" {% if request.GET.sort == '-market_value' %}selected{% endif %}>Highest Value</option>
+                <option value="market_value" {% if request.GET.sort == 'market_value' %}selected{% endif %}>Lowest Value</option>
+                <option value="-sale_price_usd" {% if request.GET.sort == '-sale_price_usd' %}selected{% endif %}>Highest Price</option>
+                <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name A-Z</option>
+            </select>
+            <button type="submit" class="px-6 py-2 rounded-lg font-semibold" style="background:var(--celeb-gold);color:#000;">Search</button>
+        </form>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for team in teams %}
+            <div class="rounded-xl overflow-hidden transition-all duration-200 hover:-translate-y-1" style="background:#111;border:1px solid rgba(234,179,8,0.15);" onmouseover="this.style.borderColor='rgba(234,179,8,0.4)';this.style.boxShadow='0 0 24px rgba(234,179,8,0.08)';" onmouseout="this.style.borderColor='rgba(234,179,8,0.15)';this.style.boxShadow='none';">
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-bold" style="font-family:'Barlow Condensed',sans-serif;color:#fff;">{{ team.name }}</h3>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-bold uppercase" style="background:rgba(234,179,8,0.15);color:var(--celeb-gold);">{{ team.tag }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+                        <span>{{ team.game.name }}</span>
+                        <span>•</span>
+                        <span>{{ team.total_wins }}W / {{ team.total_losses }}L</span>
+                    </div>
+
+                    <div class="flex items-center justify-between py-3 border-t" style="border-color:rgba(234,179,8,0.1);">
+                        <div>
+                            <div class="text-xs text-gray-500">Market Value</div>
+                            <div class="text-lg font-bold" style="color:var(--celeb-gold-light);">${{ team.market_value|floatformat:0 }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-gray-500">Sale Price</div>
+                            <div class="text-lg font-bold text-white">
+                                {% if team.sale_price_usd %}${{ team.sale_price_usd|floatformat:0 }}{% elif team.sale_price_points %}{{ team.sale_price_points|floatformat:0 }} pts{% else %}—{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t" style="border-color:rgba(255,255,255,0.05);">
+                        <div class="text-xs text-gray-500">
+                            {% if team.owner %}
+                            Owned by {{ team.owner.get_display_name }}
+                            {% else %}
+                            Captained by {{ team.captain.get_display_name }}
+                            {% endif %}
+                        </div>
+                        {% if can_purchase %}
+                        <form method="post" action="{% url 'teams:marketplace_purchase' slug=team.slug %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition" style="background:var(--celeb-gold);color:#000;" onmouseover="this.style.boxShadow='0 0 16px rgba(234,179,8,0.3)';" onmouseout="this.style.boxShadow='none';">Purchase</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-16">
+                <span class="material-symbols-outlined text-5xl mb-4" style="color:#4b5563;">storefront</span>
+                <h3 class="text-xl font-bold text-gray-400 mb-2">No Teams Listed</h3>
+                <p class="text-gray-600">There are no teams currently listed for sale.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <div class="flex justify-center mt-8 gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg text-sm font-semibold" style="background:rgba(234,179,8,0.1);color:var(--celeb-gold);">Previous</a>
+            {% endif %}
+            <span class="px-4 py-2 text-sm text-gray-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg text-sm font-semibold" style="background:rgba(234,179,8,0.1);color:var(--celeb-gold);">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

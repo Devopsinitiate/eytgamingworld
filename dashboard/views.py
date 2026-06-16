@@ -53,6 +53,7 @@ def dashboard_home(request):
     """
     Main dashboard view for authenticated users.
     
+    Redirects verified personalities to their celebrity studio.
     Displays personalized dashboard with:
     - Statistics cards (tournaments, win rate, teams, notifications)
     - Recent activity feed (last 10 activities)
@@ -63,6 +64,11 @@ def dashboard_home(request):
     
     **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5, 12.1**
     """
+    
+    # Redirect verified personalities to celebrity studio
+    # Allow ?mode=player to bypass redirect (used by 'Player Hub' link in celebrity sidebar)
+    if request.user.is_authenticated and request.user.is_verified_personality and request.GET.get('mode') != 'player':
+        return redirect('celebrity:home')
     
     # Get user statistics using StatisticsService
     try:
@@ -1750,63 +1756,26 @@ def settings_notifications(request):
     Notification preferences view.
     
     Integrates with the notifications app to manage notification preferences.
-    Redirects to the notifications preferences page.
     
     **Validates: Requirements 9.3**
     """
     from notifications.models import NotificationPreference
+    from dashboard.forms import NotificationPreferencesForm
     
     # Get or create notification preferences
     prefs, created = NotificationPreference.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
-        # Update preferences
-        prefs.in_app_enabled = request.POST.get('in_app_enabled') == 'on'
-        prefs.email_enabled = request.POST.get('email_enabled') == 'on'
-        prefs.push_enabled = request.POST.get('push_enabled') == 'on'
-        prefs.discord_enabled = request.POST.get('discord_enabled') == 'on'
-        
-        # Email preferences
-        prefs.email_tournament_updates = request.POST.get('email_tournament_updates') == 'on'
-        prefs.email_team_activity = request.POST.get('email_team_activity') == 'on'
-        prefs.email_payment_confirmations = request.POST.get('email_payment_confirmations') == 'on'
-        prefs.email_coaching_reminders = request.POST.get('email_coaching_reminders') == 'on'
-        prefs.email_marketing = request.POST.get('email_marketing') == 'on'
-        
-        # Push preferences
-        prefs.push_tournament_updates = request.POST.get('push_tournament_updates') == 'on'
-        prefs.push_team_activity = request.POST.get('push_team_activity') == 'on'
-        prefs.push_payment_confirmations = request.POST.get('push_payment_confirmations') == 'on'
-        prefs.push_coaching_reminders = request.POST.get('push_coaching_reminders') == 'on'
-        
-        # Quiet hours
-        prefs.quiet_hours_enabled = request.POST.get('quiet_hours_enabled') == 'on'
-        quiet_hours_start = request.POST.get('quiet_hours_start')
-        quiet_hours_end = request.POST.get('quiet_hours_end')
-        
-        if quiet_hours_start:
-            from datetime import time
-            try:
-                hour, minute = map(int, quiet_hours_start.split(':'))
-                prefs.quiet_hours_start = time(hour, minute)
-            except (ValueError, AttributeError):
-                pass
-        
-        if quiet_hours_end:
-            from datetime import time
-            try:
-                hour, minute = map(int, quiet_hours_end.split(':'))
-                prefs.quiet_hours_end = time(hour, minute)
-            except (ValueError, AttributeError):
-                pass
-        
-        # Discord webhook
-        prefs.discord_webhook_url = request.POST.get('discord_webhook_url', '')
-        
-        prefs.save()
-        
-        messages.success(request, 'Notification preferences updated successfully!')
-        return redirect('dashboard:settings_notifications')
+        form = NotificationPreferencesForm(request.POST, instance=prefs)
+        # Dashboard template doesn't include SMS/Discord fields; remove them
+        # so they aren't inadvertently disabled on save
+        for f in ['sms_enabled', 'sms_urgent_only', 'discord_enabled', 'discord_webhook_url']:
+            if f in form.fields:
+                del form.fields[f]
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Notification preferences updated successfully!')
+            return redirect('dashboard:settings_notifications')
     
     context = {
         'prefs': prefs,

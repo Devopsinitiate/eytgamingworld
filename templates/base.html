@@ -149,6 +149,7 @@
                 <div class="hidden md:flex items-center gap-0.5">
                     <a href="{% url 'tournaments:list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">emoji_events</span>Events</a>
                     <a href="{% url 'teams:list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">groups</span>Teams</a>
+                    <a href="{% url 'teams:marketplace' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">storefront</span>Marketplace</a>
                     <a href="{% url 'core:player_directory' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">group</span>Players</a>
                     <a href="{% url 'coaching:coach_list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">sports_esports</span>Coaching</a>
                     <a href="{% url 'store:product_list' %}" class="nav-link"><span class="material-symbols-outlined" style="font-size:14px;color:#dc2626;">shopping_bag</span>Store</a>
@@ -232,6 +233,11 @@
                 <!-- Marketplace -->
                 <div class="mb-4">
                     <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Marketplace</h3>
+                    <a href="{% url 'teams:marketplace' %}"
+                        class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
+                        <span class="material-symbols-outlined text-sm inline-block mr-2">storefront</span>
+                        Team Marketplace
+                    </a>
                     <a href="{% url 'store:product_list' %}"
                         class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium">
                         <span class="material-symbols-outlined text-sm inline-block mr-2">shopping_bag</span>

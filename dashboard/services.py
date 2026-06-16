@@ -1933,12 +1933,47 @@ class ProfileExportService:
                 'activity_visible': user.activity_visible,
                 'statistics_visible': user.statistics_visible,
             },
-            'notification_preferences': {
-                'email_notifications': user.email_notifications,
-            },
             'avatar_url': user.avatar.url if user.avatar else None,
             'banner_url': user.banner.url if user.banner else None,
         }
+    
+    @classmethod
+    def _export_notification_preferences(cls, user) -> Dict:
+        """
+        Export user's notification preferences.
+        
+        Args:
+            user: User object
+            
+        Returns:
+            Dictionary with notification preference settings
+        """
+        try:
+            prefs = user.notification_preferences
+            return {
+                'in_app_enabled': prefs.in_app_enabled,
+                'email_enabled': prefs.email_enabled,
+                'email_tournament_updates': prefs.email_tournament_updates,
+                'email_coaching_reminders': prefs.email_coaching_reminders,
+                'email_team_activity': prefs.email_team_activity,
+                'email_payment_receipts': prefs.email_payment_receipts,
+                'email_security_alerts': prefs.email_security_alerts,
+                'email_marketing': prefs.email_marketing,
+                'push_enabled': prefs.push_enabled,
+                'push_tournament_updates': prefs.push_tournament_updates,
+                'push_coaching_reminders': prefs.push_coaching_reminders,
+                'push_team_activity': prefs.push_team_activity,
+                'push_match_updates': prefs.push_match_updates,
+                'sms_enabled': prefs.sms_enabled,
+                'sms_urgent_only': prefs.sms_urgent_only,
+                'discord_enabled': prefs.discord_enabled,
+                'discord_webhook_url': prefs.discord_webhook_url,
+                'quiet_hours_enabled': prefs.quiet_hours_enabled,
+                'quiet_hours_start': str(prefs.quiet_hours_start) if prefs.quiet_hours_start else None,
+                'quiet_hours_end': str(prefs.quiet_hours_end) if prefs.quiet_hours_end else None,
+            }
+        except Exception:
+            return {'email_notifications': user.email_notifications}
     
     @classmethod
     def _export_game_profiles(cls, user) -> List[Dict]:

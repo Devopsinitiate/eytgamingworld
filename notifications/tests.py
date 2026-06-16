@@ -228,7 +228,9 @@ class TestNotificationViews:
     @pytest.mark.django_db
     def test_preferences_get(self, client_logged_in_player):
         response = client_logged_in_player.get(self.URL_PREFS)
-        assert response.status_code == 200
+        # GET now redirects to dashboard settings
+        assert response.status_code == 302
+        assert response.url == '/dashboard/settings/notifications/'
 
     @pytest.mark.django_db
     def test_preferences_post(self, client_logged_in_player):

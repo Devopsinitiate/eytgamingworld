@@ -1,0 +1,595 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/celebrity-dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard-mobile.css' %}">
+<style>
+    .material-symbols-outlined {
+        font-family: 'Material Symbols Outlined' !important;
+        font-weight: normal !important;
+        font-style: normal !important;
+        font-size: 24px;
+        line-height: 1 !important;
+        letter-spacing: 0 !important;
+        text-transform: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+        font-variant-ligatures: normal !important;
+        font-feature-settings: 'liga' 1 !important;
+        -webkit-font-feature-settings: 'liga' 1 !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility !important;
+        font-optical-sizing: none !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    html { color-scheme: dark; }
+
+    .bg-white, .bg-gray-50, .bg-gray-100 {
+        background-color: #0a0a0a !important;
+        color: #ffffff !important;
+    }
+
+    .text-gray-900 { color: #ffffff !important; }
+    .text-gray-800 { color: #e5e7eb !important; }
+    .text-gray-700 { color: #d1d5db !important; }
+    .text-gray-600 { color: #9ca3af !important; }
+    .border-gray-200 { border-color: #1f2937 !important; }
+    .border-gray-300 { border-color: #374151 !important; }
+
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+    input[type="password"], input[type="url"], textarea, select {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+        border-color: var(--celeb-border) !important;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        border-color: var(--celeb-gold) !important;
+        box-shadow: 0 0 0 2px var(--celeb-gold-dim) !important;
+    }
+
+    .card, .widget, .panel {
+        background-color: #111111 !important;
+        border-color: var(--celeb-border) !important;
+    }
+
+    .dashboard-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: var(--space-md) !important;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-content { padding: var(--space-sm) !important; }
+    }
+
+    .dropdown-menu, .modal-content {
+        background-color: #1a1a1a !important;
+        border-color: var(--celeb-border) !important;
+    }
+
+    table, .table { background-color: #111111 !important; color: #ffffff !important; }
+    table th, .table th {
+        background-color: #1a1a1a !important;
+        color: var(--celeb-gold-light) !important;
+        border-color: var(--celeb-border) !important;
+    }
+    table td, .table td {
+        border-color: var(--celeb-border) !important;
+        color: #e5e7eb !important;
+    }
+
+    .alert { background-color: #1a1a1a !important; border-color: var(--celeb-border) !important; color: #ffffff !important; }
+    .alert-success { background-color: #065f46 !important; border-color: #059669 !important; color: #d1fae5 !important; }
+    .alert-error, .alert-danger { background-color: #7f1d1d !important; border-color: #dc2626 !important; color: #fecaca !important; }
+    .alert-warning { background-color: #78350f !important; border-color: #f59e0b !important; color: #fef3c7 !important; }
+    .alert-info { background-color: #1e3a8a !important; border-color: #3b82f6 !important; color: #dbeafe !important; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+
+    #mobile-menu { transition: opacity 0.3s ease-in-out; }
+    #mobile-menu:not(.hidden) { animation: fadeIn 0.3s ease-in-out; }
+    #mobile-menu>div { transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
+    #mobile-menu:not(.hidden)>div { transform: translateX(0); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    #mobile-menu { z-index: 200000; }
+    @media (max-width: 768px) { #mobile-menu a { min-height: 44px; display: flex; align-items: center; } }
+</style>
+{% endblock %}
+
+{% block navigation %}{% endblock navigation %}
+
+{% block body %}
+<a href="#main-content"
+   class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-black focus:rounded">Skip to main content</a>
+
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-48 flex-shrink-0 celeb-sidebar hidden md:flex flex-col" style="position:relative;z-index:10;">
+        <div class="flex flex-col h-full" style="position:relative;z-index:10;">
+            <div class="logo-container" style="position:relative;z-index:1000;background:#0a0a0a;padding:0.625rem 0.75rem;border-bottom:1px solid var(--celeb-border);flex-shrink:0;">
+                <a href="{% url 'celebrity:home' %}" class="flex items-center gap-2" style="position:relative;z-index:1001;text-decoration:none;">
+                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" class="h-8 w-auto neon-gold-glow" style="border-radius:0.4rem;display:block;position:relative;z-index:1002;" />
+                    <h1 class="text-white gaming-subheader" style="font-size:1rem;line-height:1;position:relative;z-index:1002;background:#0a0a0a;color:var(--celeb-gold-light);">CELEBRITY</h1>
+                </a>
+            </div>
+
+            <nav class="flex flex-col gap-0.5 p-3" role="navigation" aria-label="Celebrity navigation" style="position:relative;z-index:1;background:#0a0a0a;flex:1;overflow-y:auto;">
+
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="{% url 'celebrity:home' %}"
+                       class="nav-item-gaming {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                       aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}"
+                       {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span></span>
+                        <span class="nav-label">Dashboard</span>
+                        {% if request.resolver_match.url_name == 'home' %}<span class="nav-active-indicator" aria-hidden="true"></span>{% endif %}
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Portfolio</h3>
+                    <div class="nav-group" role="group" aria-label="Portfolio navigation">
+                        <a href="{% url 'celebrity:teams' %}"
+                           class="nav-item-gaming {% if 'teams' in request.path %}active{% endif %}"
+                           aria-label="My Teams">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span></span>
+                            <span class="nav-label">My Teams</span>
+                        </a>
+                        <a href="{% url 'teams:marketplace' %}"
+                           class="nav-item-gaming {% if 'marketplace' in request.path %}active{% endif %}"
+                           aria-label="Team Marketplace">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">storefront</span></span>
+                            <span class="nav-label">Marketplace</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Business</h3>
+                    <div class="nav-group" role="group" aria-label="Business navigation">
+                        <a href="{% url 'celebrity:sponsors' %}"
+                           class="nav-item-gaming {% if 'sponsors' in request.path %}active{% endif %}"
+                           aria-label="Sponsorships">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">handshake</span></span>
+                            <span class="nav-label">Sponsors</span>
+                        </a>
+                        <a href="{% url 'celebrity:analytics' %}"
+                           class="nav-item-gaming {% if 'analytics' in request.path %}active{% endif %}"
+                           aria-label="Analytics">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">analytics</span></span>
+                            <span class="nav-label">Analytics</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Account</h3>
+                    <div class="nav-group" role="group" aria-label="Account navigation">
+                        <a href="{% url 'celebrity:verification' %}"
+                           class="nav-item-gaming {% if 'verification' in request.path %}active{% endif %}"
+                           aria-label="Verification">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">verified</span></span>
+                            <span class="nav-label">Verification</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="mt-auto pt-3 border-t" style="border-color:var(--celeb-border);">
+                <h3 class="nav-section-title">System</h3>
+                <div class="nav-group flex flex-col gap-0.5" role="group" aria-label="System navigation">
+                    <a href="{% url 'dashboard:home' %}?mode=player" class="nav-item-gaming nav-item-subtle" aria-label="Standard dashboard">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span></span>
+                        <span class="nav-label">Player Hub</span>
+                    </a>
+                    <a href="{% url 'home' %}" class="nav-item-gaming nav-item-subtle" aria-label="Public home page">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span></span>
+                        <span class="nav-label">Home</span>
+                    </a>
+                    <a href="{% url 'notifications:preferences' %}" class="nav-item-gaming nav-item-subtle" aria-label="Settings">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">settings</span></span>
+                        <span class="nav-label">Settings</span>
+                    </a>
+                    <a href="{% url 'account_logout' %}" class="nav-item-gaming nav-item-subtle" aria-label="Logout">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span></span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid px-4 py-0 h-12 flex-shrink-0" style="min-height:var(--nav-height);border-color:var(--celeb-border);">
+            <button class="md:hidden text-gray-300 relative z-[100000]" onclick="toggleMobileMenu()"
+                    aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu"
+                    style="pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;">
+                <span class="material-symbols-outlined" aria-hidden="true" style="pointer-events:none;">menu</span>
+            </button>
+
+            <div class="flex flex-1 items-center gap-4">
+                <div class="hidden md:flex flex-col min-w-32 max-w-56" style="height:28px;">
+                    <div class="flex w-full flex-1 items-stretch rounded-md h-full">
+                        <div class="text-gray-400 flex border-none items-center justify-center pl-2 rounded-l-md border-r-0" style="background:#1a1a1a;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">search</span>
+                        </div>
+                        <input id="global-search-input"
+                               class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-md text-white focus:outline-0 focus:ring-0 border-none focus:border-none h-full placeholder:text-gray-400 px-2 rounded-l-none border-l-0 text-xs font-normal leading-normal"
+                               style="background:#1a1a1a;"
+                               placeholder="Search teams..."
+                               type="search"
+                               aria-label="Search teams, tournaments, and sponsors" />
+                    </div>
+                </div>
+            </div>
+            <script>
+            (function(){
+                var inp = document.getElementById('global-search-input');
+                if (!inp) return;
+                inp.addEventListener('keydown', function(e){
+                    if (e.key !== 'Enter') return;
+                    e.preventDefault();
+                    var q = inp.value.trim();
+                    if (!q) return;
+                    var p = window.location.pathname;
+                    var d;
+                    if (p.indexOf('/teams') === 0) d = '/teams/?search=' + encodeURIComponent(q);
+                    else if (p.indexOf('/sponsors') === 0) d = '/celebrity/sponsors/?q=' + encodeURIComponent(q);
+                    else d = '/teams/marketplace/?q=' + encodeURIComponent(q);
+                    window.location.href = d;
+                });
+                var params = new URLSearchParams(window.location.search);
+                var cur = params.get('search') || params.get('q') || '';
+                if (cur) inp.value = cur;
+            }());
+            </script>
+
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button onclick="toggleNotifications()" id="notif-bell-btn"
+                            class="relative flex items-center justify-center w-9 h-9 rounded-lg text-gray-400 transition-all duration-200 hover:text-white border border-transparent hover:border-amber-800/40 hover:bg-amber-950/20"
+                            style="outline:none;"
+                            aria-label="Notifications" aria-expanded="false" aria-controls="notification-dropdown">
+                        <span class="material-symbols-outlined" id="notif-bell-icon" style="font-size:1.25rem;transition:transform 0.3s ease;" aria-hidden="true">notifications</span>
+                        <span id="notification-badge"
+                              class="absolute -top-1 -right-1 text-white rounded-full flex items-center justify-center font-bold leading-none"
+                              style="display:none;min-width:1.1rem;height:1.1rem;font-size:0.6rem;padding:0 0.2rem;background:#b91c1c;box-shadow:0 0 8px rgba(185,28,28,0.7),0 0 16px rgba(185,28,28,0.3);"
+                              aria-label="unread notifications">0</span>
+                    </button>
+
+                    <div id="notification-dropdown"
+                         class="hidden absolute right-0 mt-2 z-50"
+                         style="width:340px;background:#0a0a0a;border:1px solid var(--celeb-border);border-radius:0.875rem;box-shadow:0 16px 48px rgba(0,0,0,0.8);overflow:hidden;">
+                        <div style="padding:0.875rem 1rem 0.75rem;background:linear-gradient(135deg,rgba(234,179,8,0.08) 0%,rgba(10,10,10,0) 100%);border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:0.5rem;">
+                                <div style="width:1.75rem;height:1.75rem;border-radius:0.5rem;background:var(--celeb-gold-dim);border:1px solid var(--celeb-border-strong);display:flex;align-items:center;justify-content:center;">
+                                    <span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--celeb-gold);">notifications</span>
+                                </div>
+                                <div>
+                                    <h3 style="color:#fff;font-size:0.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;line-height:1;">Notifications</h3>
+                                    <span id="notification-badge-label" style="color:#6b7280;font-size:0.65rem;letter-spacing:0.04em;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="notification-list" class="overflow-y-auto" style="max-height:20rem;scrollbar-width:thin;scrollbar-color:#1f2937 transparent;">
+                            <div id="notif-skeleton" style="padding:0.75rem 1rem;">
+                                <div style="display:flex;gap:0.75rem;padding:0.5rem 0;animation:notifPulse 1.5s ease-in-out infinite;">
+                                    <div style="width:2rem;height:2rem;border-radius:0.5rem;background:#1f2937;flex-shrink:0;"></div>
+                                    <div style="flex:1;"><div style="height:0.625rem;background:#1f2937;border-radius:0.25rem;width:70%;margin-bottom:0.375rem;"></div><div style="height:0.5rem;background:#1f2937;border-radius:0.25rem;width:90%;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:0.625rem 1rem;border-top:1px solid var(--celeb-border);display:flex;align-items:center;justify-content:center;background:rgba(234,179,8,0.02);">
+                            <a href="{% url 'notifications:list' %}"
+                               style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.75rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.06em;transition:color 0.15s;"
+                               onmouseover="this.style.color='var(--celeb-gold)';" onmouseout="this.style.color='#9ca3af';">View all <span class="material-symbols-outlined" style="font-size:0.875rem;">arrow_forward</span></a>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes notifPulse { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
+                        @keyframes notifBellRing { 0%,100%{transform:rotate(0deg)} 15%{transform:rotate(12deg)} 30%{transform:rotate(-10deg)} 45%{transform:rotate(8deg)} 60%{transform:rotate(-6deg)} 75%{transform:rotate(4deg)} }
+                        #notification-list::-webkit-scrollbar { width:4px; }
+                        #notification-list::-webkit-scrollbar-track { background:transparent; }
+                        #notification-list::-webkit-scrollbar-thumb { background:#1f2937; border-radius:2px; }
+                    </style>
+                </div>
+
+                <div class="relative">
+                    <button onclick="toggleUserMenu()"
+                            class="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-150 hover:bg-white/5 border border-transparent hover:border-white/10"
+                            style="outline:none;"
+                            aria-label="User menu for {{ user.get_display_name }}" aria-expanded="false" aria-controls="user-dropdown">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}"
+                             class="h-8 w-8 rounded-full object-cover ring-2" style="--tw-ring-color:var(--celeb-gold-dim);" />
+                        {% else %}
+                        <div class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold ring-2"
+                             style="background:var(--celeb-gold);color:#000;--tw-ring-color:var(--celeb-gold-dim);">
+                            {{ user.get_display_name|first|upper }}
+                        </div>
+                        {% endif %}
+                        <span class="hidden sm:inline text-sm font-medium text-gray-200">{{ user.get_display_name }}</span>
+                        <span class="material-symbols-outlined text-gray-400" style="font-size:1.1rem;" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <div id="user-dropdown"
+                         class="hidden absolute right-0 mt-2 z-50"
+                         style="width:220px;background:#0d1117;border:1px solid var(--celeb-border);border-radius:0.75rem;box-shadow:0 8px 32px rgba(0,0,0,0.6);"
+                         role="menu" aria-label="User menu">
+                        <div style="padding:0.875rem 1rem;border-bottom:1px solid var(--celeb-border);">
+                            <div class="flex items-center gap-3">
+                                {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}"
+                                     class="h-9 w-9 rounded-full object-cover ring-2" style="--tw-ring-color:var(--celeb-gold-dim);" />
+                                {% else %}
+                                <div class="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold ring-2"
+                                     style="background:var(--celeb-gold);color:#000;--tw-ring-color:var(--celeb-gold-dim);">
+                                    {{ user.get_display_name|first|upper }}
+                                </div>
+                                {% endif %}
+                                <div class="min-w-0">
+                                    <p class="text-white text-sm font-semibold truncate">{{ user.get_display_name }}</p>
+                                    <p class="text-gray-500 text-xs truncate">@{{ user.username }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:0.375rem;">
+                            <a href="{% url 'celebrity:home' %}"
+                               style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#d1d5db;font-size:0.875rem;transition:background 0.15s,color 0.15s;border-left:2px solid transparent;"
+                               onmouseover="this.style.background='var(--celeb-gold-dim)';this.style.color='var(--celeb-gold-light)';this.style.borderLeftColor='var(--celeb-gold)';"
+                               onmouseout="this.style.background='';this.style.color='#d1d5db';this.style.borderLeftColor='transparent';"
+                               role="menuitem" aria-label="Celebrity dashboard">
+                                <span class="material-symbols-outlined" style="font-size:1rem;color:#9ca3af;" aria-hidden="true">dashboard</span>
+                                Studio
+                            </a>
+                            <a href="{% url 'celebrity:teams' %}"
+                               style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#d1d5db;font-size:0.875rem;transition:background 0.15s,color 0.15s;border-left:2px solid transparent;"
+                               onmouseover="this.style.background='var(--celeb-gold-dim)';this.style.color='var(--celeb-gold-light)';this.style.borderLeftColor='var(--celeb-gold)';"
+                               onmouseout="this.style.background='';this.style.color='#d1d5db';this.style.borderLeftColor='transparent';"
+                               role="menuitem" aria-label="My teams">
+                                <span class="material-symbols-outlined" style="font-size:1rem;color:#9ca3af;" aria-hidden="true">groups</span>
+                                My Teams
+                            </a>
+                            <a href="{% url 'celebrity:sponsors' %}"
+                               style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#d1d5db;font-size:0.875rem;transition:background 0.15s,color 0.15s;border-left:2px solid transparent;"
+                               onmouseover="this.style.background='var(--celeb-gold-dim)';this.style.color='var(--celeb-gold-light)';this.style.borderLeftColor='var(--celeb-gold)';"
+                               onmouseout="this.style.background='';this.style.color='#d1d5db';this.style.borderLeftColor='transparent';"
+                               role="menuitem" aria-label="Sponsorships">
+                                <span class="material-symbols-outlined" style="font-size:1rem;color:#9ca3af;" aria-hidden="true">handshake</span>
+                                Sponsors
+                            </a>
+                        </div>
+                        <div style="padding:0.375rem;border-top:1px solid var(--celeb-border);">
+                            <a href="{% url 'account_logout' %}"
+                               style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#f87171;font-size:0.875rem;transition:background 0.15s;border-left:2px solid transparent;"
+                               onmouseover="this.style.background='rgba(185,28,28,0.15)';this.style.borderLeftColor='#b91c1c';"
+                               onmouseout="this.style.background='';this.style.borderLeftColor='transparent';"
+                               role="menuitem" aria-label="Logout">
+                                <span class="material-symbols-outlined" style="font-size:1rem;" aria-hidden="true">logout</span>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div id="main-content" class="flex-1 overflow-y-auto dashboard-mobile-container celeb-content" style="background:var(--celeb-bg-primary);" role="main">
+            {% if messages %}
+            <div class="mb-4 space-y-2" role="alert" aria-live="polite">
+                {% for message in messages %}
+                <div class="flex items-center gap-3 px-4 py-3 rounded-lg
+                    {% if message.tags == 'error' %}bg-red-900/20 border border-red-800 text-red-200
+                    {% elif message.tags == 'success' %}bg-green-900/20 border border-green-800 text-green-200
+                    {% elif message.tags == 'warning' %}bg-yellow-900/20 border border-yellow-800 text-yellow-200
+                    {% else %}bg-blue-900/20 border border-blue-800 text-blue-200{% endif %}" role="alert">
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                        {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+                    </span>
+                    <p>{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="dashboard-content">
+            {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="mobile-menu" class="hidden md:hidden" onclick="toggleMobileMenu()"
+     style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200000;">
+    <div onclick="event.stopPropagation()"
+         style="position:absolute;top:0;left:0;bottom:0;width:16rem;background:#0A0A0A;border-right:2px solid var(--celeb-border-strong);display:flex;flex-direction:column;overflow:hidden;">
+        <div style="flex-shrink:0;padding:1rem;background:#0A0A0A;border-bottom:1px solid var(--celeb-border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <a href="{% url 'celebrity:home' %}" style="display:flex;align-items:center;gap:0.75rem;text-decoration:none;" aria-label="Celebrity Dashboard Home">
+                    <img src="{% static 'images/EYTLOGO.jpg' %}" alt="EYTGaming Logo" style="height:2.5rem;width:auto;border-radius:0.5rem;" />
+                    <h1 style="color:var(--celeb-gold-light);font-family:'Barlow Condensed',sans-serif;font-size:1.125rem;font-weight:700;letter-spacing:0.05em;margin:0;">CELEBRITY</h1>
+                </a>
+                <button onclick="toggleMobileMenu()" style="background:none;border:none;color:#9ca3af;cursor:pointer;padding:0.25rem;display:flex;align-items:center;" aria-label="Close navigation menu">
+                    <span style="font-family:'Material Symbols Outlined';font-size:1.5rem;line-height:1;" aria-hidden="true">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-nav-scroll"
+             style="flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:1rem 1rem 4rem 1rem;">
+            <nav class="flex flex-col gap-1" role="navigation" aria-label="Mobile navigation" style="position:relative;z-index:1;">
+                <div class="nav-group" role="group" aria-label="Primary navigation">
+                    <a href="{% url 'celebrity:home' %}" class="nav-item-gaming {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span></span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Portfolio</h3>
+                    <div class="nav-group" role="group" aria-label="Portfolio navigation">
+                        <a href="{% url 'celebrity:teams' %}" class="nav-item-gaming {% if 'teams' in request.path %}active{% endif %}">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">groups</span></span>
+                            <span class="nav-label">My Teams</span>
+                        </a>
+                        <a href="{% url 'teams:marketplace' %}" class="nav-item-gaming {% if 'marketplace' in request.path %}active{% endif %}">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">storefront</span></span>
+                            <span class="nav-label">Marketplace</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Business</h3>
+                    <div class="nav-group" role="group" aria-label="Business navigation">
+                        <a href="{% url 'celebrity:sponsors' %}" class="nav-item-gaming {% if 'sponsors' in request.path %}active{% endif %}">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">handshake</span></span>
+                            <span class="nav-label">Sponsors</span>
+                        </a>
+                        <a href="{% url 'celebrity:analytics' %}" class="nav-item-gaming {% if 'analytics' in request.path %}active{% endif %}">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">analytics</span></span>
+                            <span class="nav-label">Analytics</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Account</h3>
+                    <div class="nav-group" role="group" aria-label="Account navigation">
+                        <a href="{% url 'celebrity:verification' %}" class="nav-item-gaming {% if 'verification' in request.path %}active{% endif %}">
+                            <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">verified</span></span>
+                            <span class="nav-label">Verification</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="pt-4 border-t mt-4" style="border-color:var(--celeb-border);">
+                <h3 class="nav-section-title">System</h3>
+                <div class="nav-group flex flex-col gap-1" role="group" aria-label="System navigation">
+                    <a href="{% url 'dashboard:home' %}?mode=player" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">dashboard</span></span>
+                        <span class="nav-label">Player Hub</span>
+                    </a>
+                    <a href="{% url 'home' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">home</span></span>
+                        <span class="nav-label">Home</span>
+                    </a>
+                    <a href="{% url 'account_logout' %}" class="nav-item-gaming nav-item-subtle">
+                        <span class="nav-icon-wrapper"><span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span></span>
+                        <span class="nav-label">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="mobile-bottom-nav md:hidden">
+    <div class="mobile-nav-grid">
+        <a href="{% url 'celebrity:home' %}" class="mobile-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">dashboard</span>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'celebrity:teams' %}" class="mobile-nav-item {% if 'teams' in request.path %}active{% endif %}">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">groups</span>
+            <span>Teams</span>
+        </a>
+        <a href="{% url 'teams:marketplace' %}" class="mobile-nav-item {% if 'marketplace' in request.path %}active{% endif %}">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">storefront</span>
+            <span>Market</span>
+        </a>
+        <a href="{% url 'celebrity:sponsors' %}" class="mobile-nav-item {% if 'sponsors' in request.path %}active{% endif %}">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">handshake</span>
+            <span>Sponsors</span>
+        </a>
+        <button onclick="toggleMobileMenu()" class="mobile-nav-item" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">menu</span>
+            <span>Menu</span>
+        </button>
+    </div>
+</nav>
+
+<script>
+    function toggleMobileMenu() {
+        var m = document.getElementById('mobile-menu');
+        var b = document.querySelectorAll('[aria-controls="mobile-menu"]');
+        var h = m.classList.contains('hidden');
+        m.classList.toggle('hidden');
+        b.forEach(function(x){ x.setAttribute('aria-expanded', h ? 'true' : 'false'); });
+        document.body.style.overflow = h ? 'hidden' : '';
+    }
+
+    function toggleNotifications() {
+        var d = document.getElementById('notification-dropdown');
+        var b = document.querySelector('[aria-controls="notification-dropdown"]');
+        var h = d.classList.contains('hidden');
+        d.classList.toggle('hidden');
+        if (b) b.setAttribute('aria-expanded', h ? 'true' : 'false');
+        if (h) loadNotifications();
+    }
+
+    function toggleUserMenu() {
+        var d = document.getElementById('user-dropdown');
+        var b = document.querySelector('[aria-controls="user-dropdown"]');
+        var h = d.classList.contains('hidden');
+        d.classList.toggle('hidden');
+        if (b) b.setAttribute('aria-expanded', h ? 'true' : 'false');
+    }
+
+    var _notifLoading = false;
+    async function loadNotifications() {
+        if (_notifLoading) return;
+        _notifLoading = true;
+        try {
+            var r = await fetch('/notifications/recent/', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!r.ok) throw new Error(r.status);
+            var data = await r.json();
+            var badge = document.getElementById('notification-badge');
+            var label = document.getElementById('notification-badge-label');
+            if (badge) { badge.textContent = data.unread_count; badge.style.display = data.unread_count > 0 ? 'flex' : 'none'; }
+            if (label) label.textContent = data.unread_count > 0 ? data.unread_count + ' unread' : 'All caught up';
+        } catch(e) {}
+        finally { _notifLoading = false; }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        var links = document.querySelectorAll('#mobile-menu a');
+        links.forEach(function(l){ l.addEventListener('click', toggleMobileMenu); });
+        var b = document.querySelector('.mobile-bottom-nav button[aria-controls="mobile-menu"]');
+        if (b) b.addEventListener('click', function(e){ e.preventDefault(); toggleMobileMenu(); });
+    });
+
+    document.addEventListener('click', function(e){
+        var nd = document.getElementById('notification-dropdown');
+        var ud = document.getElementById('user-dropdown');
+        if (nd && !e.target.closest('.relative')) nd.classList.add('hidden');
+        if (ud && !e.target.closest('.relative')) ud.classList.add('hidden');
+    });
+
+    (function(){
+        var interval = 5*60*1000;
+        async function poll(){
+            try {
+                var r = await fetch('/notifications/unread-count/', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!r.ok) throw new Error(r.status);
+                var d = await r.json();
+                var b = document.getElementById('notification-badge');
+                if (b) { b.textContent = d.count; b.style.display = d.count > 0 ? 'flex' : 'none'; }
+            } catch(e) {}
+            setTimeout(poll, interval);
+        }
+        setTimeout(poll, interval);
+    })();
+</script>
+{% endblock body %}

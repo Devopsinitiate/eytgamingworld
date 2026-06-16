@@ -127,6 +127,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('tournaments/', include('tournaments.urls')),
     path('teams/', include('teams.urls')),
+    path('celebrity/', include('celebrity.urls')),
     path('coaching/', include('coaching.urls')),
     path('venues/', include('venues.urls')),
     path('profile/', include('accounts.urls')),

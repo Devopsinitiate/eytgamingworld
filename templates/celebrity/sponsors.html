@@ -1,0 +1,105 @@
+{% extends "layouts/celebrity_base.html" %}
+{% load static %}
+
+{% block title %}Sponsorships — Celebrity Studio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'celebrity:home' %}" class="celeb-btn celeb-btn-ghost flex items-center gap-1">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+            Back
+        </a>
+        <div>
+            <h1>Sponsorships</h1>
+            <p class="text-sm" style="color:var(--celeb-text-muted);">Manage your brand partnerships and sponsorship deals</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="celeb-stat-gold celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ active_deals_count }}</div>
+            <div class="celeb-stat-label">Active Deals</div>
+        </div>
+        <div class="celeb-card p-4 text-center">
+            <div class="celeb-stat-value" style="color:var(--celeb-gold-light);">${{ total_earnings|floatformat:0|default:"0" }}</div>
+            <div class="celeb-stat-label">Total Revenue</div>
+        </div>
+        <div class="celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ pending_offers|length }}</div>
+            <div class="celeb-stat-label">Pending Offers</div>
+        </div>
+    </div>
+
+    {% if sponsorship_email %}
+    <div class="celeb-card">
+        <div class="celeb-card-header">
+            <h3>Business Contact</h3>
+            <span class="text-sm" style="color:var(--celeb-gold);">{{ sponsorship_email }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if active_deals %}
+    <div class="celeb-card">
+        <div class="celeb-card-header"><h3>Active Partnerships</h3></div>
+        <div class="celeb-card-body">
+            <table class="celeb-table">
+                <thead>
+                    <tr><th>Sponsor</th><th>Budget</th><th>Duration</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {% for deal in active_deals %}
+                    <tr>
+                        <td class="font-medium">{{ deal.sponsor.name|default:deal.sponsor }}</td>
+                        <td style="color:var(--celeb-gold-light);">${{ deal.budget|floatformat:0 }}</td>
+                        <td>{{ deal.start_date|date:"M d" }} — {{ deal.end_date|date:"M d, Y" }}</td>
+                        <td><span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(34,197,94,0.15);color:#22c55e;">Active</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if pending_offers %}
+    <div class="celeb-card">
+        <div class="celeb-card-header"><h3>Pending Offers</h3></div>
+        <div class="celeb-card-body">
+            <table class="celeb-table">
+                <thead>
+                    <tr><th>Sponsor</th><th>Budget</th><th>Proposed</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    {% for deal in pending_offers %}
+                    <tr>
+                        <td class="font-medium">{{ deal.sponsor.name|default:deal.sponsor }}</td>
+                        <td style="color:var(--celeb-gold-light);">${{ deal.budget|floatformat:0 }}</td>
+                        <td>{{ deal.created_at|date:"M d" }}</td>
+                        <td>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(234,179,8,0.15);color:var(--celeb-gold);">Awaiting Review</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not active_deals and not pending_offers %}
+    <div class="celeb-card p-12 text-center">
+        <span class="material-symbols-outlined text-5xl mb-4" style="color:var(--celeb-text-dim);">handshake</span>
+        <h2 class="text-xl font-bold mb-2">No Sponsorships Yet</h2>
+        <p class="text-gray-500">Set up your sponsorship email to start receiving partnership offers.</p>
+        {% if not sponsorship_email %}
+        <a href="{% url 'celebrity:verification' %}" class="celeb-btn celeb-btn-primary mt-4">
+            <span class="material-symbols-outlined" style="font-size:1rem;">mail</span>
+            Add Contact Email
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

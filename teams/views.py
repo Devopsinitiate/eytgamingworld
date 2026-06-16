@@ -3,7 +3,7 @@ Views for the teams app: CRUD, membership, invites, announcements, achievements.
 """
 import json
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db import transaction
+from django.db import transaction, models
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -12,8 +12,11 @@ from django.views.generic.edit import FormView
 from django.utils import timezone
 from datetime import timedelta
 
+from django.contrib import messages
+from django.views.generic.edit import FormView
+
 from core.models import User
-from .models import Team, TeamMember, TeamInvite, TeamAnnouncement, TeamAchievement
+from .models import Team, TeamMember, TeamInvite, TeamAnnouncement, TeamAchievement, TeamTransfer
 from .forms import TeamCreateForm
 
 
@@ -60,9 +63,27 @@ class TeamCreateView(LoginRequiredMixin, CreateView):
     form_class = TeamCreateForm
     template_name = 'teams/team_form.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        max_slots = request.user.max_team_slots if hasattr(request.user, 'max_team_slots') else 1
+        user_teams = Team.objects.filter(
+            models.Q(captain=request.user) | models.Q(owner=request.user)
+        ).distinct().count()
+        if user_teams >= max_slots:
+            from django.contrib import messages
+            messages.error(
+                request,
+                f'You have reached your team limit ({max_slots}). '
+                f'{"As a verified personality you can manage up to 5 teams." if max_slots > 1 else ""}'
+            )
+            from django.shortcuts import redirect
+            return redirect('teams:list')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         team = form.save(commit=False)
         team.captain = self.request.user
+        team.owner = self.request.user if self.request.user.is_verified_personality else None
+        team.is_celebrity_owned = bool(self.request.user.is_verified_personality)
         team.save()
         TeamMember.objects.create(
             team=team, user=self.request.user,
@@ -362,3 +383,85 @@ class TeamMemberRoleChangeView(LoginRequiredMixin, UserPassesTestMixin, View):
             member.role = new_role
             member.save()
         return redirect('teams:roster', slug=slug)
+
+
+# ─── Marketplace Views (Celebrity Ecosystem) ───────────────────────────────
+
+class TeamMarketplaceListView(ListView):
+    """Public browse of teams listed for sale."""
+
+    model = Team
+    template_name = 'teams/marketplace_list.html'
+    context_object_name = 'teams'
+    paginate_by = 20
+
+    def get_queryset(self):
+        qs = Team.objects.filter(
+            is_listed_for_sale=True,
+            status='active',
+            is_public=True,
+        ).select_related('game', 'owner', 'captain')
+
+        game = self.request.GET.get('game')
+        if game:
+            qs = qs.filter(game__slug=game)
+
+        sort = self.request.GET.get('sort', '-market_value')
+        allowed_sorts = ['market_value', '-market_value', 'sale_price_usd', '-sale_price_usd', 'name', '-name']
+        if sort in allowed_sorts:
+            qs = qs.order_by(sort)
+
+        q = self.request.GET.get('q')
+        if q:
+            qs = qs.filter(name__icontains=q)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['can_purchase'] = (
+            self.request.user.is_authenticated and
+            hasattr(self.request.user, 'is_verified_personality') and
+            self.request.user.is_verified_personality
+        )
+        from core.models import Game
+        ctx['games'] = Game.objects.filter(is_active=True).order_by('name')
+        return ctx
+
+
+class TeamPurchaseView(LoginRequiredMixin, View):
+    """Initiate purchase of a team listed in the marketplace."""
+
+    def post(self, request, slug):
+        team = get_object_or_404(Team, slug=slug, is_listed_for_sale=True, status='active')
+
+        if not request.user.is_verified_personality:
+            messages.error(request, 'Only verified personalities can purchase teams.')
+            return redirect('teams:marketplace')
+
+        if team.owner == request.user:
+            messages.error(request, 'You already own this team.')
+            return redirect('teams:marketplace')
+
+        current_teams = Team.objects.filter(
+            models.Q(owner=request.user) | models.Q(captain=request.user)
+        ).distinct().count()
+        if current_teams >= request.user.max_team_slots:
+            messages.error(request, f'You\'ve reached your team limit ({request.user.max_team_slots}).')
+            return redirect('teams:marketplace')
+
+        TeamTransfer.objects.create(
+            team=team,
+            from_user=team.owner or team.captain,
+            to_user=request.user,
+            initiated_by=request.user,
+            price_usd=team.sale_price_usd,
+            price_points=team.sale_price_points,
+            notes='Marketplace purchase',
+        )
+
+        messages.success(
+            request,
+            f'Purchase initiated for {team.name}. An admin will process the transaction.'
+        )
+        return redirect('teams:marketplace')

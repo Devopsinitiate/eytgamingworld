@@ -1,0 +1,154 @@
+{% extends "layouts/celebrity_base.html" %}
+{% load static %}
+
+{% block title %}Analytics — Celebrity Studio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'celebrity:home' %}" class="celeb-btn celeb-btn-ghost flex items-center gap-1">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+            Back
+        </a>
+        <div>
+            <h1>Analytics</h1>
+            <p class="text-sm" style="color:var(--celeb-text-muted);">Portfolio performance and team statistics</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="celeb-stat-gold celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ total_portfolio_value|floatformat:0 }}</div>
+            <div class="celeb-stat-label">Portfolio Value</div>
+        </div>
+        <div class="celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ total_tournaments }}</div>
+            <div class="celeb-stat-label">Tournaments</div>
+        </div>
+        <div class="celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ total_titles }}</div>
+            <div class="celeb-stat-label">Championships</div>
+        </div>
+        <div class="celeb-card p-4 text-center">
+            <div class="celeb-stat-value">{{ overall_win_rate }}%</div>
+            <div class="celeb-stat-label">Win Rate</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="celeb-card">
+            <div class="celeb-card-header"><h3>Team Performance</h3></div>
+            <div class="celeb-card-body">
+                <canvas id="winChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="celeb-card">
+            <div class="celeb-card-header"><h3>Portfolio Value</h3></div>
+            <div class="celeb-card-body">
+                <canvas id="valueChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="celeb-card">
+        <div class="celeb-card-header"><h3>Team Breakdown</h3></div>
+        <div class="celeb-card-body">
+            <table class="celeb-table">
+                <thead>
+                    <tr>
+                        <th>Team</th>
+                        <th>Game</th>
+                        <th>W/L</th>
+                        <th>Win Rate</th>
+                        <th>Value</th>
+                        <th>Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in owned_teams %}
+                    <tr>
+                        <td class="font-medium">{{ team.name }}</td>
+                        <td>{{ team.game.name }}</td>
+                        <td>{{ team.total_wins }}W / {{ team.total_losses }}L</td>
+                        <td>
+                            <span class="{% if team.win_rate >= 50 %}text-green-400{% else %}text-red-400{% endif %} font-semibold">
+                                {{ team.win_rate }}%
+                            </span>
+                        </td>
+                        <td style="color:var(--celeb-gold-light);">${{ team.market_value|floatformat:0 }}</td>
+                        <td>
+                            <span class="text-xs font-bold uppercase
+                                {% if team.valuation_tier == 'platinum' %}celeb-tier-platinum
+                                {% elif team.valuation_tier == 'gold' %}celeb-tier-gold
+                                {% elif team.valuation_tier == 'silver' %}celeb-tier-silver
+                                {% elif team.valuation_tier == 'bronze' %}celeb-tier-bronze
+                                {% else %}celeb-tier-unvalued{% endif %}">
+                                {{ team.valuation_tier|title }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center text-gray-500 py-8">No teams in portfolio</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function(){
+    var labels = {{ chart_labels|safe }};
+    var winData = {{ chart_win_data|safe }};
+    var valueData = {{ chart_value_data|safe }};
+
+    if (labels.length > 0) {
+        new Chart(document.getElementById('winChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Wins',
+                    data: winData,
+                    backgroundColor: 'rgba(234, 179, 8, 0.2)',
+                    borderColor: 'rgba(234, 179, 8, 1)',
+                    borderWidth: 2,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b7280' } },
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('valueChart'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valueData,
+                    backgroundColor: ['rgba(234,179,8,0.3)', 'rgba(234,179,8,0.2)', 'rgba(234,179,8,0.15)', 'rgba(234,179,8,0.1)', 'rgba(234,179,8,0.05)'],
+                    borderColor: 'rgba(234,179,8,0.5)',
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#9ca3af', padding: 12 }
+                    }
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

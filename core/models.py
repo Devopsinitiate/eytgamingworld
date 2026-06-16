@@ -71,6 +71,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='player')
     skill_level = models.CharField(max_length=20, choices=SKILL_LEVEL_CHOICES, default='beginner')
     
+    # Account Tier (celebrity system)
+    ACCOUNT_TIER_CHOICES = [
+        ('standard', 'Standard'),
+        ('celebrity', 'Celebrity'),
+    ]
+    account_tier = models.CharField(max_length=20, choices=ACCOUNT_TIER_CHOICES, default='standard')
+    is_verified_personality = models.BooleanField(default=False, help_text="Blue checkmark — manually verified personality")
+    celebrity_bio = models.TextField(max_length=1000, blank=True, help_text="Extended bio shown on celebrity profile")
+    sponsorship_email = models.EmailField(blank=True, help_text="Business inquiries email")
+    max_team_slots = models.IntegerField(default=1, help_text="Max teams user can own/captain (5 for celebrities)")
+    
     # Status flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -344,6 +355,38 @@ class Game(models.Model):
     
     def __str__(self):
         return self.name
+
+
+class PersonalityVerification(models.Model):
+    """Celebrity personality verification applications."""
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='personality_verification')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    social_links = models.JSONField(default=dict, blank=True, help_text='{"twitch": "...", "youtube": "...", "twitter": "..."}')
+    follower_counts = models.JSONField(default=dict, blank=True, help_text='{"twitch": 50000, "youtube": 200000}')
+    additional_info = models.TextField(max_length=2000, blank=True, help_text="Why you should be verified")
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='verification_reviews')
+    admin_notes = models.TextField(blank=True, help_text="Internal admin notes")
+
+    class Meta:
+        db_table = 'personality_verifications'
+        ordering = ['-submitted_at']
+        verbose_name = 'Personality Verification'
+        verbose_name_plural = 'Personality Verifications'
+
+    def __str__(self):
+        return f"{self.user.get_display_name()} — {self.get_status_display()}"
 
 
 class UserGameProfile(models.Model):

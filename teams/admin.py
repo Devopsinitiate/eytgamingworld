@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Team, TeamMember, TeamInvite
+from .models import Team, TeamMember, TeamInvite, TeamTransfer
 
 
 class TeamMemberInline(admin.TabularInline):
@@ -13,19 +13,26 @@ class TeamMemberInline(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['name', 'tag', 'game', 'captain', 'member_count_display', 
-                    'status_badge', 'win_rate_display', 'is_recruiting']
-    list_filter = ['status', 'game', 'is_recruiting', 'is_public', 'created_at']
+    list_display = ['name', 'tag', 'game', 'captain', 'owner', 'member_count_display',
+                    'market_value_display', 'is_listed_for_sale', 'status_badge', 'win_rate_display',
+                    'is_recruiting']
+    list_filter = ['status', 'game', 'is_recruiting', 'is_public', 'is_celebrity_owned',
+                   'is_listed_for_sale', 'created_at']
     search_fields = ['name', 'tag', 'description', 'captain__username']
     prepopulated_fields = {'slug': ('name',)}
-    raw_id_fields = ['captain', 'game']
+    raw_id_fields = ['captain', 'owner', 'game']
     
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'slug', 'tag', 'description')
         }),
         ('Configuration', {
-            'fields': ('game', 'captain', 'status', 'max_members')
+            'fields': ('game', 'captain', 'owner', 'status', 'max_members')
+        }),
+        ('Celebrity Ownership', {
+            'fields': ('is_celebrity_owned', 'market_value', 'is_listed_for_sale',
+                       'sale_price_usd', 'sale_price_points'),
+            'classes': ('collapse',)
         }),
         ('Media', {
             'fields': ('logo', 'banner')
@@ -47,6 +54,22 @@ class TeamAdmin(admin.ModelAdmin):
     inlines = [TeamMemberInline]
     
     actions = ['activate_teams', 'deactivate_teams', 'disband_teams']
+    
+    def market_value_display(self, obj):
+        if obj.market_value >= 1_000_000:
+            color = 'gold'
+        elif obj.market_value >= 100_000:
+            color = 'silver'
+        elif obj.market_value > 0:
+            color = '#cd7f32'
+        else:
+            return '-'
+        formatted = '${:,.0f}'.format(float(obj.market_value))
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, formatted
+        )
+    market_value_display.short_description = 'Market Value'
     
     def member_count_display(self, obj):
         return f"{obj.member_count}/{obj.max_members}"
@@ -188,3 +211,44 @@ class TeamInviteAdmin(admin.ModelAdmin):
         updated = queryset.update(status='expired')
         self.message_user(request, f'{updated} invites expired.')
     expire_invites.short_description = 'Expire selected invites'
+
+
+@admin.register(TeamTransfer)
+class TeamTransferAdmin(admin.ModelAdmin):
+    list_display = ['team', 'from_user', 'to_user', 'status', 'price_usd', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['team__name', 'from_user__username', 'to_user__username']
+    raw_id_fields = ['team', 'from_user', 'to_user', 'initiated_by']
+    readonly_fields = ['created_at', 'responded_at']
+    
+    fieldsets = (
+        ('Transfer Details', {
+            'fields': ('team', 'from_user', 'to_user', 'initiated_by')
+        }),
+        ('Pricing', {
+            'fields': ('price_usd', 'price_points')
+        }),
+        ('Status', {
+            'fields': ('status', 'notes', 'created_at', 'responded_at')
+        }),
+    )
+    
+    actions = ['accept_transfers', 'decline_transfers']
+    
+    def accept_transfers(self, request, queryset):
+        from django.utils import timezone
+        for t in queryset:
+            t.status = 'accepted'
+            t.responded_at = timezone.now()
+            t.save()
+            t.team.owner = t.to_user
+            t.team.is_celebrity_owned = True
+            t.team.save(update_fields=['owner', 'is_celebrity_owned'])
+        self.message_user(request, f'{queryset.count()} transfer(s) accepted.')
+    accept_transfers.short_description = 'Accept selected transfers'
+    
+    def decline_transfers(self, request, queryset):
+        from django.utils import timezone
+        updated = queryset.update(status='declined', responded_at=timezone.now())
+        self.message_user(request, f'{updated} transfer(s) declined.')
+    decline_transfers.short_description = 'Decline selected transfers'

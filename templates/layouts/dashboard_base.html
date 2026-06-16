@@ -338,7 +338,7 @@
                             <span class="nav-icon-wrapper">
                                 <span class="material-symbols-outlined nav-icon" aria-hidden="true">school</span>
                             </span>
-                            <span class="nav-label">Coaching</span>
+                            <span class="nav-label">Coach</span>
                             {% if 'coaching' in request.path and 'session' not in request.path %}
                             <span class="nav-active-indicator" aria-hidden="true"></span>
                             {% endif %}
@@ -362,6 +362,18 @@
                 <div class="nav-section">
                     <h3 class="nav-section-title">Shop</h3>
                     <div class="nav-group" role="group" aria-label="Marketplace navigation">
+                        <a href="{% url 'teams:marketplace' %}"
+                            class="nav-item-gaming {% if 'marketplace' in request.path %}active{% endif %}"
+                            aria-label="Marketplace{% if 'marketplace' in request.path %}, current page{% endif %}" {% if 'marketplace' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">storefront</span>
+                            </span>
+                            <span class="nav-label">Marketplace</span>
+                            {% if 'marketplace' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+
                         <a href="{% url 'store:product_list' %}"
                             class="nav-item-gaming {% if 'store' in request.path %}active{% endif %}"
                             aria-label="Store{% if 'store' in request.path %}, current page{% endif %}" {% if 'store' in request.path %}aria-current="page" {% endif %}>
@@ -404,6 +416,16 @@
                             <span class="nav-active-indicator" aria-hidden="true"></span>
                             {% endif %}
                         </a>
+                        {% if user.is_verified_personality %}
+                        <a href="{% url 'celebrity:home' %}"
+                            class="nav-item-gaming"
+                            aria-label="Celebrity Studio">
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">verified</span>
+                            </span>
+                            <span class="nav-label" style="color:var(--eyt-gold);">Studio</span>
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}
@@ -813,6 +835,15 @@
                 <div class="nav-section">
                     <h3 class="nav-section-title">Shop</h3>
                     <div class="nav-group" role="group" aria-label="Shop navigation">
+                        <a href="{% url 'teams:marketplace' %}"
+                            class="nav-item-gaming {% if 'marketplace' in request.path %}active{% endif %}"
+                            aria-label="Marketplace{% if 'marketplace' in request.path %}, current page{% endif %}" {% if 'marketplace' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">storefront</span>
+                            </span>
+                            <span class="nav-label">Marketplace</span>
+                        </a>
+
                         <a href="{% url 'store:product_list' %}"
                             class="nav-item-gaming {% if 'store' in request.path %}active{% endif %}"
                             aria-label="Store{% if 'store' in request.path %}, current page{% endif %}" {% if 'store' in request.path %}aria-current="page" {% endif %}>

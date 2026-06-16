@@ -1,5 +1,5 @@
 """
-Team signals for handling achievement awards and other team events
+Team signals for handling achievement awards, valuation, and other team events
 """
 
 from django.db.models.signals import post_save, pre_save
@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from teams.models import Team, TeamMember
 from teams.achievement_service import AchievementService
 from teams.notification_service import TeamNotificationService
+from teams.services import TeamValuationService
 
 
 @receiver(post_save, sender='tournaments.Participant')
@@ -84,5 +85,13 @@ def award_participation_achievements(sender, instance, created, **kwargs):
     Award achievements after team statistics are saved
     """
     if not created:
-        # Check participation milestones
         AchievementService.check_tournament_participation_achievements(instance)
+
+
+@receiver(post_save, sender=Team)
+def update_team_valuation(sender, instance, created, **kwargs):
+    """
+    Recalculate team market value when statistics are updated.
+    """
+    if not created:
+        TeamValuationService.update_team_value(instance)

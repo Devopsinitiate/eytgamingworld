@@ -21,6 +21,7 @@ class DashboardOnboarding {
     findNavByLabel(labelText) {
         const labels = document.querySelectorAll('.nav-label');
         for (const label of labels) {
+            if (!label.offsetParent) continue;
             if (label.textContent.trim() === labelText) {
                 const link = label.closest('a');
                 if (link) return link;

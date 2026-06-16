@@ -1,0 +1,96 @@
+{% extends "layouts/celebrity_base.html" %}
+{% load static %}
+
+{% block title %}My Teams — Celebrity Studio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'celebrity:home' %}" class="celeb-btn celeb-btn-ghost flex items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+                Back
+            </a>
+            <div>
+                <h1>My Teams</h1>
+                <p class="text-sm" style="color:var(--celeb-text-muted);">{{ owned_teams|length }} / {{ max_slots }} slots used</p>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'teams:marketplace' %}" class="celeb-btn celeb-btn-primary">
+                <span class="material-symbols-outlined" style="font-size:1rem;">storefront</span>
+                Marketplace
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+        {% for team in owned_teams %}
+        <div class="celeb-card">
+            <div class="celeb-card-body">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <h2 class="text-lg font-bold" style="font-family:'Barlow Condensed',sans-serif;">{{ team.name }}</h2>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" style="background:var(--celeb-gold-dim);color:var(--celeb-gold);">{{ team.tag }}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-semibold
+                                    {% if team.valuation_tier == 'platinum' %}celeb-tier-platinum
+                                    {% elif team.valuation_tier == 'gold' %}celeb-tier-gold
+                                    {% elif team.valuation_tier == 'silver' %}celeb-tier-silver
+                                    {% elif team.valuation_tier == 'bronze' %}celeb-tier-bronze
+                                    {% endif %}">
+                                    {{ team.valuation_tier|title }}
+                                </span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-400">
+                                <span>{{ team.game.name }}</span>
+                                <span>{{ team.total_wins }}W - {{ team.total_losses }}L</span>
+                                <span>{{ team.member_count }}/{{ team.max_members }} members</span>
+                                <span>Tournaments: {{ team.tournaments_played }} ({{ team.tournaments_won }} won)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-bold" style="color:var(--celeb-gold-light);">${{ team.market_value|floatformat:0 }}</div>
+                        <div class="text-xs text-gray-500">Market Value</div>
+                    </div>
+                </div>
+
+                <hr class="celeb-divider my-4">
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-400">Captain:</span>
+                        <span class="text-sm font-medium">{{ team.captain.get_display_name }}</span>
+                        {% if team.owner %}
+                        <span class="text-xs text-gray-500 ml-2">Owner: {{ team.owner.get_display_name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="{% url 'teams:detail' slug=team.slug %}" class="celeb-btn celeb-btn-outline text-xs py-1 px-3">
+                            <span class="material-symbols-outlined" style="font-size:0.875rem;">visibility</span>
+                            View
+                        </a>
+                        <a href="{% url 'teams:settings' slug=team.slug %}" class="celeb-btn celeb-btn-ghost text-xs py-1 px-3">
+                            <span class="material-symbols-outlined" style="font-size:0.875rem;">settings</span>
+                            Manage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="celeb-card p-12 text-center">
+            <span class="material-symbols-outlined text-5xl mb-4" style="color:var(--celeb-text-dim);">sports_esports</span>
+            <h2 class="text-xl font-bold mb-2">No Teams Yet</h2>
+            <p class="text-gray-500 mb-6">You don't own or captain any teams yet. Browse the marketplace to acquire a team or create one.</p>
+            <div class="flex justify-center gap-4">
+                <a href="{% url 'teams:marketplace' %}" class="celeb-btn celeb-btn-primary">Browse Marketplace</a>
+                <a href="{% url 'teams:create' %}" class="celeb-btn celeb-btn-outline">Create Team</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

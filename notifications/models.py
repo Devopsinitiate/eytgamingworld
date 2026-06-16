@@ -204,6 +204,35 @@ class Notification(models.Model):
                           delivery_methods=None, **metadata):
         """Convenience method to create notifications"""
         
+        # Filter delivery methods against user's notification preferences
+        delivery_methods = delivery_methods or ['in_app']
+        try:
+            prefs = NotificationPreference.objects.get(user=user)
+            filtered = []
+            for method in delivery_methods:
+                if method == 'in_app':
+                    if prefs.in_app_enabled:
+                        filtered.append(method)
+                elif method == 'email' and prefs.should_send_notification(notification_type, 'email'):
+                    if not prefs.is_in_quiet_hours():
+                        filtered.append(method)
+                elif method == 'push' and prefs.should_send_notification(notification_type, 'push'):
+                    filtered.append(method)
+                elif method == 'sms' and prefs.should_send_notification(notification_type, 'sms'):
+                    if not prefs.is_in_quiet_hours():
+                        filtered.append(method)
+                elif method == 'discord' and prefs.should_send_notification(notification_type, 'discord'):
+                    filtered.append(method)
+                else:
+                    filtered.append(method)
+            delivery_methods = filtered
+        except NotificationPreference.DoesNotExist:
+            pass
+        
+        # Don't create if no delivery methods remain after filtering
+        if not delivery_methods:
+            return None
+        
         # Get content type and object id if content_object provided
         content_type = None
         object_id = ""
@@ -220,7 +249,7 @@ class Notification(models.Model):
             content_type=content_type,
             object_id=object_id,
             action_url=action_url,
-            delivery_methods=delivery_methods or ['in_app'],
+            delivery_methods=delivery_methods,
             metadata=metadata
         )
         

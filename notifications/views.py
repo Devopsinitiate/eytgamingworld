@@ -121,50 +121,20 @@ def unread_count(request):
 @login_required
 def notification_preferences(request):
     """Manage notification preferences"""
+    from dashboard.forms import NotificationPreferencesForm
+    
     prefs, created = NotificationPreference.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
-        # Update preferences
-        prefs.in_app_enabled = request.POST.get('in_app_enabled') == 'on'
-        prefs.email_enabled = request.POST.get('email_enabled') == 'on'
-        prefs.email_tournament_updates = request.POST.get('email_tournament_updates') == 'on'
-        prefs.email_coaching_reminders = request.POST.get('email_coaching_reminders') == 'on'
-        prefs.email_team_activity = request.POST.get('email_team_activity') == 'on'
-        prefs.email_payment_receipts = request.POST.get('email_payment_receipts') == 'on'
-        prefs.email_security_alerts = request.POST.get('email_security_alerts') == 'on'
-        prefs.email_marketing = request.POST.get('email_marketing') == 'on'
-        
-        prefs.push_enabled = request.POST.get('push_enabled') == 'on'
-        prefs.push_tournament_updates = request.POST.get('push_tournament_updates') == 'on'
-        prefs.push_coaching_reminders = request.POST.get('push_coaching_reminders') == 'on'
-        prefs.push_team_activity = request.POST.get('push_team_activity') == 'on'
-        prefs.push_match_updates = request.POST.get('push_match_updates') == 'on'
-        
-        prefs.sms_enabled = request.POST.get('sms_enabled') == 'on'
-        prefs.sms_urgent_only = request.POST.get('sms_urgent_only') == 'on'
-        
-        prefs.discord_enabled = request.POST.get('discord_enabled') == 'on'
-        prefs.discord_webhook_url = request.POST.get('discord_webhook_url', '')
-        
-        prefs.quiet_hours_enabled = request.POST.get('quiet_hours_enabled') == 'on'
-        
-        if prefs.quiet_hours_enabled:
-            quiet_start = request.POST.get('quiet_hours_start')
-            quiet_end = request.POST.get('quiet_hours_end')
-            if quiet_start:
-                prefs.quiet_hours_start = quiet_start
-            if quiet_end:
-                prefs.quiet_hours_end = quiet_end
-        
-        prefs.save()
-        
-        return JsonResponse({'success': True, 'message': 'Preferences updated'})
+        form = NotificationPreferencesForm(request.POST, instance=prefs)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True, 'message': 'Preferences updated'})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     
-    context = {
-        'prefs': prefs,
-    }
-    
-    return render(request, 'notifications/preferences.html', context)
+    # GET requests redirect to the dashboard settings page
+    return redirect('dashboard:settings_notifications')
 
 
 @login_required

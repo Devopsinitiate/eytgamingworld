@@ -25,6 +25,8 @@ class Team(models.Model):
     # Team Details
     game = models.ForeignKey(Game, on_delete=models.PROTECT, related_name='teams')
     captain = models.ForeignKey(User, on_delete=models.CASCADE, related_name='captained_teams')
+    owner = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,
+                              related_name='owned_teams', help_text="Economic owner (usually a celebrity)")
     
     # Media
     logo = models.ImageField(upload_to='teams/logos/', null=True, blank=True)
@@ -33,6 +35,14 @@ class Team(models.Model):
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     is_recruiting = models.BooleanField(default=False)
+    
+    # Celebrity Ownership
+    is_celebrity_owned = models.BooleanField(default=False, help_text="Flagged for premium display")
+    market_value = models.DecimalField(max_digits=12, decimal_places=2, default=0,
+                                       help_text="Calculated team valuation in USD")
+    is_listed_for_sale = models.BooleanField(default=False)
+    sale_price_usd = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    sale_price_points = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     
     # Social
     discord_server = models.URLField(blank=True)
@@ -87,6 +97,64 @@ class Team(models.Model):
         if total == 0:
             return 0
         return round((self.total_wins / total) * 100, 2)
+
+    @property
+    def valuation_tier(self):
+        """Return a tier label based on market_value."""
+        v = self.market_value
+        if v >= 1_000_000:
+            return 'platinum'
+        elif v >= 100_000:
+            return 'gold'
+        elif v >= 10_000:
+            return 'silver'
+        elif v > 0:
+            return 'bronze'
+        return 'unvalued'
+
+    def can_manage(self, user):
+        """Check if user has management rights over this team."""
+        if not user or not user.is_authenticated:
+            return False
+        return (
+            user == self.captain or
+            user == self.owner or
+            user.is_staff or
+            self.members.filter(user=user, role__in=['captain', 'co_captain']).exists()
+        )
+
+
+class TeamTransfer(models.Model):
+    """Record of team ownership transfer (celebrity ecosystem)."""
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='transfers')
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transfers_out')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transfers_in')
+    initiated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='initiated_transfers')
+
+    price_usd = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    price_points = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'team_transfers'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.team.name}: {self.from_user} → {self.to_user}"
 
 
 class TeamMember(models.Model):

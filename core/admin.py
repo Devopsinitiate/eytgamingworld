@@ -1,16 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from .models import User, Game, UserGameProfile, SiteSettings, Player, Video, NewsArticle, Product
+from django.utils import timezone
+from .models import User, Game, UserGameProfile, SiteSettings, Player, Video, NewsArticle, Product, PersonalityVerification
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     """Custom User admin"""
     
-    list_display = ['email', 'username', 'get_display_name', 'role', 'level', 
-                    'total_points', 'is_verified', 'is_active', 'date_joined']
-    list_filter = ['role', 'is_active', 'is_verified', 'is_minor', 'skill_level', 'date_joined']
+    list_display = ['email', 'username', 'get_display_name', 'role', 'account_tier', 'is_verified_personality',
+                    'level', 'total_points', 'is_verified', 'is_active', 'date_joined']
+    list_filter = ['role', 'account_tier', 'is_verified_personality', 'is_active', 'is_verified', 'is_minor', 'skill_level', 'date_joined']
     search_fields = ['email', 'username', 'display_name', 'first_name', 'last_name', 
                      'discord_username', 'steam_id']
     ordering = ['-date_joined']
@@ -27,8 +28,13 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('discord_username', 'steam_id', 'twitch_username')
         }),
         ('Role & Status', {
-            'fields': ('role', 'skill_level', 'is_active', 'is_verified', 'is_staff', 
+            'fields': ('role', 'skill_level', 'account_tier', 'is_verified_personality',
+                      'max_team_slots', 'is_active', 'is_verified', 'is_staff', 
                       'is_superuser', 'is_minor')
+        }),
+        ('Celebrity Profile', {
+            'fields': ('celebrity_bio', 'sponsorship_email'),
+            'classes': ('collapse',)
         }),
         ('Location', {
             'fields': ('country', 'city', 'timezone')
@@ -61,7 +67,8 @@ class UserAdmin(BaseUserAdmin):
     
     readonly_fields = ['date_joined', 'last_login', 'level']
     
-    actions = ['verify_users', 'deactivate_users', 'make_coaches', 'make_organizers']
+    actions = ['verify_users', 'deactivate_users', 'make_coaches', 'make_organizers',
+               'make_celebrities', 'revoke_celebrity']
     
     def verify_users(self, request, queryset):
         updated = queryset.update(is_verified=True)
@@ -82,6 +89,64 @@ class UserAdmin(BaseUserAdmin):
         updated = queryset.update(role='organizer')
         self.message_user(request, f'{updated} users promoted to Organizer.')
     make_organizers.short_description = 'Make selected users Organizers'
+
+    def make_celebrities(self, request, queryset):
+        updated = queryset.update(account_tier='celebrity', is_verified_personality=True, max_team_slots=5)
+        self.message_user(request, f'{updated} users promoted to Celebrity.')
+    make_celebrities.short_description = 'Promote selected users to Celebrity'
+
+    def revoke_celebrity(self, request, queryset):
+        updated = queryset.update(account_tier='standard', is_verified_personality=False, max_team_slots=1)
+        self.message_user(request, f'{updated} users demoted to Standard.')
+    revoke_celebrity.short_description = 'Revoke Celebrity status'
+
+
+@admin.register(PersonalityVerification)
+class PersonalityVerificationAdmin(admin.ModelAdmin):
+    """Admin for managing personality verification applications."""
+
+    list_display = ['user', 'get_follower_summary', 'status', 'submitted_at', 'reviewed_at']
+    list_filter = ['status', 'submitted_at']
+    search_fields = ['user__username', 'user__email', 'user__display_name']
+    readonly_fields = ['user', 'social_links', 'follower_counts', 'additional_info', 'submitted_at']
+    actions = ['approve_verification', 'reject_verification']
+
+    fieldsets = (
+        ('Applicant', {
+            'fields': ('user', 'submitted_at')
+        }),
+        ('Application Details', {
+            'fields': ('social_links', 'follower_counts', 'additional_info')
+        }),
+        ('Review', {
+            'fields': ('status', 'reviewed_by', 'reviewed_at', 'admin_notes')
+        }),
+    )
+
+    def get_follower_summary(self, obj):
+        total = sum(obj.follower_counts.values()) if obj.follower_counts else 0
+        return f"{total:,} followers"
+    get_follower_summary.short_description = 'Total Followers'
+
+    def approve_verification(self, request, queryset):
+        for v in queryset:
+            v.status = 'approved'
+            v.reviewed_by = request.user
+            v.reviewed_at = timezone.now()
+            v.save()
+            # Upgrade the user
+            user = v.user
+            user.account_tier = 'celebrity'
+            user.is_verified_personality = True
+            user.max_team_slots = 5
+            user.save(update_fields=['account_tier', 'is_verified_personality', 'max_team_slots'])
+        self.message_user(request, f'{queryset.count()} verification(s) approved.')
+    approve_verification.short_description = 'Approve selected verifications'
+
+    def reject_verification(self, request, queryset):
+        updated = queryset.update(status='rejected', reviewed_by=request.user, reviewed_at=timezone.now())
+        self.message_user(request, f'{updated} verification(s) rejected.')
+    reject_verification.short_description = 'Reject selected verifications'
 
 
 @admin.register(Game)
