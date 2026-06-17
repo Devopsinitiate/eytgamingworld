@@ -325,6 +325,18 @@
                             <span class="nav-active-indicator" aria-hidden="true"></span>
                             {% endif %}
                         </a>
+
+                        <a href="{% url 'core:player_directory' %}"
+                            class="nav-item-gaming {% if 'players' in request.path %}active{% endif %}"
+                            aria-label="Players{% if 'players' in request.path %}, current page{% endif %}" {% if 'players' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">person_search</span>
+                            </span>
+                            <span class="nav-label">Players</span>
+                            {% if 'players' in request.path %}
+                            <span class="nav-active-indicator" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
                     </div>
                 </div>
 
@@ -813,6 +825,15 @@
                             </span>
                             <span class="nav-label">Teams</span>
                         </a>
+
+                        <a href="{% url 'core:player_directory' %}"
+                            class="nav-item-gaming {% if 'players' in request.path %}active{% endif %}"
+                            aria-label="Players{% if 'players' in request.path %}, current page{% endif %}" {% if 'players' in request.path %}aria-current="page" {% endif %}>
+                            <span class="nav-icon-wrapper">
+                                <span class="material-symbols-outlined nav-icon" aria-hidden="true">person_search</span>
+                            </span>
+                            <span class="nav-label">Players</span>
+                        </a>
                     </div>
                 </div>
 
@@ -941,6 +962,13 @@
             aria-label="Teams{% if 'teams' in request.path %}, current page{% endif %}" {% if 'teams' in request.path %}aria-current="page" {% endif %}>
             <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">group</span>
             <span>Teams</span>
+        </a>
+
+        <a href="{% url 'core:player_directory' %}"
+            class="mobile-nav-item {% if 'players' in request.path %}active{% endif %}"
+            aria-label="Players{% if 'players' in request.path %}, current page{% endif %}" {% if 'players' in request.path %}aria-current="page" {% endif %}>
+            <span class="material-symbols-outlined mobile-nav-icon" aria-hidden="true">person_search</span>
+            <span>Players</span>
         </a>
 
         <a href="{% url 'notifications:list' %}"
