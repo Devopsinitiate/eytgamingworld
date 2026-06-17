@@ -29,20 +29,21 @@ class TournamentForm(forms.ModelForm):
         instance = kwargs.get('instance')
         if instance and instance.format != 'group_stage':
             self.fields.pop('playoffs_format', None)
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'rules': forms.Textarea(attrs={'rows': 6}),
-            'registration_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'registration_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'check_in_start': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'start_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'estimated_end': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'prize_distribution': forms.Textarea(attrs={'rows': 3, 
-                'placeholder': '{"1st": 50, "2nd": 30, "3rd": 20}'}),
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        
+        # Apply datepicker widgets
+        date_fields = ['registration_start', 'registration_end',
+                       'check_in_start', 'start_datetime', 'estimated_end']
+        for fname in date_fields:
+            if fname in self.fields:
+                self.fields[fname].widget = forms.DateTimeInput(
+                    attrs={'type': 'datetime-local'}
+                )
+        
+        self.fields['description'].widget = forms.Textarea(attrs={'rows': 4})
+        self.fields['rules'].widget = forms.Textarea(attrs={'rows': 6})
+        self.fields['prize_distribution'].widget = forms.Textarea(
+            attrs={'rows': 3, 'placeholder': '{"1st": 50, "2nd": 30, "3rd": 20}'}
+        )
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
