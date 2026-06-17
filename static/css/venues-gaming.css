@@ -481,6 +481,25 @@
     max-height: 2000px;
 }
 
+/* Card Component (shared with detail page) */
+.g-card {
+    background: #111827;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-top: 3px solid #DC2626;
+    border-radius: 4px;
+    padding: 1.75rem;
+    transition: all 0.3s ease;
+}
+.g-card:hover {
+    border-color: rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.15);
+}
+
+/* Utility Classes */
+.text-electric-red { color: #DC2626; }
+.bg-deep-black { background-color: #0A0A0A; }
+.bg-gunmetal-gray { background-color: #1F2937; }
+
 /* Touch Targets - Minimum 44x44 pixels */
 .touch-target {
     min-height: 44px;

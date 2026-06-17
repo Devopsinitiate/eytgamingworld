@@ -47,12 +47,12 @@
             <div class="border-t border-gray-700 pt-4">
                 {% if venue.hourly_rate %}
                 <p class="font-barlow text-xl font-bold text-electric-red">
-                    <span aria-label="Hourly rate">${{ venue.hourly_rate }}</span><span class="text-sm text-gray-400">/hour</span>
+                    <span aria-label="Hourly rate">₦{{ venue.hourly_rate }}</span><span class="text-sm text-gray-400">/hour</span>
                 </p>
                 {% endif %}
                 {% if venue.day_rate %}
                 <p class="font-inter text-sm text-gray-400 mt-1">
-                    <span aria-label="Day rate">${{ venue.day_rate }}/day</span>
+                    <span aria-label="Day rate">₦{{ venue.day_rate }}/day</span>
                 </p>
                 {% endif %}
             </div>
