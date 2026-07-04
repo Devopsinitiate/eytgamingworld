@@ -785,6 +785,80 @@ class TournamentDetailView(DetailView, TournamentContextMixin):
                 
                 context['matches_by_bracket'][bracket.id] = rounds
         
+        # Add standings data for the standings tab
+        pool_brackets = tournament.brackets.filter(bracket_type='groups').order_by('name')
+        has_swiss_rr = tournament.format in ('swiss', 'round_robin')
+        swiss_rr_bracket = tournament.brackets.filter(bracket_type='main').first() if has_swiss_rr else None
+        source_brackets = pool_brackets if pool_brackets.exists() else ([swiss_rr_bracket] if swiss_rr_bracket else [])
+        
+        standings_data = []
+        for bracket in source_brackets:
+            completed_matches = bracket.matches.filter(status='completed').select_related(
+                'participant1', 'participant2', 'winner'
+            )
+            total_matches = bracket.matches.count()
+            completed_count = completed_matches.count()
+            
+            bracket_participants = bracket.participants.select_related('user').all() if hasattr(bracket, 'participants') else Participant.objects.filter(bracket=bracket).select_related('user')
+            
+            player_map = {}
+            for p in bracket_participants:
+                player_map[p.id] = {
+                    'participant': p,
+                    'display_name': p.user.get_full_name() or p.user.username if hasattr(p, 'user') and p.user else str(p),
+                    'matches_won': 0,
+                    'matches_lost': 0,
+                    'games_won': 0,
+                    'games_lost': 0,
+                }
+            
+            for match in completed_matches:
+                if not match.winner:
+                    continue
+                p1_id = match.participant1_id if match.participant1 else None
+                p2_id = match.participant2_id if match.participant2 else None
+                winner_id = match.winner_id
+                score_p1 = match.participant1_score or 0
+                score_p2 = match.participant2_score or 0
+                
+                if p1_id and p1_id in player_map:
+                    if winner_id == p1_id:
+                        player_map[p1_id]['matches_won'] += 1
+                    else:
+                        player_map[p1_id]['matches_lost'] += 1
+                    player_map[p1_id]['games_won'] += score_p1
+                    player_map[p1_id]['games_lost'] += score_p2
+                
+                if p2_id and p2_id in player_map:
+                    if winner_id == p2_id:
+                        player_map[p2_id]['matches_won'] += 1
+                    else:
+                        player_map[p2_id]['matches_lost'] += 1
+                    player_map[p2_id]['games_won'] += score_p2
+                    player_map[p2_id]['games_lost'] += score_p1
+            
+            standings_list = sorted(
+                player_map.values(),
+                key=lambda x: (x['matches_won'], x['games_won'] - x['games_lost']),
+                reverse=True,
+            )
+            
+            for entry in standings_list:
+                gd = entry['games_won'] - entry['games_lost']
+                total_games = entry['games_won'] + entry['games_lost']
+                entry['game_diff'] = max(gd, 0)
+                entry['win_pct'] = round((entry['games_won'] / total_games * 100)) if total_games > 0 else 0
+            
+            standings_data.append({
+                'name': bracket.name,
+                'standings': standings_list,
+                'completed': completed_count,
+                'total': total_matches,
+            })
+        
+        context['pool_standings'] = standings_data
+        context['has_pool_stage'] = bool(source_brackets)
+        
         return context
     
     def get_enhanced_tournament_context(self, tournament):

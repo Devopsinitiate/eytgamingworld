@@ -1694,12 +1694,56 @@ nav[aria-label="Breadcrumb"] a {
                                     Full Standings
                                 </a>
                             </div>
-                            <div id="standings-content">
-                                <p style="color:#9CA3AF;text-align:center;padding:40px 0;">
-                                    <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:12px;">leaderboard</span>
-                                    Load standings from the dedicated page.
-                                </p>
-                            </div>
+        <div id="standings-content">
+            {% if pool_standings %}
+                {% for pool in pool_standings %}
+                <div class="mb-4" style="background:rgba(26,26,46,0.6);border:1px solid rgba(220,38,38,0.2);border-radius:12px;padding:16px;">
+                    <h4 style="color:#DC2626;font-size:0.95rem;font-weight:700;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;">{{ pool.name }}</h4>
+                    {% if pool.standings %}
+                    <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+                        <thead>
+                            <tr style="color:#9CA3AF;border-bottom:1px solid rgba(220,38,38,0.1);">
+                                <th style="padding:6px 8px;text-align:left;">#</th>
+                                <th style="padding:6px 8px;text-align:left;">Player</th>
+                                <th style="padding:6px 8px;text-align:center;">W</th>
+                                <th style="padding:6px 8px;text-align:center;">L</th>
+                                <th style="padding:6px 8px;text-align:center;">GD</th>
+                                <th style="padding:6px 8px;text-align:center;">Win%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in pool.standings|slice:":8" %}
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);color:#E5E7EB;">
+                                <td style="padding:6px 8px;">{{ forloop.counter }}</td>
+                                <td style="padding:6px 8px;">{{ entry.display_name }}</td>
+                                <td style="padding:6px 8px;text-align:center;color:#22C55E;">{{ entry.matches_won }}</td>
+                                <td style="padding:6px 8px;text-align:center;color:#EF4444;">{{ entry.matches_lost }}</td>
+                                <td style="padding:6px 8px;text-align:center;color:#60A5FA;">+{{ entry.game_diff }}</td>
+                                <td style="padding:6px 8px;text-align:center;">{{ entry.win_pct }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if pool.standings|length > 8 %}
+                    <p style="text-align:center;margin-top:8px;color:#6B7280;font-size:0.75rem;">Showing top 8 of {{ pool.standings|length }} players</p>
+                    {% endif %}
+                    {% else %}
+                    <p style="color:#6B7280;text-align:center;padding:12px 0;font-size:0.8rem;">No matches completed yet</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% elif has_pool_stage %}
+                <p style="color:#9CA3AF;text-align:center;padding:40px 0;">
+                    <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:12px;">leaderboard</span>
+                    Standings will appear once matches start being reported.
+                </p>
+            {% else %}
+                <p style="color:#9CA3AF;text-align:center;padding:40px 0;">
+                    <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:12px;">emoji_events</span>
+                    This tournament uses a direct elimination format. View the bracket for match details.
+                </p>
+            {% endif %}
+        </div>
                         </div>
                     </div>
 

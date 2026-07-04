@@ -586,12 +586,19 @@
                                 Bracket Reset
                                 {% endif %}
                             {% elif forloop.last %}
-                                {% if bracket.bracket_type == 'losers' %}
+                                {% if bracket.bracket_type == 'main' %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">emoji_events</span>
+                                Winner Final
+                                {% elif bracket.bracket_type == 'losers' %}
                                 <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">military_tech</span>
+                                Loser Final
+                                {% elif bracket.bracket_type == 'finals' %}
+                                <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">emoji_events</span>
+                                Grand Final
                                 {% else %}
                                 <span class="material-symbols-outlined" style="font-size:.85rem;vertical-align:middle;">emoji_events</span>
+                                Final
                                 {% endif %}
-                                Grand Final
                             {% elif forloop.revcounter == 2 %}Semi-Finals
                             {% elif forloop.revcounter == 3 %}Quarter-Finals
                             {% else %}

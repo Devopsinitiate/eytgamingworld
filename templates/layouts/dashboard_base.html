@@ -941,9 +941,11 @@
     </div>
 </div>
 
+{% block mobile_nav %}{% endblock %}
+
 <!-- Mobile Bottom Navigation (Fixed) -->
 <nav class="mobile-bottom-nav md:hidden">
-    <div class="mobile-nav-grid">
+    <div class="mobile-nav-grid mobile-nav-grid-6">
         <a href="{% url 'dashboard:home' %}"
             class="mobile-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
             aria-label="Dashboard{% if request.resolver_match.url_name == 'home' %}, current page{% endif %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page" {% endif %}>

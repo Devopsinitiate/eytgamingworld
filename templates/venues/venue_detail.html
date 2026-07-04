@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layouts/dashboard_base.html" %}
 {% load static %}
 {% load venue_filters %}
 
@@ -10,108 +10,22 @@
 {% block twitter_description %}{{ venue.description|truncatewords:25|default:'Book this gaming venue on EYTGaming.' }} Located in {{ venue.city }}, {{ venue.country }}.{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'css/venues-gaming.css' %}">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<style>
-body{background:#0A0A0A;}
-.venue-hero{position:relative;overflow:hidden;border-bottom:3px solid #DC2626;box-shadow:0 4px 40px rgba(220,38,38,0.25);margin-bottom:0;}
-.venue-hero-image{width:100%;height:32rem;object-fit:cover;display:block;}
-.venue-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,0.97) 0%,rgba(10,10,10,0.45) 55%,transparent 100%);}
-.venue-hero-content{position:absolute;bottom:0;left:0;right:0;padding:2.5rem 2rem;z-index:10;}
-.venue-name-gradient{background:linear-gradient(135deg,#fff 0%,#DC2626 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:"Barlow Condensed",sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;line-height:1;}
-.venue-type-tag{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.4);color:#f87171;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;font-size:0.85rem;padding:0.3rem 0.9rem;border-radius:2px;}
-.quick-stat{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(31,41,55,0.85);backdrop-filter:blur(10px);border:1px solid rgba(220,38,38,0.35);padding:0.6rem 1.2rem;border-radius:3px;transition:all 0.3s ease;}
-.quick-stat:hover{border-color:#DC2626;box-shadow:0 0 15px rgba(220,38,38,0.4);transform:translateY(-2px);}
-.g-card{background:#111827;border:1px solid rgba(220,38,38,0.2);border-top:3px solid #DC2626;border-radius:4px;padding:1.75rem;transition:all 0.3s ease;}
-.g-card:hover{border-color:rgba(220,38,38,0.5);box-shadow:0 0 25px rgba(220,38,38,0.15);}
-.g-heading{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:-0.01em;color:#fff;font-size:1.4rem;margin-bottom:1.25rem;padding-bottom:0.6rem;border-bottom:1px solid rgba(220,38,38,0.25);}
-.g-heading-sm{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:-0.01em;color:#fff;font-size:1.15rem;margin-bottom:1rem;}
-.pricing-card{background:#111827;border:2px solid #DC2626;border-radius:4px;padding:1.75rem;box-shadow:0 0 30px rgba(220,38,38,0.25),inset 0 0 20px rgba(220,38,38,0.07);position:relative;overflow:hidden;}
-.pricing-card::before{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(220,38,38,0.08) 0%,transparent 70%);animation:pulseGlow 3s ease-in-out infinite;}
-@keyframes pulseGlow{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.1);}}
-.booking-button{position:relative;display:block;text-align:center;padding:1rem 2rem;background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-size:1.1rem;border:none;border-radius:3px;transform:skewX(-10deg);transition:all 0.3s ease;overflow:hidden;cursor:pointer;box-shadow:0 0 20px rgba(220,38,38,0.4);}
-.booking-button span{display:block;transform:skewX(10deg);}
-.booking-button::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);transform:translateX(-100%);transition:transform 0.5s ease;}
-.booking-button:hover{background:linear-gradient(135deg,#ef4444,#DC2626);box-shadow:0 0 35px rgba(220,38,38,0.7);transform:skewX(-10deg) scale(1.03);}
-.booking-button:hover::before{transform:translateX(100%);}
-.amenity-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.75rem;background:rgba(10,10,10,0.4);border-radius:3px;border-left:2px solid rgba(220,38,38,0.4);transition:all 0.2s ease;}
-.amenity-item:hover{background:rgba(220,38,38,0.08);border-left-color:#DC2626;transform:translateX(4px);}
-.review-summary-card{background:rgba(17,24,39,0.7);border:1px solid rgba(220,38,38,0.25);border-radius:4px;padding:1.75rem;margin-bottom:1.75rem;}
-.review-form-card{background:rgba(17,24,39,0.7);border:1px solid rgba(220,38,38,0.25);border-radius:4px;padding:1.75rem;margin-bottom:1.75rem;}
-.review-card{background:rgba(17,24,39,0.6);border:1px solid rgba(220,38,38,0.18);border-radius:4px;padding:1.5rem;transition:all 0.3s ease;}
-.review-card:hover{border-color:rgba(220,38,38,0.45);box-shadow:0 0 20px rgba(220,38,38,0.15);transform:translateY(-2px);}
-.star-glow{filter:drop-shadow(0 0 6px rgba(220,38,38,0.6));}
-@keyframes starPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(220,38,38,0.6));}50%{filter:drop-shadow(0 0 12px rgba(220,38,38,0.9));}}
-.star-glow-anim{animation:starPulse 2s ease-in-out infinite;}
-.rating-bar{transition:width 0.5s ease;box-shadow:0 0 8px rgba(220,38,38,0.4);}
-.review-submit-button{position:relative;display:inline-block;padding:0.9rem 2.5rem;background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff;font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;border-radius:3px;transform:skewX(-10deg);transition:all 0.3s ease;overflow:hidden;border:none;cursor:pointer;box-shadow:0 0 20px rgba(220,38,38,0.35);}
-.review-submit-button span{display:block;transform:skewX(10deg);}
-.review-submit-button:hover{box-shadow:0 0 35px rgba(220,38,38,0.7);transform:skewX(-10deg) scale(1.04);}
-.recommend-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:700;background:rgba(6,182,212,0.15);color:#06B6D4;border:1px solid rgba(6,182,212,0.4);box-shadow:0 0 8px rgba(6,182,212,0.25);}
-.pagination-button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:rgba(31,41,55,0.8);border:1px solid rgba(220,38,38,0.3);border-radius:3px;color:#fff;transition:all 0.3s ease;}
-.pagination-button:hover{background:#DC2626;border-color:#DC2626;box-shadow:0 0 15px rgba(220,38,38,0.5);transform:scale(1.1);}
-#venue-map{height:280px;border-radius:3px;border:1px solid rgba(220,38,38,0.3);overflow:hidden;}
-.leaflet-popup-content-wrapper{background:#1F2937;color:#fff;border:1px solid #DC2626;box-shadow:0 0 15px rgba(220,38,38,0.3);}
-.leaflet-popup-tip{background:#1F2937;}
-.leaflet-popup-content{margin:0.75rem;font-family:"Inter",sans-serif;}
-.leaflet-popup-content h4{font-family:"Barlow Condensed",sans-serif;text-transform:uppercase;font-weight:700;color:#DC2626;margin-bottom:0.4rem;}
-.back-link{display:inline-flex;align-items:center;gap:0.5rem;color:#9CA3AF;font-family:"Inter",sans-serif;font-size:0.9rem;transition:color 0.2s ease;}
-.back-link:hover{color:#DC2626;}
-.info-row{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid rgba(55,65,81,0.6);}
-.info-row:last-child{border-bottom:none;}
-.info-label{font-family:"Inter",sans-serif;color:#9CA3AF;font-size:0.9rem;}
-.info-value{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:#fff;font-size:1rem;}
-.hours-row{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid rgba(55,65,81,0.4);}
-.hours-row:last-child{border-bottom:none;}
-.contact-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0;}
-.g-input{width:100%;padding:0.75rem 1rem;background:#0A0A0A;border:1px solid #374151;border-radius:3px;color:#fff;font-family:"Inter",sans-serif;font-size:0.95rem;transition:all 0.3s ease;}
-.g-input:focus{outline:none;border-color:#DC2626;box-shadow:0 0 15px rgba(220,38,38,0.25);}
-.g-input::placeholder{color:#4B5563;}
-.particle-effect{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.particle-effect::before,.particle-effect::after{content:"";position:absolute;width:4px;height:4px;background:#DC2626;border-radius:50%;opacity:0;animation:floatParticle 5s ease-in-out infinite;}
-.particle-effect::before{left:20%;animation-delay:0s;}
-.particle-effect::after{left:70%;animation-delay:2.5s;}
-@keyframes floatParticle{0%{bottom:0;opacity:0;transform:translateX(0);}10%{opacity:1;}90%{opacity:1;}100%{bottom:100%;opacity:0;transform:translateX(30px);}}
-@media(max-width:768px){.venue-hero-image{height:20rem;}.venue-hero-content{padding:1.25rem 1rem;}}
-</style>
 {% endblock %}
 
-{% block body %}
-<div class="min-h-screen" style="background:#0A0A0A;">
-
-  <!-- Back Nav -->
-  <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-sm);">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <a href="{% url 'venues:list' %}" class="back-link">
-        <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">arrow_back</span>
-        Back to Venues
-      </a>
-      <div class="hidden md:flex items-center gap-2">
-        <a href="{% url 'dashboard:home' %}" class="back-link p-2" title="Dashboard">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">dashboard</span>
-        </a>
-        <a href="{% url 'tournaments:list' %}" class="back-link p-2" title="Tournaments">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">emoji_events</span>
-        </a>
-        <a href="{% url 'teams:list' %}" class="back-link p-2" title="Teams">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">groups</span>
-        </a>
-        <a href="{% url 'store:product_list' %}" class="back-link p-2" title="Store">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">shopping_bag</span>
-        </a>
-      </div>
-    </div>
-  </div>
+{% block content %}
 
   <!-- Hero -->
   <section class="venue-hero" role="banner" aria-label="Venue header">
     {% if venue.photo %}
-    <img src="{{ venue.photo.url }}" alt="{{ venue.name }} venue photo" class="venue-hero-image" loading="eager">
+    <img src="{{ venue.photo.url }}" alt="{{ venue.name }}" class="venue-hero-image" loading="lazy">
     <div class="venue-hero-overlay" aria-hidden="true"></div>
     <div class="particle-effect" aria-hidden="true"></div>
     {% else %}
     <div class="venue-hero-image flex items-center justify-center" style="background:linear-gradient(135deg,#1F2937,#0A0A0A);">
-      <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#374151;font-size:6rem;" aria-hidden="true">location_on</span>
+      <span class="mat-icon" style="color:#374151;font-size:6rem;" aria-hidden="true">location_on</span>
     </div>
     <div class="venue-hero-overlay" aria-hidden="true"></div>
     {% endif %}
@@ -119,7 +33,7 @@ body{background:#0A0A0A;}
     <div class="venue-hero-content">
       <div class="mb-3">
         <span class="venue-type-tag">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1rem;" aria-hidden="true">category</span>
+          <span class="mat-icon" style="font-size:1rem;" aria-hidden="true">category</span>
           {{ venue.get_venue_type_display }}
         </span>
       </div>
@@ -129,24 +43,24 @@ body{background:#0A0A0A;}
       </p>
       <div class="flex flex-wrap gap-3" role="list" aria-label="Venue quick statistics">
         <div class="quick-stat" role="listitem">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.1rem;" aria-hidden="true">groups</span>
+          <span class="mat-icon" style="color:#DC2626;font-size:1.1rem;" aria-hidden="true">groups</span>
           <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;">{{ venue.capacity }}</span>
           <span style="font-family:'Inter',sans-serif;color:#9CA3AF;font-size:0.8rem;">Capacity</span>
         </div>
         <div class="quick-stat" role="listitem">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.1rem;" aria-hidden="true">computer</span>
+          <span class="mat-icon" style="color:#DC2626;font-size:1.1rem;" aria-hidden="true">computer</span>
           <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;">{{ venue.setup_stations }}</span>
           <span style="font-family:'Inter',sans-serif;color:#9CA3AF;font-size:0.8rem;">Stations</span>
         </div>
         {% if average_rating > 0 %}
         <div class="quick-stat" role="listitem">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#EAB308;font-size:1.1rem;" aria-hidden="true">star</span>
+          <span class="mat-icon" style="color:#EAB308;font-size:1.1rem;" aria-hidden="true">star</span>
           <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;">{{ average_rating|floatformat:1 }}</span>
           <span style="font-family:'Inter',sans-serif;color:#9CA3AF;font-size:0.8rem;">({{ review_count }} reviews)</span>
         </div>
         {% endif %}
         <div class="quick-stat" role="listitem">
-          <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#06B6D4;font-size:1.1rem;" aria-hidden="true">visibility</span>
+          <span class="mat-icon" style="color:#06B6D4;font-size:1.1rem;" aria-hidden="true">visibility</span>
           <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;">{{ venue.view_count }}</span>
           <span style="font-family:'Inter',sans-serif;color:#9CA3AF;font-size:0.8rem;">Views</span>
         </div>
@@ -155,7 +69,13 @@ body{background:#0A0A0A;}
   </section>
 
   <!-- Content Grid -->
-  <div class="page-wrap" style="padding-top:var(--space-md);padding-bottom:var(--space-md);">
+  <div class="px-4 md:px-8 pb-8">
+    <div class="mb-4">
+      <a href="{% url 'venues:list' %}" class="back-link">
+        <span class="mat-icon" style="font-size:1.25rem;" aria-hidden="true">arrow_back</span>
+        Back to Venues
+      </a>
+    </div>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
       <!-- Main Content -->
@@ -164,7 +84,7 @@ body{background:#0A0A0A;}
         <!-- About -->
         <section class="g-card" aria-labelledby="about-heading">
           <h2 id="about-heading" class="g-heading">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">info</span>About This Venue
+            <span class="mat-icon" style="color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">info</span>About This Venue
           </h2>
           <p style="font-family:'Inter',sans-serif;color:#D1D5DB;line-height:1.75;">{{ venue.description|default:"No description available." }}</p>
         </section>
@@ -173,12 +93,12 @@ body{background:#0A0A0A;}
         {% if venue.amenities %}
         <section class="g-card" aria-labelledby="amenities-heading">
           <h2 id="amenities-heading" class="g-heading">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">checklist</span>Amenities
+            <span class="mat-icon" style="color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">checklist</span>Amenities
           </h2>
           <ul class="grid grid-cols-1 md:grid-cols-2 gap-3" role="list">
             {% for amenity in venue.amenities %}
             <li class="amenity-item">
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#DC2626;flex-shrink:0;" aria-hidden="true">check_circle</span>
+              <span class="mat-icon mat-icon-fill" style="font-size:1.1rem;color:#DC2626;flex-shrink:0;" aria-hidden="true">check_circle</span>
               <span style="font-family:'Inter',sans-serif;color:#D1D5DB;">{{ amenity }}</span>
             </li>
             {% endfor %}
@@ -190,7 +110,7 @@ body{background:#0A0A0A;}
         {% if venue.hours_of_operation %}
         <section class="g-card" aria-labelledby="hours-heading">
           <h2 id="hours-heading" class="g-heading">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">schedule</span>Hours of Operation
+            <span class="mat-icon" style="color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">schedule</span>Hours of Operation
           </h2>
           <dl>
             {% for day, hours in venue.hours_of_operation.items %}
@@ -206,11 +126,11 @@ body{background:#0A0A0A;}
         <!-- Contact -->
         <section class="g-card" aria-labelledby="contact-heading">
           <h2 id="contact-heading" class="g-heading">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">contact_page</span>Contact Information
+            <span class="mat-icon" style="color:#DC2626;font-size:1.3rem;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">contact_page</span>Contact Information
           </h2>
           <address class="not-italic space-y-1">
             <div class="contact-row">
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">location_on</span>
+              <span class="mat-icon" style="color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">location_on</span>
               <div>
                 <p style="font-family:'Inter',sans-serif;font-size:0.75rem;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">Address</p>
                 <p style="font-family:'Inter',sans-serif;color:#D1D5DB;">{{ venue.full_address }}</p>
@@ -218,28 +138,28 @@ body{background:#0A0A0A;}
             </div>
             {% if venue.phone %}
             <div class="contact-row">
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">phone</span>
+              <span class="mat-icon" style="color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">phone</span>
               <div>
                 <p style="font-family:'Inter',sans-serif;font-size:0.75rem;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">Phone</p>
-                <a href="tel:{{ venue.phone }}" style="font-family:'Inter',sans-serif;color:#D1D5DB;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#D1D5DB'">{{ venue.phone }}</a>
+                <a href="tel:{{ venue.phone }}" class="back-link">{{ venue.phone }}</a>
               </div>
             </div>
             {% endif %}
             {% if venue.email %}
             <div class="contact-row">
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">email</span>
+              <span class="mat-icon" style="color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">email</span>
               <div>
                 <p style="font-family:'Inter',sans-serif;font-size:0.75rem;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">Email</p>
-                <a href="mailto:{{ venue.email }}" style="font-family:'Inter',sans-serif;color:#D1D5DB;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#D1D5DB'">{{ venue.email }}</a>
+                <a href="mailto:{{ venue.email }}" class="back-link">{{ venue.email }}</a>
               </div>
             </div>
             {% endif %}
             {% if venue.website %}
             <div class="contact-row">
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">language</span>
+              <span class="mat-icon" style="color:#DC2626;font-size:1.2rem;flex-shrink:0;margin-top:2px;" aria-hidden="true">language</span>
               <div>
                 <p style="font-family:'Inter',sans-serif;font-size:0.75rem;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.2rem;">Website</p>
-                <a href="{{ venue.website }}" target="_blank" rel="noopener noreferrer" style="font-family:'Inter',sans-serif;color:#D1D5DB;" onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='#D1D5DB'">{{ venue.website }}</a>
+                <a href="{{ venue.website }}" target="_blank" rel="noopener noreferrer" class="back-link">{{ venue.website }}</a>
               </div>
             </div>
             {% endif %}
@@ -249,7 +169,7 @@ body{background:#0A0A0A;}
         <!-- Reviews -->
         <section class="g-card" id="reviews-section" aria-labelledby="reviews-heading">
           <h2 id="reviews-heading" class="g-heading">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.3rem;color:#DC2626;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">rate_review</span>Reviews &amp; Ratings
+            <span class="mat-icon" style="font-size:1.3rem;color:#DC2626;vertical-align:middle;margin-right:0.5rem;" aria-hidden="true">rate_review</span>Reviews &amp; Ratings
           </h2>
 
           {% if review_count > 0 %}
@@ -260,9 +180,9 @@ body{background:#0A0A0A;}
                 <div class="flex items-center gap-1 my-2" role="img" aria-label="{{ average_rating|floatformat:1 }} stars">
                   {% for i in "12345" %}
                     {% if forloop.counter <= average_rating %}
-                    <span class="star-glow-anim" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.5rem;color:#DC2626;" aria-hidden="true">star</span>
+                    <span class="mat-icon mat-icon-fill star-glow-anim" style="font-size:1.5rem;color:#DC2626;" aria-hidden="true">star</span>
                     {% else %}
-                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.5rem;color:#374151;" aria-hidden="true">star</span>
+                    <span class="mat-icon" style="font-size:1.5rem;color:#374151;" aria-hidden="true">star</span>
                     {% endif %}
                   {% endfor %}
                 </div>
@@ -272,7 +192,7 @@ body{background:#0A0A0A;}
                 {% for rating in "54321" %}
                 <div class="flex items-center gap-3">
                   <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#fff;width:1.25rem;text-align:right;">{{ rating }}</span>
-                  <span class="star-glow" style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:0.9rem;color:#DC2626;" aria-hidden="true">star</span>
+                  <span class="mat-icon mat-icon-fill star-glow" style="font-size:0.9rem;color:#DC2626;" aria-hidden="true">star</span>
                   <div style="flex:1;height:10px;background:#1F2937;border-radius:9999px;overflow:hidden;">
                     <div class="rating-bar" style="height:100%;background:linear-gradient(90deg,#DC2626,#991B1B);width:{% widthratio rating_distribution|get_item:rating review_count 100 %}%;"></div>
                   </div>
@@ -295,7 +215,7 @@ body{background:#0A0A0A;}
                   {% for i in "12345" %}
                   <input type="radio" name="rating" value="{{ forloop.counter }}" id="star-{{ forloop.counter }}" class="hidden star-radio" required aria-label="{{ forloop.counter }} star{{ forloop.counter|pluralize }}">
                   <label for="star-{{ forloop.counter }}" class="star-label cursor-pointer">
-                    <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:2.25rem;color:#4B5563;transition:all 0.2s ease;" aria-hidden="true">star</span>
+                    <span class="mat-icon" style="font-size:2.25rem;color:#4B5563;transition:all 0.2s ease;" aria-hidden="true">star</span>
                   </label>
                   {% endfor %}
                 </div>
@@ -315,21 +235,19 @@ body{background:#0A0A0A;}
                 <input type="checkbox" name="would_recommend" id="id_would_recommend" style="width:1.1rem;height:1.1rem;accent-color:#DC2626;" {% if review_form.would_recommend.value %}checked{% endif %}>
                 <label for="id_would_recommend" style="font-family:'Inter',sans-serif;color:#D1D5DB;cursor:pointer;">I would recommend this venue</label>
               </div>
-              <button type="submit" class="review-submit-button" aria-label="Submit review"><span>Submit Review</span></button>
+              <button type="submit" class="review-submit-button" aria-label="Submit review">Submit Review</button>
             </form>
           </div>
           {% elif is_authenticated and user_has_reviewed %}
           <div class="review-form-card text-center py-6" role="status">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:3.5rem;color:#06B6D4;margin-bottom:0.75rem;" aria-hidden="true">check_circle</span>
+            <span class="mat-icon mat-icon-fill" style="font-size:3.5rem;color:#06B6D4;margin-bottom:0.75rem;" aria-hidden="true">check_circle</span>
             <p style="font-family:'Inter',sans-serif;color:#D1D5DB;">You have already reviewed this venue. Thank you for your feedback!</p>
           </div>
           {% elif not is_authenticated %}
           <div class="review-form-card text-center py-6" role="status">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:3.5rem;color:#374151;margin-bottom:0.75rem;" aria-hidden="true">login</span>
+            <span class="mat-icon" style="font-size:3.5rem;color:#374151;margin-bottom:0.75rem;" aria-hidden="true">login</span>
             <p style="font-family:'Inter',sans-serif;color:#D1D5DB;margin-bottom:1rem;">Please log in to write a review</p>
-            <a href="{% url 'account_login' %}?next={{ request.path }}#reviews-section" style="display:inline-block;padding:0.75rem 1.75rem;background:#DC2626;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-radius:3px;transform:skewX(-10deg);box-shadow:0 0 15px rgba(220,38,38,0.35);" onmouseover="this.style.background='#991B1B'" onmouseout="this.style.background='#DC2626'">
-              <span style="display:inline-block;transform:skewX(10deg);">Login to Review</span>
-            </a>
+            <a href="{% url 'account_login' %}?next={{ request.path }}#reviews-section" class="review-submit-button" aria-label="Login to review">Login to Review</a>
           </div>
           {% endif %}
 
@@ -343,13 +261,13 @@ body{background:#0A0A0A;}
             <div class="flex items-center gap-2">
               {% if reviews.has_previous %}
               <a href="?page={{ reviews.previous_page_number }}#reviews-section" class="pagination-button" aria-label="Previous page">
-                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">chevron_left</span>
+                <span class="mat-icon" style="font-size:1.25rem;" aria-hidden="true">chevron_left</span>
               </a>
               {% endif %}
               <span style="font-family:'Inter',sans-serif;color:#9CA3AF;padding:0 1rem;" role="status" aria-live="polite">Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}</span>
               {% if reviews.has_next %}
               <a href="?page={{ reviews.next_page_number }}#reviews-section" class="pagination-button" aria-label="Next page">
-                <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.25rem;" aria-hidden="true">chevron_right</span>
+                <span class="mat-icon" style="font-size:1.25rem;" aria-hidden="true">chevron_right</span>
               </a>
               {% endif %}
             </div>
@@ -357,7 +275,7 @@ body{background:#0A0A0A;}
           {% endif %}
           {% elif review_count == 0 %}
           <div class="text-center py-10" role="status">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:block;line-height:1;font-size:4.5rem;color:#374151;margin-bottom:1rem;" aria-hidden="true">rate_review</span>
+            <span class="mat-icon" style="font-size:4.5rem;color:#374151;margin-bottom:1rem;" aria-hidden="true">rate_review</span>
             <p style="font-family:'Inter',sans-serif;color:#6B7280;font-size:1rem;">No reviews yet. Be the first to review this venue!</p>
           </div>
           {% endif %}
@@ -369,7 +287,7 @@ body{background:#0A0A0A;}
 
         <section class="pricing-card" aria-labelledby="pricing-heading">
           <h3 id="pricing-heading" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;color:#fff;font-size:1.4rem;margin-bottom:1rem;position:relative;z-index:1;">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.3rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">payments</span>Pricing
+            <span class="mat-icon" style="font-size:1.3rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">payments</span>Pricing
           </h3>
           <div style="position:relative;z-index:1;margin-bottom:1.25rem;" class="space-y-2">
             {% if venue.hourly_rate %}
@@ -389,21 +307,17 @@ body{background:#0A0A0A;}
             {% endif %}
           </div>
           {% if is_authenticated %}
-          <a href="{% url 'venues:booking_create' venue.slug %}" class="booking-button" style="position:relative;z-index:1;" aria-label="Book {{ venue.name }} now">
-            <span>
-              <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">calendar_add_on</span>Book Now
-            </span>
+          <a href="{% url 'venues:booking_create' venue.slug %}" class="booking-button" aria-label="Book {{ venue.name }} now">
+            <span class="mat-icon" style="font-size:1.1rem;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">calendar_add_on</span>Book Now
           </a>
           {% else %}
-          <a href="{% url 'account_login' %}?next={{ request.path }}" style="display:block;text-align:center;padding:0.9rem 1.5rem;background:#1F2937;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-radius:3px;border:1px solid rgba(220,38,38,0.3);position:relative;z-index:1;" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#1F2937'" aria-label="Login to book this venue">
-            Login to Book
-          </a>
+          <a href="{% url 'account_login' %}?next={{ request.path }}" class="booking-button" style="background:#1F2937;box-shadow:none;" aria-label="Login to book this venue">Login to Book</a>
           {% endif %}
         </section>
 
         <section class="g-card" aria-labelledby="quick-info-heading">
           <h3 id="quick-info-heading" class="g-heading-sm">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">info</span>Quick Info
+            <span class="mat-icon" style="font-size:1.1rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">info</span>Quick Info
           </h3>
           <dl>
             <div class="info-row"><dt class="info-label">Type</dt><dd class="info-value">{{ venue.get_venue_type_display }}</dd></div>
@@ -419,7 +333,7 @@ body{background:#0A0A0A;}
         {% if venue.latitude and venue.longitude %}
         <section class="g-card" aria-labelledby="location-heading">
           <h3 id="location-heading" class="g-heading-sm">
-            <span style="font-family:'Material Symbols Outlined';font-feature-settings:'liga' 1;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;text-transform:none;letter-spacing:0;display:inline-block;line-height:1;font-size:1.1rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">map</span>Location
+            <span class="mat-icon" style="font-size:1.1rem;color:#DC2626;vertical-align:middle;margin-right:0.4rem;" aria-hidden="true">map</span>Location
           </h3>
           <div id="venue-map" role="img" aria-label="Map showing {{ venue.name }} location"></div>
         </section>
@@ -428,10 +342,10 @@ body{background:#0A0A0A;}
       </aside>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
+{{ block.super }}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -412,6 +412,16 @@
             font-size: 1rem;
         }
     }
+
+    /* Active zoom bracket indicator */
+    .bracket-stage.bracket-active-zoom {
+        outline: 2px solid rgba(220,38,38,0.5);
+        outline-offset: 2px;
+        border-radius: 12px;
+    }
+    .bracket-stage {
+        transition: outline 0.2s ease;
+    }
 </style>
 {% endblock %}
 
@@ -597,7 +607,7 @@
             <!-- Bracket Container with Horizontal Scroll -->
             <div class="bg-gray-800/30 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden bracket-wrapper-wide">
                 <div class="overflow-x-auto">
-                    <div id="bracket-container" class="p-6 min-w-max" style="transform-origin: top left;">
+                    <div class="bracket-stage p-6 min-w-max" style="transform-origin: top left;">
                         <div class="flex space-x-8 relative">
                             {% for round_num, matches in matches_by_bracket|get_item:bracket.id|dict_items %}
                             <!-- Round Column -->
@@ -607,7 +617,7 @@
                                     <div class="round-header rounded-lg p-2 mx-2">
                                         <h3 class="text-base font-black text-white">
                                             {% if round_num == bracket.total_rounds %}
-                                            🏆 Grand Finals
+                                            🏆 {% if bracket.bracket_type == 'main' %}Winner Final{% elif bracket.bracket_type == 'losers' %}Loser Final{% elif bracket.bracket_type == 'finals' %}Grand Final{% else %}Final{% endif %}
                                             {% elif round_num == bracket.total_rounds|add:"-1" %}
                                             🥈 Semi-Finals
                                             {% elif round_num == bracket.total_rounds|add:"-2" %}
@@ -785,53 +795,73 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const container = document.getElementById('bracket-container');
+        const containers = document.querySelectorAll('.bracket-stage');
         const zoomInBtn = document.getElementById('zoom-in');
         const zoomOutBtn = document.getElementById('zoom-out');
         const resetZoomBtn = document.getElementById('reset-zoom');
         const fullscreenBtn = document.getElementById('fullscreen');
         const zoomLevelDisplay = document.getElementById('zoom-level');
 
-        if (!container) return;
+        if (!containers.length) return;
 
-        let currentZoom = 1.0;
         const zoomStep = 0.1;
         const minZoom = 0.3;
         const maxZoom = 3.0;
 
-        function updateZoom() {
-            container.style.transform = `scale(${currentZoom})`;
-            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        // Initialize per-container zoom
+        let activeContainer = containers[0];
+        containers.forEach(c => { c.dataset.zoom = '1.0'; });
 
-            // Update button states
-            zoomInBtn.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
-            zoomOutBtn.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+        // Mark first container active
+        containers[0].classList.add('bracket-active-zoom');
+
+        function getZoom(el) { return parseFloat(el.dataset.zoom) || 1.0; }
+        function setZoom(el, z) {
+            z = Math.max(minZoom, Math.min(maxZoom, z));
+            el.dataset.zoom = String(z);
+            el.style.transform = 'scale(' + z + ')';
+        }
+
+        function updateActiveDisplay() {
+            const z = getZoom(activeContainer);
+            zoomLevelDisplay.textContent = Math.round(z * 100) + '%';
+            zoomInBtn.style.opacity = z >= maxZoom ? '0.5' : '1';
+            zoomOutBtn.style.opacity = z <= minZoom ? '0.5' : '1';
+            // Show bracket name in zoom display
+            var header = activeContainer.closest('.mb-12').querySelector('h2');
+            if (header) {
+                zoomLevelDisplay.title = header.textContent.trim() + ' — ' + Math.round(z * 100) + '%';
+            }
+        }
+
+        // Click on bracket header or container to activate it
+        containers.forEach(function(c) {
+            c.addEventListener('click', function(e) {
+                containers.forEach(function(x) { x.classList.remove('bracket-active-zoom'); });
+                this.classList.add('bracket-active-zoom');
+                activeContainer = this;
+                updateActiveDisplay();
+            });
+        });
+
+        function zoomActive(delta) {
+            var z = getZoom(activeContainer) + delta;
+            setZoom(activeContainer, z);
+            updateActiveDisplay();
         }
 
         // Zoom controls
-        zoomInBtn.addEventListener('click', function () {
-            if (currentZoom < maxZoom) {
-                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
-                updateZoom();
-            }
-        });
-
-        zoomOutBtn.addEventListener('click', function () {
-            if (currentZoom > minZoom) {
-                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
-                updateZoom();
-            }
-        });
-
+        zoomInBtn.addEventListener('click', function () { zoomActive(zoomStep); });
+        zoomOutBtn.addEventListener('click', function () { zoomActive(-zoomStep); });
         resetZoomBtn.addEventListener('click', function () {
-            currentZoom = 1.0;
-            updateZoom();
+            setZoom(activeContainer, 1.0);
+            updateActiveDisplay();
         });
 
         // Fullscreen toggle
         fullscreenBtn.addEventListener('click', function () {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
+                document.documentElement.requestFullscreen().catch(function (err) {
                     console.log('Error attempting to enable fullscreen:', err.message);
                 });
             } else {
@@ -839,179 +869,130 @@
             }
         });
 
-        // Mouse wheel zoom
-        container.addEventListener('wheel', function (e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
-                const newZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
-                if (newZoom !== currentZoom) {
-                    currentZoom = newZoom;
-                    updateZoom();
+        // Mouse wheel zoom on its own container only
+        containers.forEach(function(container) {
+            container.addEventListener('wheel', function (e) {
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    var z = getZoom(this) + (e.deltaY > 0 ? -zoomStep : zoomStep);
+                    setZoom(this, z);
+                    if (this === activeContainer) updateActiveDisplay();
                 }
+            });
+        });
+
+        // Keyboard shortcuts — affect active container
+        document.addEventListener('keydown', function (e) {
+            if (e.target.tagName.toLowerCase() === 'input') return;
+            switch (e.key) {
+                case '+': case '=': zoomActive(zoomStep); break;
+                case '-': zoomActive(-zoomStep); break;
+                case '0': setZoom(activeContainer, 1.0); updateActiveDisplay(); break;
+                case 'f': case 'F11': e.preventDefault(); fullscreenBtn.click(); break;
             }
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function (e) {
-            if (e.target.tagName.toLowerCase() === 'input') return;
+        // Touch pinch-to-zoom — per container
+        containers.forEach(function(container) {
+            var touchStartDist = 0;
+            var touchStartZoom = 1;
+            var isPinching = false;
 
-            switch (e.key) {
-                case '+':
-                case '=':
-                    if (currentZoom < maxZoom) {
-                        currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
-                        updateZoom();
-                    }
-                    break;
-                case '-':
-                    if (currentZoom > minZoom) {
-                        currentZoom = Math.max(currentZoom - zoomStep, minZoom);
-                        updateZoom();
-                    }
-                    break;
-                case '0':
-                    currentZoom = 1.0;
-                    updateZoom();
-                    break;
-                case 'f':
-                case 'F11':
+            container.addEventListener('touchstart', function (e) {
+                if (e.touches.length === 2) {
+                    isPinching = true;
+                    touchStartDist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    touchStartZoom = getZoom(this);
+                }
+            });
+
+            container.addEventListener('touchmove', function (e) {
+                if (e.touches.length === 2 && isPinching) {
                     e.preventDefault();
-                    fullscreenBtn.click();
-                    break;
-            }
+                    var dist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    var z = touchStartZoom * (dist / touchStartDist);
+                    setZoom(this, z);
+                    if (this === activeContainer) updateActiveDisplay();
+                }
+            });
+
+            container.addEventListener('touchend', function () { isPinching = false; });
         });
 
         // Match card interactions
-        document.querySelectorAll('.match-card').forEach(card => {
+        document.querySelectorAll('.match-card').forEach(function(card) {
             card.addEventListener('click', function (e) {
-                // Don't trigger if clicking on a link
                 if (e.target.tagName === 'A' || e.target.closest('a')) return;
-                
-                const matchId = this.dataset.matchId;
-                // Add click animation
                 this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-
-                console.log('Match clicked:', matchId);
+                setTimeout(function(el) { el.style.transform = ''; }, 150, this);
             });
         });
 
         // Match Filter Functionality
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const matchCards = document.querySelectorAll('.match-card');
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const filter = this.dataset.filter;
-
-                // Update active button
-                filterBtns.forEach(b => {
-                    b.classList.remove('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
-                    b.classList.add('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
-                });
-                this.classList.add('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
-                this.classList.remove('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
-
-                // Filter matches
-                matchCards.forEach(card => {
-                    const statusBadge = card.querySelector('.match-status-badge');
-                    if (!statusBadge) return;
-
-                    let shouldShow = false;
-                    if (filter === 'all') {
-                        shouldShow = true;
-                    } else if (filter === 'live' && statusBadge.classList.contains('status-live')) {
-                        shouldShow = true;
-                    } else if (filter === 'completed' && statusBadge.classList.contains('status-completed')) {
-                        shouldShow = true;
-                    } else if (filter === 'pending' && (statusBadge.classList.contains('status-pending') || statusBadge.classList.contains('status-ready'))) {
-                        shouldShow = true;
-                    }
-
-                    if (shouldShow) {
-                        card.style.display = '';
-                        card.style.opacity = '1';
-                    } else {
-                        card.style.opacity = '0';
-                        setTimeout(() => {
-                            if (card.style.opacity === '0') {
-                                card.style.display = 'none';
-                            }
-                        }, 300);
-                    }
+        (function() {
+            var filterBtns = document.querySelectorAll('.filter-btn');
+            var matchCards = document.querySelectorAll('.match-card');
+            filterBtns.forEach(function(btn) {
+                btn.addEventListener('click', function () {
+                    var filter = this.dataset.filter;
+                    filterBtns.forEach(function(b) {
+                        b.classList.remove('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                        b.classList.add('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary/20', 'text-primary', 'border-primary/50');
+                    this.classList.remove('bg-gray-800/50', 'text-gray-400', 'border-gray-700');
+                    matchCards.forEach(function(card) {
+                        var badge = card.querySelector('.match-status-badge');
+                        if (!badge) return;
+                        var show = false;
+                        if (filter === 'all') show = true;
+                        else if (filter === 'live' && badge.classList.contains('status-live')) show = true;
+                        else if (filter === 'completed' && badge.classList.contains('status-completed')) show = true;
+                        else if (filter === 'pending' && (badge.classList.contains('status-pending') || badge.classList.contains('status-ready'))) show = true;
+                        if (show) { card.style.display = ''; card.style.opacity = '1'; }
+                        else {
+                            card.style.opacity = '0';
+                            setTimeout(function(c) { if (c.style.opacity === '0') c.style.display = 'none'; }, 300, card);
+                        }
+                    });
                 });
             });
-        });
+        })();
 
-        // Real-time updates simulation (replace with actual WebSocket connection)
+        // Real-time updates simulation
         function simulateRealTimeUpdates() {
-            const liveMatches = document.querySelectorAll('.status-live');
-            liveMatches.forEach(badge => {
-                // Add pulsing animation to live matches
-                setInterval(() => {
+            document.querySelectorAll('.status-live').forEach(function(badge) {
+                setInterval(function() {
                     badge.style.opacity = badge.style.opacity === '0.5' ? '1' : '0.5';
                 }, 1000);
             });
         }
 
-        // Initialize
-        updateZoom();
+        updateActiveDisplay();
         simulateRealTimeUpdates();
 
-        // Auto-scroll to current round (if any live matches)
-        const liveMatch = document.querySelector('.status-live');
+        // Auto-scroll to current round
+        var liveMatch = document.querySelector('.status-live');
         if (liveMatch) {
-            setTimeout(() => {
+            setTimeout(function() {
                 liveMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 500);
         }
 
-        // Touch gestures for mobile
-        let touchStartDistance = 0;
-        let touchStartZoom = 1;
-
-        container.addEventListener('touchstart', function (e) {
-            if (e.touches.length === 2) {
-                touchStartDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                touchStartZoom = currentZoom;
-            }
-        });
-
-        container.addEventListener('touchmove', function (e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const touchDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                const scale = touchDistance / touchStartDistance;
-                const newZoom = Math.max(minZoom, Math.min(maxZoom, touchStartZoom * scale));
-                if (newZoom !== currentZoom) {
-                    currentZoom = newZoom;
-                    updateZoom();
-                }
-            }
-        });
-
-        // Show keyboard shortcuts hint
         console.log('Keyboard shortcuts: +/- to zoom, 0 to reset, F for fullscreen, Ctrl+Scroll to zoom');
     });
 
     // Fullscreen change handler
     document.addEventListener('fullscreenchange', function () {
-        const fullscreenBtn = document.getElementById('fullscreen');
-        const icon = fullscreenBtn.querySelector('.material-symbols-outlined');
-        if (document.fullscreenElement) {
-            icon.textContent = 'fullscreen_exit';
-        } else {
-            icon.textContent = 'fullscreen';
-        }
+        var btn = document.getElementById('fullscreen');
+        var icon = btn.querySelector('.material-symbols-outlined');
+        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
     });
 </script>
 {% endblock %}
