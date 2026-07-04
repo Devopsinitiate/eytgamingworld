@@ -1,0 +1,69 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual envs
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Django
+db.sqlite3
+*.log
+local_settings.py
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# Media & static (built at Docker build time)
+/media/
+/staticfiles/
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Docs & plans
+docs/
+
+# Docker
+.dockerignore
+docker-compose*.yml
+Dockerfile
+
+# Other
+logs/
+tmp/
+backups/
+*.bak
+*.backup

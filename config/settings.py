@@ -31,6 +31,7 @@ if not SECRET_KEY:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
+DEV_MODE = config('DEV_MODE', default=str(DEBUG), cast=bool)
 
 # Silence django-ratelimit cache warnings (LocMemCache works but isn't "officially" supported)
 SILENCED_SYSTEM_CHECKS = [
@@ -88,6 +89,9 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_ratelimit',
     'django_filters',
+
+    # Config (system checks, startup validation)
+    'config',
 
     # Two-Factor Authentication
     'django_otp',
